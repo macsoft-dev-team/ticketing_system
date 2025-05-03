@@ -9,7 +9,7 @@ import {
   formatRelative,
 } from "date-fns";
 import { useParams } from "react-router-dom";
-
+ 
 const Dashboard = () => {
   const API_URL = import.meta.env.VITE_APP_URL;
 
@@ -417,25 +417,7 @@ const Dashboard = () => {
       />
 
       <div className="container mt-3">
-        {ticketStatus === "close" ? (
-          " "
-        ) : (
-          <>
-            <div className="d-flex justify-content-between">
-              <h3 className="fw-bold ">Tickets</h3>
-              <button
-                type="button"
-                class="btn btn-outline-primary btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                data-bs-whatever="@mdo"
-                onClick={reset}
-              >
-                Add Ticket
-              </button>
-            </div>
-          </>
-        )}
+      
 
         <div className="mt-3 container">
           <div className="rounded border shadow-sm bg-light">
@@ -480,7 +462,7 @@ const Dashboard = () => {
                             }}
                             className="page-link"
                           >
-                            {n}{" "}
+                            {n}
                           </a>
                         </li>
                       ))}
@@ -561,17 +543,17 @@ const Dashboard = () => {
                         <strong>State:</strong> {value.state}
                       </p>
                       <p className="card-text">
-                        <strong className="">Complaint:</strong>{" "}
+                        <strong className="">Complaint:</strong>
                         {value.complainttype}
                       </p>
                       <p className="card-text">
-                        <strong className="text-dark ">Details:</strong>{" "}
+                        <strong className="text-dark ">Details:</strong>
                         {value.details}
                       </p>
                       <small>
                         <p className="card-text">
-                          <strong className="text-danger">DateTime:</strong>{" "}
-                          {new Date(value.created_at).toLocaleDateString()}{" "}
+                          <strong className="text-danger">DateTime:</strong>
+                          {new Date(value.created_at).toLocaleDateString()}
                           {new Date(value.created_at).toLocaleTimeString(
                             "en-US",
                             { hour: "2-digit", minute: "2-digit", hour12: true }
@@ -619,337 +601,16 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div
-        className="modal fade"
-        id="exampleModal"
-        tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog  modal-dialog-scrollable modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title fw-bold " id="exampleModalLabel">
-                {editing ? (
-                  <>
-                    {" "}
-                    Update Ticket :
-                    <span className="text-primary mx-1">
-                      {editing.ticketcode}
-                    </span>
-                  </>
-                ) : (
-                  "Raise Ticket"
-                )}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleSubmit} enctype="multipart/form-data">
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="customername" className="form-label">
-                      Customer Name: <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="customername"
-                      placeholder="Enter Customer Name"
-                      onChange={(e) =>
-                        setform({ ...form, customername: e.target.value })
-                      }
-                      required
-                      value={form.customername}
-                    />
-                  </div>
-
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="controllerno" className="form-label">
-                      Controller No: <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      className="form-control"
-                      value={form.controllerno}
-                      placeholder="Enter Controller No"
-                      onInput={(e) => {
-                        setform({ ...form, controllerno: e.target.value });
-                        setLmsSearch(e.target.value);
-                      }}
-                    />
-                    {searcherror && (
-                      <small>
-                        <div className="text-danger mt-1 text-sm">{searcherror}</div>
-                      </small>
-                    )}
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="head" className="form-label">
-                      Head:
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="head"
-                      placeholder="Enter Head No"
-                      onChange={(e) =>
-                        setform({ ...form, head: e.target.value })
-                      }
-                      value={form.head}
-                    />
-                  </div>
-
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="imei" className="form-label">
-                      IMEI :
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="imei"
-                      placeholder="Enter IMEI No"
-                      onChange={(e) =>
-                        setform({ ...form, imei: e.target.value })
-                      }
-                      value={form.imei}
-                    />
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="hp" className="form-label">
-                      HP:
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter HP Name"
-                      onChange={(e) => setform({ ...form, hp: e.target.value })}
-                      value={form.hp}
-                    />
-                  </div>
-
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="motortype" className="form-label">
-                      Motor Type:
-                    </label>
-                    <select
-                      name=""
-                      id=""
-                      className="form-select"
-                      value={form.motortype}
-                      onChange={(e) =>
-                        setform({ ...form, motortype: e.target.value })
-                      }
-                    >
-                      <option value="">Select Motor Type</option>
-                      <option value="AC">AC</option>
-                      <option value="DC">DC</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="state" className="form-label">
-                      State: <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="state"
-                      required
-                      onChange={(e) =>
-                        setform({ ...form, state: e.target.value })
-                      }
-                      placeholder="Enter State"
-                      value={form.state}
-                    />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="district" className="form-label">
-                      District: <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="district"
-                      required
-                      onChange={(e) =>
-                        setform({ ...form, district: e.target.value })
-                      }
-                      placeholder="Enter District"
-                      value={form.district}
-                    />
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="village" className="form-label">
-                      Village:
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="village"
-                      onChange={(e) =>
-                        setform({ ...form, village: e.target.value })
-                      }
-                      placeholder="Enter Village"
-                      value={form.village}
-                    />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="block" className="form-label">
-                      Block:
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="block"
-                      placeholder="Enter Block"
-                      value={form.block}
-                      onChange={(e) =>
-                        setform({ ...form, block: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="complainttype" className="form-label">
-                      Complaint Type: <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className="form-select"
-                      id="complainttype"
-                      value={form.complainttype}
-                      required
-                      onChange={(e) =>
-                        setform({ ...form, complainttype: e.target.value })
-                      }
-                    >
-                      <option value="">Select Complaint Type</option>
-                      <option value="motor-not-running">
-                        Motor Not Running
-                      </option>
-                      <option value="how-water-discharge">
-                        Low Water Discharge
-                      </option>
-                      <option value="external-system-damage">
-                        External System Damage
-                      </option>
-                      <option value="controller-not-on">
-                        Controller Not ON
-                      </option>
-                      <option value="others">Others</option>
-                    </select>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="faultcode" className="form-label">
-                      Fault Code: <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="faultcode"
-                      required
-                      onChange={(e) =>
-                        setform({ ...form, faultcode: e.target.value })
-                      }
-                      placeholder="Enter Fault Code"
-                      value={form.faultcode}
-                    />
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-12 mb-3">
-                    <label htmlFor="details" className="form-label">
-                      Details:
-                    </label>
-                    <textarea
-                      className="form-control"
-                      id="details"
-                      placeholder="Enter details about the issue"
-                      onChange={(e) =>
-                        setform({ ...form, details: e.target.value })
-                      }
-                      value={form.details}
-                      rows="3"
-                    ></textarea>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-12 mb-3">
-                    <label htmlFor="picture" className="form-label">
-                      Picture:
-                    </label>
-                    <input
-                      type="file"
-                      className="form-control"
-                      id="picture"
-                      accept="image/*"
-                      onChange={(e) =>
-                        setform({ ...form, picture: e.target.files[0] })
-                      }
-                    />
-                  </div>
-                </div>
-                {role.role === "admin" ? (
-                  <>
-                    <div className="row">
-                      <div className="col-12 mb-3">
-                        <label htmlFor="status" className="form-label">
-                          Status :
-                        </label>
-                        <select
-                          id="status"
-                          className="form-select"
-                          value={form.status}
-                          onChange={(e) =>
-                            setform({ ...form, status: e.target.value })
-                          }
-                        >
-                          <option value="open">open</option>
-                          <option value="close">close</option>
-                        </select>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  ""
-                )}
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    {editing ? "Update" : "Submit"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+      <TicketForm
+        form={form}
+        setform={setform}
+        handleSubmit={handleSubmit}
+        editing={editing}
+        setEditing={setEditing} 
+        setLmsSearch={setLmsSearch}
+        searcherror={searcherror}
+        reset={reset}
+      />
 
       <div
         className="modal fade"
@@ -971,9 +632,7 @@ const Dashboard = () => {
                     </span>
                     <span>
                       <small>
-                        {"   "}
                         <span>
-                          {" "}
                      <small>   ({new Date(editing.created_at).toLocaleString()})</small>  
                         </span>
                       </small>
@@ -997,13 +656,13 @@ const Dashboard = () => {
                 <div className="row ">
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>Customer Name:</strong>{" "}
+                      <strong>Customer Name:</strong>
                       {editing ? editing.customername : form.customername}
                     </p>
                   </div>
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>Controller No:</strong>{" "}
+                      <strong>Controller No:</strong>
                       {editing ? editing.controllerno : form.controllerno}
                     </p>
                   </div>
@@ -1028,13 +687,13 @@ const Dashboard = () => {
                 <div className="row ">
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>Fault Code:</strong>{" "}
+                      <strong>Fault Code:</strong>
                       {editing ? editing.faultcode : form.faultcode}
                     </p>
                   </div>
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>State:</strong>{" "}
+                      <strong>State:</strong>
                       {editing ? editing.state : form.state}
                     </p>
                   </div>
@@ -1043,13 +702,13 @@ const Dashboard = () => {
                 <div className="row ">
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>District:</strong>{" "}
+                      <strong>District:</strong>
                       {editing ? editing.district : form.district}
                     </p>
                   </div>
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>Village:</strong>{" "}
+                      <strong>Village:</strong>
                       {editing ? editing.village : form.village}
                     </p>
                   </div>
@@ -1058,20 +717,20 @@ const Dashboard = () => {
                 <div className="row ">
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>Block:</strong>{" "}
+                      <strong>Block:</strong>
                       {editing ? editing.block : form.block}
                     </p>
                   </div>
                   <div className="col-md-6 mb-3">
                     <p className="card-text">
-                      <strong>Complaint Type:</strong>{" "}
+                      <strong>Complaint Type:</strong>
                       {editing ? editing.complainttype : form.complainttype}
                     </p>
                   </div>
                 </div>
 
                 <p className="card-text">
-                  <strong>Details:</strong>{" "}
+                  <strong>Details:</strong>
                   {editing ? editing.details : form.details}
                 </p>
 
@@ -1122,7 +781,7 @@ const Dashboard = () => {
           <div class="modal-content">
             <div class="modal-header">
               <h5 className="fw-bold " id="staticBackdropLabel">
-                Send Message :{" "}
+                Send Message :
                 <span className="text-primary">
                   {messageDetails.ticketcode}
                 </span>
@@ -1164,10 +823,10 @@ const Dashboard = () => {
                     }}
                   >
                     <p style={{ margin: "0", fontSize: "14px" }}>
-                      {" "}
+                      
                       {value.message} <br />
                       <small>
-                        {format(new Date(value.created_at), "hh:mm")}{" "}
+                        {format(new Date(value.created_at), "hh:mm")}
                         {format(new Date(value.created_at), "a")}
                       </small>
                     </p>
@@ -1216,5 +875,323 @@ const Dashboard = () => {
     </>
   );
 };
+function TicketForm({
+  form,
+  setform,
+  handleSubmit,
+  editing,
+  setLmsSearch,
+  searcherror,
+}) {
+  return (
+    <div
+      className="modal fade"
+      id="exampleModal"
+      tabIndex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div className="modal-dialog  modal-dialog-scrollable modal-lg">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title fw-bold " id="exampleModalLabel">
+              {editing ? (
+                <>
+                  {" "}
+                  Update Ticket :
+                  <span className="text-primary mx-1">
+                    {editing.ticketcode}
+                  </span>
+                </>
+              ) : (
+                "Raise Ticket"
+              )}
+            </h5>
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit} enctype="multipart/form-data">
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="customername" className="form-label">
+                    Customer Name: <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="customername"
+                    placeholder="Enter Customer Name"
+                    onChange={(e) =>
+                      setform({ ...form, customername: e.target.value })
+                    }
+                    required
+                    value={form.customername}
+                  />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="controllerno" className="form-label">
+                    Controller No: <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    className="form-control"
+                    value={form.controllerno}
+                    placeholder="Enter Controller No"
+                    onInput={(e) => {
+                      setform({ ...form, controllerno: e.target.value });
+                      setLmsSearch(e.target.value);
+                    }}
+                  />
+                  {searcherror && (
+                    <small>
+                      <div className="text-danger mt-1 text-sm">{searcherror}</div>
+                    </small>
+                  )}
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="head" className="form-label">
+                    Head:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="head"
+                    placeholder="Enter Head No"
+                    onChange={(e) =>
+                      setform({ ...form, head: e.target.value })
+                    }
+                    value={form.head}
+                  />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="imei" className="form-label">
+                    IMEI :
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="imei"
+                    placeholder="Enter IMEI No"
+                    onChange={(e) =>
+                      setform({ ...form, imei: e.target.value })
+                    }
+                    value={form.imei}
+                  />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="hp" className="form-label">
+                    HP:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter HP Name"
+                    onChange={(e) => setform({ ...form, hp: e.target.value })}
+                    value={form.hp}
+                  />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="motortype" className="form-label">
+                    Motor Type:
+                  </label>
+                  <select
+                    name=""
+                    id=""
+                    className="form-select"
+                    value={form.motortype}
+                    onChange={(e) =>
+                      setform({ ...form, motortype: e.target.value })
+                    }
+                  >
+                    <option value="">Select Motor Type</option>
+                    <option value="AC">AC</option>
+                    <option value="DC">DC</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="state" className="form-label">
+                    State: <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="state"
+                    required
+                    onChange={(e) =>
+                      setform({ ...form, state: e.target.value })
+                    }
+                    placeholder="Enter State"
+                    value={form.state}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="district" className="form-label">
+                    District: <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="district"
+                    required
+                    onChange={(e) =>
+                      setform({ ...form, district: e.target.value })
+                    }
+                    placeholder="Enter District"
+                    value={form.district}
+                  />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="village" className="form-label">
+                    Village:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="village"
+                    onChange={(e) =>
+                      setform({ ...form, village: e.target.value })
+                    }
+                    placeholder="Enter Village"
+                    value={form.village}
+                  />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="block" className="form-label">
+                    Block:
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="block"
+                    placeholder="Enter Block"
+                    value={form.block}
+                    onChange={(e) =>
+                      setform({ ...form, block: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="complainttype" className="form-label">
+                    Complaint Type: <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-select"
+                    id="complainttype"
+                    value={form.complainttype}
+                    required
+                    onChange={(e) =>
+                      setform({ ...form, complainttype: e.target.value })
+                    }
+                  >
+                    <option value="">Select Complaint Type</option>
+                    <option value="motor-not-running">
+                      Motor Not Running
+                    </option>
+                    <option value="how-water-discharge">
+                      Low Water Discharge
+                    </option>
+                    <option value="external-system-damage">
+                      External System Damage
+                    </option>
+                    <option value="controller-not-on">
+                      Controller Not ON
+                    </option>
+                    <option value="others">Others</option>
+                  </select>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label htmlFor="faultcode" className="form-label">
+                    Fault Code: <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="faultcode"
+                    required
+                    onChange={(e) =>
+                      setform({ ...form, faultcode: e.target.value })
+                    }
+                    placeholder="Enter Fault Code"
+                    value={form.faultcode}
+                  />
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-12 mb-3">
+                  <label htmlFor="details" className="form-label">
+                    Details:
+                  </label>
+                  <textarea
+                    className="form-control"
+                    id="details"
+                    placeholder="Enter details about the issue"
+                    onChange={(e) =>
+                      setform({ ...form, details: e.target.value })
+                    }
+                    value={form.details}
+                    rows="3"
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="row">
+                <div className="col-12 mb-3">
+                  <label htmlFor="picture" className="form-label">
+                    Picture:
+                  </label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    id="picture"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setform({ ...form, picture: e.target.files[0] })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  {editing ? "Update" : "Submit"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  );
+}
 
 export default Dashboard;

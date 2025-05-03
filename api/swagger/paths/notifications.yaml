@@ -1,0 +1,12 @@
+paths:
+  /notifications:
+    get:
+      summary: Get notifications
+      description: Retrieve a list of notifications.
+      tags:
+        - Notifications
+      responses:
+        200:
+          description: Successfully retrieved notifications
+        500:
+          description: Internal server error

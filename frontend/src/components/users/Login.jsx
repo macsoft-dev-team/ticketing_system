@@ -10,7 +10,7 @@ const Login = () => {
     const API_URL = import.meta.env.VITE_APP_URL;
  
     
-    const [phoneNo,setPhoneNo]=useState('')
+    const [phone,setPhone]=useState('')
     const [password,setPassword]=useState('')
     const [finalError,setFinalError]=useState('')
     const [error,setError]=useState({})
@@ -20,15 +20,15 @@ const Login = () => {
         e.preventDefault()
 
         const newerrors={}
-        if(!phoneNo) newerrors.phoneNo="Phone Number is Required"
+        if(!phone) newerrors.phone="Phone Number is Required"
         if(!password) newerrors.password="Password is Required"
         setError(newerrors)
         if(Object.keys(newerrors).length>0){
             return
         }
         try{
-         //   const response=await axios.post('http://localhost:8080/api/loginuser', {phoneNo,password});
-            const response = await axios.post(`${API_URL}/api/loginuser`, { phoneNo, password });
+         //   const response=await axios.post('http://localhost:8080/api/loginuser', {phone,password});
+            const response = await axios.post(`${API_URL}/api/login`, { phone, password });
             const token=response.data.token
             console.log("JWT Token:", token);
             sessionStorage.setItem('authtoken', token)
@@ -42,7 +42,7 @@ const Login = () => {
     }
     const reset=()=>{
         setPassword('')
-        setPhoneNo('')
+        setPhone('')
     }
   return (
     <>
@@ -52,9 +52,9 @@ const Login = () => {
             <h3 className='text-center text-primary'>Login</h3>
 
             <div className='mb-3'>
-                <label htmlFor="phoneNo" className='form-label'>PhoneNo</label>
-                <input type="text" className='form-control' value={phoneNo} onChange={(e)=>setPhoneNo(e.target.value)} placeholder='Enter Phone No'/>
-                {error.phoneNo && <div className='text-danger'><small>{error.phoneNo}</small></div>}
+                <label htmlFor="phone" className='form-label'>Phone</label>
+                <input type="text" className='form-control' value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder='Enter Phone No'/>
+                {error.phone && <div className='text-danger'><small>{error.phone}</small></div>}
             </div>
            
             <div className='mb-3'>

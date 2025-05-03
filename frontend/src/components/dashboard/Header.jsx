@@ -19,19 +19,6 @@ const Header = ({ handleMessageFilter, newMessage }) => {
     }
   }, [token]);
 
-  
-  // useEffect(() => {
-  //   if (newMessage.length > 0) {
-  //     console.log("New message detected, playing sound");
-
-  //     const audio = new Audio('/notification-22-270130.mp3'); 
-  //     audio.play().then(() => {
-  //       console.log("Audio played successfully");
-  //     }).catch((err) => {
-  //       console.error("Error playing audio:", err);
-  //     });
-  //   }
-  // }, [newMessage]);
 
   const handleLogout = () => {
     sessionStorage.removeItem("authtoken");

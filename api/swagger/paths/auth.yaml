@@ -1,0 +1,65 @@
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Create a new user account.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        201:
+          description: User successfully registered
+        400:
+          description: Bad request
+        500:
+          description: Internal server error
+
+  /login:
+    post:
+      summary: User login
+      description: Authenticate a user and return a token.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        200:
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        401:
+          description: Invalid credentials
+        500:
+          description: Internal server error
