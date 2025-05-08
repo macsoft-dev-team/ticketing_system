@@ -18,7 +18,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-         <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
         <Route path="/user/*" element={<UserRoutes />} />
         <Route path="/technical-user/*" element={<TechnicalUserRoutes />} />
         <Route path="/login" element={<LoginPage/>} />

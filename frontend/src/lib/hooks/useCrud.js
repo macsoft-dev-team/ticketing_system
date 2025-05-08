@@ -27,6 +27,13 @@ export default function useCrud(entity) {
     dispatch(fetchData({ entity }));
   };
 
+  const fetchItem = (id) => {
+    try {
+      dispatch(fetchItem({ entity, id }));
+    } catch (error) {
+      message.error("Error fetching item: " + error.message);
+    }
+  }
   const createItem = (newData) => {
     try {
       dispatch(createData({ entity, newData }));
@@ -72,6 +79,7 @@ export default function useCrud(entity) {
     loading,
     error,
     refetch,
+    fetchItem,
     createItem,
     updateItem,
     deleteItem,

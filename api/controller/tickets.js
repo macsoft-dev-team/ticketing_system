@@ -1,14 +1,32 @@
 const ticketService = require("../service/tickets");
 
-const getTickets = async (req, res) => {
+const getTickets = async (req, res, filter) => {
   try {
-    const tickets = await ticketService.getTickets();
+    const { userId } = req.user;
+    const { role } = req.user;
+    const { skip, take, filter } = req.query;
+    const tickets = await ticketService.getTickets(skip, take, filter, userId, role);
     res.status(200).json(tickets);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+const getTicketById = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  try {
+    const ticket = await ticketService.getTicketById(parseInt(id), userId);
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+    res.status(200).json(ticket);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
 
 const createTicket = async (req, res) => {
   const ticket = req.body;
@@ -67,4 +85,5 @@ module.exports = {
   createTicket,
   updateTicket,
   updateStatus,
+  getTicketById,
 };

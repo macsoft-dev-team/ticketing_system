@@ -183,6 +183,9 @@ exports.Prisma.AttachmentsScalarFieldEnum = {
 
 exports.Prisma.NotificationScalarFieldEnum = {
   id: 'id',
+  title: 'title',
+  description: 'description',
+  type: 'type',
   createdAt: 'createdAt',
   createdById: 'createdById',
   ticketId: 'ticketId',
@@ -238,6 +241,12 @@ exports.Prisma.AttachmentsOrderByRelevanceFieldEnum = {
   fileName: 'fileName',
   fileType: 'fileType',
   fileUrl: 'fileUrl'
+};
+
+exports.Prisma.NotificationOrderByRelevanceFieldEnum = {
+  title: 'title',
+  description: 'description',
+  type: 'type'
 };
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',

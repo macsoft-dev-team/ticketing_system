@@ -101,6 +101,9 @@ model Attachments {
 
 model Notification {
   id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  type        String
   createdAt   DateTime @default(now())
   createdById Int
   ticketId    Int?

@@ -2,9 +2,8 @@ import { Card, Avatar, Input, Button, Form } from "antd";
 import moment from "moment";
 import { CloseOutlined } from "@ant-design/icons";
 
-export default function ChatBox({ loading, ticket, conversation,handleClose }) {
-    console.log(conversation, "ChatBox Conversation");
-
+export default function ChatBox({ loading, ticket, conversation,handleClose,handleSubmit }) {
+    
     const CardTitle = () => {
         return (
             <div className="flex justify-between items-center">
@@ -48,7 +47,10 @@ export default function ChatBox({ loading, ticket, conversation,handleClose }) {
                                     src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${msg.sender.name}`}
                                 />
                             }
-                            title={msg.sender.name}
+                            title={<div className="flex gap-1 items-center justify-between w-full">
+                                <h2 className="uppercase font-semibold tracking-wider">{msg.sender.name}</h2>
+                                <small className="text-emerald-500 !text-[10px]">{msg.sender.role}</small>
+                            </div>}
                             description={
                                 <>
                                     <p className="text-gray-600">{msg.content}</p>
@@ -66,15 +68,28 @@ export default function ChatBox({ loading, ticket, conversation,handleClose }) {
             </div>
 
             {/* Input Section */}
-            <Form className="flex items-center mt-4">
+            <Form
+                onFinish={handleSubmit}
+                layout="inline"
+                autoComplete="off"
+                initialValues={{ message: "" }}
+                className="flex items-center mt-4"
+            >  <Form.Item
+                name="message"
+                rules={[{ required: true, message: "Please type a message!" }]}
+                className="!flex-1 !m-0"
+            >
                 <Input
-                    className="flex-1 mr-2 !rounded-sm !rounded-e-none"
+                    className="!w-full mr-2 !rounded-sm !rounded-e-none"
                     placeholder="Type your message"
                     size="large"
                 />
-                <Button className="!rounded-sm !rounded-s-none" type="primary" size="large">
+            </Form.Item>
+                <Form.Item>
+                <Button className="!rounded-sm !rounded-s-none" htmlType="submit" type="primary" size="large">
                     Send
                 </Button>
+                </Form.Item>
             </Form>
         </Card>
     );

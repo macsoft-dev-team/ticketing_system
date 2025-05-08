@@ -13,6 +13,7 @@ const getAll = async (req, res) => {
         id: true,
         name: true,
         phone: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },

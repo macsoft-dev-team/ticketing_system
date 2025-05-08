@@ -25,6 +25,18 @@ export const fetchData = createAsyncThunk(
   }
 );
 
+export const fetchItem = createAsyncThunk(
+  "crud/fetchItem",
+  async ({ entity, id }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_URL}/${entity}/${id}`);
+      return { entity, data: response.data };
+    } catch (error) {
+      return rejectWithValue({ entity, message: error.message });
+    }
+  }
+);
+
 export const createData = createAsyncThunk(
   "crud/createData",
   async ({ entity, newData }, { rejectWithValue }) => {
@@ -104,7 +116,22 @@ const crudSlice = createSlice({
         state[entity].loading = false;
         state[entity].error = action.payload?.message || "Unknown error";
       })
-
+      // FETCH ITEM
+      .addCase(fetchItem.pending, (state, action) => {
+        const entity = action.meta.arg.entity;
+        state[entity].loading = true;
+        state[entity].error = null;
+      })
+      .addCase(fetchItem.fulfilled, (state, action) => {
+        const { entity, data } = action.payload;
+        state[entity].loading = false;
+        state[entity].currentData = data;
+      })
+      .addCase(fetchItem.rejected, (state, action) => {
+        const entity = action.meta.arg.entity;
+        state[entity].loading = false;
+        state[entity].error = action.payload?.message || "Unknown error";
+      })
       // CREATE
       .addCase(createData.pending, (state, action) => {
         const entity = action.meta.arg.entity;

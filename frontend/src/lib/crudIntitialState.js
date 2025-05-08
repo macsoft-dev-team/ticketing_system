@@ -22,4 +22,11 @@ export const initialState = {
     loading: false,
     error: null,
   },
+  conversation: {
+    data: [],
+    currentData: null,
+    show: false,
+    loading: false,
+    error: null,
+  },
 };

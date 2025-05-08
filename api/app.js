@@ -6,14 +6,12 @@ const path = require("path");
 const { Server } = require("socket.io");
 const appRouter = require("./routes/index");
 const http = require("http");
-const setupSwagger = require('./swagger/swaggerConfig');
+const setupSwagger = require("./swagger/swaggerConfig");
 const app = express();
-const httpServer =http.createServer(app);
-const io = new Server(http, {
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-     ],
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST"],
     credentials: true,
   },

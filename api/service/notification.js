@@ -2,20 +2,23 @@ const { prisma } = require("../lib/clients");
 
 const getNotifications = async (userId) => {
   try {
-    const notifications = await prisma.notification.findMany({
+    const notifications = await prisma.notificationRecipient.findMany({
       where: {
-        recipients: {
-          some: {
-            userId: userId,
+        userId: userId,
+      },
+      include: {
+        notification: {
+          include: {
+            createdBy: true,
+            ticket: true,
+            message: true,            
           },
         },
       },
-      include: {
-        ticket: true,
-        recipients: true,
-      },
       orderBy: {
-        createdAt: "desc",
+         notification: {
+          createdAt: "desc",
+         }
       },
     });
     return notifications;
@@ -26,15 +29,23 @@ const getNotifications = async (userId) => {
 
 const updateNotification = async (notificationId, userId) => {
   try {
-    const notification = await prisma.notification.update({
+    const notification = await prisma.notificationRecipient.update({
       where: {
-        id: notificationId,
-      },
+        notificationId_userId: {
+          notificationId: notificationId,
+          userId: userId,
+        },
+      }, 
       data: {
         seen: true,
-        seenBy: {
+        user: {
           connect: {
-            userId: userId,
+            id: userId,
+          },
+        },
+        notification: {
+          connect: {
+            id: notificationId,
           },
         },
       },

@@ -26,14 +26,25 @@ const getConversations = async (ticketId) => {
 const createConversation = async (conversation, userId, io) => {
   const { ticketId, message, attachments } = conversation;
   try {
-    const conversation = await prisma.conversation.create({
+    const conversation = await prisma.message.create({
       data: {
         ticketId: ticketId,
-        message: message,
+        content: message,
         senderId: userId,
       },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+        ticket: true,
+        seenBy:true
+      },
     });
-    if (attachments) {
+   /*  if (attachments) {
       await Promise.all(
         attachments.map(async (attachment) => {
           await prisma.attachments.create({
@@ -45,19 +56,41 @@ const createConversation = async (conversation, userId, io) => {
           });
         })
       );
-    }
+    } */
     const notification = await prisma.notification.create({
       data: {
-        type: `#${conversation.ticket.tickedCode} - conversation`,
-        userId: userId,
+        type: `#${conversation.ticket?.ticketCode} - conversation`,
         ticketId: ticketId,
-        conversationId: conversation.id,
+        messageId: conversation.id,
+        description: `New message from ${conversation.sender?.name} in ticket #${conversation.ticket?.ticketCode}`,
+        title: `New message in ticket #${conversation.ticket?.ticketCode}`,
+        createdById: userId,
       },
     });
-    if (io) {
-      io.emit("conversation", conversation);
+    const notificationRecipients = await prisma.user.findMany({
+      where: {
+        id: {
+          not: userId,
+        },
+      },
+    });
+    await Promise.all(
+      notificationRecipients.map(async (recipient) => {
+        await prisma.notificationRecipient.create({
+          data: {
+            userId: recipient.id,
+            notificationId: notification.id,
+          },
+        });
+      })
+    );
+    conversation.ticketId = ticketId;
+    if (io&&notificationRecipients.length > 0) {
       io.emit("notification", notification);
     }
+    if (io) {
+      io.emit(`conversation`, conversation);
+     }
     return conversation;
   } catch (error) {
     throw error;

@@ -1,19 +1,19 @@
 import { Avatar, Button, Card } from "antd";
 import moment from "moment";
-import { EditOutlined, SettingOutlined, MessageOutlined } from "@ant-design/icons";
+ 
 
-
-export default function TicketCard({ loading, actions, ticket, HandleChat }) {
+export default function TicketCard({ loading, HandleStatus, ticket, HandleEdit, HandleChat, currentData }) {
     return (
         <Card
             loading={loading}
             actions={[
-                <EditOutlined key="edit" />,
-                <SettingOutlined key="setting" />,
-                <HandleChat data={ticket} />
+                <HandleEdit data={ticket} />,
+                <HandleChat data={ticket} />,
+                <HandleStatus data={ticket} />,
             ] }
             style={{ minWidth: "100%", maxWidth: "100%" }}
             key={ticket.id}
+            className={`${ticket.id === currentData?.id ? "!border-2 !border-blue-500" : "!border-2"} !flex !flex-col gap-2 !justify-between`}
         >
             <Card.Meta
                 avatar={<Avatar src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${ticket.id}`} />}

@@ -7033,6 +7033,9 @@ export namespace Prisma {
 
   export type NotificationMinAggregateOutputType = {
     id: number | null
+    title: string | null
+    description: string | null
+    type: string | null
     createdAt: Date | null
     createdById: number | null
     ticketId: number | null
@@ -7041,6 +7044,9 @@ export namespace Prisma {
 
   export type NotificationMaxAggregateOutputType = {
     id: number | null
+    title: string | null
+    description: string | null
+    type: string | null
     createdAt: Date | null
     createdById: number | null
     ticketId: number | null
@@ -7049,6 +7055,9 @@ export namespace Prisma {
 
   export type NotificationCountAggregateOutputType = {
     id: number
+    title: number
+    description: number
+    type: number
     createdAt: number
     createdById: number
     ticketId: number
@@ -7073,6 +7082,9 @@ export namespace Prisma {
 
   export type NotificationMinAggregateInputType = {
     id?: true
+    title?: true
+    description?: true
+    type?: true
     createdAt?: true
     createdById?: true
     ticketId?: true
@@ -7081,6 +7093,9 @@ export namespace Prisma {
 
   export type NotificationMaxAggregateInputType = {
     id?: true
+    title?: true
+    description?: true
+    type?: true
     createdAt?: true
     createdById?: true
     ticketId?: true
@@ -7089,6 +7104,9 @@ export namespace Prisma {
 
   export type NotificationCountAggregateInputType = {
     id?: true
+    title?: true
+    description?: true
+    type?: true
     createdAt?: true
     createdById?: true
     ticketId?: true
@@ -7184,6 +7202,9 @@ export namespace Prisma {
 
   export type NotificationGroupByOutputType = {
     id: number
+    title: string
+    description: string
+    type: string
     createdAt: Date
     createdById: number
     ticketId: number | null
@@ -7211,6 +7232,9 @@ export namespace Prisma {
 
   export type NotificationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    title?: boolean
+    description?: boolean
+    type?: boolean
     createdAt?: boolean
     createdById?: boolean
     ticketId?: boolean
@@ -7226,13 +7250,16 @@ export namespace Prisma {
 
   export type NotificationSelectScalar = {
     id?: boolean
+    title?: boolean
+    description?: boolean
+    type?: boolean
     createdAt?: boolean
     createdById?: boolean
     ticketId?: boolean
     messageId?: boolean
   }
 
-  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "createdById" | "ticketId" | "messageId", ExtArgs["result"]["notification"]>
+  export type NotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "type" | "createdAt" | "createdById" | "ticketId" | "messageId", ExtArgs["result"]["notification"]>
   export type NotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     message?: boolean | Notification$messageArgs<ExtArgs>
     createdBy?: boolean | UserDefaultArgs<ExtArgs>
@@ -7251,6 +7278,9 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
+      title: string
+      description: string
+      type: string
       createdAt: Date
       createdById: number
       ticketId: number | null
@@ -7629,6 +7659,9 @@ export namespace Prisma {
    */
   interface NotificationFieldRefs {
     readonly id: FieldRef<"Notification", 'Int'>
+    readonly title: FieldRef<"Notification", 'String'>
+    readonly description: FieldRef<"Notification", 'String'>
+    readonly type: FieldRef<"Notification", 'String'>
     readonly createdAt: FieldRef<"Notification", 'DateTime'>
     readonly createdById: FieldRef<"Notification", 'Int'>
     readonly ticketId: FieldRef<"Notification", 'Int'>
@@ -9123,6 +9156,9 @@ export namespace Prisma {
 
   export const NotificationScalarFieldEnum: {
     id: 'id',
+    title: 'title',
+    description: 'description',
+    type: 'type',
     createdAt: 'createdAt',
     createdById: 'createdById',
     ticketId: 'ticketId',
@@ -9202,6 +9238,15 @@ export namespace Prisma {
   };
 
   export type AttachmentsOrderByRelevanceFieldEnum = (typeof AttachmentsOrderByRelevanceFieldEnum)[keyof typeof AttachmentsOrderByRelevanceFieldEnum]
+
+
+  export const NotificationOrderByRelevanceFieldEnum: {
+    title: 'title',
+    description: 'description',
+    type: 'type'
+  };
+
+  export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
 
 
   /**
@@ -9700,6 +9745,9 @@ export namespace Prisma {
     OR?: NotificationWhereInput[]
     NOT?: NotificationWhereInput | NotificationWhereInput[]
     id?: IntFilter<"Notification"> | number
+    title?: StringFilter<"Notification"> | string
+    description?: StringFilter<"Notification"> | string
+    type?: StringFilter<"Notification"> | string
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     createdById?: IntFilter<"Notification"> | number
     ticketId?: IntNullableFilter<"Notification"> | number | null
@@ -9712,6 +9760,9 @@ export namespace Prisma {
 
   export type NotificationOrderByWithRelationInput = {
     id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
     createdById?: SortOrder
     ticketId?: SortOrderInput | SortOrder
@@ -9720,6 +9771,7 @@ export namespace Prisma {
     createdBy?: UserOrderByWithRelationInput
     ticket?: TicketOrderByWithRelationInput
     recipients?: NotificationRecipientOrderByRelationAggregateInput
+    _relevance?: NotificationOrderByRelevanceInput
   }
 
   export type NotificationWhereUniqueInput = Prisma.AtLeast<{
@@ -9727,6 +9779,9 @@ export namespace Prisma {
     AND?: NotificationWhereInput | NotificationWhereInput[]
     OR?: NotificationWhereInput[]
     NOT?: NotificationWhereInput | NotificationWhereInput[]
+    title?: StringFilter<"Notification"> | string
+    description?: StringFilter<"Notification"> | string
+    type?: StringFilter<"Notification"> | string
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     createdById?: IntFilter<"Notification"> | number
     ticketId?: IntNullableFilter<"Notification"> | number | null
@@ -9739,6 +9794,9 @@ export namespace Prisma {
 
   export type NotificationOrderByWithAggregationInput = {
     id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
     createdById?: SortOrder
     ticketId?: SortOrderInput | SortOrder
@@ -9755,6 +9813,9 @@ export namespace Prisma {
     OR?: NotificationScalarWhereWithAggregatesInput[]
     NOT?: NotificationScalarWhereWithAggregatesInput | NotificationScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Notification"> | number
+    title?: StringWithAggregatesFilter<"Notification"> | string
+    description?: StringWithAggregatesFilter<"Notification"> | string
+    type?: StringWithAggregatesFilter<"Notification"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Notification"> | Date | string
     createdById?: IntWithAggregatesFilter<"Notification"> | number
     ticketId?: IntNullableWithAggregatesFilter<"Notification"> | number | null
@@ -10272,6 +10333,9 @@ export namespace Prisma {
   }
 
   export type NotificationCreateInput = {
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     message?: MessageCreateNestedOneWithoutNotificationInput
     createdBy: UserCreateNestedOneWithoutSentNotificationsInput
@@ -10281,6 +10345,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedCreateInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     ticketId?: number | null
@@ -10289,6 +10356,9 @@ export namespace Prisma {
   }
 
   export type NotificationUpdateInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     message?: MessageUpdateOneWithoutNotificationNestedInput
     createdBy?: UserUpdateOneRequiredWithoutSentNotificationsNestedInput
@@ -10298,6 +10368,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -10307,6 +10380,9 @@ export namespace Prisma {
 
   export type NotificationCreateManyInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     ticketId?: number | null
@@ -10314,11 +10390,17 @@ export namespace Prisma {
   }
 
   export type NotificationUpdateManyMutationInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -10943,8 +11025,17 @@ export namespace Prisma {
     isNot?: TicketWhereInput | null
   }
 
+  export type NotificationOrderByRelevanceInput = {
+    fields: NotificationOrderByRelevanceFieldEnum | NotificationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type NotificationCountOrderByAggregateInput = {
     id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
     createdById?: SortOrder
     ticketId?: SortOrder
@@ -10960,6 +11051,9 @@ export namespace Prisma {
 
   export type NotificationMaxOrderByAggregateInput = {
     id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
     createdById?: SortOrder
     ticketId?: SortOrder
@@ -10968,6 +11062,9 @@ export namespace Prisma {
 
   export type NotificationMinOrderByAggregateInput = {
     id?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
     createdAt?: SortOrder
     createdById?: SortOrder
     ticketId?: SortOrder
@@ -12170,6 +12267,9 @@ export namespace Prisma {
   }
 
   export type NotificationCreateWithoutCreatedByInput = {
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     message?: MessageCreateNestedOneWithoutNotificationInput
     ticket?: TicketCreateNestedOneWithoutNotificationsInput
@@ -12178,6 +12278,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedCreateWithoutCreatedByInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     ticketId?: number | null
     messageId?: number | null
@@ -12350,6 +12453,9 @@ export namespace Prisma {
     OR?: NotificationScalarWhereInput[]
     NOT?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
     id?: IntFilter<"Notification"> | number
+    title?: StringFilter<"Notification"> | string
+    description?: StringFilter<"Notification"> | string
+    type?: StringFilter<"Notification"> | string
     createdAt?: DateTimeFilter<"Notification"> | Date | string
     createdById?: IntFilter<"Notification"> | number
     ticketId?: IntNullableFilter<"Notification"> | number | null
@@ -12489,6 +12595,9 @@ export namespace Prisma {
   }
 
   export type NotificationCreateWithoutTicketInput = {
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     message?: MessageCreateNestedOneWithoutNotificationInput
     createdBy: UserCreateNestedOneWithoutSentNotificationsInput
@@ -12497,6 +12606,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedCreateWithoutTicketInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     messageId?: number | null
@@ -12726,6 +12838,9 @@ export namespace Prisma {
   }
 
   export type NotificationCreateWithoutMessageInput = {
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdBy: UserCreateNestedOneWithoutSentNotificationsInput
     ticket?: TicketCreateNestedOneWithoutNotificationsInput
@@ -12734,6 +12849,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedCreateWithoutMessageInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     ticketId?: number | null
@@ -13443,6 +13561,9 @@ export namespace Prisma {
   }
 
   export type NotificationCreateWithoutRecipientsInput = {
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     message?: MessageCreateNestedOneWithoutNotificationInput
     createdBy: UserCreateNestedOneWithoutSentNotificationsInput
@@ -13451,6 +13572,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedCreateWithoutRecipientsInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     ticketId?: number | null
@@ -13512,6 +13636,9 @@ export namespace Prisma {
   }
 
   export type NotificationUpdateWithoutRecipientsInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     message?: MessageUpdateOneWithoutNotificationNestedInput
     createdBy?: UserUpdateOneRequiredWithoutSentNotificationsNestedInput
@@ -13520,6 +13647,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateWithoutRecipientsInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -13631,6 +13761,9 @@ export namespace Prisma {
 
   export type NotificationCreateManyCreatedByInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     ticketId?: number | null
     messageId?: number | null
@@ -13831,6 +13964,9 @@ export namespace Prisma {
   }
 
   export type NotificationUpdateWithoutCreatedByInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     message?: MessageUpdateOneWithoutNotificationNestedInput
     ticket?: TicketUpdateOneWithoutNotificationsNestedInput
@@ -13839,6 +13975,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateWithoutCreatedByInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
     messageId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -13847,6 +13986,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateManyWithoutCreatedByInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
     messageId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -13881,6 +14023,9 @@ export namespace Prisma {
 
   export type NotificationCreateManyTicketInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     messageId?: number | null
@@ -13913,6 +14058,9 @@ export namespace Prisma {
   }
 
   export type NotificationUpdateWithoutTicketInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     message?: MessageUpdateOneWithoutNotificationNestedInput
     createdBy?: UserUpdateOneRequiredWithoutSentNotificationsNestedInput
@@ -13921,6 +14069,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateWithoutTicketInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     messageId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -13929,6 +14080,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateManyWithoutTicketInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     messageId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -13936,6 +14090,9 @@ export namespace Prisma {
 
   export type NotificationCreateManyMessageInput = {
     id?: number
+    title: string
+    description: string
+    type: string
     createdAt?: Date | string
     createdById: number
     ticketId?: number | null
@@ -13957,6 +14114,9 @@ export namespace Prisma {
   }
 
   export type NotificationUpdateWithoutMessageInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdBy?: UserUpdateOneRequiredWithoutSentNotificationsNestedInput
     ticket?: TicketUpdateOneWithoutNotificationsNestedInput
@@ -13965,6 +14125,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateWithoutMessageInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
@@ -13973,6 +14136,9 @@ export namespace Prisma {
 
   export type NotificationUncheckedUpdateManyWithoutMessageInput = {
     id?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    type?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdById?: IntFieldUpdateOperationsInput | number
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null

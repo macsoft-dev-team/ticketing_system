@@ -73,7 +73,7 @@ export default function RegisterUser() {
                     {error.password && <div className="text-danger"><small>{error.password}</small></div>}
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" className="w-100">
+                        <Button type="primary" htmlType="submit" className="w-full">
                             Register
                             {loading && <Spin style={{
                                 color: 'white',

@@ -1,8 +1,34 @@
 const { prisma } = require("../lib/clients");
 
-const getTickets = async () => {
+const getTickets = async (skip, take, filter, userId, role) => {
   try {
+    const params = {};
+    if (filter && filter.search) {
+      params.OR = [
+        { ticketCode: { contains: filter.search } },
+        { description: { contains: filter.search } },
+        { customerName: { contains: filter.search } },
+        { controllerNo: { contains: filter.search } },
+        { head: { contains: filter.search } },
+        { imei: { contains: filter.search } },
+        { hp: { contains: filter.search } },
+        { motorType: { contains: filter.search } },
+        { state: { contains: filter.search } },
+        { district: { contains: filter.search } },
+        { village: { contains: filter.search } },
+        { block: { contains: filter.search } },
+        { complaintType: { contains: filter.search } },
+        { faultCode: { contains: filter.search } },
+      ];
+    }
+    if(filter && filter.status) {
+      params.status = filter.status;
+    }
+    if (role === "USER") {
+      params.createdById = userId;
+    }
     const tickets = await prisma.ticket.findMany({
+      where: params,
       include: {
         createdByUser: true,
         updatedByUser: true,
@@ -27,6 +53,34 @@ const getTickets = async () => {
   }
 };
 
+const getTicketById = async (ticketId, userId) => {
+  try {
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      include: {
+        createdByUser: true,
+        updatedByUser: true,
+        messages: {
+          include: {
+            sender: true,
+          },
+        },
+        notifications: {
+          include: {
+            recipients: true,
+          },
+        },
+      },
+    });
+    if (!ticket) {
+      throw new Error("Ticket not found");
+    }
+    return ticket;
+  } catch (error) {
+    throw error;
+  }
+}
+
 const createTicket = async (ticket, userId, io) => {
   const {
     ticketCode,
@@ -43,7 +97,7 @@ const createTicket = async (ticket, userId, io) => {
     block,
     complaintType,
     faultCode,
-   } = ticket;
+  } = ticket;
   try {
     const newTicket = await prisma.ticket.create({
       data: {
@@ -61,25 +115,28 @@ const createTicket = async (ticket, userId, io) => {
         block: block,
         complaintType: complaintType,
         faultCode: faultCode,
-         createdBy: userId,
+        createdBy: userId,
       },
     });
     const notification = await prisma.notification.create({
       data: {
+        type: "TICKET_CREATED",
+        title: `New ticket created: ${newTicket.ticketCode}`,
+        description: `New ticket created: ${newTicket.ticketCode}`,
         createdById: userId,
-        ticketId: ticket.id,  
+        ticketId: ticket.id,
       },
     });
 
     const users = await prisma.user.findMany({
-      where:{
-        id:{
-          not: userId
-        }
-      }
+      where: {
+        id: {
+          not: userId,
+        },
+      },
     });
 
-    for(const user of users) {
+    for (const user of users) {
       await prisma.notificationRecipient.create({
         data: {
           userId: user.id,
@@ -147,8 +204,9 @@ const updateTicket = async (ticketId, ticketData, userId, io) => {
     });
     const notification = await prisma.notification.create({
       data: {
-        type: "ticket_updated",
-        message: `Ticket updated: ${updatedTicket.ticketCode}`,
+        title: `Ticket updated: ${updatedTicket.ticketCode}`,
+        type: "TICKET_UPDATED",
+        description: `Ticket updated: ${updatedTicket.ticketCode}`,
         createdById: userId,
         ticketId: updatedTicket.id,
         receivers: {
@@ -174,8 +232,9 @@ const updateStatus = async (ticketId, status, userId, io) => {
     });
     const notification = await prisma.notification.create({
       data: {
-        type: "ticket_status_updated",
-        message: `Ticket status updated: ${updatedTicket.ticketCode}`,
+        type: "TICKET_STATUS_UPDATED",
+        title: `Ticket status updated: ${updatedTicket.ticketCode}`,
+        description: `Ticket status updated: ${updatedTicket.ticketCode}`,
         createdById: userId,
         ticketId: updatedTicket.id,
         receivers: {
@@ -195,6 +254,7 @@ const updateStatus = async (ticketId, status, userId, io) => {
 
 module.exports = {
   getTickets,
+  getTicketById,
   createTicket,
   updateTicket,
   updateStatus,
