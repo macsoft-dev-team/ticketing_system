@@ -29,16 +29,33 @@ app.get("/", (req, res) => {
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use("/api", appRouter);
 
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
+app.use("/api", appRouter);
  
+io.on("connection", (socket) => {
+  console.log("✅ Socket connected:", socket.id);
+
+  socket.onAny((event, ...args) => {
+    console.log(`📨 Received client event: ${event}`, args);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Socket disconnected:", socket.id);
+  });
+});
+
 
 const PORT = process.env.PORT || 8080;
+
+io.on("connection", (socket) => {
+  console.log("✅ Client connected:", socket.id);
+});
+
 httpServer.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });

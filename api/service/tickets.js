@@ -21,7 +21,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
         { faultCode: { contains: filter.search } },
       ];
     }
-    if(filter && filter.status) {
+    if (filter && filter.status) {
       params.status = filter.status;
     }
     if (role === "USER") {
@@ -79,7 +79,7 @@ const getTicketById = async (ticketId, userId) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 const createTicket = async (ticket, userId, io) => {
   const {
@@ -130,9 +130,18 @@ const createTicket = async (ticket, userId, io) => {
 
     const users = await prisma.user.findMany({
       where: {
-        id: {
-          not: userId,
-        },
+        AND: [
+          {
+            id: {
+              not: userId,
+            },
+          },
+          {
+            role: {
+              in: ["ADMIN", "TECHNICAL_USER"],
+            },
+          },
+        ],
       },
     });
 
@@ -154,7 +163,6 @@ const createTicket = async (ticket, userId, io) => {
     });
     if (io) {
       io.emit("ticket", newTicket);
-      io.emit("notification", notification);
       io.emit("conversation", conversation);
     }
     return newTicket;
@@ -214,9 +222,18 @@ const updateTicket = async (ticketId, ticketData, userId, io) => {
 
     const users = await prisma.user.findMany({
       where: {
-        id: {
-          not: userId,
-        },
+        AND: [
+          {
+            id: {
+              not: userId,
+            },
+          },
+          {
+            role: {
+              in: ["ADMIN", "TECHNICAL_USER"],
+            },
+          },
+        ],
       },
     });
 
@@ -261,14 +278,29 @@ const updateStatus = async (ticketId, status, userId, io) => {
       data: {
         type: "TICKET_STATUS_UPDATED",
         title: `Ticket status updated: ${updatedTicket.ticketCode}`,
-        description: `Ticket status updated: ${updatedTicket.ticketCode}`,
+        description: `Ticket status updated: ${updatedTicket.status}`,
         createdById: userId,
         ticketId: updatedTicket.id,
-        receivers: {
-          create: [{ userId: adminId }, { userId: technicalUserId }],
+      },
+    });
+
+    const users = await prisma.user.findMany({
+      where: {
+        id: {
+          not: userId,
         },
       },
     });
+
+    for (const user of users) {
+      await prisma.notificationRecipient.create({
+        data: {
+          userId: user.id,
+          notificationId: notification.id,
+        },
+      });
+    }
+
     if (io) {
       io.emit("ticket", updatedTicket);
       io.emit("notification", notification);

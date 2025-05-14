@@ -14,26 +14,7 @@ const AppLayout = () => {
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
     const { data, setData, updateItem } = useCrud("notification");
-    //use socket to get notification
-    useEffect(() => {
-        socket.connect();
-
-        socket.on("connect", () => {
-            console.log("Connected:", socket.id);
-        });
-
-        socket.on("notification", (newNotification) => {
-            setData(prev => [...prev, newNotification]);
-            console.log("Notification received:", newNotification);
-            
-        });
-
-        return () => {
-            socket.disconnect();
-            socket.off("notification");
-        };
-    }, []);
-
+   
     const items = [
         {
             label: (
@@ -84,22 +65,23 @@ const AppLayout = () => {
 
 
     const markAsRead = (id) => {
-         updateItem(id, { seen: true });
+        updateItem(id, { seen: true });
     };
 
 
     const content = (
         <div className='w-96 max-h-96 overflow-y-auto *:p-2 *:max-h-20 flex flex-col divide-y divide-gray-200'>
             {data.length > 0 ? data?.map((notification) => (
-                <div className={`grid grid-flow-row ${notification.seen ? "bg-gray-100" : "bg-inherit"} `} key={notification?.notification?.id}>
+                <div className={`grid grid-flow-row ${notification.seen ? "bg-inherit" : " bg-gray-100"} `} key={notification?.notification?.id}>
                     <h1 className='uppercase text-cyan-800'>{notification?.notification?.title}</h1>
                     <h2>{notification?.notification?.description}</h2>
                     <footer>
                         <div className='flex justify-between items-center'>
                             <small className='text-gray-500'>{moment(notification?.notification?.createdAt).format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS)}</small>
-                            <Button rootClassName='!uppercase !text-xs !text-gray-500' type="text" size="small" onClick={() => markAsRead(notification.id)}>
+                            {notification?.seen ? <small className='text-gray-500'>Seen</small> :
+                             <Button rootClassName='!uppercase !text-xs !text-gray-500' type="text" size="small" onClick={() => markAsRead(notification.id)}>
                                 <small>Mark as Read</small>
-                            </Button>
+                            </Button>}
                         </div>
                     </footer>
                 </div>

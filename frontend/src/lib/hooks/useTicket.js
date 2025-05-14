@@ -10,7 +10,10 @@ import {
   setData as setTicketData,
   setFilter as setTicketFilter,
   setShow as setModalShow,
+  updateStatus as updateTicketStatus,
+  addConversationMessage,
 } from "../features/ticketsSlice";
+ import socket from "../socket/socket";
 
 export default function useTicket() {
   const dispatch = useDispatch();
@@ -61,6 +64,31 @@ export default function useTicket() {
     dispatch(setModalShow(show));
   };
 
+  const updateStatus = (id, status) => {
+    dispatch(updateTicketStatus({ id, status }));
+  }
+
+  useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.on("connect", () => {
+      console.log("Connected for conversation:", socket.id);
+    });
+
+    socket.on("conversation", (newConversation) => {
+      if( currentData && currentData.id === newConversation.ticketId) {
+        dispatch(addConversationMessage(newConversation));
+      } 
+    });
+
+    return () => {
+      socket.disconnect();
+      socket.off("conversation");
+    };
+  }, []);
+
   useEffect(() => {
     if (!data.length) {
       refetch();
@@ -85,6 +113,7 @@ export default function useTicket() {
     fetchTicket,
     createItem,
     updateItem,
+    updateStatus,
     deleteItem,
     setCurrentData,
     setData,

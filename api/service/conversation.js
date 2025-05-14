@@ -10,6 +10,7 @@ const getConversations = async (ticketId) => {
             id: true,
             name: true,
             phone: true,
+            role: true,
           },
         },
         attachments: true,
@@ -38,10 +39,11 @@ const createConversation = async (conversation, userId, io) => {
             id: true,
             name: true,
             phone: true,
+            role: true,
           },
         },
         ticket: true,
-        seenBy:true
+        seenBy: true,
       },
     });
    /*  if (attachments) {
@@ -80,6 +82,16 @@ const createConversation = async (conversation, userId, io) => {
           data: {
             userId: recipient.id,
             notificationId: notification.id,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
           },
         });
       })

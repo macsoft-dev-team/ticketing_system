@@ -4,28 +4,33 @@ const getNotifications = async (userId) => {
   try {
     const notifications = await prisma.notificationRecipient.findMany({
       where: {
-        userId: userId,
+      userId: userId,
       },
       include: {
-        notification: {
-          include: {
-            createdBy: true,
-            ticket: true,
-            message: true,            
-          },
+      notification: {
+        include: {
+        createdBy: true,
+        ticket: true,
+        message: true,
         },
       },
-      orderBy: {
-         notification: {
-          createdAt: "desc",
-         }
       },
+      orderBy: [
+      {
+        seen: "asc",
+      },
+      {
+        notification: {
+        createdAt: "desc",
+        },
+      },
+      ],
     });
     return notifications;
   } catch (error) {
     throw error;
   }
-}
+};
 
 const updateNotification = async (notificationId, userId, io) => {
   try {
@@ -42,12 +47,12 @@ const updateNotification = async (notificationId, userId, io) => {
           include: {
             createdBy: true,
             ticket: true,
-            message: true,            
+            message: true,
           },
         },
       },
     });
-    if (io){
+    if (io) {
       const notificationData = await prisma.notificationRecipient.findUnique({
         where: {
           id: notificationId,
@@ -57,14 +62,14 @@ const updateNotification = async (notificationId, userId, io) => {
             include: {
               createdBy: true,
               ticket: true,
-              message: true,            
+              message: true,
             },
           },
         },
       });
       io.emit("notification", notificationData);
     }
-      
+
     return notification;
   } catch (error) {
     throw error;
@@ -72,7 +77,6 @@ const updateNotification = async (notificationId, userId, io) => {
 };
 
 module.exports = {
-    getNotifications,
-    updateNotification,
-    };
-
+  getNotifications,
+  updateNotification,
+};

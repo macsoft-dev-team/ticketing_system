@@ -37,8 +37,7 @@ export default function useCrud(entity) {
   const createItem = (newData) => {
     try {
       dispatch(createData({ entity, newData }));
-      message.success("Item created successfully!");
-    } catch (error) {
+     } catch (error) {
       message.error("Error creating item: " + error.message);
     }
   };
@@ -46,8 +45,7 @@ export default function useCrud(entity) {
   const updateItem = (id, updatedData) => {
     try {
       dispatch(updateData({ entity, id, updatedData }));
-      message.success("Item updated successfully!");
-    } catch (error) {
+     } catch (error) {
       message.error("Error updating item: " + error.message);
     }
   };
@@ -55,8 +53,7 @@ export default function useCrud(entity) {
   const deleteItem = (id) => {
     try {
       dispatch(deleteData({ entity, id }));
-      message.success("Item deleted successfully!");
-    } catch (error) {
+     } catch (error) {
       message.error("Error deleting item: " + error.message);
     }
   };
