@@ -1,40 +1,45 @@
 {
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "backend",
-      "type": "node",
-      "request": "launch",
-      "runtimeArgs": ["run", "start"],
-      "runtimeExecutable": "npm",
-      "cwd": "${workspaceFolder}/api",
-      "skipFiles": ["<node_internals>/**"]
-    },
-    {
-      "name": "frontend",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "${workspaceFolder}/frontend",
-      "skipFiles": ["<node_internals>/**"]
-    },
- 
-    {
-      "name": "chrome",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/frontend/src",
-      "sourceMaps": true
-    },
-   
-  ],
   "compounds": [
     {
-      "name": "Run all",
-      "configurations": ["backend", "frontend", "chrome"]
+      "name": "Debug Frontend and Backend",
+      "configurations": ["Debug www", "Debug api", "Chrome"]
+    }
+  ],
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug www",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/frontend"
     },
-    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug api",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Chrome",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/www"
+    },
+    {
+      "name": "Flutter Debug",
+      "request": "launch",
+      "type": "dart",
+      "program": "${workspaceFolder}/app/lib/main.dart",
+    }
   ]
 }

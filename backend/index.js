@@ -7,6 +7,7 @@ const path = require("path");
 const registerRoutes = require("./routes/registerRouter");
 const loginRouter = require("./routes/loginRouter");
 const ticketRouter = require("./routes/ticketRouter");
+const spareRequestRouter = require("./routes/spareRequestRouter");
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", registerRoutes);
 app.use("/api", loginRouter);
 app.use("/api", ticketRouter);
+app.use("/api", spareRequestRouter);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
