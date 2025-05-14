@@ -5,6 +5,7 @@ import {
   setConversation,
   setCurrentMessage,
   setShowConversation,
+  appendMessageToTicket 
 } from "../features/conversationSlice";
 import { message } from "antd";
 import { useSelector, useDispatch } from "react-redux";
@@ -61,6 +62,26 @@ export default function useConversation() {
   const setData = (data) => {
     dispatch(setConversation(data));
   };
+
+  useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.on("connect", () => {
+      console.log("Connected for conversation:", socket.id);
+    });
+
+    socket.on("conversation", (newConversation) => {
+      dispatch(appendMessageToTicket(newConversation));
+      console.log("New conversation:", newConversation);
+    });
+
+    return () => {
+      socket.disconnect();
+      socket.off("conversation");
+    };
+  }, []);
 
   return {
     data,

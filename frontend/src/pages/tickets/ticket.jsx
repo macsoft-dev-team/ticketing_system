@@ -7,6 +7,7 @@ import moment from "moment";
 import TicketForm from "../../components/forms/ticket";
 import ChatBox from "../../components/chat-box";
 import useConversation from "../../lib/hooks/conversation";
+import socket from "../../lib/socket/socket";
 
 export default function Ticket() {
     const { currentData, show, fetchTicket, setCurrentData, setShow } = useTicket();
@@ -23,6 +24,7 @@ export default function Ticket() {
     const handleClose = () => {
         setShow(false);
     };
+ 
 
     useEffect(() => {
         fetchTicket(ticketId);
@@ -85,7 +87,7 @@ export default function Ticket() {
                             <Typography.Text strong>Ticket Code</Typography.Text>
                             <Typography.Text>{currentData?.ticketCode}</Typography.Text>
                             <Typography.Text strong>Raised Date</Typography.Text>
-                            <Typography.Text>{moment(currentData?.createdAt).format("LLL")}</Typography.Text>
+                            <Typography.Text className="text-nowrap">{moment(currentData?.createdAt).format("LLL")}</Typography.Text>
                             <Typography.Text strong>Status</Typography.Text>
                             <Typography.Text>{currentData?.status}</Typography.Text>
                         </div>
@@ -146,7 +148,7 @@ export default function Ticket() {
                     </div>
                 </div>
                 <div>
-                    <ChatBox loading={loading} ticket={currentData} conversation={conversation} />
+                    <ChatBox loading={loading} ticket={currentData} conversation={currentData?.messages?.length > 0 ? currentData?.messages : []} />
                 </div>
             </section>
         </section>

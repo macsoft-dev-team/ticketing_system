@@ -54,6 +54,11 @@ const conversationSlice = createSlice({
     setConversation: (state, action) => {
       state.conversation.data = action.payload;
     },
+    appendMessageToTicket(state, action) {
+      if (state.currentData && state.currentData.messages) {
+        state.currentData.messages.push(action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -86,6 +91,10 @@ const conversationSlice = createSlice({
   },
 });
 
-export const { setCurrentMessage, setShowConversation, setConversation } =
-  conversationSlice.actions;
+export const {
+  setCurrentMessage,
+  setShowConversation,
+  setConversation,
+  appendMessageToTicket,
+} = conversationSlice.actions;
 export default conversationSlice.reducer;

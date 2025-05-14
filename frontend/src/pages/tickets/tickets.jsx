@@ -15,7 +15,7 @@ const Tickets = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-    const { data, currentData, loading, error, show, setShow, filter, setCurrentData, createItem, updateItem, setFilter, setData } = useTicket();
+    const { data, currentData, loading, error, show, setShow, filter, setCurrentData, createItem, updateItem, setFilter, setData, updateStatus } = useTicket();
     const { Search } = Input;
     const { data: conversation, createItem: createConversation, setData: setConversation, show: chatWindow, setShow: setChatWindow } = useConversation();
 
@@ -41,11 +41,12 @@ const Tickets = () => {
             <Select
                 className="min-w-26"
                 key="status"
+                disabled={data.data.status === "CLOSED"}
                 loading={loading}
                 defaultValue={data.data.status}
                 options={[{ value: 'OPEN', label: 'OPEN' }, { value: 'CLOSED', label: 'CLOSED' }]}
                 onChange={(value) => {
-                    updateStatus(data.data.id, { status: value });
+                    updateStatus(data.data.id, value );
                 }}
             />
         )
@@ -67,6 +68,8 @@ const Tickets = () => {
     }
 
     const handleSubmitChat = (values) => {
+        console.log("values", values);
+        
         const _data = { ...values, ticketId: currentData?.id };
         createConversation({ ticketId: currentData.id, newMessage: _data });
     }
@@ -86,7 +89,9 @@ const Tickets = () => {
     };
 
     useEffect(() => {
-        socket.connect();
+        if (!socket.connected) {
+            socket.connect();
+        }
 
         socket.on("connect", () => {
             console.log("Connected for conversation:", socket.id);
@@ -198,12 +203,7 @@ const Tickets = () => {
 
                             </div >
                         </Splitter.Panel>
-
-                        {chatWindow && (
-                            <Splitter.Panel className="!p-2" >
-                                <ChatBox handleSubmit={handleSubmitChat} handleClose={handleClose} conversation={currentData?.messages?.length > 0 ? currentData?.messages : []} ticket={currentData} />
-                            </Splitter.Panel>
-                        )}
+ 
 
                     </Splitter>
                 )}

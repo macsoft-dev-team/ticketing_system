@@ -69,6 +69,20 @@ export const updateTicket = createAsyncThunk(
   }
 );
 
+export const updateStatus = createAsyncThunk(
+  "tickets/updateStatus",
+  async ({ id, status }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${API_URL}/ticket/status/${id}`, {
+        status,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const deleteTicket = createAsyncThunk(
   "tickets/deleteTicket",
   async (id, { rejectWithValue }) => {
@@ -96,6 +110,11 @@ const ticketsSlice = createSlice({
     },
     setShow: (state, action) => {
       state.show = action.payload;
+    },
+    addConversationMessage: (state, action) => {
+      if (state.currentData && state.currentData.messages) {
+        state.currentData.messages.push(action.payload);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -166,10 +185,32 @@ const ticketsSlice = createSlice({
       .addCase(deleteTicket.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Unknown error";
+      })
+      .addCase(updateStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.data.findIndex(
+          (ticket) => ticket.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.data[index] = action.payload;
+        }
+      })
+      .addCase(updateStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Unknown error";
       });
   },
 });
 
-export const { setCurrentTicket, setData, setFilter, setShow } =
-  ticketsSlice.actions;
+export const {
+  setCurrentTicket,
+  setData,
+  setFilter,
+  setShow,
+  addConversationMessage,
+} = ticketsSlice.actions;
 export default ticketsSlice.reducer;
