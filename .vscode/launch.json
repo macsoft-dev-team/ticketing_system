@@ -7,7 +7,7 @@
       "request": "launch",
       "runtimeArgs": ["run", "start"],
       "runtimeExecutable": "npm",
-      "cwd": "${workspaceFolder}/backend",
+      "cwd": "${workspaceFolder}/api",
       "skipFiles": ["<node_internals>/**"]
     },
     {

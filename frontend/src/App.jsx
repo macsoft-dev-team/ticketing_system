@@ -1,36 +1,33 @@
-import React from 'react'
-import {BrowserRouter,Routes,Route} from 'react-router-dom'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Register from './components/users/Register'
-import Login from './components/users/Login';
-import PrivateRouter from './components/users/PrivateRouter';
-import Dashboard from './components/dashboard/Dashboard';
-import Userdetails from './components/dashboard/Userdetails';
-import Statusdashboard from './components/dashboard/Statusdashboard';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { getCurrentUserRole } from "./lib/auth";
+import axios from "axios";
+import AdminRoutes from "./components/routes/admin";
+import UserRoutes from "./components/routes/user";
+import TechnicalUserRoutes from "./components/routes/technical-user";
+import LoginPage from "./pages/login/login";
+import "./App.css";
+import RegisterUser from "./pages/register/register";
 
-
-
-
-const App = () => {
+function App() {
+  const userToken = sessionStorage.getItem('authToken')
+  if (userToken) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`
+  }
+  
   return (
-    <>
     <BrowserRouter>
-    <Routes>
-      <Route path='/register' element={<Register/>} />
-      <Route path='/' element={<Login/>}/>
-
-      {/* <Route path='/dashboard'  element={<PrivateRouter ><Dashboard/></PrivateRouter>} /> */}
-      <Route path='/statusdashboard' element={<PrivateRouter><Statusdashboard/></PrivateRouter>}/>
-      <Route path='/tickets/:ticketStatus'  element={<PrivateRouter ><Dashboard/></PrivateRouter>} />
-      <Route path='/userdetails' element={<PrivateRouter><Userdetails/></PrivateRouter>}/>
-      
-    
-    </Routes>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/user/*" element={<UserRoutes />} />
+        <Route path="/technical-user/*" element={<TechnicalUserRoutes />} />
+        <Route path="/login" element={<LoginPage/>} />
+        <Route path="/register" element={<RegisterUser />} />
+        <Route path="*" element={<div>404 - Not Found</div>} />
+      </Routes>
     </BrowserRouter>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,12 @@
+paths:
+  /chat:
+    get:
+      summary: Get chat messages
+      description: Retrieve a list of chat messages.
+      tags:
+        - Chat
+      responses:
+        200:
+          description: Successfully retrieved chat messages
+        500:
+          description: Internal server error
