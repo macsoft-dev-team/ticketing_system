@@ -13,9 +13,10 @@ const getNotifications = async (req, res) => {
 
 const updateNotification = async (req, res) => {
     const { id } = req.params;
+    const io = req.io;
     const userId = req.user.id;
     try {
-        const notification = await notificationService.updateNotification(parseInt(id), userId);
+        const notification = await notificationService.updateNotification(parseInt(id), userId,io);
         res.status(200).json(notification);
     } catch (error) {
         console.error(error);

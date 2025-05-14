@@ -27,34 +27,49 @@ const getNotifications = async (userId) => {
   }
 }
 
-const updateNotification = async (notificationId, userId) => {
+const updateNotification = async (notificationId, userId, io) => {
   try {
     const notification = await prisma.notificationRecipient.update({
       where: {
-        notificationId_userId: {
-          notificationId: notificationId,
-          userId: userId,
-        },
-      }, 
+        id: notificationId,
+      },
       data: {
         seen: true,
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
+        seenAt: new Date(),
+      },
+      include: {
         notification: {
-          connect: {
-            id: notificationId,
+          include: {
+            createdBy: true,
+            ticket: true,
+            message: true,            
           },
         },
       },
     });
+    if (io){
+      const notificationData = await prisma.notificationRecipient.findUnique({
+        where: {
+          id: notificationId,
+        },
+        include: {
+          notification: {
+            include: {
+              createdBy: true,
+              ticket: true,
+              message: true,            
+            },
+          },
+        },
+      });
+      io.emit("notification", notificationData);
+    }
+      
     return notification;
   } catch (error) {
     throw error;
   }
-}
+};
 
 module.exports = {
     getNotifications,

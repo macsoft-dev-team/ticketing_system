@@ -15,10 +15,9 @@ const Tickets = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-    const { data, currentData, loading, error, show, setShow, filter, setCurrentData, createItem, updateItem, setFilter } = useTicket();
+    const { data, currentData, loading, error, show, setShow, filter, setCurrentData, createItem, updateItem, setFilter, setData } = useTicket();
     const { Search } = Input;
     const { data: conversation, createItem: createConversation, setData: setConversation, show: chatWindow, setShow: setChatWindow } = useConversation();
-
 
     const HandleChat = (data) => {
         return (
@@ -60,7 +59,7 @@ const Tickets = () => {
                 type="text"
                 icon={<EyeOutlined />}
                 onClick={() => {
-                    navigate(`/${user.role.toLowerCase()}/tickets/` + data.data.id);
+                    navigate(`${user.role.toLowerCase() === "technical_user" ? '/technical-user/tickets/' + data.data?.id : "/"+user.role.toLowerCase() +'/tickets/' + data.data?.id}`);
                     setCurrentData(data.data);
                 }}>
             </Button>
@@ -87,9 +86,40 @@ const Tickets = () => {
     };
 
     useEffect(() => {
-        socket.on("conversation", (message) => {
-            console.log(message, "message");
-        })
+        socket.connect();
+
+        socket.on("connect", () => {
+            console.log("Connected for conversation:", socket.id);
+        });
+
+        socket.on("conversation", (newConversation) => {
+            setConversation(prev => [...prev, newConversation]);
+            console.log("New conversation:", newConversation);
+
+        });
+
+        return () => {
+            socket.disconnect();
+            socket.off("conversation");
+        };
+
+    }, []);
+    useEffect(() => {
+        socket.connect();
+
+        socket.on("connect", () => {
+            console.log("Connected for tickets:", socket.id);
+        });
+
+        socket.on("ticket", (newTicket) => {
+            setData(prev => [...prev, newTicket]);
+            console.log("New ticket:", newTicket);
+        });
+
+        return () => {
+            socket.disconnect();
+            socket.off("ticket");
+        };
 
     }, []);
 
@@ -97,7 +127,7 @@ const Tickets = () => {
         return <p>Error loading tickets: {error.message}</p>;
     }
 
-    if(show){
+    if (show) {
         return (
             <TicketForm
                 handleClose={() => setShow(false)}
@@ -161,7 +191,7 @@ const Tickets = () => {
                 ) : (
                     <Splitter layout="horizontal" style={{ height: "100%", width: "100%" }}>
                         <Splitter.Panel resizable={false}>
-                            <div className={`grid gap-2 p-5 ${chatWindow ? "grid-cols-2 " : "grid-cols-4 "}`} wrap="true" gap="small" justify="space-evenly" style={{ margin: 0 }}>
+                            <div className={`grid gap-2 p-5 ${chatWindow ? "sm:grid-cols-2 " : "sm:grid-cols-4 "}`} wrap="true" gap="small" justify="space-evenly" style={{ margin: 0 }}>
                                 {data?.map((ticket) => (
                                     <TicketCard key={ticket.id + "Ticket"} loading={loading} HandleEdit={HandleEdit} HandleChat={HandleChat} HandleStatus={HandleStatus} ticket={ticket} currentData={currentData} />
                                 ))}
@@ -178,7 +208,7 @@ const Tickets = () => {
                     </Splitter>
                 )}
             </Row>
-          
+
 
         </section>
     );

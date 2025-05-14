@@ -23,7 +23,7 @@ export default function RegisterUser() {
             navigate("/login"); 
             form.resetFields();
         } catch (error) {
-            message.error(`${error.code} - ${error.message}` || "Registration failed. Please try again.");
+            message.error(`${error?.code} - ${error?.message}` || "Registration failed. Please try again.");
         }
     };
     

@@ -4,7 +4,7 @@ import useCrud from "../../lib/hooks/useCrud";
 
 export default function Users() {
 
-    const {data,currentData,show,setCurrentData,setModal} = useCrud("user");
+    const { data, currentData, show, setCurrentData, setModal } = useCrud("user");
     const { Search } = Input;
     const onSearch = (value) => {
         console.log(value);
@@ -36,7 +36,7 @@ export default function Users() {
                 dataSource={data}
                 rowKey="id"
                 loading={false}
-                size="middle"
+                size="small"
                 className="!rounded-lg !shadow-md !bg-white"
                 style={{
                     width: "100%",
@@ -55,7 +55,7 @@ export default function Users() {
                             className="!rounded-lg  mx-5 !bg-white"
                         />
                         <Button
-                        className="!ms-auto"
+                            className="!ms-auto"
                             variant="dashed"
                             color="cyan"
                             onClick={() => {
@@ -65,11 +65,6 @@ export default function Users() {
                             CREATE USER
                             <PlusOutlined />
                         </Button>
-                    </div>
-                )}
-                footer={() => (
-                    <div className="flex justify-end">
-                        <Pagination align="end" defaultCurrent={1} total={50} showSizeChanger onShowSizeChange={onShowSizeChange} />
                     </div>
                 )}
             />

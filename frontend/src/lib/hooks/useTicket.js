@@ -14,12 +14,19 @@ import {
 
 export default function useTicket() {
   const dispatch = useDispatch();
-  const { data, currentData, loading, error, filter,show} = useSelector(
-    (state) => state.ticket
-  );
+  const {
+    data,
+    currentData,
+    loading,
+    error,
+    filter,
+    show,
+    currentPage,
+    totalPages,
+  } = useSelector((state) => state.ticket);
 
   const refetch = () => {
-    dispatch(fetchTickets());
+    dispatch(fetchTickets({ page: currentPage, size: 10, filter }));
   };
 
   const fetchTicket = (id) => {
@@ -62,7 +69,7 @@ export default function useTicket() {
 
   useEffect(() => {
     if (filter) {
-      dispatch(fetchTickets(filter));
+      dispatch(fetchTickets({page:currentPage,size:10,filter}));
     }
   }, [filter]);
 
@@ -72,6 +79,8 @@ export default function useTicket() {
     show,
     loading,
     error,
+    currentPage,
+    totalPages,
     refetch,
     fetchTicket,
     createItem,

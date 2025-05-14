@@ -204,16 +204,43 @@ const updateTicket = async (ticketId, ticketData, userId, io) => {
     });
     const notification = await prisma.notification.create({
       data: {
-        title: `Ticket updated: ${updatedTicket.ticketCode}`,
-        type: "TICKET_UPDATED",
-        description: `Ticket updated: ${updatedTicket.ticketCode}`,
+        type: "TICKET_CREATED",
+        title: `New ticket created: ${updatedTicket.ticketCode}`,
+        description: `New ticket created: ${updatedTicket.ticketCode}`,
         createdById: userId,
-        ticketId: updatedTicket.id,
-        receivers: {
-          create: [{ userId: adminId }, { userId: technicalUserId }],
+        ticketId: ticketData.id,
+      },
+    });
+
+    const users = await prisma.user.findMany({
+      where: {
+        id: {
+          not: userId,
         },
       },
     });
+
+    for (const user of users) {
+      await prisma.notificationRecipient.create({
+        data: {
+          userId: user.id,
+          notificationId: notification.id,
+        },
+      });
+    }
+
+    const conversation = await prisma.message.create({
+      data: {
+        content: ticketData.description,
+        senderId: userId,
+        ticketId: updatedTicket.id,
+      },
+    });
+    if (io) {
+      io.emit("ticket", updatedTicket);
+      io.emit("notification", notification);
+      io.emit("conversation", conversation);
+    }
     if (io) {
       io.emit("ticket", updatedTicket);
       io.emit("notification", notification);

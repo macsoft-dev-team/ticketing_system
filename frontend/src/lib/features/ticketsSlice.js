@@ -10,17 +10,21 @@ const initialState = {
   },
   loading: false,
   error: null,
+  currentPage: 0,
+  totalPages: 0,
   show: false,
 };
 
 export const fetchTickets = createAsyncThunk(
   "tickets/fetchTickets",
-  async (filter, { rejectWithValue }) => {
+  async ({ page, size, filter }, { rejectWithValue }) => {
     try {
+      const params = {};
+      if (page && page !== 0) params.skip = page;
+      if (size && size !== 0) params.take = size;
+      if (filter) params.filter = filter;
       const response = await axios.get(`${API_URL}/ticket`, {
-        params: {
-          filter: filter ? filter : null,
-        },
+        params: params,
       });
       return response.data;
     } catch (error) {

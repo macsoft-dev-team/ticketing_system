@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import {
-  fetchConversation,
+  fetchConversation as fetchConversationAction,
   createMessage,
   setConversation,
   setCurrentMessage,
@@ -16,20 +16,30 @@ export default function useConversation() {
   const { data, currentData, show, loading, error } = useSelector(
     (state) => state.conversation.conversation
   );
-  const {currentData: ticket} = useCrud("ticket");
+  const { currentData: ticket } = useCrud("ticket");
 
- 
-
-  const refetch = () => {
-    dispatch(fetchConversation({  }));
+  const fetchConversation = (ticketId) => {
+    try {
+      dispatch(fetchConversationAction(ticketId)).then((res) => {
+        if (res.error) {
+          throw new Error(res.error.message);
+        }
+      });
+    } catch (error) {
+      message.error("Error fetching conversation: " + error.message);
+    }
   };
 
-  const createItem = ({ticketId, newMessage}) => {
+  const refetch = () => {
+    dispatch(fetchConversation({}));
+  };
+
+  const createItem = ({ ticketId, newMessage }) => {
     try {
       dispatch(createMessage({ ticketId, message: newMessage })).then((res) => {
-         socket.on("conversation", (message) => {
-           console.log(message, "message");
-         });
+        socket.on("conversation", (message) => {
+          console.log(message, "message");
+        });
         if (res.error) {
           throw new Error(res.error.message);
         }
@@ -47,7 +57,7 @@ export default function useConversation() {
   const setModal = (show) => {
     dispatch(setShowConversation(show));
   };
-  
+
   const setData = (data) => {
     dispatch(setConversation(data));
   };
@@ -55,6 +65,7 @@ export default function useConversation() {
   return {
     data,
     setData,
+    fetchConversation,
     currentData,
     show,
     loading,
