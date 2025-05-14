@@ -32,19 +32,18 @@ exports.register = async (req, res) => {
         role: "USER",
       },
     });
-    if (newUser){
+    if (newUser) {
       const users = await prisma.user.findMany({
-        where:{
-          role:{
-            contains: "ADIMN"
-          }
-        }
+        where: {
+          role: {
+            equals: "ADMIN",
+          },
+        },
       });
       // Create a notification for all users except the newly created user
       const notification = await prisma.notification.create({
         data: {
           createdById: newUser.id,
-          userId: newUser.id,
           description: `New user registered: ${newUser.name}`,
           type: "USER_REGISTERED",
           title: "New User Registration",
@@ -60,10 +59,12 @@ exports.register = async (req, res) => {
         });
       }
     }
-      if (io && newUser) {
-        io.emit("user", newUser);
-      }
+    if (io && newUser) {
+      io.emit("user", newUser);
+    }
     return res.status(201).json({
+      code: "USER_REGISTERED",
+      success: true,
       message: "User registered successfully",
     });
   } catch (error) {

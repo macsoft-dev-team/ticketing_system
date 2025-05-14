@@ -6,15 +6,15 @@ export default function ChatBox({ loading, ticket, conversation,handleClose,hand
     
     const CardTitle = () => {
         return (
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center py-2">
                 <div className="flex items-center gap-2">
-                    <Avatar
+                    {/* <Avatar
                         src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${ticket?.id}`}
-                    />
+                    /> */}
                     <h2 className="text-lg font-semibold">{ticket?.ticketCode}</h2>
                 </div>
-                <Button onClick={handleClose}  icon={<CloseOutlined />}/>
-             </div>
+{/*                 <Button onClick={handleClose}  icon={<CloseOutlined />}/>
+ */}             </div>
 
         );
             }
@@ -22,11 +22,7 @@ export default function ChatBox({ loading, ticket, conversation,handleClose,hand
         <Card className="p-4 flex flex-col justify-between">
             <Card.Meta
                 title={<CardTitle />}
-                description={
-                    <p className="text-gray-600">
-                        {ticket?.description}
-                    </p>
-                }
+               
             />
             <div className="overflow-y-auto p-2 flex flex-col gap-1 flex-1 min-h-[25rem] max-h-[25rem]">
                 {/* Render conversation messages */}

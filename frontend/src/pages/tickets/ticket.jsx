@@ -5,9 +5,12 @@ import { useEffect } from "react";
 import useTicket from "../../lib/hooks/useTicket";
 import moment from "moment";
 import TicketForm from "../../components/forms/ticket";
+import ChatBox from "../../components/chat-box";
+import useConversation from "../../lib/hooks/conversation";
 
 export default function Ticket() {
     const { currentData, show, fetchTicket, setCurrentData, setShow } = useTicket();
+    const { data: conversation, loading, fetchConversation } = useConversation();
     const { ticketId } = useParams();
     const navigate = useNavigate();
 
@@ -21,7 +24,10 @@ export default function Ticket() {
         setShow(false);
     };
 
-    useEffect(() => { fetchTicket(ticketId); }, [ticketId]);
+    useEffect(() => {
+        fetchTicket(ticketId);
+        fetchConversation(ticketId);
+    }, [ticketId]);
 
     console.log(show, "show ticket form");
 
@@ -50,12 +56,12 @@ export default function Ticket() {
                     Ticket (<span className="text-green-600">#{currentData?.ticketCode}</span>)
                 </Typography.Title>
                 <Space.Compact block className="!w-max !ms-auto">
-                    <Button
+                   {/*  <Button
                         type="primary"
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold"
                         onClick={() => alert("Create Ticket")}
                         icon={<MessageOutlined />}
-                    />
+                    /> */}
                     <Button
                         type="primary"
                         className="!bg-green-700 hover:!bg-green-700/80 text-white font-bold"
@@ -72,7 +78,7 @@ export default function Ticket() {
                     />
                 </Space.Compact>
             </header>
-            <section className="bg-white shadow-md rounded-lg mt-2">
+            <section className="bg-white shadow-md rounded-lg mt-2 grid sm:grid-cols-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 *:p-4 md:divide-x divide-gray-200 gap-6">
                     <div>
                         <div className="grid grid-cols-2 gap-4">
@@ -138,6 +144,9 @@ export default function Ticket() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div>
+                    <ChatBox loading={loading} ticket={currentData} conversation={conversation} />
                 </div>
             </section>
         </section>

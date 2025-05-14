@@ -17,7 +17,9 @@ export const login = createAsyncThunk(
     } catch (err) {
       const status = err.response?.status;
       const error = err.response?.data?.error;
-      error.code = status;
+      if (error) {
+        error.code = status;
+      }
       return rejectWithValue(error || "Registration failed");
     }
   }
@@ -32,7 +34,9 @@ export const register = createAsyncThunk(
     } catch (err) {
       const status = err.response?.status;
       const error = err.response?.data?.error;
-      error.code = status;
+      if (error) {
+        error.code = status;
+      }
       return rejectWithValue(error || "Registration failed");
     }
   }

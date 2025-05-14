@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Col, Flex, Layout, Menu, Popover, Row, Splitter, Typography } from 'antd';
-import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Button, Col, Layout, Menu, Popover, Row, Typography } from 'antd';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import logo from "../../assets/macsoft-logo.png";
 import { logout } from '../../lib/features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,16 +18,21 @@ const AppLayout = () => {
     useEffect(() => {
         socket.connect();
 
-        socket.on("notification", (data) => {
-            setData([...data, data]);
+        socket.on("connect", () => {
+            console.log("Connected:", socket.id);
+        });
+
+        socket.on("notification", (newNotification) => {
+            setData(prev => [...prev, newNotification]);
+            console.log("Notification received:", newNotification);
+            
         });
 
         return () => {
+            socket.disconnect();
             socket.off("notification");
         };
     }, []);
-
-
 
     const items = [
         {
@@ -61,16 +66,32 @@ const AppLayout = () => {
         });
     }
 
+    if (user?.role === "TECHNICAL_USER") {
+        items.push({
+            label: (
+                <NavLink
+                    to="spare-request"
+                    className={({ isActive }) =>
+                        isActive ? 'menu-link active-link' : 'menu-link'
+                    }
+                >
+                    Spare Request
+                </NavLink>
+            ),
+            key: 'spare-request',
+        });
+    }
+
+
     const markAsRead = (id) => {
-        setData(data.filter((item) => item.id !== id));
-        updateItem(id, { read: true });
+         updateItem(id, { seen: true });
     };
 
 
     const content = (
         <div className='w-96 max-h-96 overflow-y-auto *:p-2 *:max-h-20 flex flex-col divide-y divide-gray-200'>
             {data.length > 0 ? data?.map((notification) => (
-                <div className='grid grid-flow-row' key={notification?.notification?.id}>
+                <div className={`grid grid-flow-row ${notification.seen ? "bg-gray-100" : "bg-inherit"} `} key={notification?.notification?.id}>
                     <h1 className='uppercase text-cyan-800'>{notification?.notification?.title}</h1>
                     <h2>{notification?.notification?.description}</h2>
                     <footer>
@@ -135,8 +156,12 @@ const AppLayout = () => {
                         } content={content}>
                             <Button
                                 size='small'
+                                className='relative'
                             >
                                 <i className="fa-solid fa-bell"></i>
+                                <span className='h-5 w-5 rounded-full bg-stone-800 text-white absolute -top-2 -start-4 flex justify-center items-center'>
+                                    {data.filter(notification => !notification.seen).length}
+                                </span>
                             </Button>
                         </Popover>
                         <Button
