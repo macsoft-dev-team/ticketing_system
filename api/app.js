@@ -11,9 +11,7 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-    credentials: true,
+    origin: ["http://localhost:5173", "https://cms2.macsoftautomations.in"]
   },
 });
 

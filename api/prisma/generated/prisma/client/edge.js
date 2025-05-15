@@ -253,7 +253,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\WORKSPACE\\MACSOFT\\ticketing-system\\api\\prisma\\generated\\prisma\\client",
+      "value": "/home/raja/workspace/ticketing-system/api/prisma/generated/prisma/client",
       "fromEnvVar": null
     },
     "config": {
@@ -262,12 +262,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\WORKSPACE\\MACSOFT\\ticketing-system\\api\\prisma\\schema.prisma",
+    "sourceFilePath": "/home/raja/workspace/ticketing-system/api/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -281,12 +281,11 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "mysql://root:Welcome123!@localhost:3306/ticketsystem2"
       }
     }
   },
