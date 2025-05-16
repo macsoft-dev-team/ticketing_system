@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { API_URL } from "../config";
 import { initialState } from "../crudIntitialState";
-  
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const fetchData = createAsyncThunk(
   "crud/fetchData",
