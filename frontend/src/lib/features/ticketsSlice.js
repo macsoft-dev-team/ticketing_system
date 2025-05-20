@@ -21,9 +21,11 @@ export const fetchTickets = createAsyncThunk(
   async ({ page, size, filter }, { rejectWithValue }) => {
     try {
       const params = {};
-      if (page && page !== 0) params.skip = page;
-      if (size && size !== 0) params.take = size;
+      if (page !== 0) params.skip = page;
+      if (size !== 0) params.take = size;
       if (filter) params.filter = filter;
+      console.log(params, "params");
+      
       const response = await axios.get(`${API_URL}/ticket`, {
         params: params,
       });
@@ -150,7 +152,11 @@ const ticketsSlice = createSlice({
       })
       .addCase(createTicket.fulfilled, (state, action) => {
         state.loading = false;
-        state.data.push(action.payload);
+        if (Array.isArray(state.data)) {
+          state.data = [...state.data, action.payload];
+        } else {
+          state.data = [action.payload];
+        }
       })
       .addCase(createTicket.rejected, (state, action) => {
         state.loading = false;

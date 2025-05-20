@@ -14,7 +14,7 @@ export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/notifications`);
+      const response = await axios.get(`${API_URL}/notification`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -26,7 +26,7 @@ export const updateNotificationStatus = createAsyncThunk(
   "notifications/updateNotificationStatus",
   async ({ id, status }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/notifications/${id}`, { status });
+      const response = await axios.put(`${API_URL}/notification/${id}`, { status });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -78,5 +78,5 @@ const notificationSlice = createSlice({
       
   },
 });
-
+export const { appendNotification } = notificationSlice.actions;
 export default notificationSlice.reducer;

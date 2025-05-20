@@ -5,15 +5,16 @@ import {
   appendNotification,
 } from "../features/notificationSlice";
 import { useEffect } from "react";
+import socket from "../socket/socket";
+import { useNotificationSound } from "../../components/notification/useNotificationSound";
 
 export default function useNotification() {
   const dispatch = useDispatch();
-  const {
-    notifications,
-    loading,
-    error,
-  } = useSelector((state) => state.notifications);
-
+  const playSound = useNotificationSound();
+  const { notifications, loading, error } = useSelector(
+    (state) => state.notification
+  );
+  const { user } = useSelector((state) => state.auth);
   const refetch = () => {
     dispatch(fetchNotifications());
   };
@@ -24,7 +25,20 @@ export default function useNotification() {
 
   useEffect(() => {
     const handleNotification = (notification) => {
-      dispatch(appendNotification(notification));
+      console.log(user.id, "notification.userId");
+      const _notificationForUser = notification.find(
+        (n) => n.userId === user.id
+      );
+      if (_notificationForUser) {
+        console.log("_notificationForUser", _notificationForUser);
+        if (user.id === _notificationForUser.userId) {
+          playSound();
+          if (_notificationForUser) {
+            dispatch(appendNotification(_notificationForUser));
+          }
+        }
+      }
+   
     };
 
     // Assuming you have a socket connection set up
@@ -34,7 +48,7 @@ export default function useNotification() {
       socket.off("notification", handleNotification);
     };
   }, [dispatch]);
-   
+
   useEffect(() => {
     refetch();
   }, []);
@@ -45,5 +59,5 @@ export default function useNotification() {
     error,
     refetch,
     updateStatus,
-   };
+  };
 }

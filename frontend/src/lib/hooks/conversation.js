@@ -5,7 +5,7 @@ import {
   setConversation,
   setCurrentMessage,
   setShowConversation,
-  appendMessageToTicket 
+  appendMessageToTicket,
 } from "../features/conversationSlice";
 import { message } from "antd";
 import { useSelector, useDispatch } from "react-redux";
@@ -37,15 +37,7 @@ export default function useConversation() {
 
   const createItem = ({ ticketId, newMessage }) => {
     try {
-      dispatch(createMessage({ ticketId, message: newMessage })).then((res) => {
-        socket.on("conversation", (message) => {
-          console.log(message, "message");
-        });
-        if (res.error) {
-          throw new Error(res.error.message);
-        }
-      });
-      message.success("Message sent successfully!");
+      dispatch(createMessage({ ticketId, message: newMessage }));
     } catch (error) {
       message.error("Error sending message: " + error.message);
     }
@@ -74,7 +66,6 @@ export default function useConversation() {
 
     socket.on("conversation", (newConversation) => {
       dispatch(appendMessageToTicket(newConversation));
-      console.log("New conversation:", newConversation);
     });
 
     return () => {

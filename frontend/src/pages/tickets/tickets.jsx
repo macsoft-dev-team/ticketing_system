@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
-import { EditOutlined, EyeOutlined, MessageOutlined, PlusOutlined, } from "@ant-design/icons";
+import { EyeOutlined, MessageOutlined, PlusOutlined, } from "@ant-design/icons";
 import { Row, Button, Segmented, Splitter, Input, Empty, Typography, Spin, Select } from "antd";
-import useCrud from "../../lib/hooks/useCrud";
 import TicketForm from "../../components/forms/ticket";
 import TicketCard from "../../components/ticket-card";
-import ChatBox from "../../components/chat-box";
 import useConversation from "../../lib/hooks/conversation";
-import socket from "../../lib/socket/socket";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchConversation } from "../../lib/features/conversationSlice";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +42,7 @@ const Tickets = () => {
                 defaultValue={data.data.status}
                 options={[{ value: 'OPEN', label: 'OPEN' }, { value: 'CLOSED', label: 'CLOSED' }]}
                 onChange={(value) => {
-                    updateStatus(data.data.id, value );
+                    updateStatus(data.data.id, value);
                 }}
             />
         )
@@ -60,73 +56,35 @@ const Tickets = () => {
                 type="text"
                 icon={<EyeOutlined />}
                 onClick={() => {
-                    navigate(`${user.role.toLowerCase() === "technical_user" ? '/technical-user/tickets/' + data.data?.id : "/"+user.role.toLowerCase() +'/tickets/' + data.data?.id}`);
+                    navigate(`${user.role.toLowerCase() === "technical_user" ? '/technical-user/tickets/' + data.data?.id : "/" + user.role.toLowerCase() + '/tickets/' + data.data?.id}`);
                     setCurrentData(data.data);
                 }}>
             </Button>
         )
     }
-
-    const handleSubmitChat = (values) => {
-        console.log("values", values);
-        
-        const _data = { ...values, ticketId: currentData?.id };
-        createConversation({ ticketId: currentData.id, newMessage: _data });
-    }
-
-    const handleClose = () => {
-        setChatWindow(false);
-        setShow(false);
-        setCurrentData(null);
-    };
-
-    const onSearch = (value) => {
-        if (value) {
-            setFilter({ ...filter, ...value });
-        } else {
-            setFilter({});
-        }
-    };
-
-    useEffect(() => {
-        if (!socket.connected) {
-            socket.connect();
+    const onSearch = (value = {}) => {
+        const updatedFilter = { ...filter };
+        console.log(value, "value");
+            console.log(updatedFilter, "updatedFilter");
+            
+        // Update status
+        if (value.status) {            
+            if (value.status) updatedFilter.status = value.status;
+            else delete updatedFilter.status;
+            console.log(updatedFilter, "updatedFilter");
+            
         }
 
-        socket.on("connect", () => {
-            console.log("Connected for conversation:", socket.id);
-        });
+        // Update search
+        if (value.search) {
+            if (value.search) updatedFilter.search = value.search;
+            else delete updatedFilter.search;
+            console.log(updatedFilter, "updatedFilter");
+        }
 
-        socket.on("conversation", (newConversation) => {
-            setConversation(prev => [...prev, newConversation]);
-            console.log("New conversation:", newConversation);
+        setFilter(updatedFilter);
+    };
 
-        });
-
-        return () => {
-            socket.disconnect();
-            socket.off("conversation");
-        };
-
-    }, []);
-    useEffect(() => {
-        socket.connect();
-
-        socket.on("connect", () => {
-            console.log("Connected for tickets:", socket.id);
-        });
-
-        socket.on("ticket", (newTicket) => {
-            setData(prev => [...prev, newTicket]);
-            console.log("New ticket:", newTicket);
-        });
-
-        return () => {
-            socket.disconnect();
-            socket.off("ticket");
-        };
-
-    }, []);
 
     if (error) {
         return <p>Error loading tickets: {error.message}</p>;
@@ -173,7 +131,7 @@ const Tickets = () => {
                     onChange={value => {
                         onSearch({ status: value });
                     }} />
-                <Search placeholder="Search by Ticket id/Controller No" allowClear onSearch={onSearch} style={{ width: 300 }} />
+                <Search placeholder="Search by Ticket id/Controller No" allowClear onSearch={(value) => onSearch({ search: value })} style={{ width: 300 }} />
                 <Button
                     variant="dashed"
                     color="cyan"
@@ -189,7 +147,7 @@ const Tickets = () => {
             </Row>
             <Row>
 
-                {data.length === 0 && !loading ? (
+                {data?.length === 0 && !loading ? (
                     <div className="flex items-center justify-center h-[400px] w-full">
                         <Empty description={<Typography.Text type="secondary">No Tickets Found</Typography.Text>} />
                     </div>
@@ -203,7 +161,7 @@ const Tickets = () => {
 
                             </div >
                         </Splitter.Panel>
- 
+
 
                     </Splitter>
                 )}

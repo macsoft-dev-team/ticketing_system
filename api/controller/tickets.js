@@ -2,10 +2,10 @@ const ticketService = require("../service/tickets");
 
 const getTickets = async (req, res, filter) => {
   try {
-    const { userId } = req.user;
+    const { id } = req.user;
     const { role } = req.user;
     const { skip, take, filter } = req.query;
-    const tickets = await ticketService.getTickets(skip, take, filter, userId, role);
+    const tickets = await ticketService.getTickets(skip, take, filter, id, role);
     res.status(200).json(tickets);
   } catch (error) {
     console.error(error);

@@ -13,7 +13,7 @@ import {
   updateStatus as updateTicketStatus,
   addConversationMessage,
 } from "../features/ticketsSlice";
- import socket from "../socket/socket";
+import socket from "../socket/socket";
 
 export default function useTicket() {
   const dispatch = useDispatch();
@@ -27,6 +27,7 @@ export default function useTicket() {
     currentPage,
     totalPages,
   } = useSelector((state) => state.ticket);
+  const { user } = useSelector((state) => state.auth);
 
   const refetch = () => {
     dispatch(fetchTickets({ page: currentPage, size: 10, filter }));
@@ -66,7 +67,7 @@ export default function useTicket() {
 
   const updateStatus = (id, status) => {
     dispatch(updateTicketStatus({ id, status }));
-  }
+  };
 
   useEffect(() => {
     if (!socket.connected) {
@@ -78,14 +79,31 @@ export default function useTicket() {
     });
 
     socket.on("conversation", (newConversation) => {
-      if( currentData && currentData.id === newConversation.ticketId) {
+      if (currentData && currentData.id === newConversation.ticketId) {
         dispatch(addConversationMessage(newConversation));
-      } 
+      }
+    });
+    socket.on("ticket", (newTicket) => {
+       const _ticket = data.find((ticket) => ticket.id === newTicket.id);
+       if (user.id !== newTicket.createdBy && user.role !== "USER") {
+        if (_ticket) {
+          let _tickets = [];
+          _tickets = data.filter((id) => id !== _ticket.id);
+          _tickets.push(newTicket);
+          setData(_tickets);
+        } else {
+          let tickets = [];
+          tickets = [...data];
+          tickets.push(newTicket);
+           setData(tickets);
+        }
+      }
     });
 
     return () => {
       socket.disconnect();
       socket.off("conversation");
+      socket.off("ticket");
     };
   }, []);
 
@@ -97,7 +115,9 @@ export default function useTicket() {
 
   useEffect(() => {
     if (filter) {
-      dispatch(fetchTickets({page:currentPage,size:10,filter}));
+      console.log(filter, "filter");
+      
+      dispatch(fetchTickets({ page: currentPage, size: 10, filter: filter }));
     }
   }, [filter]);
 
@@ -105,6 +125,7 @@ export default function useTicket() {
     data,
     currentData,
     show,
+    filter,
     loading,
     error,
     currentPage,

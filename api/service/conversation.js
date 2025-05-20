@@ -97,8 +97,30 @@ const createConversation = async (conversation, userId, io) => {
       })
     );
     conversation.ticketId = ticketId;
-    if (io&&notificationRecipients.length > 0) {
-      io.emit("notification", notification);
+    const _notificationRecipients = await prisma.notificationRecipient.findMany({
+      where: {
+        notificationId: notification.id,
+      },
+      include: {
+        notification: {
+          include: {
+            createdBy: true,
+            ticket: true,
+            message: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            role: true,
+          },
+        },
+      },
+    });
+    if (io && notificationRecipients.length > 0) {
+      io.emit("notification", _notificationRecipients);
     }
     if (io) {
       io.emit(`conversation`, conversation);
