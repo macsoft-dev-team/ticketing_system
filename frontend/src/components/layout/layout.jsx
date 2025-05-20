@@ -7,13 +7,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import useCrud from '../../lib/hooks/useCrud';
 import socket from "../../lib/socket/socket";
 import moment from 'moment';
+import useNotification from '../../lib/hooks/useNotification';
 const { Header, Content } = Layout;
 
 const AppLayout = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-    const { data, setData, updateItem } = useCrud("notification");
+    const { notifications, updateNotificationStatus } = useNotification();
    
     const items = [
         {
@@ -65,13 +66,13 @@ const AppLayout = () => {
 
 
     const markAsRead = (id) => {
-        updateItem(id, { seen: true });
+        updateNotificationStatus(id, { seen: true });
     };
 
 
     const content = (
         <div className='w-96 max-h-96 overflow-y-auto *:p-2 *:max-h-20 flex flex-col divide-y divide-gray-200'>
-            {data.length > 0 ? data?.map((notification) => (
+            {notifications.length > 0 ? notifications?.map((notification) => (
                 <div className={`grid grid-flow-row ${notification.seen ? "bg-inherit" : " bg-gray-100"} `} key={notification?.notification?.id}>
                     <h1 className='uppercase text-cyan-800'>{notification?.notification?.title}</h1>
                     <h2>{notification?.notification?.description}</h2>
@@ -133,7 +134,7 @@ const AppLayout = () => {
                         <Popover placement="bottomRight" title={
                             <div className='flex items-center justify-between border-b border-gray-200'>
                                 <Typography.Text strong>Notifications</Typography.Text>
-                                <Button type="text" onClick={() => setData([])} size="small">Clear All</Button>
+                                <Button type="text"  size="small">Clear All</Button>
                             </div>
                         } content={content}>
                             <Button
@@ -142,7 +143,7 @@ const AppLayout = () => {
                             >
                                 <i className="fa-solid fa-bell"></i>
                                 <span className='h-5 w-5 rounded-full bg-stone-800 text-white absolute -top-2 -start-4 flex justify-center items-center'>
-                                    {data.filter(notification => !notification.seen).length}
+                                    {notifications.filter(notification => !notification.seen).length}
                                 </span>
                             </Button>
                         </Popover>
