@@ -21,8 +21,6 @@ export default function ChatBox({ loading, ticket, conversation, handleClose }) 
         );
     }
     const handleSubmit = (values) => {
-        console.log("values", values);
-
         const _data = { ...values, ticketId: ticket?.id };
         createConversation({ ticketId: ticket.id, newMessage: _data });
     }    

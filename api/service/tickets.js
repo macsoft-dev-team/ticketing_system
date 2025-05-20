@@ -2,33 +2,7 @@ const { prisma } = require("../lib/clients");
 
 const getTickets = async (skip, take, filter, userId, role) => {
   try {
-    const params = {};
-    if (filter && filter.search) {
-      params.OR = [
-        { ticketCode: { contains: filter.search } },
-        { description: { contains: filter.search } },
-        { customerName: { contains: filter.search } },
-        { controllerNo: { contains: filter.search } },
-        { head: { contains: filter.search } },
-        { imei: { contains: filter.search } },
-        { hp: { contains: filter.search } },
-        { motorType: { contains: filter.search } },
-        { state: { contains: filter.search } },
-        { district: { contains: filter.search } },
-        { village: { contains: filter.search } },
-        { block: { contains: filter.search } },
-        { complaintType: { contains: filter.search } },
-        { faultCode: { contains: filter.search } },
-      ];
-    }
-    if (filter && filter.status) {
-      params.status = filter.status;
-    }
-    if (role === "USER") {
-      params.createdById = userId;
-    }
-    const tickets = await prisma.ticket.findMany({
-      where: params,
+    const params = {
       include: {
         createdByUser: true,
         updatedByUser: true,
@@ -46,7 +20,39 @@ const getTickets = async (skip, take, filter, userId, role) => {
       orderBy: {
         createdAt: "desc",
       },
-    });
+    };
+    if (filter && filter.search) {
+      params.where.OR = [
+        { ticketCode: { contains: filter.search } },
+        { description: { contains: filter.search } },
+        { customerName: { contains: filter.search } },
+        { controllerNo: { contains: filter.search } },
+        { head: { contains: filter.search } },
+        { imei: { contains: filter.search } },
+        { hp: { contains: filter.search } },
+        { motorType: { contains: filter.search } },
+        { state: { contains: filter.search } },
+        { district: { contains: filter.search } },
+        { village: { contains: filter.search } },
+        { block: { contains: filter.search } },
+        { complaintType: { contains: filter.search } },
+        { faultCode: { contains: filter.search } },
+      ];
+    }
+    if (filter && filter.status) {
+      params.where = {
+        ...params.where,
+        status: filter.status,
+      };
+    }
+    if (role === "USER") {
+      params.where = {
+        ...params.where,
+        createdBy: userId,
+      };
+    }
+
+    const tickets = await prisma.ticket.findMany(params);
     return tickets;
   } catch (error) {
     throw error;
@@ -117,6 +123,20 @@ const createTicket = async (ticket, userId, io) => {
         faultCode: faultCode,
         createdBy: userId,
       },
+      include: {
+        createdByUser: true,
+        updatedByUser: true,
+        messages: {
+          include: {
+            sender: true,
+          },
+        },
+        notifications: {
+          include: {
+            recipients: true,
+          },
+        },
+      },
     });
     const notification = await prisma.notification.create({
       data: {
@@ -144,38 +164,35 @@ const createTicket = async (ticket, userId, io) => {
         ],
       },
     });
-
+    let notificationRecipients = [];
     for (const user of users) {
-      await prisma.notificationRecipient.create({
-        data: {
-          userId: user.id,
-          notificationId: notification.id,
-        },
-      });
-    }
-
-    const notificationRecipients= await prisma.notificationRecipient.findMany({
-      where: {
-        notificationId: notification.id,
-      },
-      include: {
-        notification: {
+      const _notificationRecipients = await prisma.notificationRecipient.create(
+        {
+          data: {
+            userId: user.id,
+            notificationId: notification.id,
+          },
           include: {
-            createdBy: true,
-            ticket: true,
-            message: true,
+            notification: {
+              include: {
+                createdBy: true,
+                ticket: true,
+                message: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
           },
-        },
-        user: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-            role: true,
-          },
-        },
-      },
-    });
+        }
+      );
+      notificationRecipients.push(_notificationRecipients);
+    }
 
     const conversation = await prisma.message.create({
       data: {
