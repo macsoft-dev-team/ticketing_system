@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 export const useNotificationSound = () => {
-  const audioRef = useRef(new Audio("/sounds/level-up-191997.mp3"));
+  const audioRef = useRef(new Audio("/sounds/livechat-129007.mp3"));
 
   const playSound = () => {
     audioRef.current.currentTime = 0;

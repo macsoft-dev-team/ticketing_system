@@ -130,7 +130,6 @@ const AppLayout = () => {
                         <Menu theme='dark' mode="horizontal" items={items} itemactivebg="bg-secondary" />
                     </Col>
                     <Col style={{ marginLeft: "auto", color: 'white', fontWeight: 'bold', fontSize: '18px', padding: '0 20px' }}>
-
                         <Popover placement="bottomRight" title={
                             <div className='flex items-center justify-between border-b border-gray-200'>
                                 <Typography.Text strong>Notifications</Typography.Text>
@@ -172,8 +171,8 @@ const AppLayout = () => {
                     </Col>
                 </Row>
             </Header>
-            <Content style={{ marginTop: 64 }}>
-                <div className="site-layout-content" style={{ padding: '5px', minHeight: "100vh" }}>
+            <Content>
+                <div className="site-layout-content !overflow-hidden mt-16 fixed w-full" style={{ padding: '5px', minHeight: "100vh" }}>
                     <Outlet />
                 </div>
             </Content>

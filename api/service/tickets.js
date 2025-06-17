@@ -353,10 +353,31 @@ const updateStatus = async (ticketId, status, userId, io) => {
   }
 };
 
+const deleteTicket = async (ticketId) => {
+  try {
+    const deletedNotificationRecipients = await prisma.notificationRecipient.deleteMany({
+      where: { notification: { ticketId: ticketId } },
+    });
+    const deletedNotifications = await prisma.notification.deleteMany({
+      where: { ticketId: ticketId },
+    });
+    const deletedMessages = await prisma.message.deleteMany({
+      where: { ticketId: ticketId },
+    });
+    const deletedTicket = await prisma.ticket.delete({
+      where: { id: ticketId },
+    });
+    return deletedTicket;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getTickets,
   getTicketById,
   createTicket,
   updateTicket,
   updateStatus,
+  deleteTicket,
 };

@@ -80,10 +80,27 @@ const updateStatus = async (req, res) => {
   }
 };
 
+const deleteTicket = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const io = req.io;
+  try {
+    const deletedTicket = await ticketService.deleteTicket(parseInt(id), userId, io);
+    if (!deletedTicket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+    res.status(200).json({ message: "Ticket deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   getTickets,
   createTicket,
   updateTicket,
   updateStatus,
   getTicketById,
+  deleteTicket
 };

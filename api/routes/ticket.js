@@ -11,4 +11,5 @@ router.get("/:id", tickets.getTicketById);
 router.put("/:id", upload.single("picture"), tickets.updateTicket);
 router.put("/status/:id", tickets.updateStatus);
 router.post("/", upload.single("picture"), tickets.createTicket);
+router.delete("/:id", tickets.deleteTicket);
 module.exports = router;

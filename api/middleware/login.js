@@ -59,17 +59,35 @@ exports.login = async (req, res) => {
           title: "User Login",
         },
       });
-
+      let _notification = [];
       for (const user of users) {
-        await prisma.notificationRecipient.create({
+       const notificationRecipient = await prisma.notificationRecipient.create({
           data: {
             userId: user.id,
             notificationId: notification.id,
           },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
+            notification: {
+              include: {
+                createdBy: true,
+                ticket: true,
+                message: true,
+              },
+            },
+          },
         });
+        _notification.push(notificationRecipient);
       }
-      if(io && notification) {
-        io.emit("notification", notification);
+      if(io && _notification) {
+        io.emit("notification", _notification);
       }
      }
     return res.status(200).json({
