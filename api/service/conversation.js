@@ -15,7 +15,7 @@ const getConversations = async (ticketId) => {
         },
         attachments: true,
         ticket: true,
-        seenBy:true
+        seenBy: true,
       },
     });
     return conversations;
@@ -46,7 +46,7 @@ const createConversation = async (conversation, userId, io) => {
         seenBy: true,
       },
     });
-   /*  if (attachments) {
+    /*  if (attachments) {
       await Promise.all(
         attachments.map(async (attachment) => {
           await prisma.attachments.create({
@@ -71,9 +71,20 @@ const createConversation = async (conversation, userId, io) => {
     });
     const notificationRecipients = await prisma.user.findMany({
       where: {
-        id: {
-          not: userId,
-        },
+        OR: [
+          {
+            id: {
+              not: userId,
+            },
+          },
+          {
+            createdTickets: {
+              some: {
+                id: ticketId,
+              },
+            },
+          },
+        ],
       },
     });
     await Promise.all(
@@ -97,34 +108,36 @@ const createConversation = async (conversation, userId, io) => {
       })
     );
     conversation.ticketId = ticketId;
-    const _notificationRecipients = await prisma.notificationRecipient.findMany({
-      where: {
-        notificationId: notification.id,
-      },
-      include: {
-        notification: {
-          include: {
-            createdBy: true,
-            ticket: true,
-            message: true,
+    const _notificationRecipients = await prisma.notificationRecipient.findMany(
+      {
+        where: {
+          notificationId: notification.id,
+        },
+        include: {
+          notification: {
+            include: {
+              createdBy: true,
+              ticket: true,
+              message: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              phone: true,
+              role: true,
+            },
           },
         },
-        user: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-            role: true,
-          },
-        },
-      },
-    });
+      }
+    );
     if (io && notificationRecipients.length > 0) {
       io.emit("notification", _notificationRecipients);
     }
     if (io) {
       io.emit(`conversation`, conversation);
-     }
+    }
     return conversation;
   } catch (error) {
     throw error;

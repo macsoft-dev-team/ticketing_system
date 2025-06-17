@@ -31,8 +31,6 @@ export default function Ticket() {
         fetchConversation(ticketId);
     }, [ticketId]);
 
-    console.log(show, "show ticket form");
-
     const handleSubmit = (values) => {
         if (currentData) {
             updateItem(currentData.id, values);
@@ -52,9 +50,9 @@ export default function Ticket() {
             />);
     }
     return (
-        <section className="bg-gray-50 min-h-screen p-4">
+        <section className="bg-gray-50 overflow-hidden">
             <header className="border-b border-gray-300 bg-white shadow-sm text-blue-800 uppercase p-4 flex justify-between items-center">
-                <Typography.Title level={4} className="text-xl tracking-wider font-bold flex-1">
+                <Typography.Title level={4} className="text-xl tracking-wider font-bold flex-1 !m-0">
                     Ticket (<span className="text-green-600">#{currentData?.ticketCode}</span>)
                 </Typography.Title>
                 <Space.Compact block className="!w-max !ms-auto">

@@ -1,5 +1,5 @@
-import { EyeOutlined, MessageOutlined, PlusOutlined, } from "@ant-design/icons";
-import { Row, Button, Segmented, Splitter, Input, Empty, Typography, Spin, Select } from "antd";
+import { DeleteOutlined, EyeOutlined, MessageOutlined, PlusOutlined, } from "@ant-design/icons";
+import { Row, Button, Segmented, Splitter, Input, Empty, Typography, Spin, Select, Popconfirm, message } from "antd";
 import TicketForm from "../../components/forms/ticket";
 import TicketCard from "../../components/ticket-card";
 import useConversation from "../../lib/hooks/conversation";
@@ -11,7 +11,7 @@ const Tickets = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-    const { data, currentData, loading, error, show, setShow, filter, setCurrentData, createItem, updateItem, setFilter, setData, updateStatus } = useTicket();
+    const { data, currentData, loading, error, show, setShow, filter, setCurrentData, createItem, updateItem, deleteItem,setFilter, setData, updateStatus } = useTicket();
     const { Search } = Input;
     const { data: conversation, createItem: createConversation, setData: setConversation, show: chatWindow, setShow: setChatWindow } = useConversation();
 
@@ -33,6 +33,7 @@ const Tickets = () => {
     }
 
     const HandleStatus = (data) => {
+        if (user.role.toLowerCase() ==="user") return null;
         return (
             <Select
                 className="min-w-26"
@@ -62,6 +63,42 @@ const Tickets = () => {
             </Button>
         )
     }
+
+    const HandleDelete = (data) => {
+        const confirm = e => {
+                deleteItem(data.data.id);
+            message.success('Ticket deleted successfully');
+        };
+        const cancel = e => {
+            console.log(e);
+            message.error('Ticket deletion cancelled');
+          };
+
+        if(user.role.toLowerCase() !== "admin") return null;
+
+        return (
+            <Popconfirm
+                placement="topRight"
+                title="Delete the ticket"
+                description="Are you sure to delete this ticket?"
+                onConfirm={confirm}
+                onCancel={cancel}
+                okText="Yes"
+                cancelText="No"
+            >
+                <Button
+                    key="delete"
+                    disabled={chatWindow}
+                
+                type="text"
+                icon={<DeleteOutlined />}
+             >
+            </Button>
+            </Popconfirm>
+        )
+    }
+
+
     const onSearch = (value = {}) => {
         const updatedFilter = { ...filter };
         console.log(value, "value");
@@ -108,9 +145,9 @@ const Tickets = () => {
     }
 
     return (
-        <section>
+        <section className="overflow-y-auto max-h-screen pb-20">
             <Row
-                className="!px-6 !py-2"
+                className="!px-6 !py-2 sticky top-0 z-50 bg-white flex flex-wrap items-center gap-2 shadow-sm"
                 style={{
                     width: "100%",
                     margin: "0",
@@ -146,7 +183,6 @@ const Tickets = () => {
                 </Button>
             </Row>
             <Row>
-
                 {data?.length === 0 && !loading ? (
                     <div className="flex items-center justify-center h-[400px] w-full">
                         <Empty description={<Typography.Text type="secondary">No Tickets Found</Typography.Text>} />
@@ -156,7 +192,7 @@ const Tickets = () => {
                         <Splitter.Panel resizable={false}>
                             <div className={`grid gap-2 p-5 ${chatWindow ? "sm:grid-cols-2 " : "sm:grid-cols-4 "}`} wrap="true" gap="small" justify="space-evenly" style={{ margin: 0 }}>
                                 {data?.map((ticket) => (
-                                    <TicketCard key={ticket.id + "Ticket"} loading={loading} HandleEdit={HandleEdit} HandleChat={HandleChat} HandleStatus={HandleStatus} ticket={ticket} currentData={currentData} />
+                                    <TicketCard key={ticket.id + "Ticket"} loading={loading} HandleEdit={HandleEdit} HandleChat={HandleChat} HandleDelete={HandleDelete} HandleStatus={HandleStatus} ticket={ticket} currentData={currentData} />
                                 ))}
 
                             </div >

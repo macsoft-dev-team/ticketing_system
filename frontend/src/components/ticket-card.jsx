@@ -2,13 +2,14 @@ import { Avatar, Button, Card } from "antd";
 import moment from "moment";
  
 
-export default function TicketCard({ loading, HandleStatus, ticket, HandleEdit,  currentData }) {
+export default function TicketCard({ loading, HandleStatus, ticket, HandleEdit, currentData, HandleDelete }) {
     return (
         <Card
             loading={loading}
             actions={[
                 <HandleEdit data={ticket} />,
                 <HandleStatus data={ticket} />,
+                <HandleDelete data={ticket} />,
             ] }
             style={{ minWidth: "100%", maxWidth: "100%" }}
             key={ticket.id}
