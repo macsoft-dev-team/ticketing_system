@@ -1,0 +1,138 @@
+[
+  {
+    "id": 1,
+    "name": "DC MCB 500V",
+    "description": "500V DC Miniature Circuit Breaker for solar and industrial protection.",
+    "brandName": "Generic",
+    "productCode": "MCB-DC-500V",
+    "category": "MCB"
+  },
+  {
+    "id": 2,
+    "name": "DC MCB 1000V",
+    "description": "1000V DC Miniature Circuit Breaker suitable for PV protection.",
+    "brandName": "Generic",
+    "productCode": "MCB-DC-1000V",
+    "category": "MCB"
+  },
+  {
+    "id": 3,
+    "name": "DC SPD 600V",
+    "description": "600V DC Surge Protection Device for solar systems.",
+    "brandName": "Generic",
+    "productCode": "SPD-DC-600V",
+    "category": "SPD"
+  },
+  {
+    "id": 4,
+    "name": "DC SPD 1000V",
+    "description": "1000V DC Surge Protection Device for high-voltage PV applications.",
+    "brandName": "Generic",
+    "productCode": "SPD-DC-1000V",
+    "category": "SPD"
+  },
+  {
+    "id": 5,
+    "name": "VFD Control PCB SI22 2R2G",
+    "description": "Control board for VEICHI SI22 VFD model 2R2G.",
+    "brandName": "VEICHI",
+    "productCode": "PCB-VFD-SI22-2R2G-VEICHI",
+    "category": "VFD"
+  },
+  {
+    "id": 6,
+    "name": "VFD Control PCB SI21 5R5G",
+    "description": "Control board compatible with VEICHI SI21 5R5G VFD.",
+    "brandName": "VEICHI",
+    "productCode": "PCB-VFD-SI21-5R5G-VEICHI",
+    "category": "VFD"
+  },
+  {
+    "id": 7,
+    "name": "VFD Control PCB SI21 004P",
+    "description": "VEICHI SI21 series PCB for model 004P.",
+    "brandName": "VEICHI",
+    "productCode": "PCB-VFD-SI21-004P-VEICHI",
+    "category": "VFD"
+  },
+  {
+    "id": 8,
+    "name": "VFD Power PCB 450V 15A",
+    "description": "HEX series VFD power stage PCB rated 450V, 15A.",
+    "brandName": "HEX",
+    "productCode": "PCB-VFD-HEX-450V-15A",
+    "category": "VFD"
+  },
+  {
+    "id": 9,
+    "name": "VFD Power PCB 900V 15A",
+    "description": "High-voltage HEX series VFD PCB rated 900V, 15A.",
+    "brandName": "HEX",
+    "productCode": "PCB-VFD-HEX-900V-15A",
+    "category": "VFD"
+  },
+  {
+    "id": 10,
+    "name": "VFD Power PCB 800V 10A",
+    "description": "HEX series PCB for 800V, 10A VFD applications.",
+    "brandName": "HEX",
+    "productCode": "PCB-VFD-HEX-800V-10A",
+    "category": "VFD"
+  },
+  {
+    "id": 11,
+    "name": "RMS Communication PCB 4G TVT",
+    "description": "Remote monitoring PCB with 4G module for TVT-based systems.",
+    "brandName": "TVT",
+    "productCode": "PCB-RMS-4G-TVT",
+    "category": "RMS"
+  },
+  {
+    "id": 12,
+    "name": "RMS Communication PCB 4G MAC",
+    "description": "Remote monitoring system PCB with 4G module (MAC variant).",
+    "brandName": "MAC",
+    "productCode": "PCB-RMS-4G-MAC",
+    "category": "RMS"
+  },
+  {
+    "id": 13,
+    "name": "Output Cable",
+    "description": "Standard output cable for electrical connections.",
+    "brandName": "Generic",
+    "productCode": "OUTPUT-CABLE",
+    "category": "WIRE"
+  },
+  {
+    "id": 14,
+    "name": "MC4 Connector",
+    "description": "Standard MC4 connector for solar PV wiring.",
+    "brandName": "Generic",
+    "productCode": "MC4",
+    "category": "CONNECTOR"
+  },
+  {
+    "id": 15,
+    "name": "Electrical Switch",
+    "description": "Standard ON/OFF switch for general electrical applications.",
+    "brandName": "Generic",
+    "productCode": "SWITCH",
+    "category": "ENCLOSURE_AND_ACCESSORIES"
+  },
+  {
+    "id": 16,
+    "name": "End Clamp",
+    "description": "Solar panel mounting end clamp.",
+    "brandName": "Generic",
+    "productCode": "END-CLAMP",
+    "category": "ENCLOSURE_AND_ACCESSORIES"
+  },
+  {
+    "id": 17,
+    "name": "Internal Wiring Cable",
+    "description": "Internal wiring used inside enclosures and control panels.",
+    "brandName": "Generic",
+    "productCode": "WIRE-INTERNAL",
+    "category": "WIRE"
+  }
+]

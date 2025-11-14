@@ -1,0 +1,49 @@
+const express = require("express");
+const authenticate = require("../middleware/authenticate");
+
+const router = express.Router();
+const { login } = require("../middleware/login");
+const { register } = require("../middleware/register");
+const user = require("./user");
+const ticket = require("./ticket");
+const notification = require("./notification");
+const conversation = require("./conversation");
+const organisation = require("./organisations");
+const serviceCenter = require("./serviceCenter");
+const attachments = require("./attachments");
+const milestones = require("./milestones");
+const spareRequests = require("./spareRequests");
+const product = require("./products");
+const projects = require("./projects");
+const uploadRoutes = require("./uploads");
+const serviceCenterAssignment = require("./serviceCenterAssignment");
+const states = require("./states");
+const ticketCode = require("./ticketCode");
+const settings = require("./settings");
+const inventory = require("./inventory");
+const inboundActivity = require("./inboundActivity");
+
+router.post("/auth/login", login);
+router.post("/auth/register", register);
+router.use("/users", authenticate, user);
+router.use("/tickets", authenticate, ticket);
+router.use("/organisations", authenticate, organisation);
+router.use("/service-centers", authenticate, serviceCenter);
+router.use("/service-center-assignment", authenticate, serviceCenterAssignment);
+router.use("/notifications", authenticate, notification);
+router.use("/conversations", authenticate, conversation);
+router.use("/attachments", authenticate, attachments);
+router.use("/milestones", authenticate, milestones);
+router.use("/spare-requests", authenticate, spareRequests);
+router.use("/products", authenticate, product);
+router.use("/projects", authenticate, projects);
+router.use("/states", states);
+router.use("/ticket-code", authenticate, ticketCode);
+router.use("/settings", authenticate, settings);
+router.use("/inventory", authenticate, inventory);
+router.use("/inbound-activities", authenticate, inboundActivity);
+
+//upload routes
+
+router.use("/uploads", authenticate, uploadRoutes);
+module.exports = router;

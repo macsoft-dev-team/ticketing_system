@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Macsoft Solutions",
+    "email": "info@macsoftsolutions.com",
+    "address": "789 Corporate Blvd, Tech City",
+    "projectCode": "MACSOFT001",
+    "isActive": true,
+    "centerCode": "MACSC001"
+  },
+  {
+    "id": 2,
+    "name": "Acme Corp",
+    "email": "info@acmecorp.com",
+    "address": "123 Main St, Springfield",
+    "projectCode": "ACME001",
+    "isActive": true,
+    "centerCode": "ACMSC001"
+  },
+  {
+    "id": 3,
+    "name": "Beta Solutions",
+    "email": "contact@betasolutions.com",
+    "address": "456 Elm St, Metropolis",
+    "projectCode": "BETA002",
+    "isActive": true,
+    "centerCode": "BETASC001"
+  },
+  {
+    "id": 4,
+    "name": "Gamma Industries",
+    "email": "hello@gammaindustries.com",
+    "address": "789 Oak Ave, Gotham",
+    "projectCode": "GAMMA003",
+    "isActive": true,
+    "centerCode": "GAMMSC001"
+  },
+  {
+    "id": 5,
+    "name": "Delta Services",
+    "email": "support@deltaservices.com",
+    "address": "321 Pine Rd, Star City",
+    "projectCode": "DELTA004",
+    "isActive": true,
+    "centerCode": "DELMSC001"
+  },
+  {
+    "id": 6,
+    "name": "Epsilon Tech",
+    "email": "admin@epsilontech.com",
+    "address": "654 Maple Blvd, Central City",
+    "projectCode": "EPSILON005",
+    "isActive": true,
+    "centerCode": "EPSMSC001"
+  }
+]

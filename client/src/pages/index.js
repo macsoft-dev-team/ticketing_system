@@ -1,0 +1,9 @@
+export { default as SpareRequest } from './spareRequest/spareRequest';
+export { default as ServiceCenters } from './serviceCenters/serviceCenters';
+export { default as Dashboard } from './dashboard/dashboard';
+export { default as Tickets } from './tickets';
+export { default as TicketDashboard } from './ticket/TicketDashboard';
+export { default as UsersPage } from './users/users'; 
+export { default as LoginPage } from './login/login';
+export { default as SignupPage } from './signup/signup';
+export { default as Inventory } from './inventory/inventory';

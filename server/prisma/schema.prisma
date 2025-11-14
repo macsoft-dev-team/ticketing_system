@@ -1,0 +1,375 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma/client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
+enum ServiceStage {
+  TICKET_RAISED // Initial ticket raised
+  SERVICE_CENTER_ASSIGNED // Service center assigned by MACSOFT_SUPPORT
+  REQUEST_CLEARED_AT_FIELD // Fault cleared on-site by field engineer
+  SENT_TO_SERVICE_CENTER // Controller sent/request raised to service centre
+  RECEIVED_AT_SERVICE_CENTER // Controller physically received at centre (photo required)
+  DIAGNOSIS_IN_PROGRESS // Diagnosis started to decide repair or replacement
+  SPARE_REQUESTED // Spare parts requested (photo required)
+  SPARE_APPROVED // Spare request approved by head
+  REPAIR_IN_PROGRESS // Controller repair initiated
+  REPLACEMENT_IN_PROGRESS // Replacement initiated (alternate to repair)
+  REPAIRED // Controller repaired
+  READY_FOR_DISPATCH // Controller ready for dispatch (photo required)
+  DELIVERED_TO_FIELD // Controller delivered/dispatched back to field
+  FIELD_CLEARANCE_APPROVED // Field clearance approved by Head
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TransactionType {
+  RECEIPT
+  DELIVERY
+}
+
+enum Role {
+  MACSOFT_ADMIN // Global superuser – all access
+  MACSOFT_HEAD // Approver – oversees multiple states/centers
+  MACSOFT_SUPPORT // Technical/remote support, assign centers, raise spares
+  SERVICE_CENTER_HEAD // Head of a service center (Macsoft or 3rd-party)
+  SERVICE_CENTER_TECHNICIAN // Technician repairing/diagnosing at center
+  FIELD_ENGINEER // Field-level engineer or service person visiting farmer
+}
+
+enum Category {
+  MCB
+  VFD
+  RMS
+  SPD
+  WIRE
+  CONNECTOR
+  ENCLOSURE_AND_ACCESSORIES
+}
+
+model State {
+  id        Int     @id @default(autoincrement())
+  name      String
+  stateCode String? @unique
+  users     User[]
+}
+
+model Organisation {
+  id        Int       @id @default(autoincrement())
+  name      String
+  orgCode   String    @unique
+  email     String    @unique
+  address   String?
+  isActive  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model Project {
+  id            Int             @id @default(autoincrement())
+  name          String
+  projectCode   String          @unique
+  email         String          @unique
+  address       String?
+  isActive      Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       @updatedAt
+  deletedAt     DateTime?       @map("deleted_at")
+  ServiceCenter ServiceCenter[]
+}
+
+model ServiceCenter {
+  id                Int       @id @default(autoincrement())
+  name              String
+  projectCode       String?
+  centerCode        String    @unique
+  email             String    @unique
+  address           String?
+  isActive          Boolean   @default(false)
+  serviceableStates String? // Comma-separated list of states this center serves
+  users             User[]
+  project           Project?  @relation(fields: [projectCode], references: [projectCode])
+  assignedTickets   Ticket[] // Tickets assigned to this service center
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime? @updatedAt
+  deletedAt         DateTime? @map("deleted_at")
+}
+
+model User {
+  id                     Int                     @id @default(autoincrement())
+  name                   String
+  phone                  String                  @unique
+  password               String
+  role                   Role?
+  centerCode             String?
+  lastLogin              DateTime?               @default(now())
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime?               @updatedAt
+  deletedAt              DateTime?               @map("deleted_at")
+  isActive               Boolean                 @default(true)
+  // Relations
+  serviceCenter          ServiceCenter?          @relation(fields: [centerCode], references: [centerCode])
+  createdTickets         Ticket[]                @relation("CreatedTickets")
+  updatedTickets         Ticket[]                @relation("UpdatedTickets")
+  messages               Message[]               @relation("UserMessages")
+  messageSeens           MessageSeen[]
+  sentNotifications      Notification[]          @relation("NotificationCreators")
+  notificationRecipients NotificationRecipient[]
+  spareRequestsCreated   spareRequest[]          @relation("SpareRequestCreated")
+  spareRequestsUpdated   spareRequest[]          @relation("SpareRequestUpdated")
+  productTransactions    ProductTransaction[]    @relation("ProductTransactionCreated")
+  TicketMilestone        TicketMilestone[]
+  State                  State?                  @relation(fields: [stateId], references: [id])
+  stateId                Int?
+}
+
+model Ticket {
+  id                    Int          @id @default(autoincrement())
+  ticketCode            String       @unique
+  description           String
+  customerName          String
+  controllerNo          String
+  imei                  String?
+  hp                    String?
+  motorType             String?
+  state                 String
+  district              String
+  village               String?
+  block                 String?
+  complaintType         String
+  faultCode             String
+  faultType             String
+  status                TicketStatus @default(OPEN)
+  priority              String?
+  assignedServiceCenter String? // Service center code assigned based on state
+  createdBy             Int
+  updatedBy             Int?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  deletedAt             DateTime?    @map("deleted_at")
+
+  // Relations
+  createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
+  updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
+  serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
+  messages            Message[]
+  notifications       Notification[]
+  productTransactions ProductTransaction[]
+  attachments         Attachments[]
+  ticketMilestones    TicketMilestone[]
+}
+
+model TicketMilestone {
+  id            Int             @id @default(autoincrement())
+  ticketId      Int
+  stage         ServiceStage
+  order         Int
+  description   String?
+  allowedRoles  String?
+  status        MilestoneStatus @default(PENDING)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  eta           DateTime?
+  slaDueAt      DateTime?
+  photoRequired Boolean         @default(false)
+  changedBy     Int?
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+
+  // REMOVE the relation name so no back-ref is required
+  changer User? @relation(fields: [changedBy], references: [id])
+
+  // keep, but make sure Attachments has milestoneId + relation (see below)
+  attachments Attachments[]
+
+  @@unique([ticketId, stage])
+  @@index([ticketId, order])
+  @@index([status])
+}
+
+model Attachments {
+  id        Int      @id @default(autoincrement())
+  fileName  String
+  fileType  String
+  fileSize  Int
+  fileUrl   String
+  createdAt DateTime @default(now())
+  messageId Int?
+  ticketId  Int?
+
+  // ADD these two lines:
+  milestoneId Int?
+  milestone   TicketMilestone? @relation(fields: [milestoneId], references: [id])
+
+  message Message? @relation(fields: [messageId], references: [id])
+  ticket  Ticket?  @relation(fields: [ticketId], references: [id])
+}
+
+model spareRequest {
+  id         Int      @id @default(autoincrement())
+  ticketCode String
+  status     String   @default("PENDING")
+  createdBy  Int
+  updatedBy  Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  createdByUser User               @relation("SpareRequestCreated", fields: [createdBy], references: [id])
+  updatedByUser User?              @relation("SpareRequestUpdated", fields: [updatedBy], references: [id])
+  spareItems    spareRequestItem[]
+}
+
+model spareRequestItem {
+  id             Int      @id @default(autoincrement())
+  spareRequestId Int
+  productId      Int
+  quantity       Int
+  status         String   @default("REQUESTED")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  spareRequest spareRequest @relation(fields: [spareRequestId], references: [id])
+  product      Product      @relation(fields: [productId], references: [id])
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  brandName   String?
+  productCode String    @unique
+  category    Category?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  transactions      ProductTransaction[]
+  inventory         Inventory?
+  spareRequestItems spareRequestItem[]
+}
+
+model ProductTransaction {
+  id        Int             @id @default(autoincrement())
+  productId Int
+  type      TransactionType
+  quantity  Int
+  ticketId  Int?
+  notes     String?
+  createdBy Int
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  // Relations
+  product       Product @relation(fields: [productId], references: [id])
+  ticket        Ticket? @relation(fields: [ticketId], references: [id])
+  createdByUser User    @relation("ProductTransactionCreated", fields: [createdBy], references: [id])
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  productId Int      @unique
+  quantity  Int      @default(0)
+  minStock  Int      @default(0)
+  maxStock  Int?
+  location  String?
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  senderId  Int
+  ticketId  Int
+
+  // Relations
+  sender       User           @relation("UserMessages", fields: [senderId], references: [id])
+  ticket       Ticket         @relation(fields: [ticketId], references: [id])
+  notification Notification[] @relation("messageNotification")
+  attachments  Attachments[]
+  seenBy       MessageSeen[]
+}
+
+model MessageSeen {
+  id        Int      @id @default(autoincrement())
+  seenAt    DateTime @default(now())
+  messageId Int
+  userId    Int
+
+  // Relations
+  message Message @relation(fields: [messageId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  type        String
+  createdAt   DateTime @default(now())
+  createdById Int
+  ticketId    Int?
+  messageId   Int?
+
+  // Relations
+  message    Message?                @relation("messageNotification", fields: [messageId], references: [id])
+  createdBy  User                    @relation("NotificationCreators", fields: [createdById], references: [id])
+  ticket     Ticket?                 @relation(fields: [ticketId], references: [id])
+  recipients NotificationRecipient[]
+}
+
+model NotificationRecipient {
+  id             Int       @id @default(autoincrement())
+  notificationId Int
+  userId         Int
+  seen           Boolean   @default(false)
+  seenAt         DateTime?
+
+  // Relations
+  notification Notification @relation(fields: [notificationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([notificationId, userId])
+}
+
+model TicketSequence {
+  id         Int      @id @default(autoincrement())
+  year       Int      @unique
+  lastNumber Int      @default(0)
+  prefix     String   @default("TKT")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
