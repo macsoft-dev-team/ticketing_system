@@ -142,11 +142,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.spareRequest,
-    BASE_ITEMS.products,
-    BASE_ITEMS.project,
-    BASE_ITEMS.inventory,
-    BASE_ITEMS.users,
+    BASE_ITEMS.spareRequest, 
     BASE_ITEMS.profile,
   ],
   MACSOFT_SUPPORT: [
@@ -162,14 +158,12 @@ const ROLE_ITEMS = {
   SERVICE_CENTER_HEAD: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
-    BASE_ITEMS.inventory,
-    BASE_ITEMS.products,
+    BASE_ITEMS.inventory, 
     BASE_ITEMS.ticketNew,
-     BASE_ITEMS.spareRequest,
+    BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
   ],
-  SERVICE_CENTER_TECHNICIAN: [
-    BASE_ITEMS.dashboard,
+  SERVICE_CENTER_TECHNICIAN: [ 
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
