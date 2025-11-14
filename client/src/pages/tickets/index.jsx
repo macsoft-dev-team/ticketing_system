@@ -1,4 +1,4 @@
-import Pagination from "../../components/ui/Pagination";
+import Pagination from "../../components/ui/pagination";
 import useTickets from "../../lib/hooks/useTickets";
 import Header from "./components/header";
 import TicketCard from "./components/ticketCard";
