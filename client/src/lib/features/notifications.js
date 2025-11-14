@@ -1,23 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { notificationsState } from "../../lib/constants/variables";
 import { API_ENDPOINTS } from "../../lib/constants/api";
-import axios from "axios";
+import axios from "../services/apiInterceptor";
 
 export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
   async ({ skip = 0, take = 10, filter = "all" }, { rejectWithValue }) => {
     try {
+      console.log('📡 Fetching notifications with params:', { skip, take, filter });
       const params = {};
       if (skip !== 0) params.skip = skip;
       if (take !== 0) params.take = take;
       if (filter) params.filter = filter;
+      
+      console.log('📡 Making API call to:', API_ENDPOINTS.notifications, 'with params:', params);
       const response = await axios.get(API_ENDPOINTS.notifications, {
         params,
         withCredentials: true,
       });
+      
+      console.log('📡 API Response:', response.data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      console.error('❌ Fetch notifications error:', error);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -113,6 +119,31 @@ export const enableConversation = createAsyncThunk(
   }
 );
 
+export const markAllAsRead = createAsyncThunk(
+  "notifications/markAllAsRead",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const { notifications } = getState().notification;
+      const unreadNotifications = notifications.filter(n => !n.seen);
+      
+      // Mark all unread notifications as read
+      await Promise.all(
+        unreadNotifications.map(notification =>
+          axios.put(
+            `${API_ENDPOINTS.notifications}/${notification.id}`,
+            {},
+            { withCredentials: true }
+          )
+        )
+      );
+      
+      return unreadNotifications.map(n => n.id);
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const notificationsSlice = createSlice({
   name: "notifications",
   initialState: notificationsState,
@@ -141,6 +172,14 @@ export const notificationsSlice = createSlice({
       // Update total count
       state.totalCount = (state.totalCount || 0) + 1;
     },
+    markNotificationAsRead: (state, action) => {
+      const notificationId = action.payload;
+      const notification = state.notifications.find(n => n.id === notificationId);
+      if (notification && !notification.seen) {
+        notification.seen = true;
+        state.unreadCount = Math.max(0, (state.unreadCount || 0) - 1);
+      }
+    },
     clearError: (state) => {
       state.error = null;
     },
@@ -158,11 +197,15 @@ export const notificationsSlice = createSlice({
           state.notifications = action.payload.data;
           state.totalPages = action.payload.totalPages || 1;
           state.currentPage = action.payload.currentPage || 1;
+          state.totalCount = action.payload.count || action.payload.data.length;
+          state.unreadCount = action.payload.data.filter(n => !n.seen).length;
         } else {
           // Fallback for old format
           state.notifications = action.payload.notifications || action.payload;
           state.totalPages = action.payload.totalPages || 1;
           state.currentPage = action.payload.currentPage || 1;
+          state.totalCount = Array.isArray(state.notifications) ? state.notifications.length : 0;
+          state.unreadCount = Array.isArray(state.notifications) ? state.notifications.filter(n => !n.seen).length : 0;
         }
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
@@ -273,6 +316,24 @@ export const notificationsSlice = createSlice({
       })
       .addCase(fetchNotificationCounts.rejected, (state, action) => {
         state.error = action.payload || "Failed to fetch notification counts";
+      })
+      .addCase(markAllAsRead.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(markAllAsRead.fulfilled, (state, action) => {
+        state.loading = false;
+        // Mark all notifications as read
+        state.notifications.forEach(notification => {
+          if (action.payload.includes(notification.id)) {
+            notification.seen = true;
+          }
+        });
+        state.unreadCount = 0;
+      })
+      .addCase(markAllAsRead.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to mark all notifications as read";
       });
   },
 });
@@ -283,6 +344,7 @@ export const {
   setCurrentFilter, 
   setMode, 
   addNotification, 
+  markNotificationAsRead,
   clearError 
 } = notificationsSlice.actions;
 

@@ -155,6 +155,9 @@ const createTicket = async (ticket, userId, io) => {
             id: {
               not: userId,
             },
+            role: {
+              not: ["FIELD_ENGINEER"],
+            },
           },
           {
             role: {
@@ -355,9 +358,10 @@ const updateStatus = async (ticketId, status, userId, io) => {
 
 const deleteTicket = async (ticketId) => {
   try {
-    const deletedNotificationRecipients = await prisma.notificationRecipient.deleteMany({
-      where: { notification: { ticketId: ticketId } },
-    });
+    const deletedNotificationRecipients =
+      await prisma.notificationRecipient.deleteMany({
+        where: { notification: { ticketId: ticketId } },
+      });
     const deletedNotifications = await prisma.notification.deleteMany({
       where: { ticketId: ticketId },
     });

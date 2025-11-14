@@ -17,7 +17,7 @@
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "${workspaceFolder}/frontend"
+      "cwd": "${workspaceFolder}/client"
     },
     {
       "type": "node",
@@ -26,7 +26,7 @@
       "skipFiles": ["<node_internals>/**"],
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start"],
-      "cwd": "${workspaceFolder}/api"
+      "cwd": "${workspaceFolder}/server"
     },
     {
       "type": "chrome",

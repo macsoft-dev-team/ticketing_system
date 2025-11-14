@@ -87,6 +87,8 @@ export const notificationsState = {
     discussable: 0,
     priority: 0,
   },
+  unreadCount: 0,
+  totalCount: 0,
   currentFilter: "all",
   filter: {
     search: "",
