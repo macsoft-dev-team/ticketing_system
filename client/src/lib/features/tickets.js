@@ -361,6 +361,9 @@ const ticketSlice = createSlice({
     clearDeviceDetails: (state) => {
       state.deviceDetails = null;
     },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -495,6 +498,7 @@ export const {
   setSorting,
   clearError,
   clearDeviceDetails,
+  setCurrentPage,
 } = ticketSlice.actions;
 
 export default ticketSlice.reducer;

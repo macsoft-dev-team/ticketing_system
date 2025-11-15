@@ -6,7 +6,7 @@ import useTickets from "../../../lib/hooks/useTickets";
 import { useDebounce } from "../../../lib/hooks/ticketHooks";
 
 export default function Header() {
-    const { setFilters, filters, statusCount } = useTickets();
+    const { setFilters, filters, statusCount,setCurrentPage } = useTickets();
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,7 +25,8 @@ export default function Header() {
     const handleFilterChange = useCallback((status) => {
         setActiveFilter(status);
         setFilters({ status, search: debouncedSearchTerm || '' });
-    }, [debouncedSearchTerm, setFilters]);
+        setCurrentPage(0); // Reset to first page on filter change
+    }, [debouncedSearchTerm, setFilters, setCurrentPage]);
 
     // Handle search changes
     const handleSearchChange = useCallback((search) => {

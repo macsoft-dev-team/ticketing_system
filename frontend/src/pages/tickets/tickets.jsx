@@ -197,8 +197,6 @@ const Tickets = () => {
 
                             </div >
                         </Splitter.Panel>
-
-
                     </Splitter>
                 )}
             </Row>
