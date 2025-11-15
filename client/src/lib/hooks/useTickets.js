@@ -8,6 +8,7 @@ import {
   setFilters,
   clearError,
   updateMilestone as updateMilestoneAction,
+  setCurrentPage,
 } from "../features/tickets";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -63,6 +64,10 @@ function useTickets() {
     return dispatch(updateMilestoneAction({ ticketId, milestoneData }));
   };
 
+  const setCurrentPageNumber = (pageNumber) => {
+    dispatch(setCurrentPage(pageNumber));
+  }
+
   return {
     tickets,
     currentPage,
@@ -85,6 +90,7 @@ function useTickets() {
     setFilters: setTicketFilters,
     clearError: clearErrors,
     updateMilestone,
+    setCurrentPage: setCurrentPageNumber,
   };
 }
 export default useTickets;
