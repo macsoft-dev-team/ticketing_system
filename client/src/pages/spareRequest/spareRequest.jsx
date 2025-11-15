@@ -241,8 +241,8 @@ export default function SpareRequest() {
             columns={[
               { key: "ticketCode", label: "Ticketcode", align: "left" },
               { key: "status", label: "Status", align: "left" },
-              { key: "createdBy", label: "CreatedBy", align: "left" },
-              { key: "updatedBy", label: "UpdatedBy", align: "center" },
+              { key: "createdBy", label: "Raised by", align: "left" },
+              { key: "updatedBy", label: "Updated by", align: "left" },
             ]}
             data={fetchSpareData}
             title="Spare Request"
