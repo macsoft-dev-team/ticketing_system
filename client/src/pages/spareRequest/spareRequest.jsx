@@ -289,7 +289,7 @@ export default function SpareRequest() {
                   <div className="flex items-center space-x-4 text-sm text-blue-100">
                     <div className="flex items-center space-x-1">
                       <User className="w-3 h-3" />
-                      <span>Created by: {selectedSpare.createdBy || 'N/A'}</span>
+                      <span>Raised by: {selectedSpare.createdBy || 'N/A'}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-3 h-3" />
@@ -299,7 +299,7 @@ export default function SpareRequest() {
                   {currentUser && (
                     <div className="mt-2 text-xs text-blue-200 bg-blue-700 bg-opacity-30 px-2 py-1 rounded flex items-center justify-between">
                       <div>
-                        <span>Viewing as: {currentUser.name} ({currentUser.role})</span>
+                        <span>Viewing as: {currentUser.name}</span>
                         {hasApprovalRights() && (
                           <span className="ml-2 text-green-200 font-medium">• Approval Rights</span>
                         )}
@@ -316,7 +316,7 @@ export default function SpareRequest() {
                   )}
                 </div>
                 <button
-                  className="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white hover:bg-opacity-10 rounded-full"
+                  className="text-white hover:text-gray-800 duration-300 cursor-pointer transition-colors p-2 hover:bg-white hover:bg-opacity-10 rounded-full"
                   onClick={() => setShowItems(false)}
                 >
                   <X className="w-5 h-5" />
@@ -325,7 +325,7 @@ export default function SpareRequest() {
             </div>
 
             {/* Request Status Badge */}
-            <div className="p-4 bg-gray-50 border-b">
+            <div className="p-4 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-600">Request Status:</span>
                 <div className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(selectedSpare.status)}`}>
@@ -348,7 +348,7 @@ export default function SpareRequest() {
                       <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
                           <div className="flex-1 space-y-2">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+                            <div className="flex flex-col items-start gap-2">
                               <h4 className="font-semibold text-gray-900 text-base">
                                 {item.product?.name || 'Unknown Product'}
                               </h4>
@@ -357,7 +357,7 @@ export default function SpareRequest() {
                               </span>
                             </div>
                             
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm items-center">
                               <div>
                                 <span className="text-gray-500">Brand:</span>
                                 <span className="ml-1 font-medium">{item.product?.brandName || 'N/A'}</span>
@@ -365,11 +365,7 @@ export default function SpareRequest() {
                               <div>
                                 <span className="text-gray-500">Quantity:</span>
                                 <span className="ml-1 font-bold text-lg">{item.quantity}</span>
-                              </div>
-                              <div>
-                                <span className="text-gray-500">Unit Price:</span>
-                                <span className="ml-1 font-medium">${item.product?.unitPrice || 'N/A'}</span>
-                              </div>
+                              </div> 
                             </div>
 
                             {item.notes && (
@@ -462,7 +458,7 @@ export default function SpareRequest() {
             </div>
 
             {/* Footer Actions */}
-            <div className="border-t bg-gray-50 p-4">
+            <div className="border-t bg-gray-50 p-4 border-gray-200">
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 sm:justify-end">
                 <button
                   onClick={() => setShowItems(false)}
