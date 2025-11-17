@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import SocketTest from '../../components/SocketTest';
 import MilestoneTimeline from '../../components/MilestoneTimeline';
-import MilestoneActionButton from '../../components/MilestoneActionButton';
 import PhotoUploadModal from '../../components/PhotoUploadModal';
 import ServiceCenterAssignmentModal from '../../components/ServiceCenterAssignmentModal';
 import {
@@ -13,7 +11,6 @@ import {
   User,
   MapPin,
   Phone,
-  Mail,
   FileText,
   Download,
   Settings,
@@ -24,9 +21,7 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Plus,
   MessageSquare,
-  Package,
   GitBranch,
   Building
 } from 'lucide-react';
@@ -96,9 +91,6 @@ const mapTicketData = (apiTicket) => {
   };
 };
 
-// Removed old message formatting - now handled by useConversation hook
-
-// Removed mock messages - now using real data from useConversation hook
 
 const StatusBadge = ({ status }) => {
   const statusConfig = {
@@ -296,7 +288,6 @@ export default function TicketDashboard() {
   const { addToast } = useToast();
   const { ticketId } = useParams();
   const navigate = useNavigate();
-  const { assignServiceCenter, loading: serviceCenterLoading } = useServiceCenter();
 
   // Use the new conversation hook
   const {
@@ -306,7 +297,6 @@ export default function TicketDashboard() {
     isConnected: socketConnected,
     sendMessage: sendConversationMessage,
     refreshMessages,
-    testConnection
   } = useConversation(ticketId);
 
   const [ticketData, setTicketData] = useState({});
@@ -315,7 +305,6 @@ export default function TicketDashboard() {
   const [showSpareRequestForm, setShowSpareRequestForm] = useState(false);
   const [activeTab, setActiveTab] = useState('ticket'); // For mobile tabs
   const [downloadingAll, setDownloadingAll] = useState(false);
-  const [showSocketTest, setShowSocketTest] = useState(false);
   const [showPhotoUploadModal, setShowPhotoUploadModal] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [showServiceCenterModal, setShowServiceCenterModal] = useState(false);
@@ -344,7 +333,7 @@ export default function TicketDashboard() {
   const handleSendMessage = useCallback(async (message, attachments) => {
     try {
       await sendConversationMessage(message, attachments);
-      setAutoCloseTimer(null); 
+      setAutoCloseTimer(null);
       addToast({
         title: 'Message sent',
         description: 'Your message has been sent successfully',
@@ -376,7 +365,7 @@ export default function TicketDashboard() {
         urgencyLevel: formData.urgencyLevel || 'NORMAL',
         expectedDelivery: formData.expectedDelivery,
         additionalNotes: formData.additionalNotes
-      }; 
+      };
       const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
       const response = await fetch(`${baseUrl}/api/spare-requests`, {
         method: 'POST',
@@ -441,12 +430,12 @@ export default function TicketDashboard() {
           const stageDisplayName = targetStage.replace(/_/g, ' ').toLowerCase();
           let successMessage = `Successfully advanced to ${stageDisplayName}`;
           let successTitle = 'Milestone Updated';
-          
+
           // Special message for spare approval
           if (targetStage === 'SPARE_APPROVED') {
             successTitle = 'Spare Request Approved';
             successMessage = 'All pending spare requests have been approved and milestone updated';
-            
+
             // Check if we have spare approval details in the response
             const responseData = resultAction.payload;
             if (responseData?.milestone?.spareApprovalResult) {
@@ -456,7 +445,7 @@ export default function TicketDashboard() {
               }
             }
           }
-          
+
           addToast({
             title: successTitle,
             description: successMessage,
@@ -724,22 +713,21 @@ export default function TicketDashboard() {
             <StatusBadge status={ticketData.status} />
             {/* Service Center Assignment Button for MACSOFT_SUPPORT, MACSOFT_HEAD, and MACSOFT_ADMIN */}
             {/* Hide button after ticket has been sent to service center */}
-            {(user?.role === 'MACSOFT_SUPPORT' || user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && 
-             !ticket?.ticketMilestones?.some(milestone => milestone.stage === 'SENT_TO_SERVICE_CENTER') && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowServiceCenterModal(true)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  ticketData.assignedServiceCenter
+            {(user?.role === 'MACSOFT_SUPPORT' || user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') &&
+              !ticket?.ticketMilestones?.some(milestone => milestone.stage === 'SENT_TO_SERVICE_CENTER') && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowServiceCenterModal(true)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${ticketData.assignedServiceCenter
                     ? 'bg-green-100 text-green-700 hover:bg-green-200'
                     : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
-                }`}
-              >
-                <Building size={16} />
-                {ticketData.assignedServiceCenter ? 'Reassign SC' : 'Assign SC'}
-              </motion.button>
-            )}
+                    }`}
+                >
+                  <Building size={16} />
+                  {ticketData.assignedServiceCenter ? 'Reassign SC' : 'Assign SC'}
+                </motion.button>
+              )}
           </div>
         </div>
       </motion.div>

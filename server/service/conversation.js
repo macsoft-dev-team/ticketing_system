@@ -115,7 +115,7 @@ const createConversation = async (conversation, userId, io, files = []) => {
       where: {
       AND: [
         { id: { not: userId } }, // Exclude the sender
-        { role: { in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT", "SERVICE_CENTER_HEAD", "SERVICE_CENTER_TECHNICIAN", "FIELD_ENGINEER"] } },
+        { role: { in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT", "CUSTOMER_SERVICE_HEAD", "SERVICE_CENTER_TECHNICIAN", "CUSTOMER_FIELD_ENGINEER"] } },
       ],
       },
       select: { id: true, name: true, role: true },

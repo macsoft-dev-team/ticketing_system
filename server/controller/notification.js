@@ -21,7 +21,7 @@ const getNotifications = async (req, res) => {
         // Add detailed logging for debugging
         if (notifications.length === 0) {
             console.log(`⚠️  No notifications found for user ${userId} (${req.user.name}, ${req.user.role})`);
-            console.log(`⚠️  This user should receive notifications if they have role: MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT, or SERVICE_CENTER_HEAD`);
+            console.log(`⚠️  This user should receive notifications if they have role: MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT, or CUSTOMER_SERVICE_HEAD`);
         }
         
         res.status(200).json({

@@ -26,19 +26,19 @@ import { API_URL } from '../lib/constants/api';
 
 // Role-based permissions - matches backend milestoneConfig.js
 const STAGE_ROLE_PERMISSIONS = {
-    TICKET_RAISED: ['FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-    REQUEST_CLEARED_AT_FIELD: ['FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-    SERVICE_CENTER_ASSIGNED: ['FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
-    SENT_TO_SERVICE_CENTER: ['FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-    RECEIVED_AT_SERVICE_CENTER: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    DIAGNOSIS_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    SPARE_REQUESTED: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    SPARE_APPROVED: ['SERVICE_CENTER_HEAD', 'MACSOFT_HEAD', 'MACSOFT_ADMIN'],
-    REPAIR_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    REPLACEMENT_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    REPAIRED: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    READY_FOR_DISPATCH: ['SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
-    DELIVERED_TO_FIELD: ['SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    TICKET_RAISED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+    REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+    SERVICE_CENTER_ASSIGNED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+    SENT_TO_SERVICE_CENTER: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+    RECEIVED_AT_SERVICE_CENTER: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    DIAGNOSIS_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    SPARE_REQUESTED: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
+    SPARE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+    REPAIR_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    REPLACEMENT_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    REPAIRED: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+    DELIVERED_TO_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_HEAD', 'MACSOFT_ADMIN'],
     FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
@@ -1163,11 +1163,11 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         // Special handling for spare request actions - service center technicians, heads, and admins can create spare requests
         if (action === 'spare_request' || targetStage === 'SPARE_REQUESTED') {
             // Check if user has permission to create spare requests
-            const allowedRoles = ['MACSOFT_ADMIN', 'SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD'];
+            const allowedRoles = ['MACSOFT_ADMIN', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_SUPPORT'];
             if (!allowedRoles.includes(user?.role)) {
                 addToast({
                     title: 'Permission Denied',
-                    description: 'Only service center staff and admins can create spare requests',
+                    description: 'Only service center technicians, support staff, and admins can create spare requests',
                     variant: 'error'
                 });
                 return;

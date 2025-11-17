@@ -88,16 +88,16 @@ const getTickets = async (skip, take, filter, userId, role) => {
         status: filter.status,
       };
     }
-    // FIELD_ENGINEER should only see their own tickets
-    if (role === "FIELD_ENGINEER") {
+    // CUSTOMER_FIELD_ENGINEER should only see their own tickets
+    if (role === "CUSTOMER_FIELD_ENGINEER") {
       params.where = {
         ...params.where,
         createdBy: userId,
       };
     }
 
-    // SERVICE_CENTER_HEAD and SERVICE_CENTER_TECHNICIAN should only see tickets assigned to their service center
-    if (role === "SERVICE_CENTER_HEAD" || role === "SERVICE_CENTER_TECHNICIAN") {
+    // CUSTOMER_SERVICE_HEAD and SERVICE_CENTER_TECHNICIAN should only see tickets assigned to their service center
+    if (role === "CUSTOMER_SERVICE_HEAD" || role === "SERVICE_CENTER_TECHNICIAN") {
       // Get user's service center code
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -118,10 +118,10 @@ const getTickets = async (skip, take, filter, userId, role) => {
       }
     }
 
-    // For FIELD_ENGINEER, only count their own tickets
+    // For CUSTOMER_FIELD_ENGINEER, only count their own tickets
     // For SERVICE_CENTER users, only count tickets assigned to their service center
     let statusCountWhere = {};
-    if (role === "FIELD_ENGINEER") {
+    if (role === "CUSTOMER_FIELD_ENGINEER") {
       statusCountWhere = { createdBy: userId };
     } else if (role === "SERVICE_CENTER_HEAD" || role === "SERVICE_CENTER_TECHNICIAN") {
       // Get user's service center code for status count

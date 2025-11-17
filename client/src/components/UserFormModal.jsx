@@ -123,9 +123,9 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
         { label: 'Macsoft Admin', value: 'MACSOFT_ADMIN' },
         { label: 'Macsoft Head', value: 'MACSOFT_HEAD' },
         { label: 'Macsoft Support', value: 'MACSOFT_SUPPORT' },
-        { label: 'Service Center Head', value: 'SERVICE_CENTER_HEAD' },
+        { label: 'Customer Service Head', value: 'CUSTOMER_SERVICE_HEAD' },
         { label: 'Service Center Technician', value: 'SERVICE_CENTER_TECHNICIAN' },
-        { label: 'Field Engineer', value: 'FIELD_ENGINEER' },
+        { label: 'Customer Field Engineer', value: 'CUSTOMER_FIELD_ENGINEER' },
     ];
 
     const statusOptions = [

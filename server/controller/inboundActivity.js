@@ -11,11 +11,11 @@ async function createInboundActivity(req, res) {
     const { role: userRole, id: userId } = req.user;
 
     // Role-based validation
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'SERVICE_CENTER_HEAD'];
+    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
     if (!allowedRoles.includes(userRole.toUpperCase())) {
       return res.status(403).json({
         success: false,
-        message: `Access denied. Only ADMIN, HEAD, and SERVICE_CENTER_HEAD can create inbound activities. Your role: ${userRole}`
+        message: `Access denied. Only ADMIN and HEAD can create inbound activities. Your role: ${userRole}`
       });
     }
 

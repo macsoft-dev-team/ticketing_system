@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Krishna Kumar",
+    "name": "Venkat Kumar",
     "phone": "9876543210",
     "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
     "role": "MACSOFT_ADMIN"
@@ -23,22 +23,22 @@
   {
     "id": 4,
     "name": "Sarah Wilson",
-    "phone": "9876543214",
-    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
-    "role": "SERVICE_CENTER_HEAD"
-  },
-  {
-    "id": 5,
-    "name": "Mike Brown",
-    "phone": "9876543215",
+    "phone": "9876543213",
     "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
     "role": "SERVICE_CENTER_TECHNICIAN"
   },
   {
+    "id": 5,
+    "name": "Mike Brown",
+    "phone": "9876543214",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
+    "role": "CUSTOMER_SERVICE_HEAD"
+  },
+  {
     "id": 6,
     "name": "Lisa Davis",
-    "phone": "9876543216",
+    "phone": "9876543215",
     "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
-    "role": "FIELD_ENGINEER"
+    "role": "CUSTOMER_FIELD_ENGINEER"
   }
 ]

@@ -41,7 +41,7 @@ export default function Inventory() {
 
   // Check if user can manage inventory
   const canManageInventory = () => {
-    return canAccess(['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'SERVICE_CENTER_HEAD']);
+    return canAccess(['MACSOFT_ADMIN', 'MACSOFT_HEAD']);
   };
 
   // Fetch inventory data

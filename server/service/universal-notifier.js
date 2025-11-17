@@ -172,7 +172,7 @@ async function getRecipients(
           { id: { not: actorId } },
           {
             role: {
-              in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "SERVICE_CENTER_HEAD", "MACSOFT_SUPPORT"],
+              in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "CUSTOMER_SERVICE_HEAD", "MACSOFT_SUPPORT"],
             },
           },
         ],

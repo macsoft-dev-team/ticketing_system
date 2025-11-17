@@ -21,13 +21,13 @@ const ServiceStages = {
 };
 
 // Role definitions
-const Roles = {
+const ROLES = {
   MACSOFT_ADMIN: 'MACSOFT_ADMIN',
   MACSOFT_HEAD: 'MACSOFT_HEAD',
   MACSOFT_SUPPORT: 'MACSOFT_SUPPORT',
-  SERVICE_CENTER_HEAD: 'SERVICE_CENTER_HEAD',
+  CUSTOMER_SERVICE_HEAD: 'CUSTOMER_SERVICE_HEAD',
   SERVICE_CENTER_TECHNICIAN: 'SERVICE_CENTER_TECHNICIAN',
-  FIELD_ENGINEER: 'FIELD_ENGINEER',
+  CUSTOMER_FIELD_ENGINEER: 'CUSTOMER_FIELD_ENGINEER',
 };
 
 // Milestone stage configuration
@@ -37,7 +37,7 @@ const milestoneStageConfig = [
     order: 0,
     label: 'Ticket Raised',
     description: 'Initial ticket raised by field engineer',
-    allowedRoles: ['FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+    allowedRoles: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
     photoRequired: false,
     autoProgress: true, // Automatically created when ticket is created
     notes: 'Ticket has been raised in the system',
@@ -47,7 +47,7 @@ const milestoneStageConfig = [
     order: 1,
     label: 'Service Center Assigned',
     description: 'Service center assigned - field engineer can clear at field or send to service center',
-    allowedRoles: ['FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+    allowedRoles: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
     photoRequired: false,
     notes: 'Service center has been assigned - choose to clear at field or send to service center',
   },
@@ -56,7 +56,7 @@ const milestoneStageConfig = [
     order: 2,
     label: 'Request Cleared at Field',
     description: 'Fault cleared on-site by field engineer',
-    allowedRoles: ['FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+    allowedRoles: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
     photoRequired: true,
     minPhotos: 1,
     isFinal: true,
@@ -67,7 +67,7 @@ const milestoneStageConfig = [
     order: 3,
     label: 'Sent to Service Center',
     description: 'Controller sent/request raised to service centre',
-    allowedRoles: ['FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
+    allowedRoles: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
     photoRequired: false,
     notes: 'Controller dispatched to service center',
   },
@@ -76,7 +76,7 @@ const milestoneStageConfig = [
     order: 4,
     label: 'Received at Service Center',
     description: 'Controller physically received at service center (4 specific photos required)',
-    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
     photoRequired: true,
     minPhotos: 4,
     requiredPhotos: ['Controller Front', 'Controller Bottom', 'Full View Open', 'MCB Close Up'],
@@ -87,7 +87,7 @@ const milestoneStageConfig = [
     order: 5,
     label: 'Diagnosis in Progress',
     description: 'Diagnosis started to decide repair or replacement',
-    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
     photoRequired: false,
     notes: 'Technical diagnosis underway',
   },
@@ -96,7 +96,7 @@ const milestoneStageConfig = [
     order: 6,
     label: 'Repair in Progress',
     description: 'Controller repair initiated',
-    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
     photoRequired: false,
     pathChoice: true,
     notes: 'Repair work in progress',
@@ -106,7 +106,7 @@ const milestoneStageConfig = [
     order: 7, // First replacement stage
     label: 'Replacement in Progress',
     description: 'Replacement initiated (alternate to repair)',
-    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
     photoRequired: false,
     pathChoice: true,
     notes: 'Replacement work in progress',
@@ -116,7 +116,7 @@ const milestoneStageConfig = [
     order: 8,
     label: 'Spare Requested',
     description: 'Spare parts requested',
-    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
+    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
     photoRequired: true,
     minPhotos: 1,
     requiresSpareRequest: true,
@@ -127,7 +127,7 @@ const milestoneStageConfig = [
     order: 9,
     label: 'Spare Approved',
     description: 'Spare request approved by head',
-    allowedRoles: ['SERVICE_CENTER_HEAD', 'MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
     photoRequired: false,
     approvalGate: true,
     notes: 'Approval required to proceed with spare parts',
@@ -137,7 +137,7 @@ const milestoneStageConfig = [
     order: 10,
     label: 'Repaired',
     description: 'Controller repaired and tested',
-    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
     photoRequired: false,
     notes: 'Controller repair completed',
   },
@@ -146,7 +146,7 @@ const milestoneStageConfig = [
     order: 11,
     label: 'Ready for Dispatch',
     description: 'Controller ready for dispatch',
-    allowedRoles: ['SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
     photoRequired: true,
     minPhotos: 1,
     notes: 'Photo of packaged controller required',
@@ -156,7 +156,7 @@ const milestoneStageConfig = [
     order: 12,
     label: 'Delivered to Field',
     description: 'Controller delivered/dispatched back to field - Final completion',
-    allowedRoles: ['FIELD_ENGINEER', 'SERVICE_CENTER_HEAD', 'MACSOFT_ADMIN'],
+    allowedRoles: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_HEAD', 'MACSOFT_ADMIN'],
     photoRequired: false,
     isFinal: true,
     notes: 'Controller delivered back to field - Ticket completed',
@@ -287,10 +287,7 @@ function validateMilestoneTransition(userRole, targetStage, currentMilestone, da
   return { valid: true };
 }
 
-module.exports = {
-  ServiceStages,
-  Roles,
-  milestoneStageConfig,
+module.exports = { 
   getAllowedRolesForStage,
   canRoleTransitionToStage,
   getStageConfig,

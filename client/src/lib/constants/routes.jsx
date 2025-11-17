@@ -155,7 +155,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.serviceCenter,
     BASE_ITEMS.profile,
   ],
-  SERVICE_CENTER_HEAD: [
+  CUSTOMER_SERVICE_HEAD: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.inventory, 
@@ -170,7 +170,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
   ],
-  FIELD_ENGINEER: [
+  CUSTOMER_FIELD_ENGINEER: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
@@ -178,15 +178,15 @@ const ROLE_ITEMS = {
   ],
 };
 
-export const switchMenuItems = (role) => (ROLE_ITEMS[role] || ROLE_ITEMS.FIELD_ENGINEER).filter(item => item && item.path);
+export const switchMenuItems = (role) => (ROLE_ITEMS[role] || ROLE_ITEMS.CUSTOMER_FIELD_ENGINEER).filter(item => item && item.path);
 
 
 // Define role-based access for specific routes
 const getRouteProtection = (item, role) => {
   const routeProtections = {
-    '/users': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'SERVICE_CENTER_HEAD'],
-    '/service-center': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_HEAD'],
-    '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'SERVICE_CENTER_HEAD'],
+    '/users': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
+    '/service-center': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_SERVICE_HEAD'],
+    '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'],
     '/settings': ['MACSOFT_ADMIN'], // Only MACSOFT_ADMIN can access settings
   };
 
@@ -213,7 +213,7 @@ export const switchRoutes = (role) =>
       children: [
         // Add explicit index route that redirects to tickets
         { index: true, element: <Navigate to="/tickets" replace /> },
-        ...(ROLE_ITEMS[role] || ROLE_ITEMS.FIELD_ENGINEER)
+        ...(ROLE_ITEMS[role] || ROLE_ITEMS.CUSTOMER_FIELD_ENGINEER)
           .filter(item => item && item.path && item.path !== '/') // Filter out root path
           .map((item) => ({
             path: item.path.replace(/^\//, ''),

@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
         name,
         phone,
         password: hashedPassword,
-        role: "FIELD_ENGINEER", // Default role
+        role: "CUSTOMER_FIELD_ENGINEER", // Default role
         stateId: stateId ? parseInt(stateId) : null,
       },
     });
