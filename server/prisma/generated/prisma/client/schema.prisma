@@ -54,9 +54,9 @@ enum Role {
   MACSOFT_ADMIN // Global superuser – all access
   MACSOFT_HEAD // Approver – oversees multiple states/centers
   MACSOFT_SUPPORT // Technical/remote support, assign centers, raise spares
-  SERVICE_CENTER_HEAD // Head of a service center (Macsoft or 3rd-party)
+  CUSTOMER_SERVICE_HEAD // Head of a service center (Macsoft or 3rd-party)
   SERVICE_CENTER_TECHNICIAN // Technician repairing/diagnosing at center
-  FIELD_ENGINEER // Field-level engineer or service person visiting farmer
+  CUSTOMER_FIELD_ENGINEER // Field-level engineer or service person visiting farmer
 }
 
 enum Category {
