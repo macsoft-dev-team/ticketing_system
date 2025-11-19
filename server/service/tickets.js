@@ -398,7 +398,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
       stage: "TICKET_RAISED", // Updated to use new stage name
       order: 0,
       notes:
-        "Ticket has been raised and awaiting service center assignment by MACSOFT_SUPPORT",
+        "Ticket has been raised and awaiting service center assignment.",
       status: "IN_PROGRESS",
       startedAt: new Date(),
       eta: null,

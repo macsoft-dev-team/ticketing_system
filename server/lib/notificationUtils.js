@@ -75,6 +75,12 @@ const NOTIFICATION_TYPES = {
   INVENTORY_LOW_STOCK: 'inventory_low_stock',
   INVENTORY_RESTOCK: 'inventory_restock',
   
+  // Milestone operations
+  MILESTONE_CREATED: 'milestone_created',
+  MILESTONE_UPDATED: 'milestone_updated',
+  MILESTONE_STAGE_CHANGED: 'milestone_stage_changed',
+  MILESTONE_COMPLETED: 'milestone_completed',
+  
   // System operations
   SYSTEM_ALERT: 'system_alert',
   SYSTEM_MAINTENANCE: 'system_maintenance',
@@ -230,6 +236,42 @@ const createInventoryNotification = (action, inventory, userId, additionalData =
   );
 };
 
+const createMilestoneNotification = (action, milestone, ticket, userId, additionalData = {}) => {
+  const actions = {
+    'stage_changed': `Ticket ${ticket.ticketCode} milestone updated to "${milestone.config?.label || milestone.stage}". ${additionalData.previousStage ? `Previous: "${additionalData.previousStageLabel || additionalData.previousStage}"` : ''}`,
+    'created': `New milestone "${milestone.config?.label || milestone.stage}" created for ticket ${ticket.ticketCode}`,
+    'updated': `Milestone "${milestone.config?.label || milestone.stage}" updated for ticket ${ticket.ticketCode}`,
+    'completed': `Milestone "${milestone.config?.label || milestone.stage}" completed for ticket ${ticket.ticketCode}${milestone.config?.isFinal ? ' - Ticket Closed' : ''}`,
+  };
+
+  const titles = {
+    'stage_changed': ' Milestone Stage Updated',
+    'created': 'New Milestone Created',
+    'updated': 'Milestone Updated', 
+    'completed': milestone.config?.isFinal ? '✅ Ticket Completed' : '✅ Milestone Completed',
+  };
+
+  return createNotification(
+    NOTIFICATION_TYPES[`MILESTONE_${action.toUpperCase()}`] || NOTIFICATION_TYPES.MILESTONE_UPDATED,
+    titles[action] || `Milestone ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+    actions[action] || `Milestone ${milestone.config?.label || milestone.stage} has been ${action}`,
+    {
+      ticketId: ticket.id,
+      ticketCode: ticket.ticketCode,
+      userId: userId,
+      entityId: milestone.id,
+      entityType: 'milestone',
+      action: action,
+      milestoneStage: milestone.stage,
+      milestoneLabel: milestone.config?.label,
+      isTicketClosed: milestone.config?.isFinal,
+      priority: ticket.priority,
+      customerName: ticket.customerName,
+      ...additionalData
+    }
+  );
+};
+
 // Enhanced broadcast function that saves to database and emits via socket
 const saveAndBroadcastNotification = async (prisma, io, notificationData, targetUserIds = null) => {
   try {
@@ -323,6 +365,7 @@ module.exports = {
   createProductNotification,
   createSpareRequestNotification,
   createInventoryNotification,
+  createMilestoneNotification,
   saveAndBroadcastNotification,
   NOTIFICATION_TYPES,
 };

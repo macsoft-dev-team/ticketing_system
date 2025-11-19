@@ -2,11 +2,7 @@ const { prisma } = require("../lib/clients");
 const { createMilestone } = require("./milestones");
 const { getStageConfig } = require("../lib/milestoneConfig");
 
-/**
- * Gets available service centers for a given state (for manual assignment suggestions)
- * @param {string} state - The state where the ticket originated
- * @returns {Promise<Array>} - List of suitable service centers for the state
- */
+ 
 const getSuggestedServiceCentersForState = async (state) => {
   try {
     const serviceCenters = await prisma.serviceCenter.findMany({
@@ -86,13 +82,7 @@ const getSuggestedServiceCentersForState = async (state) => {
   }
 };
 
-/**
- * Manually assigns a service center to a ticket (used by MACSOFT_SUPPORT)
- * @param {number} ticketId - The ID of the ticket
- * @param {string} centerCode - The service center code to assign
- * @param {number} assignedByUserId - The ID of the user making the assignment
- * @returns {Promise<Object>} - Updated ticket with assigned service center
- */
+ 
 const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserId) => {
   try {
     console.log(`🔄 Starting service center assignment: ticketId=${ticketId}, centerCode=${centerCode}, userId=${assignedByUserId}`);
@@ -247,14 +237,7 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
   }
 };
 
-/**
- * Gets all service centers with their serviceable states
- * @param {Object} filters - Search and filter parameters
- * @param {string} filters.search - Search term for name, centerCode, or address
- * @param {string} filters.state - Filter by serviceable states (state name)
- * @param {string} filters.stateId - Filter by state ID (will be converted to state name)
- * @returns {Promise<Array>} - List of service centers with state assignments
- */
+ 
 const getServiceCentersWithStates = async (filters = {}) => {
   try {
     const { search, state, stateId } = filters;
@@ -360,13 +343,7 @@ const getServiceCentersWithStates = async (filters = {}) => {
     throw error;
   }
 };
-
-/**
- * Updates the serviceable states for a service center
- * @param {string} centerCode - The center code
- * @param {Array<string>} states - Array of state names
- * @returns {Promise<Object>} - Updated service center
- */
+ 
 const updateServiceCenterStates = async (centerCode, states) => {
   try {
     const statesString = states && states.length > 0 ? states.join(',') : null;
@@ -388,10 +365,7 @@ const updateServiceCenterStates = async (centerCode, states) => {
   }
 };
 
-/**
- * Gets ticket distribution by service center
- * @returns {Promise<Array>} - Service center ticket statistics
- */
+ 
 const getServiceCenterTicketStats = async () => {
   try {
     return await prisma.serviceCenter.findMany({
@@ -427,10 +401,7 @@ const getServiceCenterTicketStats = async () => {
   }
 };
 
-/**
- * Gets tickets that are unassigned (no service center assigned yet)
- * @returns {Promise<Array>} - List of unassigned tickets
- */
+ 
 const getUnassignedTickets = async () => {
   try {
     return await prisma.ticket.findMany({
@@ -451,12 +422,7 @@ const getUnassignedTickets = async () => {
   }
 };
 
-/**
- * Removes service center assignment from a ticket
- * @param {number} ticketId - The ID of the ticket
- * @param {number} removedByUserId - The ID of the user removing the assignment
- * @returns {Promise<Object>} - Updated ticket without service center assignment
- */
+ 
 const removeServiceCenterAssignment = async (ticketId, removedByUserId) => {
   try {
     const updatedTicket = await prisma.ticket.update({

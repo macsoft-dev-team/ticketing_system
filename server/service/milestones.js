@@ -7,12 +7,67 @@ const {
   canRoleTransitionToStage,
 } = require("../lib/milestoneConfig");
 const spareRequestService = require("./spareRequests");
+const { saveAndBroadcastNotification, createMilestoneNotification } = require("../lib/notificationUtils");
 
-const createMilestone = async (milestoneData) => {
+const createMilestone = async (milestoneData, io) => {
   try {
     const milestone = await prisma.ticketMilestone.create({
       data: milestoneData,
+      include: {
+        changer: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
+        },
+        attachments: true,
+        ticket: true,
+      },
     });
+
+    // Create notification for milestone creation
+    try {
+      if (milestoneData.changedBy) {
+        const milestoneConfig = getStageConfig(milestone.stage);
+        const milestoneWithConfig = {
+          ...milestone,
+          config: milestoneConfig,
+        };
+        
+        const targetRoles = [
+          'MACSOFT_ADMIN',
+          'MACSOFT_HEAD', 
+          'MACSOFT_SUPPORT',
+          'CUSTOMER_SERVICE_HEAD'
+        ];
+        
+        const targetUsers = await prisma.user.findMany({
+          where: {
+            role: { in: targetRoles },
+            id: { not: milestoneData.changedBy }
+          },
+          select: { id: true }
+        });
+        
+        const targetUserIds = targetUsers.map(user => user.id);
+        
+        if (targetUserIds.length > 0) {
+          const notificationData = createMilestoneNotification(
+            'created',
+            milestoneWithConfig,
+            milestone.ticket,
+            milestoneData.changedBy
+          );
+          
+          await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+          console.log(`📢 Milestone creation notification sent to ${targetUserIds.length} users`);
+        }
+      }
+    } catch (notificationError) {
+      console.error('❌ Error sending milestone creation notification:', notificationError);
+      // Don't throw - milestone creation should succeed even if notification fails
+    }
 
     return milestone;
   } catch (error) {
@@ -132,7 +187,7 @@ const transitionMilestone = async (
           fileUrl: generateTicketFileUrl(
             ticket.ticketCode,
             attachment.filename,
-            'milestones'
+            "milestones"
           ),
           milestoneId: currentMilestone.id,
           ticketId: ticketId,
@@ -153,15 +208,21 @@ const transitionMilestone = async (
 
     // Handle special case for SPARE_APPROVED - update all pending spare request items
     let spareApprovalResult = null;
-    if (targetStage === 'SPARE_APPROVED') {
+    if (targetStage === "SPARE_APPROVED") {
       try {
-        spareApprovalResult = await spareRequestService.bulkApproveSpareRequestsByTicket(
-          ticket.ticketCode, 
-          userId
+        spareApprovalResult =
+          await spareRequestService.bulkApproveSpareRequestsByTicket(
+            ticket.ticketCode,
+            userId
+          );
+        console.log(
+          `✅ Bulk approved ${spareApprovalResult.approvedRequests} spare requests with ${spareApprovalResult.approvedItems} items for ticket ${ticket.ticketCode}`
         );
-        console.log(`✅ Bulk approved ${spareApprovalResult.approvedRequests} spare requests with ${spareApprovalResult.approvedItems} items for ticket ${ticket.ticketCode}`);
       } catch (spareApprovalError) {
-        console.error('❌ Error auto-approving spare requests during milestone transition:', spareApprovalError);
+        console.error(
+          "❌ Error auto-approving spare requests during milestone transition:",
+          spareApprovalError
+        );
         // Continue with milestone creation even if spare approval fails
       }
     }
@@ -179,7 +240,7 @@ const transitionMilestone = async (
         notes: data.notes || null,
         photoRequired: targetConfig.photoRequired || false,
         description: targetConfig.description || null,
-        allowedRoles:  String(targetConfig.allowedRoles || []),
+        allowedRoles: String(targetConfig.allowedRoles || []),
       },
       include: {
         changer: {
@@ -203,7 +264,7 @@ const transitionMilestone = async (
           fileUrl: generateTicketFileUrl(
             ticket.ticketCode,
             attachment.filename,
-            'milestones'
+            "milestones"
           ),
           milestoneId: createdMilestone.id,
           ticketId: ticketId,
@@ -239,6 +300,65 @@ const transitionMilestone = async (
       },
     });
 
+    // Create and send milestone notification
+    try {
+      const milestoneWithConfig = {
+        ...finalMilestone,
+        config: targetConfig,
+      };
+      
+      // Determine which users should receive milestone notifications
+      // Get users based on roles that should be notified about milestone changes
+      const targetRoles = [
+        'MACSOFT_ADMIN',
+        'MACSOFT_HEAD', 
+        'MACSOFT_SUPPORT',
+        'CUSTOMER_SERVICE_HEAD'
+      ];
+      
+      // For field clearance notifications, also notify field engineers
+      if (targetStage === 'REQUEST_CLEARED_AT_FIELD' || targetStage === 'FIELD_CLEARANCE_APPROVED') {
+        targetRoles.push('CUSTOMER_FIELD_ENGINEER');
+      }
+      
+      // For service center related stages, notify technicians
+      if (['RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED'].includes(targetStage)) {
+        targetRoles.push('SERVICE_CENTER_TECHNICIAN');
+      }
+      
+      const targetUsers = await prisma.user.findMany({
+        where: {
+          role: { in: targetRoles },
+          // Exclude the user who made the transition
+          id: { not: userId }
+        },
+        select: { id: true }
+      });
+      
+      const targetUserIds = targetUsers.map(user => user.id);
+      
+      if (targetUserIds.length > 0) {
+        const notificationData = createMilestoneNotification(
+          targetConfig.isFinal ? 'completed' : 'stage_changed',
+          milestoneWithConfig,
+          ticket,
+          userId,
+          {
+            previousStage: currentMilestone?.stage,
+            previousStageLabel: currentMilestone ? getStageConfig(currentMilestone.stage)?.label : null,
+            isTransition: true,
+            spareRequestsApproved: targetStage === "SPARE_APPROVED" && spareApprovalResult
+          }
+        );
+        
+        await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+        console.log(`📢 Milestone notification sent to ${targetUserIds.length} users for stage transition to ${targetConfig.label}`);
+      }
+    } catch (notificationError) {
+      console.error('❌ Error sending milestone notification:', notificationError);
+      // Don't throw - milestone transition should succeed even if notification fails
+    }
+
     // Broadcast real-time update
     if (io) {
       const updateData = {
@@ -251,15 +371,15 @@ const transitionMilestone = async (
       };
 
       // Add spare request approval info for SPARE_APPROVED transitions
-      if (targetStage === 'SPARE_APPROVED' && spareApprovalResult) {
+      if (targetStage === "SPARE_APPROVED" && spareApprovalResult) {
         updateData.spareRequestsApproved = true;
         updateData.spareApprovalResult = spareApprovalResult;
       }
 
       io.emit("milestone-updated", updateData);
-      
+
       // Also emit spare request update for real-time UI updates
-      if (targetStage === 'SPARE_APPROVED' && spareApprovalResult) {
+      if (targetStage === "SPARE_APPROVED" && spareApprovalResult) {
         io.emit("spare-requests-bulk-approved", {
           ticketCode: ticket.ticketCode,
           approvedBy: userId,
@@ -275,7 +395,7 @@ const transitionMilestone = async (
     };
 
     // Include spare approval result for SPARE_APPROVED transitions
-    if (targetStage === 'SPARE_APPROVED' && spareApprovalResult) {
+    if (targetStage === "SPARE_APPROVED" && spareApprovalResult) {
       result.spareApprovalResult = spareApprovalResult;
     }
 
@@ -328,14 +448,64 @@ const updateMilestoneNotes = async (milestoneId, notes, userId) => {
           },
         },
         attachments: true,
+        ticket: {
+          select: {
+            id: true,
+            ticketCode: true,
+            customerName: true,
+            priority: true,
+          },
+        },
       },
     });
 
     const config = getStageConfig(updatedMilestone.stage);
-    return {
+    const milestoneWithConfig = {
       ...updatedMilestone,
       config,
     };
+
+    // Create notification for milestone notes update
+    try {
+      const targetRoles = [
+        'MACSOFT_ADMIN',
+        'MACSOFT_HEAD', 
+        'MACSOFT_SUPPORT',
+        'CUSTOMER_SERVICE_HEAD'
+      ];
+      
+      const targetUsers = await prisma.user.findMany({
+        where: {
+          role: { in: targetRoles },
+          id: { not: userId }
+        },
+        select: { id: true }
+      });
+      
+      const targetUserIds = targetUsers.map(user => user.id);
+      
+      if (targetUserIds.length > 0) {
+        const notificationData = createMilestoneNotification(
+          'updated',
+          milestoneWithConfig,
+          updatedMilestone.ticket,
+          userId,
+          {
+            updateType: 'notes',
+            hasNotes: Boolean(notes)
+          }
+        );
+        
+        // Note: We don't have io here, so pass null - notifications will still be saved to DB
+        await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
+        console.log(`📢 Milestone notes update notification sent to ${targetUserIds.length} users`);
+      }
+    } catch (notificationError) {
+      console.error('❌ Error sending milestone notes update notification:', notificationError);
+      // Don't throw - notes update should succeed even if notification fails
+    }
+
+    return milestoneWithConfig;
   } catch (error) {
     console.error("Error updating milestone notes:", error);
     throw error;
@@ -360,7 +530,12 @@ const addPhotosToCurrentMilestone = async (
 
     const ticket = await prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { ticketCode: true },
+      select: { 
+        ticketCode: true,
+        id: true,
+        customerName: true,
+        priority: true,
+      },
     });
 
     // Create attachments for the current milestone
@@ -369,7 +544,11 @@ const addPhotosToCurrentMilestone = async (
         fileName: attachment.originalName || attachment.filename,
         fileType: attachment.mimetype,
         fileSize: attachment.size,
-        fileUrl: generateTicketFileUrl(ticket.ticketCode, attachment.filename, 'milestones'),
+        fileUrl: generateTicketFileUrl(
+          ticket.ticketCode,
+          attachment.filename,
+          "milestones"
+        ),
         milestoneId: currentMilestone.id,
         ticketId: ticketId,
       })),
@@ -391,10 +570,52 @@ const addPhotosToCurrentMilestone = async (
     });
 
     const config = getStageConfig(updatedMilestone.stage);
-    return {
+    const milestoneWithConfig = {
       ...updatedMilestone,
       config,
     };
+
+    // Create notification for photos added to milestone
+    try {
+      const targetRoles = [
+        'MACSOFT_ADMIN',
+        'MACSOFT_HEAD', 
+        'MACSOFT_SUPPORT',
+        'CUSTOMER_SERVICE_HEAD'
+      ];
+      
+      const targetUsers = await prisma.user.findMany({
+        where: {
+          role: { in: targetRoles },
+          id: { not: userId }
+        },
+        select: { id: true }
+      });
+      
+      const targetUserIds = targetUsers.map(user => user.id);
+      
+      if (targetUserIds.length > 0) {
+        const notificationData = createMilestoneNotification(
+          'updated',
+          milestoneWithConfig,
+          ticket,
+          userId,
+          {
+            updateType: 'photos',
+            photosAdded: attachments.length
+          }
+        );
+        
+        // Note: We don't have io here, so pass null - notifications will still be saved to DB
+        await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
+        console.log(`📢 Milestone photos update notification sent to ${targetUserIds.length} users`);
+      }
+    } catch (notificationError) {
+      console.error('❌ Error sending milestone photos update notification:', notificationError);
+      // Don't throw - photos update should succeed even if notification fails
+    }
+
+    return milestoneWithConfig;
   } catch (error) {
     console.error("Error adding photos to milestone:", error);
     throw error;

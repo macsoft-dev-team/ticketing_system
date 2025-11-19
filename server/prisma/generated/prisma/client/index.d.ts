@@ -2365,10 +2365,12 @@ export namespace Prisma {
    */
 
   export type StateCountOutputType = {
+    primaryUsers: number
     users: number
   }
 
   export type StateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    primaryUsers?: boolean | StateCountOutputTypeCountPrimaryUsersArgs
     users?: boolean | StateCountOutputTypeCountUsersArgs
   }
 
@@ -2381,6 +2383,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the StateCountOutputType
      */
     select?: StateCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * StateCountOutputType without action
+   */
+  export type StateCountOutputTypeCountPrimaryUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
   }
 
   /**
@@ -2477,6 +2486,7 @@ export namespace Prisma {
     spareRequestsUpdated: number
     productTransactions: number
     TicketMilestone: number
+    states: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2490,6 +2500,7 @@ export namespace Prisma {
     spareRequestsUpdated?: boolean | UserCountOutputTypeCountSpareRequestsUpdatedArgs
     productTransactions?: boolean | UserCountOutputTypeCountProductTransactionsArgs
     TicketMilestone?: boolean | UserCountOutputTypeCountTicketMilestoneArgs
+    states?: boolean | UserCountOutputTypeCountStatesArgs
   }
 
   // Custom InputTypes
@@ -2571,6 +2582,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountTicketMilestoneArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TicketMilestoneWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StateWhereInput
   }
 
 
@@ -3009,6 +3027,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     stateCode?: boolean
+    primaryUsers?: boolean | State$primaryUsersArgs<ExtArgs>
     users?: boolean | State$usersArgs<ExtArgs>
     _count?: boolean | StateCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["state"]>
@@ -3023,6 +3042,7 @@ export namespace Prisma {
 
   export type StateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "stateCode", ExtArgs["result"]["state"]>
   export type StateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    primaryUsers?: boolean | State$primaryUsersArgs<ExtArgs>
     users?: boolean | State$usersArgs<ExtArgs>
     _count?: boolean | StateCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -3030,6 +3050,7 @@ export namespace Prisma {
   export type $StatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "State"
     objects: {
+      primaryUsers: Prisma.$UserPayload<ExtArgs>[]
       users: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -3376,6 +3397,7 @@ export namespace Prisma {
    */
   export interface Prisma__StateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    primaryUsers<T extends State$primaryUsersArgs<ExtArgs> = {}>(args?: Subset<T, State$primaryUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     users<T extends State$usersArgs<ExtArgs> = {}>(args?: Subset<T, State$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3749,6 +3771,30 @@ export namespace Prisma {
      * Limit how many States to delete.
      */
     limit?: number
+  }
+
+  /**
+   * State.primaryUsers
+   */
+  export type State$primaryUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -7163,6 +7209,7 @@ export namespace Prisma {
     productTransactions?: boolean | User$productTransactionsArgs<ExtArgs>
     TicketMilestone?: boolean | User$TicketMilestoneArgs<ExtArgs>
     State?: boolean | User$StateArgs<ExtArgs>
+    states?: boolean | User$statesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -7197,6 +7244,7 @@ export namespace Prisma {
     productTransactions?: boolean | User$productTransactionsArgs<ExtArgs>
     TicketMilestone?: boolean | User$TicketMilestoneArgs<ExtArgs>
     State?: boolean | User$StateArgs<ExtArgs>
+    states?: boolean | User$statesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7215,6 +7263,7 @@ export namespace Prisma {
       productTransactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
       TicketMilestone: Prisma.$TicketMilestonePayload<ExtArgs>[]
       State: Prisma.$StatePayload<ExtArgs> | null
+      states: Prisma.$StatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -7581,6 +7630,7 @@ export namespace Prisma {
     productTransactions<T extends User$productTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$productTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     TicketMilestone<T extends User$TicketMilestoneArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketMilestoneArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketMilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     State<T extends User$StateArgs<ExtArgs> = {}>(args?: Subset<T, User$StateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    states<T extends User$statesArgs<ExtArgs> = {}>(args?: Subset<T, User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8240,6 +8290,30 @@ export namespace Prisma {
      */
     include?: StateInclude<ExtArgs> | null
     where?: StateWhereInput
+  }
+
+  /**
+   * User.states
+   */
+  export type User$statesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the State
+     */
+    select?: StateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the State
+     */
+    omit?: StateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StateInclude<ExtArgs> | null
+    where?: StateWhereInput
+    orderBy?: StateOrderByWithRelationInput | StateOrderByWithRelationInput[]
+    cursor?: StateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StateScalarFieldEnum | StateScalarFieldEnum[]
   }
 
   /**
@@ -22585,6 +22659,7 @@ export namespace Prisma {
     id?: IntFilter<"State"> | number
     name?: StringFilter<"State"> | string
     stateCode?: StringNullableFilter<"State"> | string | null
+    primaryUsers?: UserListRelationFilter
     users?: UserListRelationFilter
   }
 
@@ -22592,6 +22667,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     stateCode?: SortOrderInput | SortOrder
+    primaryUsers?: UserOrderByRelationAggregateInput
     users?: UserOrderByRelationAggregateInput
     _relevance?: StateOrderByRelevanceInput
   }
@@ -22603,6 +22679,7 @@ export namespace Prisma {
     OR?: StateWhereInput[]
     NOT?: StateWhereInput | StateWhereInput[]
     name?: StringFilter<"State"> | string
+    primaryUsers?: UserListRelationFilter
     users?: UserListRelationFilter
   }, "id" | "stateCode">
 
@@ -22901,6 +22978,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionListRelationFilter
     TicketMilestone?: TicketMilestoneListRelationFilter
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
+    states?: StateListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -22928,6 +23006,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionOrderByRelationAggregateInput
     TicketMilestone?: TicketMilestoneOrderByRelationAggregateInput
     State?: StateOrderByWithRelationInput
+    states?: StateOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -22959,6 +23038,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionListRelationFilter
     TicketMilestone?: TicketMilestoneListRelationFilter
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
+    states?: StateListRelationFilter
   }, "id" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -24080,27 +24160,31 @@ export namespace Prisma {
   export type StateCreateInput = {
     name: string
     stateCode?: string | null
-    users?: UserCreateNestedManyWithoutStateInput
+    primaryUsers?: UserCreateNestedManyWithoutStateInput
+    users?: UserCreateNestedManyWithoutStatesInput
   }
 
   export type StateUncheckedCreateInput = {
     id?: number
     name: string
     stateCode?: string | null
-    users?: UserUncheckedCreateNestedManyWithoutStateInput
+    primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
+    users?: UserUncheckedCreateNestedManyWithoutStatesInput
   }
 
   export type StateUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
-    users?: UserUpdateManyWithoutStateNestedInput
+    primaryUsers?: UserUpdateManyWithoutStateNestedInput
+    users?: UserUpdateManyWithoutStatesNestedInput
   }
 
   export type StateUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
-    users?: UserUncheckedUpdateManyWithoutStateNestedInput
+    primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
+    users?: UserUncheckedUpdateManyWithoutStatesNestedInput
   }
 
   export type StateCreateManyInput = {
@@ -24409,7 +24493,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -24435,6 +24520,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserUpdateInput = {
@@ -24458,7 +24544,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -24484,6 +24571,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -26045,6 +26133,12 @@ export namespace Prisma {
     isNot?: StateWhereInput | null
   }
 
+  export type StateListRelationFilter = {
+    every?: StateWhereInput
+    some?: StateWhereInput
+    none?: StateWhereInput
+  }
+
   export type MessageOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -26070,6 +26164,10 @@ export namespace Prisma {
   }
 
   export type TicketMilestoneOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -27037,10 +27135,22 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
+  export type UserCreateNestedManyWithoutStatesInput = {
+    create?: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput> | UserCreateWithoutStatesInput[] | UserUncheckedCreateWithoutStatesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutStatesInput | UserCreateOrConnectWithoutStatesInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutStateInput = {
     create?: XOR<UserCreateWithoutStateInput, UserUncheckedCreateWithoutStateInput> | UserCreateWithoutStateInput[] | UserUncheckedCreateWithoutStateInput[]
     connectOrCreate?: UserCreateOrConnectWithoutStateInput | UserCreateOrConnectWithoutStateInput[]
     createMany?: UserCreateManyStateInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutStatesInput = {
+    create?: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput> | UserCreateWithoutStatesInput[] | UserUncheckedCreateWithoutStatesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutStatesInput | UserCreateOrConnectWithoutStatesInput[]
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
@@ -27066,6 +27176,19 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
+  export type UserUpdateManyWithoutStatesNestedInput = {
+    create?: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput> | UserCreateWithoutStatesInput[] | UserUncheckedCreateWithoutStatesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutStatesInput | UserCreateOrConnectWithoutStatesInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutStatesInput | UserUpsertWithWhereUniqueWithoutStatesInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutStatesInput | UserUpdateWithWhereUniqueWithoutStatesInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutStatesInput | UserUpdateManyWithWhereWithoutStatesInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -27085,6 +27208,19 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
     update?: UserUpdateWithWhereUniqueWithoutStateInput | UserUpdateWithWhereUniqueWithoutStateInput[]
     updateMany?: UserUpdateManyWithWhereWithoutStateInput | UserUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutStatesNestedInput = {
+    create?: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput> | UserCreateWithoutStatesInput[] | UserUncheckedCreateWithoutStatesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutStatesInput | UserCreateOrConnectWithoutStatesInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutStatesInput | UserUpsertWithWhereUniqueWithoutStatesInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutStatesInput | UserUpdateWithWhereUniqueWithoutStatesInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutStatesInput | UserUpdateManyWithWhereWithoutStatesInput[]
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
@@ -27318,10 +27454,16 @@ export namespace Prisma {
     connect?: TicketMilestoneWhereUniqueInput | TicketMilestoneWhereUniqueInput[]
   }
 
-  export type StateCreateNestedOneWithoutUsersInput = {
-    create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput>
-    connectOrCreate?: StateCreateOrConnectWithoutUsersInput
+  export type StateCreateNestedOneWithoutPrimaryUsersInput = {
+    create?: XOR<StateCreateWithoutPrimaryUsersInput, StateUncheckedCreateWithoutPrimaryUsersInput>
+    connectOrCreate?: StateCreateOrConnectWithoutPrimaryUsersInput
     connect?: StateWhereUniqueInput
+  }
+
+  export type StateCreateNestedManyWithoutUsersInput = {
+    create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput> | StateCreateWithoutUsersInput[] | StateUncheckedCreateWithoutUsersInput[]
+    connectOrCreate?: StateCreateOrConnectWithoutUsersInput | StateCreateOrConnectWithoutUsersInput[]
+    connect?: StateWhereUniqueInput | StateWhereUniqueInput[]
   }
 
   export type TicketUncheckedCreateNestedManyWithoutCreatedByUserInput = {
@@ -27392,6 +27534,12 @@ export namespace Prisma {
     connectOrCreate?: TicketMilestoneCreateOrConnectWithoutChangerInput | TicketMilestoneCreateOrConnectWithoutChangerInput[]
     createMany?: TicketMilestoneCreateManyChangerInputEnvelope
     connect?: TicketMilestoneWhereUniqueInput | TicketMilestoneWhereUniqueInput[]
+  }
+
+  export type StateUncheckedCreateNestedManyWithoutUsersInput = {
+    create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput> | StateCreateWithoutUsersInput[] | StateUncheckedCreateWithoutUsersInput[]
+    connectOrCreate?: StateCreateOrConnectWithoutUsersInput | StateCreateOrConnectWithoutUsersInput[]
+    connect?: StateWhereUniqueInput | StateWhereUniqueInput[]
   }
 
   export type NullableEnumRoleFieldUpdateOperationsInput = {
@@ -27548,14 +27696,27 @@ export namespace Prisma {
     deleteMany?: TicketMilestoneScalarWhereInput | TicketMilestoneScalarWhereInput[]
   }
 
-  export type StateUpdateOneWithoutUsersNestedInput = {
-    create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput>
-    connectOrCreate?: StateCreateOrConnectWithoutUsersInput
-    upsert?: StateUpsertWithoutUsersInput
+  export type StateUpdateOneWithoutPrimaryUsersNestedInput = {
+    create?: XOR<StateCreateWithoutPrimaryUsersInput, StateUncheckedCreateWithoutPrimaryUsersInput>
+    connectOrCreate?: StateCreateOrConnectWithoutPrimaryUsersInput
+    upsert?: StateUpsertWithoutPrimaryUsersInput
     disconnect?: StateWhereInput | boolean
     delete?: StateWhereInput | boolean
     connect?: StateWhereUniqueInput
-    update?: XOR<XOR<StateUpdateToOneWithWhereWithoutUsersInput, StateUpdateWithoutUsersInput>, StateUncheckedUpdateWithoutUsersInput>
+    update?: XOR<XOR<StateUpdateToOneWithWhereWithoutPrimaryUsersInput, StateUpdateWithoutPrimaryUsersInput>, StateUncheckedUpdateWithoutPrimaryUsersInput>
+  }
+
+  export type StateUpdateManyWithoutUsersNestedInput = {
+    create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput> | StateCreateWithoutUsersInput[] | StateUncheckedCreateWithoutUsersInput[]
+    connectOrCreate?: StateCreateOrConnectWithoutUsersInput | StateCreateOrConnectWithoutUsersInput[]
+    upsert?: StateUpsertWithWhereUniqueWithoutUsersInput | StateUpsertWithWhereUniqueWithoutUsersInput[]
+    set?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    disconnect?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    delete?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    connect?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    update?: StateUpdateWithWhereUniqueWithoutUsersInput | StateUpdateWithWhereUniqueWithoutUsersInput[]
+    updateMany?: StateUpdateManyWithWhereWithoutUsersInput | StateUpdateManyWithWhereWithoutUsersInput[]
+    deleteMany?: StateScalarWhereInput | StateScalarWhereInput[]
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -27704,6 +27865,19 @@ export namespace Prisma {
     update?: TicketMilestoneUpdateWithWhereUniqueWithoutChangerInput | TicketMilestoneUpdateWithWhereUniqueWithoutChangerInput[]
     updateMany?: TicketMilestoneUpdateManyWithWhereWithoutChangerInput | TicketMilestoneUpdateManyWithWhereWithoutChangerInput[]
     deleteMany?: TicketMilestoneScalarWhereInput | TicketMilestoneScalarWhereInput[]
+  }
+
+  export type StateUncheckedUpdateManyWithoutUsersNestedInput = {
+    create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput> | StateCreateWithoutUsersInput[] | StateUncheckedCreateWithoutUsersInput[]
+    connectOrCreate?: StateCreateOrConnectWithoutUsersInput | StateCreateOrConnectWithoutUsersInput[]
+    upsert?: StateUpsertWithWhereUniqueWithoutUsersInput | StateUpsertWithWhereUniqueWithoutUsersInput[]
+    set?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    disconnect?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    delete?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    connect?: StateWhereUniqueInput | StateWhereUniqueInput[]
+    update?: StateUpdateWithWhereUniqueWithoutUsersInput | StateUpdateWithWhereUniqueWithoutUsersInput[]
+    updateMany?: StateUpdateManyWithWhereWithoutUsersInput | StateUpdateManyWithWhereWithoutUsersInput[]
+    deleteMany?: StateScalarWhereInput | StateScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutCreatedTicketsInput = {
@@ -29002,6 +29176,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutStateInput = {
@@ -29026,6 +29201,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutStateInput = {
@@ -29036,6 +29212,60 @@ export namespace Prisma {
   export type UserCreateManyStateInputEnvelope = {
     data: UserCreateManyStateInput | UserCreateManyStateInput[]
     skipDuplicates?: boolean
+  }
+
+  export type UserCreateWithoutStatesInput = {
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutUsersInput
+    createdTickets?: TicketCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+  }
+
+  export type UserUncheckedCreateWithoutStatesInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+  }
+
+  export type UserCreateOrConnectWithoutStatesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput>
   }
 
   export type UserUpsertWithWhereUniqueWithoutStateInput = {
@@ -29070,6 +29300,22 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutStatesInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutStatesInput, UserUncheckedUpdateWithoutStatesInput>
+    create: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutStatesInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutStatesInput, UserUncheckedUpdateWithoutStatesInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutStatesInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutStatesInput>
   }
 
   export type ServiceCenterCreateWithoutProjectInput = {
@@ -29164,7 +29410,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutServiceCenterInput = {
@@ -29189,6 +29436,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutServiceCenterInput = {
@@ -29805,15 +30053,35 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type StateCreateWithoutPrimaryUsersInput = {
+    name: string
+    stateCode?: string | null
+    users?: UserCreateNestedManyWithoutStatesInput
+  }
+
+  export type StateUncheckedCreateWithoutPrimaryUsersInput = {
+    id?: number
+    name: string
+    stateCode?: string | null
+    users?: UserUncheckedCreateNestedManyWithoutStatesInput
+  }
+
+  export type StateCreateOrConnectWithoutPrimaryUsersInput = {
+    where: StateWhereUniqueInput
+    create: XOR<StateCreateWithoutPrimaryUsersInput, StateUncheckedCreateWithoutPrimaryUsersInput>
+  }
+
   export type StateCreateWithoutUsersInput = {
     name: string
     stateCode?: string | null
+    primaryUsers?: UserCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutUsersInput = {
     id?: number
     name: string
     stateCode?: string | null
+    primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutUsersInput = {
@@ -30117,26 +30385,53 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"TicketMilestone"> | Date | string
   }
 
-  export type StateUpsertWithoutUsersInput = {
-    update: XOR<StateUpdateWithoutUsersInput, StateUncheckedUpdateWithoutUsersInput>
-    create: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput>
+  export type StateUpsertWithoutPrimaryUsersInput = {
+    update: XOR<StateUpdateWithoutPrimaryUsersInput, StateUncheckedUpdateWithoutPrimaryUsersInput>
+    create: XOR<StateCreateWithoutPrimaryUsersInput, StateUncheckedCreateWithoutPrimaryUsersInput>
     where?: StateWhereInput
   }
 
-  export type StateUpdateToOneWithWhereWithoutUsersInput = {
+  export type StateUpdateToOneWithWhereWithoutPrimaryUsersInput = {
     where?: StateWhereInput
-    data: XOR<StateUpdateWithoutUsersInput, StateUncheckedUpdateWithoutUsersInput>
+    data: XOR<StateUpdateWithoutPrimaryUsersInput, StateUncheckedUpdateWithoutPrimaryUsersInput>
   }
 
-  export type StateUpdateWithoutUsersInput = {
+  export type StateUpdateWithoutPrimaryUsersInput = {
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    users?: UserUpdateManyWithoutStatesNestedInput
   }
 
-  export type StateUncheckedUpdateWithoutUsersInput = {
+  export type StateUncheckedUpdateWithoutPrimaryUsersInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    users?: UserUncheckedUpdateManyWithoutStatesNestedInput
+  }
+
+  export type StateUpsertWithWhereUniqueWithoutUsersInput = {
+    where: StateWhereUniqueInput
+    update: XOR<StateUpdateWithoutUsersInput, StateUncheckedUpdateWithoutUsersInput>
+    create: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput>
+  }
+
+  export type StateUpdateWithWhereUniqueWithoutUsersInput = {
+    where: StateWhereUniqueInput
+    data: XOR<StateUpdateWithoutUsersInput, StateUncheckedUpdateWithoutUsersInput>
+  }
+
+  export type StateUpdateManyWithWhereWithoutUsersInput = {
+    where: StateScalarWhereInput
+    data: XOR<StateUpdateManyMutationInput, StateUncheckedUpdateManyWithoutUsersInput>
+  }
+
+  export type StateScalarWhereInput = {
+    AND?: StateScalarWhereInput | StateScalarWhereInput[]
+    OR?: StateScalarWhereInput[]
+    NOT?: StateScalarWhereInput | StateScalarWhereInput[]
+    id?: IntFilter<"State"> | number
+    name?: StringFilter<"State"> | string
+    stateCode?: StringNullableFilter<"State"> | string | null
   }
 
   export type UserCreateWithoutCreatedTicketsInput = {
@@ -30159,7 +30454,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutCreatedTicketsInput = {
@@ -30184,6 +30480,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutCreatedTicketsInput = {
@@ -30211,7 +30508,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutUpdatedTicketsInput = {
@@ -30236,6 +30534,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutUpdatedTicketsInput = {
@@ -30477,7 +30776,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedTicketsInput = {
@@ -30502,6 +30802,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUpsertWithoutUpdatedTicketsInput = {
@@ -30535,7 +30836,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUpdatedTicketsInput = {
@@ -30560,6 +30862,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type ServiceCenterUpsertWithoutAssignedTicketsInput = {
@@ -30781,7 +31084,8 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutTicketMilestoneInput = {
@@ -30806,6 +31110,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutTicketMilestoneInput = {
@@ -30945,7 +31250,8 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTicketMilestoneInput = {
@@ -30970,6 +31276,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type AttachmentsUpsertWithWhereUniqueWithoutMilestoneInput = {
@@ -31286,7 +31593,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsCreatedInput = {
@@ -31311,6 +31619,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutSpareRequestsCreatedInput = {
@@ -31338,7 +31647,8 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsUpdatedInput = {
@@ -31363,6 +31673,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutSpareRequestsUpdatedInput = {
@@ -31428,7 +31739,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsCreatedInput = {
@@ -31453,6 +31765,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUpsertWithoutSpareRequestsUpdatedInput = {
@@ -31486,7 +31799,8 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsUpdatedInput = {
@@ -31511,6 +31825,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type spareRequestItemUpsertWithWhereUniqueWithoutSpareRequestInput = {
@@ -31916,7 +32231,8 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutProductTransactionsInput = {
@@ -31941,6 +32257,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutProductTransactionsInput = {
@@ -32085,7 +32402,8 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductTransactionsInput = {
@@ -32110,6 +32428,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type ProductCreateWithoutInventoryInput = {
@@ -32198,7 +32517,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -32223,6 +32543,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -32408,7 +32729,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -32433,6 +32755,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type TicketUpsertWithoutMessagesInput = {
@@ -32597,7 +32920,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutMessageSeensInput = {
@@ -32622,6 +32946,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutMessageSeensInput = {
@@ -32690,7 +33015,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessageSeensInput = {
@@ -32715,6 +33041,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type MessageCreateWithoutNotificationInput = {
@@ -32761,7 +33088,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSentNotificationsInput = {
@@ -32786,6 +33114,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutSentNotificationsInput = {
@@ -32941,7 +33270,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentNotificationsInput = {
@@ -32966,6 +33296,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type TicketUpsertWithoutNotificationsInput = {
@@ -33100,7 +33431,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
-    State?: StateCreateNestedOneWithoutUsersInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutNotificationRecipientsInput = {
@@ -33125,6 +33457,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
   }
 
   export type UserCreateOrConnectWithoutNotificationRecipientsInput = {
@@ -33195,7 +33528,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationRecipientsInput = {
@@ -33220,6 +33554,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type UserCreateManyStateInput = {
@@ -33257,6 +33592,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStateInput = {
@@ -33281,6 +33617,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutStateInput = {
@@ -33295,6 +33632,70 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type UserUpdateWithoutStatesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    serviceCenter?: ServiceCenterUpdateOneWithoutUsersNestedInput
+    createdTickets?: TicketUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutStatesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutStatesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type ServiceCenterCreateManyProjectInput = {
@@ -33411,7 +33812,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
-    State?: StateUpdateOneWithoutUsersNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutServiceCenterInput = {
@@ -33436,6 +33838,7 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutServiceCenterInput = {
@@ -34066,6 +34469,25 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StateUpdateWithoutUsersInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUpdateManyWithoutStateNestedInput
+  }
+
+  export type StateUncheckedUpdateWithoutUsersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
+  }
+
+  export type StateUncheckedUpdateManyWithoutUsersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type MessageCreateManyTicketInput = {

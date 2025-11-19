@@ -70,10 +70,11 @@ enum Category {
 }
 
 model State {
-  id        Int     @id @default(autoincrement())
-  name      String
-  stateCode String? @unique
-  users     User[]
+  id           Int     @id @default(autoincrement())
+  name         String
+  stateCode    String? @unique
+  primaryUsers User[]  @relation("PrimaryState")
+  users        User[]  @relation("UserStates")
 }
 
 model Organisation {
@@ -142,8 +143,9 @@ model User {
   spareRequestsUpdated   spareRequest[]          @relation("SpareRequestUpdated")
   productTransactions    ProductTransaction[]    @relation("ProductTransactionCreated")
   TicketMilestone        TicketMilestone[]
-  State                  State?                  @relation(fields: [stateId], references: [id])
+  State                  State?                  @relation("PrimaryState", fields: [stateId], references: [id])
   stateId                Int?
+  states                 State[]                 @relation("UserStates")
 }
 
 model Ticket {

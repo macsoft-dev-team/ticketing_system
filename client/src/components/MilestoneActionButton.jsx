@@ -16,19 +16,30 @@ import {
 
 // Role-based permissions - matches backend milestoneConfig.js
 const STAGE_ROLE_PERMISSIONS = {
+  // ticket creation / field actions
   TICKET_RAISED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
   REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-  SERVICE_CENTER_ASSIGNED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
-  SENT_TO_SERVICE_CENTER: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-  RECEIVED_AT_SERVICE_CENTER: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-  DIAGNOSIS_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-  SPARE_REQUESTED: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
+
+  // assigning / submitting to service centre (image shows Macsoft roles + support/head)
+  SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+  SENT_TO_SERVICE_CENTER: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
+
+  // service centre arrival / work
+  RECEIVED_AT_SERVICE_CENTER: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+  DIAGNOSIS_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+
+  // spares workflow
+  SPARE_REQUESTED: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN', 'CUSTOMER_SERVICE_HEAD', 'CUSTOMER_FIELD_ENGINEER'],
   SPARE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
-  REPAIR_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-  REPLACEMENT_IN_PROGRESS: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-  REPAIRED: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-  READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
-  DELIVERED_TO_FIELD: [ 'CUSTOMER_FIELD_ENGINEER', 'MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+
+  // repair / replacement
+  REPAIR_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+  REPLACEMENT_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+  REPAIRED: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+
+  // dispatch / field delivery / final clearance
+  READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','MACSOFT_ADMIN'],
+  DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN'],
   FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
@@ -137,8 +148,8 @@ const MilestoneActionButton = ({
           requiresPhotos: true,
         },
         {
-          title: 'Send to Service Center',
-          shortTitle: 'Send to SC',
+          title: 'Submit to service center',
+          shortTitle: 'Submit to SC',
           icon: Send,
           color: 'blue',
           action: 'transition',
@@ -347,9 +358,9 @@ const MilestoneActionButton = ({
     }
 
     const filteredActions = stageConfigs.filter(config => {
-      // Special handling for spare_request action - only certain roles can create spare requests
+      // Special handling for spare_request action - any role can create spare requests
       if (config.action === 'spare_request') {
-        return userRole === 'MACSOFT_ADMIN' || userRole === 'SERVICE_CENTER_TECHNICIAN' || userRole === 'SERVICE_CENTER_HEAD';
+        return true; // All roles can create spare requests
       }
 
       // Special handling for service_center_assignment action

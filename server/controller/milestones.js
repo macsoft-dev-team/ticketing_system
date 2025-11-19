@@ -141,7 +141,7 @@ const getAvailableTransitions = async (req, res) => {
   }
 };
 
-const transitionMilestone =   async (req, res) => {
+const transitionMilestone = async (req, res) => {
   try {
     const { ticketId } = req.params;
     const { targetStage, notes, spareRequestId } = req.body;
@@ -295,6 +295,7 @@ const createMilestone = async (req, res) => {
     const { ticketId } = req.params;
     const milestoneData = req.body;
     const { id: userId } = req.user;
+    const io = req.io;
 
     const _milestoneData = {
       ticketId,
@@ -306,7 +307,7 @@ const createMilestone = async (req, res) => {
       changedBy: milestoneData.status === "IN_PROGRESS" ? userId : null,
     };
 
-    const newMilestone = await milestoneService.createMilestone(_milestoneData);
+    const newMilestone = await milestoneService.createMilestone(_milestoneData, io);
 
     res.status(201).json({
       message: "Milestone created successfully",
