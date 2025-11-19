@@ -506,7 +506,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\manir\\Desktop\\workspace\\macsoft\\ticketing-system\\server\\prisma\\generated\\prisma\\client",
+      "value": "/root/ticketing-system2/server/prisma/generated/prisma/client",
       "fromEnvVar": null
     },
     "config": {
@@ -515,12 +515,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\manir\\Desktop\\workspace\\macsoft\\ticketing-system\\server\\prisma\\schema.prisma",
+    "sourceFilePath": "/root/ticketing-system2/server/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

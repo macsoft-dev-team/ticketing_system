@@ -3,21 +3,21 @@
         "id":1,
         "name":"Krishna Kumar",
         "phone":"9876543210",
-        "password":"$2b$10$52kMN6JhRFRMdkYL3WJ7Oemgz3WL7YtuQ.AMzov1PFgpPNOQm/e.G",
+        "password":"$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
         "role":"ADMIN"
     },
     {
         "id":2,
         "name":"John Doe",
-        "phone":"6383716366",
-        "password":"$2b$10$52kMN6JhRFRMdkYL3WJ7Oemgz3WL7YtuQ.AMzov1PFgpPNOQm/e.G",
+        "phone":"9876543211",
+        "password":"$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
         "role":"TECHNICAL_USER"
     },
     {
         "id":3,
         "name":"Jane Smith",
-        "phone":"9751544395",
-        "password":"$2b$10$52kMN6JhRFRMdkYL3WJ7Oemgz3WL7YtuQ.AMzov1PFgpPNOQm/e.G",
+        "phone":"9876543212",
+        "password":"$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
         "role":"USER"
     }
 ]

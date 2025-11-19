@@ -6,11 +6,12 @@ module.exports = {
       env: {
         NODE_ENV: "development",
         JWT_SECRET: "whatasecretforyou",
-        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketsystem",
-        PORT: 4052,
-        FILE_UPLOAD_PATH: "/var/www/ticketsystem/uploads",
+        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketingsystem",
+        PORT: 4055,
+        FILE_UPLOAD_PATH: "/var/www/ticketsystem2/uploads",
+        UPLOAD_DIR: "/var/www/ticketsystem2/uploads",
         PASSWORD_RESET_URL:
-          "https://ticketsystem.macsoftautomations.in/auth/reset-password",
+          "https://cms2.macsoftautomations.in/auth/reset-password",
         ZEPTO_MAIL_URL: "api.zeptomail.in/",
         ZEPTO_MAIL_TEMPLATE_KEY:
           "2518b.66b5be0ceb82ed4c.k1.6966d6f0-f8d3-11ef-91c7-ae9c7e0b6a9f.195604a49df",
@@ -23,11 +24,11 @@ module.exports = {
       env_production: {
         NODE_ENV: "production",
         JWT_SECRET: "nevergonnagiveyouup",
-        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketsystem",
-        PORT: 4052,
-        FILE_UPLOAD_PATH: "/var/www/ticketsystem/uploads",
+        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketingsystem",
+        PORT: 4055,
+        FILE_UPLOAD_PATH: "/var/www/ticketsystem2/uploads",
         PASSWORD_RESET_URL:
-          "https://ticketsystem.macsoftautomations.in/auth/reset-password",
+          "https://cms2.macsoftautomations.in/auth/reset-password",
         ZEPTO_MAIL_URL: "api.zeptomail.in/",
         ZEPTO_MAIL_TEMPLATE_KEY:
           "2518b.66b5be0ceb82ed4c.k1.6966d6f0-f8d3-11ef-91c7-ae9c7e0b6a9f.195604a49df",

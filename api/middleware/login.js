@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    const token = await generateToken({ ...user, password: undefined });
+    const token = generateToken({ ...user, password: undefined });
     if (token && user.role !== "ADMIN") {
       const users = await prisma.user.findMany({
         where: {
