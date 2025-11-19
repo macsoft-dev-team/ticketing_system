@@ -40,7 +40,8 @@ export default function OrganisationPage() {
         createOrganisation, 
         updateOrganisation, 
         deleteOrganisation, 
-        setFilters 
+        setFilters,
+        statusCounts 
     } = useOrganisation();
 
     useEffect(() => {
@@ -71,7 +72,7 @@ export default function OrganisationPage() {
                 setOrganisationToDelete(null);
                 setMode(null);
                 // Refresh the list
-                fetchOrganisations({ skip: 0, take: 10 });
+                fetchOrganisations({ skip: 0, take: 10, filter });
             } catch (error) {
                 console.error("Error deleting organisation:", error);
             }
@@ -80,19 +81,27 @@ export default function OrganisationPage() {
 
     const handleFormSubmit = async (formData) => {
         try {
+            let result;
             if (mode === 'create') {
-                await createOrganisation(formData);
+                result = await createOrganisation(formData);
             } else if (mode === 'edit') {
-                await updateOrganisation({ ...formData, id: selectedOrganisation.id });
+                result = await updateOrganisation({ 
+                    id: selectedOrganisation.id, 
+                    organisationData: formData 
+                });
             }
-            // Close modal and reset state
-            setModalOpen(false);
-            setMode(null);
-            setSelectedOrganisation(null);
-            // Refresh the list
-            fetchOrganisations({ skip: 0, take: 10 });
+            
+            // Only close modal and refresh on successful submission
+            if (result) {
+                setModalOpen(false);
+                setMode(null);
+                setSelectedOrganisation(null);
+                // Refresh the list
+                fetchOrganisations({ skip: 0, take: 10, filter });
+            }
         } catch (error) {
             console.error("Error submitting form:", error);
+            // Don't close the modal on error - let user see the error and try again
             throw error; // Re-throw to let the form handle it
         }
     };
@@ -110,7 +119,7 @@ export default function OrganisationPage() {
             // Close modal and refresh the list
             setUploadModalOpen(false);
             setMode(null);
-            fetchOrganisations({ skip: 0, take: 10 });
+            fetchOrganisations({ skip: 0, take: 10, filter });
         } catch (error) {
             console.error("Error uploading organisations:", error);
             throw error;
@@ -120,9 +129,19 @@ export default function OrganisationPage() {
     const handleStatusToggle = async (row) => {
         const newStatus = row.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
         try {
-            await updateOrganisation({ ...row, status: newStatus });
+            await updateOrganisation({ 
+                id: row.id,
+                organisationData: {
+                    name: row.name,
+                    orgCode: row.orgCode, 
+                    address: row.address,
+                    email: row.email,
+                    phone: row.phone,
+                    status: newStatus 
+                }
+            });
             // Refresh the list
-            fetchOrganisations({ skip: 0, take: 10 });
+            fetchOrganisations({ skip: 0, take: 10, filter });
         } catch (error) {
             console.error("Error updating status:", error);
         }
@@ -130,15 +149,18 @@ export default function OrganisationPage() {
 
     const handleFilterChange = (status) => {
         console.log('Filter organisations by status:', status);
-        setFilters({ ...filter, status });
+        const updatedFilter = { ...filter, status };
+        setFilters(updatedFilter);
+        fetchOrganisations({ skip: 0, take: 10, filter: updatedFilter });
     };
 
     // Create a debounced search function
     const debouncedSearch = useCallback(
         debounceSearch((searchTerm) => {
             console.log('Debounced search organisations:', searchTerm);
-            setFilters({ ...filter, search: searchTerm });
-            fetchOrganisations({ skip: 0, take: 10, filter: { ...filter, search: searchTerm } });
+            const updatedFilter = { ...filter, search: searchTerm };
+            setFilters(updatedFilter);
+            fetchOrganisations({ skip: 0, take: 10, filter: updatedFilter });
         }, 500),
         [filter, fetchOrganisations, setFilters]
     );
@@ -181,8 +203,6 @@ export default function OrganisationPage() {
                         headerColor="bg-gray-700"
                         headerTextColor="text-white"
                         bordered
-                                searchPlaceholder="Search Customers..."
-                                onAdd={handleCreate} Customers
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                     />

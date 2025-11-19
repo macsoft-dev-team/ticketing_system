@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const organisationService = require("../controller/organisations");
+const organisationController = require("../controller/organisations");
 
-router.get("/", organisationService.getAll);
+router.get("/", organisationController.getAll);
+router.get("/:id", organisationController.getById);
+router.post("/", organisationController.create);
+router.put("/:id", organisationController.update);
+router.delete("/:id", organisationController.deleteOrganisation);
  
 module.exports = router;

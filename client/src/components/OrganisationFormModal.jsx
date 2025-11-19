@@ -11,7 +11,8 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
         orgCode: '',
         address: '',
         email: '',
-         status: 'ACTIVE',
+        phone: '',
+        status: 'ACTIVE',
     });
 
     const [errors, setErrors] = useState({});
@@ -24,7 +25,8 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                 orgCode: initialData.orgCode || '',
                 address: initialData.address || '',
                 email: initialData.email || '',
-                 status: initialData.status || 'ACTIVE',
+                phone: initialData.phone || '',
+                status: initialData.status || 'ACTIVE',
             });
         } else {
             setFormData({
@@ -32,7 +34,8 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                 orgCode: '',
                 address: '',
                 email: '',
-                 status: 'ACTIVE',
+                phone: '',
+                status: 'ACTIVE',
             });
         }
         setErrors({});
@@ -86,13 +89,14 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
         setIsSubmitting(true);
         try {
             const submitData = { 
-                ...formData,
-                isActive: formData.status === 'ACTIVE'
+                ...formData
+                // Keep status as string for backend to handle
             };
             await onSubmit(submitData);
             // Don't call handleClose() here - let parent component handle modal closing
         } catch (error) {
             console.error('Form submission error:', error);
+            // You could set form-level errors here if needed
         } finally {
             setIsSubmitting(false);
         }
@@ -188,6 +192,26 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                             />
                             {errors.email && (
                                 <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                            )}
+                        </div>
+
+                        {/* Phone */}
+                        <div className="space-y-2">
+                            <Label htmlFor="phone">
+                                Phone <span className="text-xs text-gray-500">(optional)</span>
+                            </Label>
+                            <Input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                placeholder="Enter phone number (optional)"
+                                disabled={isSubmitting}
+                                className={errors.phone ? 'border-red-500' : ''}
+                            />
+                            {errors.phone && (
+                                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
                             )}
                         </div>
 

@@ -15,7 +15,7 @@ import { createErrorHandler } from "../../utils/errorUtils";
 
 const useOrganisation = () => {
   const dispatch = useDispatch();
-  const { organisation, organisations, filter, loading, error, mode } =
+  const { organisation, organisations, filter, loading, error, mode, statusCounts } =
     useSelector((state) => state.organisation);
   const { addToast } = useToast();
 
@@ -121,6 +121,7 @@ const useOrganisation = () => {
     organisation,
     organisations,
     filter,
+    statusCounts,
     fetchOrganisations: fetchOrganisationsCallback,
     loading,
     error,

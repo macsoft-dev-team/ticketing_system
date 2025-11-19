@@ -1,7 +1,7 @@
 import { API_ENDPOINTS } from "../constants/api";
 import { organisationsState } from "../constants/variables";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios from "../services/apiInterceptor";
 
 export const fetchOrganisations = createAsyncThunk(
   "organisations/fetchOrganisations",
@@ -10,11 +10,33 @@ export const fetchOrganisations = createAsyncThunk(
       const params = {};
       if (skip !== 0) params.skip = skip;
       if (take !== 0) params.take = take;
-      if (filter) params.filter = filter;
+      
+      // Transform frontend filter format to backend format
+      if (filter) {
+        const backendFilter = {};
+        
+        // Map search to name field
+        if (filter.search && filter.search.trim()) {
+          backendFilter.name = filter.search.trim();
+        }
+        
+        // Map status to isActive boolean
+        if (filter.status && filter.status !== '') {
+          if (filter.status === 'ACTIVE') {
+            backendFilter.isActive = true;
+          } else if (filter.status === 'INACTIVE') {
+            backendFilter.isActive = false;
+          }
+          // If status is empty string or 'ALL', don't add isActive filter
+        }
+        
+        if (Object.keys(backendFilter).length > 0) {
+          params.filter = JSON.stringify(backendFilter);
+        }
+      }
 
       const response = await axios.get(API_ENDPOINTS.organisation, {
         params: params,
-        withCredentials: true,
       });
       return response.data;
     } catch (error) {
@@ -27,9 +49,7 @@ export const fetchOrganisationById = createAsyncThunk(
   "organisations/fetchOrganisationById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_ENDPOINTS.organisation}/${id}`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(`${API_ENDPOINTS.organisation}/${id}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -41,16 +61,16 @@ export const createOrganisation = createAsyncThunk(
   "organisations/createOrganisation",
   async (organisationData, { rejectWithValue }) => {
     try {
+      console.log('Creating organisation with data:', organisationData);
       const response = await axios.post(
         API_ENDPOINTS.organisation,
-        organisationData,
-        {
-          withCredentials: true,
-        }
+        organisationData
       );
+      console.log('Create organisation response:', response.data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error('Create organisation error:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -59,14 +79,16 @@ export const updateOrganisation = createAsyncThunk(
   "organisations/updateOrganisation",
   async ({ id, organisationData }, { rejectWithValue }) => {
     try {
+      console.log('Updating organisation with id:', id, 'data:', organisationData);
       const response = await axios.put(
         `${API_ENDPOINTS.organisation}/${id}`,
-        organisationData,
-        { withCredentials: true }
+        organisationData
       );
+      console.log('Update organisation response:', response.data);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error('Update organisation error:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -75,15 +97,15 @@ export const deleteOrganisation = createAsyncThunk(
   "organisations/deleteOrganisation",
   async (id, { rejectWithValue }) => {
     try {
+      console.log('Deleting organisation with id:', id);
       const response = await axios.delete(
-        `${API_ENDPOINTS.organisation}/${id}`,
-        {
-          withCredentials: true,
-        }
+        `${API_ENDPOINTS.organisation}/${id}`
       );
-      return response.data;
+      console.log('Delete organisation response:', response.data);
+      return { ...response.data, id }; // Include id in response for proper removal from state
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error('Delete organisation error:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -94,8 +116,7 @@ export const uploadOrganisation = createAsyncThunk(
     try {
       const response = await axios.post(
         `${API_ENDPOINTS.upload}/organisation`,
-        formData,
-        { withCredentials: true }
+        formData
       );
       dispatch(fetchOrganisations({ skip: 0, take: 10, filter: null }));
       return response.data;
@@ -132,6 +153,7 @@ const organisationsSlice = createSlice({
         state.organisations = action.payload.organisations;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
+        state.statusCounts = action.payload.statusCount || state.statusCounts;
         state.error = null;
       })
       .addCase(fetchOrganisations.rejected, (state, action) => {

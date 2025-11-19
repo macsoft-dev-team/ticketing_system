@@ -135,6 +135,11 @@ export const organisationsState = {
     search: "",
     status: "",
   },
+  statusCounts: {
+    ALL: 0,
+    ACTIVE: 0,
+    INACTIVE: 0,
+  },
 };
 export const projectsState = {
   projects: [],

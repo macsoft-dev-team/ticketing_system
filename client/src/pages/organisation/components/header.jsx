@@ -1,32 +1,38 @@
 import { Plus, Search, Filter, X, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useOrganisation from "../../../lib/hooks/useOrganisation";
 
 export default function Header({ onAddOrganisation, onUploadOrganisations, onFilterChange, onSearchChange }) {
-    const { filters, setFilters } = useOrganisation();
-    const [activeFilter, setActiveFilter] = useState('');
-    const [searchTerm, setSearchTerm] = useState('');
+    const { filter, setFilters, statusCounts } = useOrganisation();
+    const [activeFilter, setActiveFilter] = useState(filter?.status || '');
+    const [searchTerm, setSearchTerm] = useState(filter?.search || '');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     
+    // Sync local state with Redux filter state
+    useEffect(() => {
+        setActiveFilter(filter?.status || '');
+        setSearchTerm(filter?.search || '');
+    }, [filter?.status, filter?.search]);
+    
     const filterTabItems = [
-        { id: '', label: 'All Customers', shortLabel: 'All', count: 25, key: 'ALL' },
-        { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: 18, key: 'ACTIVE' },
-        { id: 'INACTIVE', label: 'Inactive', shortLabel: 'Inactive', count: 5, key: 'INACTIVE' },
+        { id: '', label: 'All Customers', shortLabel: 'All', count: statusCounts?.ALL || 0, key: 'ALL' },
+        { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCounts?.ACTIVE || 0, key: 'ACTIVE' },
+        { id: 'INACTIVE', label: 'Inactive', shortLabel: 'Inactive', count: statusCounts?.INACTIVE || 0, key: 'INACTIVE' },
     ];
 
     // Handle filter changes
     const handleFilterChange = (status) => {
         setActiveFilter(status);
-        setFilters({ ...filters, status });
+        setFilters({ ...filter, status });
         onFilterChange(status);
     };
 
     // Handle search changes
     const handleSearchChange = (search) => {
         setSearchTerm(search);
-        setFilters({ ...filters, search });
+        setFilters({ ...filter, search });
         onSearchChange(search);
     };
 
