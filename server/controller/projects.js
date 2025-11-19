@@ -4,11 +4,11 @@ const getAllProjects = async (req, res) => {
   try {
     const { skip, take, filter } = req.query;
     const _transformedFilter = filter ? JSON.parse(filter) : undefined;
-    const { projects, count } = await projectService.getAllProjects(
-      skip,
-      take,
-      _transformedFilter
-    );
+    
+    console.log('Projects controller - params:', { skip, take, filter: _transformedFilter });
+    
+    const { projects, count, statusCount } =
+      await projectService.getAllProjects(skip, take, _transformedFilter);
 
     const _transformedProjects = projects.map((project) => ({
       ...project,
@@ -16,10 +16,17 @@ const getAllProjects = async (req, res) => {
       createdAt: moment(project.createdAt).format("YYYY-MM-DD HH:mm:ss"),
     }));
 
+    const takeNum = take ? parseInt(take) : 10;
+    const skipNum = skip ? parseInt(skip) : 0;
+
     res.status(200).json({
       projects: _transformedProjects,
-      totalPages: Math.ceil(count / take),
-      currentPage: parseInt(skip) || 1,
+      totalPages: Math.ceil(count / takeNum),
+      currentPage: Math.floor(skipNum / takeNum) + 1,
+      total: count,
+      skip: skipNum,
+      take: takeNum,
+      statusCount,
     });
   } catch (error) {
     console.error("Error fetching projects:", error);

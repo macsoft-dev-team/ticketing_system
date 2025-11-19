@@ -5,20 +5,27 @@ import axios from "axios";
 
 export const fetchProjects = createAsyncThunk(
   "projects/fetchProjects",
-  async ({ skip, take, filter }, { rejectWithValue }) => {
+  async ({ skip, take, filter } = {}, { rejectWithValue }) => {
     try {
       const params = {};
-      if (skip !== 0) params.skip = skip;
-      if (take !== 0) params.take = take;
-      if (filter) params.filter = filter;
+      if (skip && skip > 0) params.skip = skip;
+      if (take && take > 0) params.take = take;
+      if (filter && Object.keys(filter).length > 0) {
+        params.filter = JSON.stringify(filter);
+      }
 
+      console.log('Fetching projects with params:', params);
+      
       const response = await axios.get(API_ENDPOINTS.project, {
         params: params,
         withCredentials: true,
       });
+      
+      console.log('fetchProjects response statusCount:', response.data.statusCount);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      console.error('Projects fetch error:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -121,6 +128,9 @@ const projectsSlice = createSlice({
     setFilters: (state, action) => {
       state.filter = { ...state.filter, ...action.payload };
     },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -132,6 +142,7 @@ const projectsSlice = createSlice({
         state.projects = action.payload.projects;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
+        state.statusCount = action.payload.statusCount;
         state.error = null;
       })
       .addCase(fetchProjects.rejected, (state, action) => {
@@ -192,7 +203,7 @@ const projectsSlice = createSlice({
   },
 });
 
-export const { setProjects, setProject, setMode, setFilters } =
+export const { setProjects, setProject, setMode, setFilters, setCurrentPage } =
   projectsSlice.actions;
 
 export default projectsSlice.reducer;

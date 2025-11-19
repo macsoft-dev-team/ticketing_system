@@ -10,6 +10,9 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     
+    // Debug statusCount
+    console.log('Projects Header statusCount:', statusCount);
+        
     const filterTabItems = [
         { id: '', label: 'All Projects', shortLabel: 'All', count: statusCount?.ALL || 0, key: 'ALL' },
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCount?.ACTIVE || 0, key: 'ACTIVE' },

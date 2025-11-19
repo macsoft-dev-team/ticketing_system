@@ -21,7 +21,7 @@ export default function Projects() {
         {
             key: 'status',
             label: 'Status',
-            align: 'center',
+            align: 'start',
             render: (value, row) => (
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.isActive
                         ? 'bg-green-100 text-green-800'
@@ -30,13 +30,7 @@ export default function Projects() {
                     {row.isActive ? 'ACTIVE' : 'INACTIVE'}
                 </span>
             )
-        },
-        {
-            key: 'createdAt',
-            label: 'Created Date',
-            align: 'center',
-            render: (value) => moment(value).format('MMM DD, YYYY')
-        },
+        }, 
     ];
 
     const {
@@ -46,8 +40,7 @@ export default function Projects() {
         filter,
         error,
         mode,
-        statusCount,
-        setMode,
+         setMode,
         createProject,
         updateProject,
         deleteProject,
@@ -61,7 +54,7 @@ export default function Projects() {
             take: 10,
             filter: filter
         });
-    }, [getProjects, filter]);
+    }, [getProjects]);
 
     const handleCreate = () => {
         setSelectedProject(null);
@@ -88,8 +81,7 @@ export default function Projects() {
                 getProjects({
                     skip: 0,
                     take: 10,
-                    status: filter.status || '',
-                    search: filter.search || ''
+                    filter: filter
                 });
             } catch (error) {
                 console.error("Error deleting project:", error);
@@ -116,8 +108,7 @@ export default function Projects() {
             getProjects({
                 skip: 0,
                 take: 10,
-                status: filter.status || '',
-                search: filter.search || ''
+                filter: filter
             });
         } catch (error) {
             console.error("Error submitting form:", error);
@@ -136,8 +127,7 @@ export default function Projects() {
             getProjects({
                 skip: 0,
                 take: 10,
-                status: filter.status || '',
-                search: filter.search || ''
+                filter: filter
             });
         } catch (error) {
             console.error("Error uploading projects:", error);
@@ -147,12 +137,12 @@ export default function Projects() {
 
     const handleFilterChange = (status) => {
         console.log('Filter projects by status:', status);
-        setFilters({ ...filter, status });
+        const newFilter = { ...filter, status };
+        setFilters(newFilter);
         getProjects({
             skip: 0,
             take: 10,
-            status,
-            search: filter.search || ''
+            filter: newFilter
         });
     };
 
@@ -160,12 +150,12 @@ export default function Projects() {
     const debouncedSearch = useCallback(
         debounceSearch((searchTerm) => {
             console.log('Debounced search projects:', searchTerm);
-            setFilters({ ...filter, search: searchTerm });
+            const newFilter = { ...filter, search: searchTerm };
+            setFilters(newFilter);
             getProjects({
                 skip: 0,
                 take: 10,
-                status: filter.status || '',
-                search: searchTerm
+                filter: newFilter
             });
         }, 500),
         [filter, getProjects, setFilters]

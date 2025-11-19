@@ -12,8 +12,6 @@ export default function ServiceCenters() {
     const [selectedServiceCenter, setSelectedServiceCenter] = useState(null);
     const [serviceCenterToDelete, setServiceCenterToDelete] = useState(null);
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
 
     const columns = [
         { key: 'name', label: 'Name', align: 'left' },
@@ -41,22 +39,27 @@ export default function ServiceCenters() {
         error,
         mode,
         statusCount,
+        totalPages,
+        currentPage,
         setMode,
         createServiceCenter,
         updateServiceCenter,
         deleteServiceCenter,
         uploadServiceCenters,
-        setFilters
+        setFilters,
+        onPageChange
     } = useServiceCenter();
+
+    // Debug statusCount
+    console.log('ServiceCenters statusCount:', statusCount);
 
     useEffect(() => {
         getServiceCenters({ skip: currentPage, take: 10, filter: filter });
-    }, [getServiceCenters]);
+    }, [getServiceCenters, currentPage]);
 
     useEffect(() => {
         if (filter && Object.keys(filter).some(key => filter[key])) {
             getServiceCenters({ skip: 0, take: 10, filter: filter });
-            setCurrentPage(0);
         }
     }, [filter, getServiceCenters]);
 
@@ -132,13 +135,11 @@ export default function ServiceCenters() {
         const newFilter = { ...filter, status };
         setFilters(newFilter);
         getServiceCenters({ skip: 0, take: 10, filter: newFilter });
-        setCurrentPage(0); // Reset to first page when filtering
     };
 
     // Handle page change
     const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
-        getServiceCenters({ skip: newPage, take: 10, filter });
+        onPageChange(newPage);
     };
 
     // Create a debounced search function
@@ -148,7 +149,6 @@ export default function ServiceCenters() {
             const newFilter = { ...filter, search: searchTerm };
             setFilters(newFilter);
             getServiceCenters({ skip: 0, take: 10, filter: newFilter });
-            setCurrentPage(0); // Reset to first page when searching
         }, 500),
         [filter, getServiceCenters, setFilters]
     );

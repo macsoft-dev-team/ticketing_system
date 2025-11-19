@@ -9,6 +9,10 @@ export default function Header({ onAddServiceCenter, onUploadServiceCenters, onF
     const [searchTerm, setSearchTerm] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    
+    // Debug statusCount
+    console.log('Header statusCount:', statusCount);
+    
      const filterTabItems = [
         { id: '', label: 'All Service Centers', shortLabel: 'All', count: statusCount?.ALL || 0 ,key: 'ALL'},
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCount?.ACTIVE || 0 ,key: 'ACTIVE'},

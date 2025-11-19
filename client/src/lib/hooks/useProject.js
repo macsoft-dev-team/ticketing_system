@@ -8,6 +8,7 @@ import {
   deleteProject,
   setMode,
   setFilters,
+  setCurrentPage,
 } from "../features/projects";
 import { useDispatch, useSelector } from "react-redux";
 import { useToast } from "../../components/ui/toast";
@@ -15,7 +16,7 @@ import { createErrorHandler } from "../../utils/errorUtils";
 
 const useProject = () => {
   const dispatch = useDispatch();
-  const { project, projects, filter, loading, error, mode } =
+  const { project, projects, filter, loading, error, mode, statusCount, totalPages, currentPage } =
     useSelector((state) => state.project);
   const { addToast } = useToast();
 
@@ -124,6 +125,9 @@ const useProject = () => {
     fetchProjects: fetchProjectsCallback,
     loading,
     error,
+    statusCount,
+    totalPages,
+    currentPage,
     setProject: setProjectCallback,
     getProjectById,
     getProjects,

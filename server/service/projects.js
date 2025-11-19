@@ -2,9 +2,16 @@ const { prisma } = require("../lib/clients");
 
 const getAllProjects = async (skip, take, filter) => {
   try {
+    console.log('Projects service - params:', { skip, take, filter });
+    
     const params = {};
-    if (skip) params.skip = (parseInt(skip) - 1) * parseInt(take || 10);
-    if (take) params.take = parseInt(take);
+    // skip should be used as-is, not calculated
+    if (skip && parseInt(skip) > 0) {
+      params.skip = parseInt(skip);
+    }
+    if (take && parseInt(take) > 0) {
+      params.take = parseInt(take);
+    }
 
     let where = {};
 
@@ -18,11 +25,12 @@ const getAllProjects = async (skip, take, filter) => {
     }
 
     // Handle search filter
-    if (filter?.search) {
+    if (filter?.search && filter.search.trim() !== '') {
+      const searchTerm = filter.search.trim();
       where.OR = [
-        { name: { contains: filter?.search } },
-        { projectCode: { contains: filter?.search } },
-        { email: { contains: filter?.search } },
+        { name: { contains: searchTerm } },
+        { projectCode: { contains: searchTerm } },
+        { email: { contains: searchTerm } },
       ];
     }
 
@@ -41,10 +49,35 @@ const getAllProjects = async (skip, take, filter) => {
       }
     }
 
+    const _statusCount = await prisma.project.groupBy({
+      by: ["isActive"],
+      _count: {
+        id: true,
+      },
+    });
+
+    const statusCount = _statusCount.reduce((acc, item) => {
+      acc[item.isActive ? "ACTIVE" : "INACTIVE"] = item._count.id;
+      acc["ALL"] = (acc["ALL"] || 0) + item._count.id;
+      return acc;
+    }, {});
+
+
+
     params.where = where;
+    
+    console.log('Projects service - final params:', JSON.stringify(params, null, 2));
+    console.log('Projects service - where clause:', JSON.stringify(where, null, 2));
+    
     const count = await prisma.project.count({ where: params.where });
-    const projects = await prisma.project.findMany(params);
-    return { projects, count };
+    const projects = await prisma.project.findMany({
+      ...params,
+      orderBy: [{ createdAt: "desc" }]
+    });
+    
+    console.log(`Projects service - found ${projects.length} projects, total count: ${count}`);
+    
+    return { projects, count, statusCount };
   } catch (error) {
     console.error("Error fetching projects:", error);
     throw error;

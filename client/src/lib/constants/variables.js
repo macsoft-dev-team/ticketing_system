@@ -137,12 +137,13 @@ export const organisationsState = {
   },
 };
 export const projectsState = {
-  organisations: [],
-  organisation: null,
+  projects: [],
+  project: null,
   loading: false,
   error: null,
   totalPages: 0,
   currentPage: 0,
+  statusCount: { ALL: 0, ACTIVE: 0, INACTIVE: 0 },
   mode: null, // null | 'create' | 'edit' | 'delete' | 'upload'
   filter: {
     search: "",

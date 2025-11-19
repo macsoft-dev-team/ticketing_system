@@ -23,6 +23,8 @@ export const fetchServiceCenters = createAsyncThunk(
           withCredentials: true,
         }
       );
+      
+      console.log('fetchServiceCenters statusCount:', response.data.statusCount);
       return response.data;
     } catch (error) {
       console.error('Service centers fetch error:', error);
@@ -203,6 +205,7 @@ const serviceCenterState = {
   error: null,
   totalPages: 0,
   currentPage: 0,
+  statusCount: { ALL: 0, ACTIVE: 0, INACTIVE: 0 },
   mode: null, // null | 'create' | 'edit' | 'delete' | 'upload'
   filter: {
     search: "",
