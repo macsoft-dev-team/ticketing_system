@@ -16,7 +16,7 @@ export default function OrganisationPage() {
     
     const columns = [
         { key: 'name', label: 'Name', align: 'left' },
-        { key: 'orgCode', label: 'Organization Code', align: 'left' },
+        { key: 'orgCode', label: 'Customer Code', align: 'left' },
         { key: 'address', label: 'Address', align: 'left' },
         { key: 'email', label: 'Email', align: 'left' },
         { key: 'phone', label: 'Phone', align: 'left' },
@@ -24,9 +24,8 @@ export default function OrganisationPage() {
         {
             key: 'createdAt',
             label: 'Created Date',
-            align: 'center',
-            render: (value) => value ? moment(value).format('DD MMM YYYY') : '-'
-        },
+            align: 'start ',
+         },
     ];
 
     const { 
