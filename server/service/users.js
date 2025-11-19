@@ -114,8 +114,8 @@ const getAll = async (skip, take, filter, currentUser) => {
         _transformedStatusCounts.INACTIVE = statusGroup._count.id;
       }
     });
-
-    return { users, count: _transformedStatusCounts.ALL, statusCounts: _transformedStatusCounts };
+    const count = await prisma.user.count({ where });
+    return { users, count, statusCounts: _transformedStatusCounts };
   } catch (error) {
     console.error('Error in getAll users service:', error);
     throw new Error("Failed to fetch users");

@@ -16,8 +16,17 @@ import { extractErrorMessage, createErrorHandler } from "../../utils/errorUtils"
 
 const useUser = () => {
   const dispatch = useDispatch();
-  const { user, users, filter, loading, error, mode, statusCounts } =
-    useSelector((state) => state.user);
+  const {
+    user,
+    users,
+    filter,
+    loading,
+    error,
+    mode,
+    statusCounts,
+    currentPage,
+    totalPages,
+  } = useSelector((state) => state.user);
   const { addToast } = useToast();
  
   const setUserCallback = useCallback(
@@ -159,6 +168,7 @@ const useUser = () => {
     loading,
     error,
     statusCounts,
+    currentPage,totalPages,
     setUser: setUserCallback,
     getUserById,
     getUsers,

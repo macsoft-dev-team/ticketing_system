@@ -1,7 +1,7 @@
 
 import ReusableTable from "../../components/ui/reusableTable";
 import useUser from "../../lib/hooks/useUser";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import moment from "moment";
 import Header from "./components/header";
 import UploadModal from "../../components/UploadModal";
@@ -9,6 +9,7 @@ import UserFormModal from "../../components/UserFormModal";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import useOrganisation from "../../lib/hooks/useOrganisation";
 import { hashDevicePasswords } from "../../utils/passwordHasher";
+import { debounceSearch } from "../../utils/debounce";
 
 
 export default function UsersPage() {
@@ -35,10 +36,10 @@ export default function UsersPage() {
         },
     ];
 
-    const { users, fetchUsers, loading, filter, error, mode, setMode, createUser, updateUser, deleteUser, uploadUser, updateUserStatus, setFilters } = useUser();
+    const { users, fetchUsers, loading, filter, error, mode, setMode, createUser, updateUser, deleteUser, uploadUser, updateUserStatus, setFilters, currentPage, totalPages } = useUser();
 
     useEffect(() => {
-        fetchUsers({ skip: 0, take: 10, filter: filter });
+        fetchUsers({ skip: currentPage, take: 10, filter: filter });
         // Fetch organisations for the dropdown
         fetchOrganisations();
     }, [fetchUsers, filter]);
@@ -91,7 +92,7 @@ export default function UsersPage() {
         try {
             // Hash passwords before sending to server
             console.log("Original data:", data);
-            
+
             const hashedData = await hashDevicePasswords(
                 data,
                 (progress) => {
@@ -99,12 +100,12 @@ export default function UsersPage() {
                 },
                 10 // saltRounds
             );
-            
+
             console.log("Hashed data:", hashedData);
-            
+
             await uploadUser(hashedData);
             // Close modal and refresh the list
-            setUploadModalOpen(false);  
+            setUploadModalOpen(false);
             setMode(null);
             fetchUsers({ skip: 0, take: 10 });
         } catch (error) {
@@ -113,7 +114,7 @@ export default function UsersPage() {
         }
     };
 
- 
+
     const handleFilterChange = (status) => {
         // TODO: Implement filtering logic based on status
         console.log('Filter users by status:', status);
@@ -121,20 +122,28 @@ export default function UsersPage() {
         // fetchUsers({ skip: 0, take: 10, status });
     };
 
+    // Create a debounced search function
+    const debouncedSearch = useCallback(
+        debounceSearch((searchTerm) => {
+            console.log('Debounced search users:', searchTerm);
+            setFilters({ ...filter, search: searchTerm });
+            fetchUsers({ skip: 0, take: 10, filter: { ...filter, search: searchTerm } });
+        }, 500),
+        [filter, fetchUsers, setFilters]
+    );
+
     const handleSearchChange = (search) => {
-        // TODO: Implement search logic
-        console.log('Search users:', search);
-        // You can add search logic here when ready
-        // fetchUsers({ skip: 0, take: 10, search });
+        // Call the debounced search function
+        debouncedSearch(search);
     };
 
     const handleUploadClick = () => {
         setMode('upload');
         setUploadModalOpen(true);
     };
-    
+
     return (
-        <section className="space-y-3">
+        <section className="space-y-1">
             <Header
                 onAddUser={handleCreate}
                 onUploadUsers={handleUploadClick}
@@ -155,6 +164,11 @@ export default function UsersPage() {
                         headerColor="bg-gray-700"
                         headerTextColor="text-white"
                         bordered
+                        onPageChange={(page) => {
+                            fetchUsers({ skip: page, take: 10, filter: filter });
+                        }}
+                        currentPage={currentPage}
+                        totalPages={totalPages}
                         searchPlaceholder="Search users..."
                         onAdd={handleCreate}
                         onEdit={handleEdit}
