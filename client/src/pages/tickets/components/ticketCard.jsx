@@ -7,7 +7,6 @@ import {
     User,
     Tag,
     Calendar,
-    ChevronDown,
     AlertCircle,
     ArrowRight,
     Zap,
@@ -15,12 +14,6 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import { TICKET_STATUS, STATUS_COLORS, TICKET_PRIORITY, PRIORITY_COLORS } from '../../../lib/constants';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '../../../components/ui/dropdown-menu';
 
 export default function TicketCard({
     ticket = {
@@ -147,63 +140,25 @@ export default function TicketCard({
                         </motion.div>
                     </div>
 
-                    {/* Actions */}
-                    <AnimatePresence>
-                            <motion.div
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                className="flex items-center gap-1"
-                            >
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <motion.button
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            onClick={(e) => handleButtonClick(e)}
-                                            className={`
-                                                flex items-center gap-1 text-xs font-medium
-                                                px-3 py-1.5 rounded-full border transition-all
-                                                ${STATUS_COLORS[ticket.status] || 'bg-gray-100 text-gray-800 border-gray-200'} 
-                                                hover:shadow-md capitalize backdrop-blur-sm
-                                            `}
-                                        >
-                                            {ticket.status.replace('-', ' ')}
-                                            <ChevronDown className="w-3 h-3" />
-                                        </motion.button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-40 backdrop-blur-sm">
-                                        {Object.values(TICKET_STATUS).map((status) => (
-                                            <DropdownMenuItem
-                                                disabled={ticket.status === TICKET_STATUS.CLOSED}
-                                                key={status}
-                                                data-cy={`ticket-status-${status}`}
-                                                onClick={() => handleStatusChange(status)}
-                                                className="capitalize cursor-pointer"
-                                            >
-                                                <div className="flex items-center gap-2 w-full">
-                                                    <div className={`w-2 h-2 rounded-full ${status === TICKET_STATUS.OPEN ? 'bg-red-500' :
-                                                            status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
-                                                                'bg-blue-500'
-                                                        }`}></div>
-                                                    {status.replace('-', ' ')}
-                                                </div>
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-{/* 
-                                <motion.button
-                                    whileHover={{ scale: 1.1, rotate: 5 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={(e) => handleButtonClick(e, () => onDelete?.(ticket.id))}
-                                    className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-all duration-200"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </motion.button> */}
-                            </motion.div>
-                    </AnimatePresence>
+                    {/* Status Display */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`
+                            flex items-center gap-2 text-xs font-medium
+                            px-3 py-1.5 rounded-full border transition-all
+                            ${STATUS_COLORS[ticket.status] || 'bg-gray-100 text-gray-800 border-gray-200'} 
+                            capitalize backdrop-blur-sm shadow-sm
+                        `}
+                    >
+                        <div className={`w-2 h-2 rounded-full ${
+                            ticket.status === TICKET_STATUS.OPEN ? 'bg-red-500' :
+                            ticket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
+                            'bg-blue-500'
+                        }`}></div>
+                        {ticket.status.replace('-', ' ')}
+                    </motion.div>
                 </div>
 
                 {/* Title and Description */}
