@@ -3865,6 +3865,7 @@ export namespace Prisma {
     name: string | null
     orgCode: string | null
     email: string | null
+    phone: string | null
     address: string | null
     isActive: boolean | null
     createdAt: Date | null
@@ -3877,6 +3878,7 @@ export namespace Prisma {
     name: string | null
     orgCode: string | null
     email: string | null
+    phone: string | null
     address: string | null
     isActive: boolean | null
     createdAt: Date | null
@@ -3889,6 +3891,7 @@ export namespace Prisma {
     name: number
     orgCode: number
     email: number
+    phone: number
     address: number
     isActive: number
     createdAt: number
@@ -3911,6 +3914,7 @@ export namespace Prisma {
     name?: true
     orgCode?: true
     email?: true
+    phone?: true
     address?: true
     isActive?: true
     createdAt?: true
@@ -3923,6 +3927,7 @@ export namespace Prisma {
     name?: true
     orgCode?: true
     email?: true
+    phone?: true
     address?: true
     isActive?: true
     createdAt?: true
@@ -3935,6 +3940,7 @@ export namespace Prisma {
     name?: true
     orgCode?: true
     email?: true
+    phone?: true
     address?: true
     isActive?: true
     createdAt?: true
@@ -4034,6 +4040,7 @@ export namespace Prisma {
     name: string
     orgCode: string
     email: string
+    phone: string
     address: string | null
     isActive: boolean
     createdAt: Date
@@ -4065,6 +4072,7 @@ export namespace Prisma {
     name?: boolean
     orgCode?: boolean
     email?: boolean
+    phone?: boolean
     address?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -4079,6 +4087,7 @@ export namespace Prisma {
     name?: boolean
     orgCode?: boolean
     email?: boolean
+    phone?: boolean
     address?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -4086,7 +4095,7 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type OrganisationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "orgCode" | "email" | "address" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["organisation"]>
+  export type OrganisationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "orgCode" | "email" | "phone" | "address" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["organisation"]>
 
   export type $OrganisationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Organisation"
@@ -4096,6 +4105,7 @@ export namespace Prisma {
       name: string
       orgCode: string
       email: string
+      phone: string
       address: string | null
       isActive: boolean
       createdAt: Date
@@ -4474,6 +4484,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Organisation", 'String'>
     readonly orgCode: FieldRef<"Organisation", 'String'>
     readonly email: FieldRef<"Organisation", 'String'>
+    readonly phone: FieldRef<"Organisation", 'String'>
     readonly address: FieldRef<"Organisation", 'String'>
     readonly isActive: FieldRef<"Organisation", 'Boolean'>
     readonly createdAt: FieldRef<"Organisation", 'DateTime'>
@@ -22147,6 +22158,7 @@ export namespace Prisma {
     name: 'name',
     orgCode: 'orgCode',
     email: 'email',
+    phone: 'phone',
     address: 'address',
     isActive: 'isActive',
     createdAt: 'createdAt',
@@ -22427,6 +22439,7 @@ export namespace Prisma {
     name: 'name',
     orgCode: 'orgCode',
     email: 'email',
+    phone: 'phone',
     address: 'address'
   };
 
@@ -22711,6 +22724,7 @@ export namespace Prisma {
     name?: StringFilter<"Organisation"> | string
     orgCode?: StringFilter<"Organisation"> | string
     email?: StringFilter<"Organisation"> | string
+    phone?: StringFilter<"Organisation"> | string
     address?: StringNullableFilter<"Organisation"> | string | null
     isActive?: BoolFilter<"Organisation"> | boolean
     createdAt?: DateTimeFilter<"Organisation"> | Date | string
@@ -22723,6 +22737,7 @@ export namespace Prisma {
     name?: SortOrder
     orgCode?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     address?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -22735,6 +22750,7 @@ export namespace Prisma {
     id?: number
     orgCode?: string
     email?: string
+    phone?: string
     AND?: OrganisationWhereInput | OrganisationWhereInput[]
     OR?: OrganisationWhereInput[]
     NOT?: OrganisationWhereInput | OrganisationWhereInput[]
@@ -22744,13 +22760,14 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Organisation"> | Date | string
     updatedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
-  }, "id" | "orgCode" | "email">
+  }, "id" | "orgCode" | "email" | "phone">
 
   export type OrganisationOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
     orgCode?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     address?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -22771,6 +22788,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Organisation"> | string
     orgCode?: StringWithAggregatesFilter<"Organisation"> | string
     email?: StringWithAggregatesFilter<"Organisation"> | string
+    phone?: StringWithAggregatesFilter<"Organisation"> | string
     address?: StringNullableWithAggregatesFilter<"Organisation"> | string | null
     isActive?: BoolWithAggregatesFilter<"Organisation"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Organisation"> | Date | string
@@ -24208,6 +24226,7 @@ export namespace Prisma {
     name: string
     orgCode: string
     email: string
+    phone: string
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -24220,6 +24239,7 @@ export namespace Prisma {
     name: string
     orgCode: string
     email: string
+    phone: string
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -24231,6 +24251,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     orgCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24243,6 +24264,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     orgCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24255,6 +24277,7 @@ export namespace Prisma {
     name: string
     orgCode: string
     email: string
+    phone: string
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -24266,6 +24289,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     orgCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24278,6 +24302,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     orgCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25857,6 +25882,7 @@ export namespace Prisma {
     name?: SortOrder
     orgCode?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     address?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -25873,6 +25899,7 @@ export namespace Prisma {
     name?: SortOrder
     orgCode?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     address?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -25885,6 +25912,7 @@ export namespace Prisma {
     name?: SortOrder
     orgCode?: SortOrder
     email?: SortOrder
+    phone?: SortOrder
     address?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder

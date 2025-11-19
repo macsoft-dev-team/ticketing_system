@@ -131,6 +131,7 @@ exports.Prisma.OrganisationScalarFieldEnum = {
   name: 'name',
   orgCode: 'orgCode',
   email: 'email',
+  phone: 'phone',
   address: 'address',
   isActive: 'isActive',
   createdAt: 'createdAt',
@@ -351,6 +352,7 @@ exports.Prisma.OrganisationOrderByRelevanceFieldEnum = {
   name: 'name',
   orgCode: 'orgCode',
   email: 'email',
+  phone: 'phone',
   address: 'address'
 };
 

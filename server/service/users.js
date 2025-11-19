@@ -1,5 +1,23 @@
 const { prisma } = require("../lib/clients");
 const { hashPassword } = require("../lib/hashPassword");
+
+// Helper function to convert state codes to state IDs
+const getStateIdByCode = async (stateCode) => {
+  if (!stateCode) return null;
+  const state = await prisma.state.findUnique({
+    where: { stateCode }
+  });
+  return state ? state.id : null;
+};
+
+// Helper function to convert array of state codes to array of state IDs
+const getStateIdsByCodes = async (stateCodes) => {
+  if (!stateCodes || !Array.isArray(stateCodes) || stateCodes.length === 0) return [];
+  const states = await prisma.state.findMany({
+    where: { stateCode: { in: stateCodes } }
+  });
+  return states.map(state => ({ id: state.id }));
+};
  
 const getAll = async (skip, take, filter, currentUser) => {
   try {
@@ -73,6 +91,7 @@ const getAll = async (skip, take, filter, currentUser) => {
           },
         },
         State: true,
+        states: true,
       },
       orderBy: [{ createdAt: "desc" }],
     });
@@ -125,7 +144,8 @@ const getCurrentUser = async (userId) => {
             organisation: true
           }
         },
-        State: true
+        State: true,
+        states: true
       },
     });
 
@@ -153,7 +173,8 @@ const getById = async (id) => {
             organisation: true
           }
         },
-        State: true
+        State: true,
+        states: true
       }
     });
 
@@ -217,20 +238,37 @@ const create = async (userData) => {
       }
     }
 
-    // Handle state relationship
-    if (userData.stateId) {
+    // Handle primary state relationship
+    if (userData.primaryState) {
+      const primaryStateId = await getStateIdByCode(userData.primaryState);
+      if (primaryStateId) {
+        createData.stateId = primaryStateId;
+      }
+    } else if (userData.stateId) {
       createData.stateId = parseInt(userData.stateId);
     }
 
+    // Handle multiple states relationship
+    let multipleStatesConnect = [];
+    if (userData.multipleStates && Array.isArray(userData.multipleStates)) {
+      multipleStatesConnect = await getStateIdsByCodes(userData.multipleStates);
+    }
+
     const newUser = await prisma.user.create({
-      data: createData,
+      data: {
+        ...createData,
+        states: {
+          connect: multipleStatesConnect
+        }
+      },
       include: {
         serviceCenter: {
           include: {
             project: true
           }
         },
-        State: true
+        State: true,
+        states: true
       }
     });
 
@@ -309,21 +347,54 @@ const update = async (id, userData) => {
       }
     }
 
-    // Handle state relationship
-    if (userData.stateId) {
+    // Handle primary state relationship
+    if (userData.hasOwnProperty('primaryState')) {
+      if (userData.primaryState) {
+        const primaryStateId = await getStateIdByCode(userData.primaryState);
+        updateData.stateId = primaryStateId;
+      } else {
+        updateData.stateId = null;
+      }
+    } else if (userData.stateId) {
       updateData.stateId = parseInt(userData.stateId);
+    }
+
+    // Handle multiple states relationship
+    let statesUpdate = {};
+    if (userData.hasOwnProperty('multipleStates')) {
+      // First disconnect all existing states
+      const currentUser = await prisma.user.findUnique({
+        where: { id: parseInt(id) },
+        include: { states: true }
+      });
+      
+      if (currentUser && currentUser.states.length > 0) {
+        statesUpdate.disconnect = currentUser.states.map(state => ({ id: state.id }));
+      }
+      
+      // Then connect new states if provided
+      if (userData.multipleStates && Array.isArray(userData.multipleStates) && userData.multipleStates.length > 0) {
+        const multipleStatesConnect = await getStateIdsByCodes(userData.multipleStates);
+        if (multipleStatesConnect.length > 0) {
+          statesUpdate.connect = multipleStatesConnect;
+        }
+      }
     }
 
     const updatedUser = await prisma.user.update({
       where: { id: parseInt(id) },
-      data: updateData,
+      data: {
+        ...updateData,
+        ...(Object.keys(statesUpdate).length > 0 && { states: statesUpdate })
+      },
       include: {
         serviceCenter: {
           include: {
             project: true
           }
         },
-        State: true
+        State: true,
+        states: true
       }
     });
 
@@ -429,7 +500,8 @@ const updateProfile = async (userId, profileData) => {
       data: updateData,
       include: {
         serviceCenter: true,
-        State: true
+        State: true,
+        states: true
       }
     });
 

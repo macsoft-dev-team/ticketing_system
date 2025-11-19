@@ -5,6 +5,7 @@ const path = require("path");
 
 async function main() {
   const files = [
+    "organisation",
     "project",
     "serviceCenter",
     "user",

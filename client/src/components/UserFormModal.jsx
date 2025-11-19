@@ -3,9 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import Input from './ui/input';
 import Select from './ui/select';
+import MultiSelect from './ui/multi-select';
 import { Label } from './ui/label';
 import { useSelector } from 'react-redux';
 import useOrganisation from '../lib/hooks/useOrganisation';
+import { SORTED_INDIAN_STATES } from '../utils/states';
 
 const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode = 'create' }) => {
     const { organisations ,getOrganisationById,getOrganisations} = useOrganisation();
@@ -17,6 +19,8 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
         role: 'SCE_USER',
         orgCode: '',
         status: 'ACTIVE',
+        primaryState: '',
+        multipleStates: [],
     });
 
     const [errors, setErrors] = useState({});
@@ -32,6 +36,8 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                 role: initialData.role || 'SCE_USER',
                 orgCode: initialData.orgCode || '',
                 status: initialData.status || 'ACTIVE',
+                primaryState: initialData.primaryState || '',
+                multipleStates: initialData.multipleStates || [],
             });
         } else {
             setFormData({
@@ -42,6 +48,8 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                 role: 'SCE_USER',
                 orgCode: '',
                 status: 'ACTIVE',
+                primaryState: '',
+                multipleStates: [],
             });
         }
         setErrors({});
@@ -96,6 +104,22 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleClose = () => {
+        setFormData({
+            name: '',
+            email: '',
+            phone: '',
+            password: '',
+            role: 'SCE_USER',
+            orgCode: '',
+            status: 'ACTIVE',
+            primaryState: '',
+            multipleStates: [],
+        });
+        setErrors({});
+        onOpenChange(false);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -147,7 +171,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto select-none">
                 <DialogHeader>
                     <DialogTitle className="uppercase">
                         {mode === 'create' ? 'Create New User' : 'Edit User'}
@@ -278,7 +302,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                         </div>
 
                         {/* Status */}
-                        <div className="space-y-2 md:col-span-2">
+                        <div className="space-y-2">
                             <Label htmlFor="status">
                                 Status <span className="text-red-500">*</span>
                             </Label>
@@ -297,6 +321,49 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                                 <p className="text-red-500 text-xs mt-1">{errors.status}</p>
                             )}
                         </div>
+
+                        {/* Primary State */}
+                        <div className="space-y-2">
+                            <Label htmlFor="primaryState">
+                                Primary State <span className="text-xs text-gray-500">(optional)</span>
+                            </Label>
+                            <Select
+                                id="primaryState"
+                                name="primaryState"
+                                value={formData.primaryState}
+                                onChange={handleChange}
+                                options={SORTED_INDIAN_STATES}
+                                placeholder="Select primary state (optional)"
+                                disabled={isSubmitting}
+                                direction="down"
+                                className={errors.primaryState ? 'border-red-500' : ''}
+                            />
+                            {errors.primaryState && (
+                                <p className="text-red-500 text-xs mt-1">{errors.primaryState}</p>
+                            )}
+                        </div>
+
+                        {/* Multiple States */}
+                        <div className="space-y-2 md:col-span-2">
+                            <Label htmlFor="multipleStates">
+                                Additional States <span className="text-xs text-gray-500">(optional, multiple selection)</span>
+                            </Label>
+                            <MultiSelect
+                                id="multipleStates"
+                                name="multipleStates"
+                                value={formData.multipleStates}
+                                onChange={handleChange}
+                                options={SORTED_INDIAN_STATES}
+                                placeholder="Select additional states (optional)"
+                                disabled={isSubmitting}
+                                direction="down"
+                                className={errors.multipleStates ? 'border-red-500' : ''}
+                                maxSelectedDisplay={2}
+                            />
+                            {errors.multipleStates && (
+                                <p className="text-red-500 text-xs mt-1">{errors.multipleStates}</p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -306,17 +373,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                             variant="outline"
                             onClick={() => {
                                 if (!isSubmitting) {
-                                    setFormData({
-                                        name: '',
-                                        email: '',
-                                        phone: '',
-                                        password: '',
-                                        role: 'USER',
-                                        orgCode: '',
-                                        status: 'ACTIVE',
-                                    });
-                                    setErrors({});
-                                    onOpenChange(false);
+                                    handleClose();
                                 }
                             }}
                             disabled={isSubmitting}

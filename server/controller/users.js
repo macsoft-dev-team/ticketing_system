@@ -24,6 +24,8 @@ const getAll = async (req, res) => {
           orgCode: user.serviceCenter?.orgCode || null,
           centerCode: user.centerCode || null,
           state: user.State?.name || null,
+          primaryState: user.State?.stateCode || null,
+          multipleStates: user.states?.map(state => state.stateCode) || [],
           createdAt: moment(user.createdAt).format("DD MMM YYYY, hh:mm A"),
           lastLogin: moment(user.lastLogin).format("DD MMM YYYY, hh:mm A"),
         }));
@@ -86,6 +88,8 @@ const getById = async (req, res) => {
             organisation: user.serviceCenter?.organisation?.name || 'N/A',
             orgCode: user.serviceCenter?.orgCode || null,
             state: user.State?.name || null,
+            primaryState: user.State?.stateCode || null,
+            multipleStates: user.states?.map(state => state.stateCode) || [],
         };
         
         res.status(200).json(transformedUser);
@@ -122,6 +126,8 @@ const create = async (req, res) => {
             organisation: newUser.serviceCenter?.organisation?.name || 'N/A',
             orgCode: newUser.serviceCenter?.orgCode || null,
             state: newUser.State?.name || null,
+            primaryState: newUser.State?.stateCode || null,
+            multipleStates: newUser.states?.map(state => state.stateCode) || [],
         };
         
         res.status(201).json(transformedUser);
@@ -155,6 +161,8 @@ const update = async (req, res) => {
             organisation: updatedUser.serviceCenter?.organisation?.name || 'N/A',
             orgCode: updatedUser.serviceCenter?.orgCode || null,
             state: updatedUser.State?.name || null,
+            primaryState: updatedUser.State?.stateCode || null,
+            multipleStates: updatedUser.states?.map(state => state.stateCode) || [],
         };
         
         res.status(200).json(transformedUser);
@@ -190,6 +198,8 @@ const deleteUser = async (req, res) => {
             organisation: deletedUser.serviceCenter?.organisation?.name || 'N/A',
             orgCode: deletedUser.serviceCenter?.orgCode || null,
             state: deletedUser.State?.name || null,
+            primaryState: deletedUser.State?.stateCode || null,
+            multipleStates: deletedUser.states?.map(state => state.stateCode) || [],
         };
         
         res.status(200).json({ 

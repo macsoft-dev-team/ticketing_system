@@ -82,6 +82,7 @@ model Organisation {
   name      String
   orgCode   String    @unique
   email     String    @unique
+  phone     String    @unique
   address   String?
   isActive  Boolean   @default(false)
   createdAt DateTime  @default(now())

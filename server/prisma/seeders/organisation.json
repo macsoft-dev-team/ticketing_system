@@ -1,44 +1,42 @@
 [
   {
     "id": 1,
-    "name": "Macsoft Solutions",
-    "email": "info@macsoftsolutions.com",
-    "address": "789 Corporate Blvd, Tech City",
-    "orgCode": "MACSOFT001"
+    "name": "CRI PUMPS",
+    "email": "solar@cripumps.com",
+    "phone": "9962264503",
+    "address": "COIMBATORE",
+    "orgCode": "CRIPUMPS001"
   },
   {
     "id": 2,
-    "name": "Acme Corp",
-    "email": "info@acmecorp.com",
-    "address": "123 Main St, Springfield",
-    "orgCode": "ACME001"
+    "name": "KSB LIMITED",
+    "email": "Shrikant.Mate@ksb.com",
+    "phone": "+912551229721",
+    "address": "Water Pump Division,Plot No E-3, MIDC Sinnar, Nashik  Maharashtra  422103",
+    "orgCode": "KSB001"
   },
   {
     "id": 3,
-    "name": "Beta Solutions",
-    "email": "contact@betasolutions.com",
-    "address": "456 Elm St, Metropolis",
-    "orgCode": "BETA002"
+    "name": "Pvt",
+    "email": "pvt",
+    "phone": "123",
+    "address": "cbe",
+    "orgCode": "PVT001"
   },
   {
     "id": 4,
-    "name": "Gamma Industries",
-    "email": "hello@gammaindustries.com",
-    "address": "789 Oak Ave, Gotham",
-    "orgCode": "GAMMA003"
+    "name": "Waaree",
+    "email": "waamotors",
+    "phone": "9876543210",
+    "address": "GJ",
+    "orgCode": "WAAREE001"
   },
   {
     "id": 5,
-    "name": "Delta Services",
-    "email": "support@deltaservices.com",
-    "address": "321 Pine Rd, Star City",
-    "orgCode": "DELTA004"
-  },
-  {
-    "id": 6,
-    "name": "Epsilon Tech",
-    "email": "admin@epsilontech.com",
-    "address": "654 Maple Blvd, Central City",
-    "orgCode": "EPSILON005"
+    "name": "PSG",
+    "email": "info@psgpumps.com",
+    "phone": "9876543211",
+    "address": "CBE",
+    "orgCode": "PSG001"
   }
 ]
