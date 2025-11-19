@@ -45,6 +45,10 @@ const getAllProjects = async (skip, take, filter) => {
           { name: { contains: filter?.search } },
           { projectCode: { contains: filter?.search } },
           { email: { contains: filter?.search } },
+          { organisation:{
+            name: { contains: filter?.search },
+            orgCode: { contains: filter?.search }
+          }}
         ];
       }
     }
@@ -65,7 +69,7 @@ const getAllProjects = async (skip, take, filter) => {
 
 
     params.where = where;
-    
+    params.include = { organisation: true };
     console.log('Projects service - final params:', JSON.stringify(params, null, 2));
     console.log('Projects service - where clause:', JSON.stringify(where, null, 2));
     
@@ -87,7 +91,9 @@ const getAllProjects = async (skip, take, filter) => {
 const getProjectById = async (projectId) => {
   try {
     const project = await prisma.project.findUnique({
-      where: { id: projectId },
+      where: { id: projectId,
+      include: { organisation: true}
+       },
     });
     return project;
   } catch (error) {
@@ -99,6 +105,7 @@ const createProject = async (projectData) => {
   try {
     const newProject = await prisma.project.create({
       data: projectData,
+      include: { organisation: true },
     });
     return newProject;
   } catch (error) {
@@ -112,6 +119,7 @@ const updateProject = async (projectId, projectData) => {
     const updatedProject = await prisma.project.update({
       where: { id: projectId },
       data: projectData,
+      include: { organisation: true },
     });
     return updatedProject;
   } catch (error) {
@@ -123,6 +131,7 @@ const deleteProject = async (projectId) => {
   try {
     const deletedProject = await prisma.project.delete({
       where: { id: projectId },
+      include: { organisation: true },
     });
     return deletedProject;
   } catch (error) {

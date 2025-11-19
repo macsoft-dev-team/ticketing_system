@@ -13,6 +13,8 @@ const getAllProjects = async (req, res) => {
     const _transformedProjects = projects.map((project) => ({
       ...project,
       status: project.isActive ? "ACTIVE" : "INACTIVE",
+      organisationName: project.organisation ?  project.organisation.name : 'N/A',
+      organizationCode: project.organisation ? project.organisation.orgCode : 'N/A',
       createdAt: moment(project.createdAt).format("YYYY-MM-DD HH:mm:ss"),
     }));
 

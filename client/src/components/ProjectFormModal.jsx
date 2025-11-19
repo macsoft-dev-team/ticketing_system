@@ -3,6 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import Input from './ui/input';
 import { Label } from './ui/label';
+import Select from './ui/select';
+import useOrganisation from '../lib/hooks/useOrganisation';
 
 const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode = 'create' }) => {
     const [formData, setFormData] = useState({
@@ -10,11 +12,14 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
         projectCode: '',
         email: '',
         address: '',
+        organisationId: '',
         isActive: true,
     });
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const { organisations, getOrganisations } = useOrganisation();
 
     useEffect(() => {
         if (initialData) {
@@ -23,6 +28,7 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                 projectCode: initialData.projectCode || '',
                 email: initialData.email || '',
                 address: initialData.address || '',
+                organisationId: initialData.organisationId || '',
                 isActive: initialData.isActive !== undefined ? initialData.isActive : true,
             });
         } else {
@@ -31,11 +37,19 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                 projectCode: '',
                 email: '',
                 address: '',
+                organisationId: '',
                 isActive: true,
             });
         }
         setErrors({});
     }, [initialData, open]);
+
+    // Fetch organisations when modal opens
+    useEffect(() => {
+        if (open) {
+            getOrganisations({ skip: 0, take: 100, filter: null });
+        }
+    }, [open, getOrganisations]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -162,6 +176,29 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                             )}
                         </div>
 
+                        {/* Organisation */}
+                        <div className="space-y-2 md:col-span-2">
+                            <Label htmlFor="organisationId">
+                                Customer/Organisation <span className="text-xs text-gray-500">(optional)</span>
+                            </Label>
+                            <Select
+                                id="organisationId"
+                                name="organisationId"
+                                value={formData.organisationId}
+                                onChange={handleChange}
+                                placeholder="Select customer/organisation (optional)"
+                                options={organisations?.map(org => ({
+                                    value: org.id,
+                                    label: `${org.name} (${org.orgCode})`
+                                })) || []}
+                                disabled={isSubmitting}
+                                className={errors.organisationId ? 'border-red-500' : ''}
+                            />
+                            {errors.organisationId && (
+                                <p className="text-red-500 text-xs mt-1">{errors.organisationId}</p>
+                            )}
+                        </div>
+
                         {/* Address */}
                         <div className="space-y-2 md:col-span-2">
                             <Label htmlFor="address">
@@ -220,6 +257,7 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                                     projectCode: '',
                                     email: '',
                                     address: '',
+                                    organisationId: '',
                                     isActive: true,
                                 });
                                 setErrors({});

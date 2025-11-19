@@ -14,9 +14,19 @@ export default function Projects() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const columns = [
-        { key: 'name', label: 'Name', align: 'left' },
         { key: 'projectCode', label: 'Project Code', align: 'left' },
+        { key: 'name', label: 'Name', align: 'left' },
         { key: 'email', label: 'Email', align: 'left' },
+        {
+            key: 'organizationCode',
+            label: 'Customer Code',
+            align: 'left',
+        },
+        {
+            key: 'organisationName',
+            label: 'Customer Name',
+            align: 'left',
+        },
         { key: 'address', label: 'Address', align: 'left' },
         {
             key: 'status',
@@ -24,13 +34,13 @@ export default function Projects() {
             align: 'start',
             render: (value, row) => (
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.isActive
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
                     }`}>
                     {row.isActive ? 'ACTIVE' : 'INACTIVE'}
                 </span>
             )
-        }, 
+        },
     ];
 
     const {
@@ -40,7 +50,7 @@ export default function Projects() {
         filter,
         error,
         mode,
-         setMode,
+        setMode,
         createProject,
         updateProject,
         deleteProject,
@@ -229,7 +239,7 @@ export default function Projects() {
                     }
                 }}
                 uploadDevice={handleUpload}
-                requiredColumns={['name', 'projectCode', 'email', 'address (optional)', 'isActive (optional)']}
+                requiredColumns={['name', 'projectCode', 'email', 'organisationId (optional)', 'address (optional)', 'isActive (optional)']}
             />
 
             {/* Delete Confirmation Dialog */}

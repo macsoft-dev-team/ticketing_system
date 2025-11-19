@@ -6,6 +6,7 @@ import {
   updateProject,
   createProject,
   deleteProject,
+  uploadProject,
   setMode,
   setFilters,
   setCurrentPage,
@@ -111,6 +112,23 @@ const useProject = () => {
     },
     [dispatch, getProjects, filter]
   );
+  const uploadProjectsCallback = useCallback(
+    (formData) => {
+      return dispatch(uploadProject(formData))
+        .unwrap()
+        .then((result) => {
+          addToast({
+            title: "Projects Uploaded!",
+            description: "Projects have been uploaded successfully.",
+            variant: "success",
+          });
+          return result;
+        })
+        .catch(createErrorHandler(addToast, "upload", "projects"));
+    },
+    [dispatch, addToast]
+  );
+
   const setFiltersCallback = useCallback(
     (filters) => {
       dispatch(setFilters(filters));
@@ -134,6 +152,7 @@ const useProject = () => {
     updateProject: updateProjectCallback,
     createProject: createProjectCallback,
     deleteProject: deleteProjectCallback,
+    uploadProjects: uploadProjectsCallback,
     setMode: setModeCallback,
     onPageChange,
     setFilters: setFiltersCallback,

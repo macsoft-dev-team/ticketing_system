@@ -102,7 +102,7 @@ model Project {
   updatedAt      DateTime?       @updatedAt
   deletedAt      DateTime?       @map("deleted_at")
   ServiceCenter  ServiceCenter[]
-  Organisation   Organisation?   @relation(fields: [organisationId], references: [id])
+  organisation   Organisation?   @relation(fields: [organisationId], references: [id])
   organisationId Int?
 }
 

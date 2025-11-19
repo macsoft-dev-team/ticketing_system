@@ -5158,7 +5158,7 @@ export namespace Prisma {
     deletedAt?: boolean
     organisationId?: boolean
     ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
-    Organisation?: boolean | Project$OrganisationArgs<ExtArgs>
+    organisation?: boolean | Project$organisationArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -5180,7 +5180,7 @@ export namespace Prisma {
   export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "projectCode" | "email" | "address" | "isActive" | "createdAt" | "updatedAt" | "deletedAt" | "organisationId", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
-    Organisation?: boolean | Project$OrganisationArgs<ExtArgs>
+    organisation?: boolean | Project$organisationArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -5188,7 +5188,7 @@ export namespace Prisma {
     name: "Project"
     objects: {
       ServiceCenter: Prisma.$ServiceCenterPayload<ExtArgs>[]
-      Organisation: Prisma.$OrganisationPayload<ExtArgs> | null
+      organisation: Prisma.$OrganisationPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -5542,7 +5542,7 @@ export namespace Prisma {
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     ServiceCenter<T extends Project$ServiceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Project$ServiceCenterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    Organisation<T extends Project$OrganisationArgs<ExtArgs> = {}>(args?: Subset<T, Project$OrganisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    organisation<T extends Project$organisationArgs<ExtArgs> = {}>(args?: Subset<T, Project$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5949,9 +5949,9 @@ export namespace Prisma {
   }
 
   /**
-   * Project.Organisation
+   * Project.organisation
    */
-  export type Project$OrganisationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Project$organisationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Organisation
      */
@@ -22957,7 +22957,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
     ServiceCenter?: ServiceCenterListRelationFilter
-    Organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
+    organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -22972,7 +22972,7 @@ export namespace Prisma {
     deletedAt?: SortOrderInput | SortOrder
     organisationId?: SortOrderInput | SortOrder
     ServiceCenter?: ServiceCenterOrderByRelationAggregateInput
-    Organisation?: OrganisationOrderByWithRelationInput
+    organisation?: OrganisationOrderByWithRelationInput
     _relevance?: ProjectOrderByRelevanceInput
   }
 
@@ -22991,7 +22991,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
     ServiceCenter?: ServiceCenterListRelationFilter
-    Organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
+    organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
   }, "id" | "projectCode" | "email">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -24478,7 +24478,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
-    Organisation?: OrganisationCreateNestedOneWithoutProjectInput
+    organisation?: OrganisationCreateNestedOneWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -24505,7 +24505,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
-    Organisation?: OrganisationUpdateOneWithoutProjectNestedInput
+    organisation?: OrganisationUpdateOneWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -29861,7 +29861,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    Organisation?: OrganisationCreateNestedOneWithoutProjectInput
+    organisation?: OrganisationCreateNestedOneWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutServiceCenterInput = {
@@ -29987,7 +29987,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Organisation?: OrganisationUpdateOneWithoutProjectNestedInput
+    organisation?: OrganisationUpdateOneWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutServiceCenterInput = {
