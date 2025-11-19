@@ -88,19 +88,22 @@ model Organisation {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime? @map("deleted_at")
+  Project   Project[]
 }
 
 model Project {
-  id            Int             @id @default(autoincrement())
-  name          String
-  projectCode   String          @unique
-  email         String          @unique
-  address       String?
-  isActive      Boolean         @default(false)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime?       @updatedAt
-  deletedAt     DateTime?       @map("deleted_at")
-  ServiceCenter ServiceCenter[]
+  id             Int             @id @default(autoincrement())
+  name           String
+  projectCode    String          @unique
+  email          String          @unique
+  address        String?
+  isActive       Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime?       @updatedAt
+  deletedAt      DateTime?       @map("deleted_at")
+  ServiceCenter  ServiceCenter[]
+  Organisation   Organisation?   @relation(fields: [organisationId], references: [id])
+  organisationId Int?
 }
 
 model ServiceCenter {

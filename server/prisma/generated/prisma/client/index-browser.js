@@ -148,7 +148,8 @@ exports.Prisma.ProjectScalarFieldEnum = {
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  organisationId: 'organisationId'
 };
 
 exports.Prisma.ServiceCenterScalarFieldEnum = {
