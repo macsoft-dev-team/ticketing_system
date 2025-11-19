@@ -11,7 +11,7 @@ export default function Header({ onAddOrganisation, onUploadOrganisations, onFil
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     
     const filterTabItems = [
-        { id: '', label: 'All Organisations', shortLabel: 'All', count: 25, key: 'ALL' },
+        { id: '', label: 'All Customers', shortLabel: 'All', count: 25, key: 'ALL' },
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: 18, key: 'ACTIVE' },
         { id: 'INACTIVE', label: 'Inactive', shortLabel: 'Inactive', count: 5, key: 'INACTIVE' },
     ];
@@ -71,7 +71,7 @@ export default function Header({ onAddOrganisation, onUploadOrganisations, onFil
                         transition={{ delay: 0.1 }}
                         className="text-lg sm:text-xl lg:text-2xl tracking-wide font-medium text-slate-700 uppercase"
                     >
-                        Organisations
+                        Customers
                     </motion.h1>
                     
                     {/* Filter Tabs - Hidden on small screens */}

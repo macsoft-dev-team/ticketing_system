@@ -1,16 +1,19 @@
 import ReusableTable from "../../components/ui/reusableTable";
 import useServiceCenter from "../../lib/hooks/useServiceCenter";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import moment from "moment";
 import Header from "./components/header";
 import UploadModal from "../../components/UploadModal";
 import ServiceCenterFormModal from "../../components/ServiceCenterFormModal";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import { debounceSearch } from "../../utils/debounce";
 
 export default function ServiceCenters() {
     const [selectedServiceCenter, setSelectedServiceCenter] = useState(null);
     const [serviceCenterToDelete, setServiceCenterToDelete] = useState(null);
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     const columns = [
         { key: 'name', label: 'Name', align: 'left' },
@@ -25,7 +28,8 @@ export default function ServiceCenters() {
         {
             key: 'createdAt',
             label: 'Created Date',
-            align: 'start',
+            align: 'center',
+            render: (value) => value ? moment(value).format('DD MMM YYYY') : '-'
         },
     ];
 
@@ -46,8 +50,15 @@ export default function ServiceCenters() {
     } = useServiceCenter();
 
     useEffect(() => {
-        getServiceCenters({ skip: 0, take: 10, filter: filter });
-    }, [getServiceCenters, filter]);
+        getServiceCenters({ skip: currentPage, take: 10, filter: filter });
+    }, [getServiceCenters]);
+
+    useEffect(() => {
+        if (filter && Object.keys(filter).some(key => filter[key])) {
+            getServiceCenters({ skip: 0, take: 10, filter: filter });
+            setCurrentPage(0);
+        }
+    }, [filter, getServiceCenters]);
 
     const handleCreate = () => {
         setSelectedServiceCenter(null);
@@ -71,7 +82,7 @@ export default function ServiceCenters() {
                 setServiceCenterToDelete(null);
                 setMode(null);
                 // Refresh the list
-                getServiceCenters({ skip: 0, take: 10 });
+                getServiceCenters({ skip: currentPage, take: 10, filter });
             } catch (error) {
                 console.error("Error deleting service center:", error);
             }
@@ -94,7 +105,7 @@ export default function ServiceCenters() {
             setMode(null);
 
             // Refresh the list
-            getServiceCenters({ skip: 0, take: 10 });
+            getServiceCenters({ skip: currentPage, take: 10, filter });
         } catch (error) {
             console.error("Error submitting form:", error);
             throw error; // Re-throw to let the form handle it
@@ -109,7 +120,7 @@ export default function ServiceCenters() {
             // Close modal and refresh the list
             setUploadModalOpen(false);
             setMode(null);
-            getServiceCenters({ skip: 0, take: 10 });
+            getServiceCenters({ skip: currentPage, take: 10, filter });
         } catch (error) {
             console.error("Error uploading service centers:", error);
             throw error;
@@ -118,12 +129,33 @@ export default function ServiceCenters() {
 
     const handleFilterChange = (status) => {
         console.log('Filter service centers by status:', status);
-        setFilters({ ...filter, status });
+        const newFilter = { ...filter, status };
+        setFilters(newFilter);
+        getServiceCenters({ skip: 0, take: 10, filter: newFilter });
+        setCurrentPage(0); // Reset to first page when filtering
     };
 
+    // Handle page change
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        getServiceCenters({ skip: newPage, take: 10, filter });
+    };
+
+    // Create a debounced search function
+    const debouncedSearch = useCallback(
+        debounceSearch((searchTerm) => {
+            console.log('Debounced search service centers:', searchTerm);
+            const newFilter = { ...filter, search: searchTerm };
+            setFilters(newFilter);
+            getServiceCenters({ skip: 0, take: 10, filter: newFilter });
+            setCurrentPage(0); // Reset to first page when searching
+        }, 500),
+        [filter, getServiceCenters, setFilters]
+    );
+
     const handleSearchChange = (search) => {
-        console.log('Search service centers:', search);
-        setFilters({ ...filter, search });
+        // Call the debounced search function
+        debouncedSearch(search);
     };
 
     const handleUploadClick = () => {
@@ -153,7 +185,12 @@ export default function ServiceCenters() {
                         headerColor="bg-gray-700"
                         headerTextColor="text-white"
                         bordered
+                        loading={loading}
                         searchPlaceholder="Search service centers..."
+                        onSearchChange={handleSearchChange}
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
                         onAdd={handleCreate}
                         onEdit={handleEdit}
                         onDelete={handleDelete}

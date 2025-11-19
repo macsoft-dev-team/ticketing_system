@@ -357,10 +357,55 @@ async function getAllSpareRequests(skip, take, filters) {
     if (skip) params.skip = (parseInt(skip) - 1) * parseInt(take || 10);
     if (take) params.take = parseInt(take);
 
+    // Build where clause for filtering
     params.where = {};
- 
- 
+
+    // Parse filter if it exists
+    if (filters) {
+      try {
+        const filterObj = typeof filters === 'string' ? JSON.parse(filters) : filters;
+
+        // Status filter
+        if (filterObj.status && filterObj.status !== '') {
+          params.where.status = filterObj.status;
+        }
+
+        // Search filter (ticketCode, createdBy name, updatedBy name)
+        if (filterObj.search && filterObj.search.trim() !== '') {
+          const searchTerm = filterObj.search.trim();
+          params.where.OR = [
+            { ticketCode: { contains: searchTerm } },
+            {
+              createdByUser: {
+                name: { contains: searchTerm }
+              }
+            },
+            {
+              updatedByUser: {
+                name: { contains: searchTerm }
+              }
+            }
+          ];
+        }
+
+        // Date range filter
+        if (filterObj.dateFrom || filterObj.dateTo) {
+          params.where.createdAt = {};
+          if (filterObj.dateFrom) {
+            params.where.createdAt.gte = new Date(filterObj.dateFrom);
+          }
+          if (filterObj.dateTo) {
+            params.where.createdAt.lte = new Date(filterObj.dateTo);
+          }
+        }
+      } catch (parseError) {
+        console.warn('Filter parsing error:', parseError);
+      }
+    }
+
     const spareRequests = await prisma.spareRequest.findMany({
+      skip: params.skip,
+      take: params.take,
       where: params.where,
       include: {
         spareItems: {
@@ -387,7 +432,8 @@ async function getAllSpareRequests(skip, take, filters) {
         createdAt: "desc",
       },
     });
-    const count = await prisma.spareRequest.count({ where:params.where });
+    
+    const count = await prisma.spareRequest.count({ where: params.where });
     return { spareRequests, count };
   } catch (error) {
     console.error("❌ Error fetching all spare requests:", error);

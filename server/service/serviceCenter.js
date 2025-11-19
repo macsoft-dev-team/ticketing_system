@@ -1,64 +1,99 @@
 const { prisma } = require("../lib/clients");
 
-const getAll = async (skip, take, filter, userId) => {
+const getAll = async (skip, take, filter, currentUser) => {
   try {
-    //VERIFY IT IS MACSOFT_ADMIN OR SUPER ADMIN
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
+    console.log('Service centers getAll called with:', { skip, take, filter, currentUserRole: currentUser?.role });
+    
+    // Check if current user is authorized
+    if (!currentUser) {
+      throw new Error("Authentication required: User not found");
+    }
+    
+    if (!['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(currentUser.role)) {
+      throw new Error(`Unauthorized: Role '${currentUser.role}' is not authorized. Only MACSOFT_ADMIN, MACSOFT_HEAD, or MACSOFT_SUPPORT can access service centers list`);
+    }
+
+    // Parse pagination parameters
+    const params = {};
+    if (skip && parseInt(skip) > 0) {
+      params.skip = (parseInt(skip) - 1) * parseInt(take || 10);
+    }
+    if (take && parseInt(take) > 0) {
+      params.take = parseInt(take);
+    }
+
+    // Build where clause for filtering
+    const where = {};
+
+    // Parse filter if it exists
+    if (filter) {
+      try {
+        const filterObj = typeof filter === "string" ? JSON.parse(filter) : filter;
+
+        // Status filter
+        if (filterObj.status && filterObj.status !== "") {
+          where.isActive = filterObj.status === "ACTIVE";
+        }
+
+        // Search filter (name, centerCode, orgCode, address, email)
+        if (filterObj.search && filterObj.search.trim() !== "") {
+          const searchTerm = filterObj.search.trim();
+          where.OR = [
+            { name: { contains: searchTerm } },
+            { centerCode: { contains: searchTerm } },
+            { projectCode: { contains: searchTerm } },
+            { address: { contains: searchTerm } },
+            { email: { contains: searchTerm } },
+          ];
+        }
+      } catch (parseError) {
+        console.warn('Filter parsing error:', parseError);
+      }
+    }
+
+    params.where = where;
+
+    const serviceCenters = await prisma.serviceCenter.findMany({
+      skip: params.skip,
+      take: params.take,
+      where: params.where, 
+      orderBy: [{ createdAt: "desc" }],
     });
 
-    if (
-      user?.role !== "MACSOFT_ADMIN" &&
-      user?.role !== "MACSOFT_HEAD" &&
-      user?.role !== "MACSOFT_SUPPORT"
-    ) {
-      throw new Error("Unauthorized");
-    }
-    //isActive IS boolean
-    const params = {};
-    if (skip) params.skip = (parseInt(skip) - 1) * parseInt(take || 10);
-    if (take) params.take = parseInt(take);
-    if (filter) {
-      let where = {};
-      if (filter.search)
-        where.OR = [
-          { orgCode: { contains: filter.search } },
-          { centerCode: { contains: filter.search } },
-          { name: { contains: filter.search } },
-          { address: { contains: filter.search } },
-        ];
-      if (filter.status)
-        where.isActive =
-          filter.status === "ACTIVE"
-            ? true
-            : filter.status === "INACTIVE"
-            ? false
-            : undefined;
-      params.where = where;
-    }
-
-    //get status count for isActive field true/false
-
-    //EXPECTED RESULT { 'true': 5, 'false': 3, 'ALL': 8 }
-    const [activeCount, inactiveCount, allCount] = await Promise.all([
-      prisma.serviceCenter.count({ where: { isActive: true } }),
-      prisma.serviceCenter.count({ where: { isActive: false } }),
-      prisma.serviceCenter.count(),
-    ]);
-    const _transformedStatusCount = {
-      ACTIVE: activeCount,
-      INACTIVE: inactiveCount,
-      ALL: allCount,
-    };
-    const serviceCenters = await prisma.serviceCenter.findMany(params);
-
+    // Get status count for isActive field true/false
+    const statusCounts = await prisma.serviceCenter.groupBy({
+      by: ["isActive"],
+      _count: {
+        id: true,
+      },
+     });
+    
+    // Transform statusCounts to have 'ALL','ACTIVE' and 'INACTIVE' 
+    const _transformedStatusCount = { ALL: 0, ACTIVE: 0, INACTIVE: 0 };
+    _transformedStatusCount.ALL = await prisma.serviceCenter.count();
+    statusCounts.forEach((statusGroup) => {
+      if (statusGroup.isActive) {
+        _transformedStatusCount.ACTIVE = statusGroup._count.id;
+      } else {
+        _transformedStatusCount.INACTIVE = statusGroup._count.id;
+      }
+    });
+    
     const count = await prisma.serviceCenter.count({ where: params.where });
 
+    console.log(`Successfully fetched ${serviceCenters.length} service centers`);
     return { serviceCenters, count, statusCount: _transformedStatusCount };
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to fetch serviceCenters");
+    console.error('Service center getAll error:', error);
+    
+    // Provide more specific error messages
+    if (error.message.includes('Unauthorized') || error.message.includes('Authentication required')) {
+      throw error; // Re-throw auth errors as-is
+    }
+    
+    // For database or other errors, provide a generic message but log the details
+    console.error('Database error in service center getAll:', error.stack);
+    throw new Error(`Failed to fetch serviceCenters: ${error.message}`);
   }
 };
 

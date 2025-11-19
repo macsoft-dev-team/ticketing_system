@@ -5,12 +5,17 @@ import axios from "axios";
 // Service Center Management Actions
 export const fetchServiceCenters = createAsyncThunk(
   "serviceCenter/fetchServiceCenters",
-  async ({skip,take,filter }, { rejectWithValue }) => {
+  async ({skip, take, filter } = {}, { rejectWithValue }) => {
     try {
       const params = {};
-      if(skip !== 0) params.skip = skip ;
-      if (take !== 0) params.take = take;
-      if (filter) params.filter = JSON.stringify(filter);
+      if (skip && skip > 0) params.skip = skip;
+      if (take && take > 0) params.take = take;
+      if (filter && Object.keys(filter).length > 0) {
+        params.filter = JSON.stringify(filter);
+      }
+      
+      console.log('Fetching service centers with params:', params);
+      
       const response = await axios.get(
         `${API_ENDPOINTS.serviceCenter}`,
         {
@@ -20,6 +25,7 @@ export const fetchServiceCenters = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
+      console.error('Service centers fetch error:', error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -221,6 +227,9 @@ const serviceCenterSlice = createSlice({
     setFilters: (state, action) => {
       state.filter = { ...state.filter, ...action.payload };
     },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
     clearError: (state) => {
       state.error = null;
     },
@@ -393,7 +402,8 @@ export const {
   setMode, 
   setFilters, 
   clearError, 
-  clearSuggestedServiceCenters 
+  clearSuggestedServiceCenters,
+  setCurrentPage 
 } = serviceCenterSlice.actions;
 
 export default serviceCenterSlice.reducer;

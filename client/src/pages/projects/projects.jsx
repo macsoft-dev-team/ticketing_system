@@ -1,11 +1,12 @@
 import ReusableTable from "../../components/ui/reusableTable";
 import useProject from "../../lib/hooks/useProject";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import moment from "moment";
 import Header from "./components/header";
 import UploadModal from "../../components/UploadModal";
 import ProjectFormModal from "../../components/ProjectFormModal";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import { debounceSearch } from "../../utils/debounce";
 
 export default function Projects() {
     const [selectedProject, setSelectedProject] = useState(null);
@@ -155,15 +156,24 @@ export default function Projects() {
         });
     };
 
+    // Create a debounced search function
+    const debouncedSearch = useCallback(
+        debounceSearch((searchTerm) => {
+            console.log('Debounced search projects:', searchTerm);
+            setFilters({ ...filter, search: searchTerm });
+            getProjects({
+                skip: 0,
+                take: 10,
+                status: filter.status || '',
+                search: searchTerm
+            });
+        }, 500),
+        [filter, getProjects, setFilters]
+    );
+
     const handleSearchChange = (search) => {
-        console.log('Search projects:', search);
-        setFilters({ ...filter, search });
-        getProjects({
-            skip: 0,
-            take: 10,
-            status: filter.status || '',
-            search
-        });
+        // Call the debounced search function
+        debouncedSearch(search);
     };
 
     const handleUploadClick = () => {

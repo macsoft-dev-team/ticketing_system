@@ -1,11 +1,12 @@
 import ReusableTable from "../../components/ui/reusableTable";
 import useOrganisation from "../../lib/hooks/useOrganisation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import moment from "moment";
 import Header from "./components/header";
 import UploadModal from "../../components/UploadModal";
 import OrganisationFormModal from "../../components/OrganisationFormModal";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
+import { debounceSearch } from "../../utils/debounce";
 
 export default function OrganisationPage() {
     const [selectedOrganisation, setSelectedOrganisation] = useState(null);
@@ -132,9 +133,19 @@ export default function OrganisationPage() {
         setFilters({ ...filter, status });
     };
 
+    // Create a debounced search function
+    const debouncedSearch = useCallback(
+        debounceSearch((searchTerm) => {
+            console.log('Debounced search organisations:', searchTerm);
+            setFilters({ ...filter, search: searchTerm });
+            fetchOrganisations({ skip: 0, take: 10, filter: { ...filter, search: searchTerm } });
+        }, 500),
+        [filter, fetchOrganisations, setFilters]
+    );
+
     const handleSearchChange = (search) => {
-        console.log('Search organisations:', search);
-        setFilters({ ...filter, search });
+        // Call the debounced search function
+        debouncedSearch(search);
     };
 
     const handleUploadClick = () => {
@@ -159,19 +170,19 @@ export default function OrganisationPage() {
 
             <div className="px-6">
                 {loading ? (
-                    <div>Loading organisations...</div>
+                    <div>Loading Customers...</div>
                 ) : error ? (
                     <div className="text-red-500">Error: {error?.message || error}</div>
                 ) : (
                     <ReusableTable
                         columns={columns}
                         data={transformedData}
-                        title="Organisations"
+                        title="Customers"
                         headerColor="bg-gray-700"
                         headerTextColor="text-white"
                         bordered
-                        searchPlaceholder="Search organisations..."
-                        onAdd={handleCreate}
+                                searchPlaceholder="Search Customers..."
+                                onAdd={handleCreate} Customers
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                     />
@@ -182,10 +193,8 @@ export default function OrganisationPage() {
             <OrganisationFormModal
                 open={modalOpen && (mode === 'create' || mode === 'edit')}
                 onOpenChange={(isOpen) => {
-                    console.log('Organisation modal onOpenChange called with isOpen:', isOpen);
-                    if (!isOpen) {
-                        console.log('Closing organisation modal, setting mode to null');
-                        // Use local state to immediately close the modal
+                     if (!isOpen) {
+                         // Use local state to immediately close the modal
                         setModalOpen(false);
                         // Also update Redux state
                         setMode(null);
@@ -199,8 +208,8 @@ export default function OrganisationPage() {
 
             {/* Upload Modal */}
             <UploadModal
-                title="Upload Organisations"
-                description="Upload an Excel file to add multiple organisations at once."
+                title="Upload Customers"
+                description="Upload an Excel file to add multiple Customers at once."
                 open={uploadModalOpen && mode === 'upload'}
                 onOpenChange={(isOpen) => {
                     console.log('Upload modal onOpenChange called with isOpen:', isOpen);
@@ -219,7 +228,7 @@ export default function OrganisationPage() {
             {/* Delete Confirmation Dialog */}
             <ConfirmDialog
                 open={mode === 'delete'}
-                title="Delete Organisation"
+                title="Delete Customer"
                 description={`Are you sure you want to delete ${organisationToDelete?.name}? This action cannot be undone.`}
                 onConfirm={confirmDelete}
                 onCancel={() => {

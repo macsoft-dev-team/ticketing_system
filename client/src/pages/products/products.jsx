@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useState } from "react";
 import TitleHead from "../../components/TitleHead";
 import ReusableTable from "../../components/ui/reusableTable";
@@ -6,6 +6,7 @@ import Header from "./components/header";
 import axios from "axios";
 import { API_URL } from "../../lib/constants/api";
 import UploadModal from "../../components/UploadModal";
+import { debounceSearch } from "../../utils/debounce";
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -179,9 +180,19 @@ export default function Products() {
     setCurrentPage(0); // Reset to first page when filtering
   };
 
+  // Create a debounced search function
+  const debouncedSearch = useCallback(
+    debounceSearch((searchTerm) => {
+      console.log('Debounced search products:', searchTerm);
+      setSearchFilter(searchTerm);
+      setCurrentPage(0); // Reset to first page when searching
+    }, 500),
+    []
+  );
+
   const handleSearchChange = (search) => {
-    setSearchFilter(search);
-    setCurrentPage(0); // Reset to first page when searching
+    // Call the debounced search function
+    debouncedSearch(search);
   };
 
   return (

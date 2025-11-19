@@ -9,6 +9,7 @@ import {
   uploadServiceCenters,
   setMode,
   setFilters,
+  setCurrentPage,
   assignServiceCenterToTicket,
   removeServiceCenterAssignment,
   fetchSuggestedServiceCenters,
@@ -32,6 +33,8 @@ const useServiceCenter = () => {
     error,
     mode,
     statusCount,
+    totalPages,
+    currentPage,
   } = useSelector((state) => state.servicecenter);
   const { addToast } = useToast();
 
@@ -237,6 +240,8 @@ const useServiceCenter = () => {
     unassignedTickets,
     statusCount,
     serviceCenterStats,
+    totalPages,
+    currentPage,
   };
 };
 

@@ -4,26 +4,45 @@ const moment = require("moment");
 const getAll = async (req, res) => {
   try {
     const { skip, take, filter } = req.query;
-    const parsedFilter = filter ? JSON.parse(filter) : undefined;
-    const userId = req.user.id;
+    const transformedFilter = filter ? JSON.parse(filter) : null;
+    const currentUser = req.user;
     const { serviceCenters, count, statusCount } =
-      await serviceCenterService.getAll(skip, take, parsedFilter, userId);
+      await serviceCenterService.getAll(skip, take, transformedFilter, currentUser);
 
-    const _transformedOrgs = serviceCenters.map((org) => ({
-      ...org,
-      status: org.isActive ? "ACTIVE" : "INACTIVE",
-      createdAt: moment(org.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-      
+    const takeNum = take ? parseInt(take) : 10;
+    const skipNum = skip ? parseInt(skip) : 0;
+
+    const _transformedServiceCenters = serviceCenters.map((serviceCenter) => ({
+      ...serviceCenter,
+      status: serviceCenter.isActive ? "ACTIVE" : "INACTIVE",
+      createdAt: moment(serviceCenter.createdAt).format("DD MMM YYYY, hh:mm A"),
+      updatedAt: moment(serviceCenter.updatedAt).format("DD MMM YYYY, hh:mm A"),
     }));
+    
     res.status(200).json({
-      serviceCenters: _transformedOrgs,
+      serviceCenters: _transformedServiceCenters,
+      totalPages: Math.ceil(count / takeNum),
+      currentPage: Math.floor(skipNum / takeNum) + 1,
+      total: count,
+      skip: skipNum,
+      take: takeNum,
       statusCount,
-      totalPages: Math.ceil(count / 10),
-      currentPage: Math.ceil(skip / take),
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error('Error in getAll service centers controller:', error);
+    
+    // Handle authorization errors differently
+    if (error.message.includes('Unauthorized') || error.message.includes('Authentication required')) {
+      return res.status(403).json({
+        message: error.message,
+        error: error.message
+      });
+    }
+    
+    res.status(500).json({ 
+      message: "Failed to fetch service centers",
+      error: error.message 
+    });
   }
 };
 

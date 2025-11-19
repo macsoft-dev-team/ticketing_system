@@ -156,24 +156,35 @@ async function updateSpareRequestStatus(req, res) {
  */
 async function getAllSpareRequests(req, res) {
   try {
-    const { skip, take, filters } = req.query;
-
+    const { skip, take, filter } = req.query;
+    const transformedFilter = filter ? JSON.parse(filter) : {};
     const { spareRequests, count } =
-      await spareRequestService.getAllSpareRequests(skip, take, filters);
+      await spareRequestService.getAllSpareRequests(
+        skip,
+        take,
+        transformedFilter
+      );
+    
     const _transformSpareRequests = spareRequests.map((request) => {
       return {
         ...request,
-        createdAt: moment(request.createdAt).toISOString(),
-        updatedAt: moment(request.updatedAt).toISOString(),
+        createdAt: moment(request.createdAt).format('DD MMM YYYY, hh:mm A'),
+        updatedAt: moment(request.updatedAt).format('DD MMM YYYY, hh:mm A'),
         createdBy: request.createdByUser ? request.createdByUser.name : null,
         updatedBy: request.updatedByUser ? request.updatedByUser.name : null,
       };
     });
 
+    const takeNum = take ? parseInt(take) : 10;
+    const skipNum = skip ? parseInt(skip) : 0;
+
     res.status(200).json({
       spareRequests: _transformSpareRequests,
-      totalPages: Math.ceil(count / (take || 10)),
-      currentPage: parseInt(skip) || 1,
+      totalPages: Math.ceil(count / takeNum),
+      currentPage: Math.floor(skipNum / takeNum) + 1,
+      total: count,
+      skip: skipNum,
+      take: takeNum,
     });
   } catch (error) {
     console.error("❌ Error in getAllSpareRequests controller:", error);

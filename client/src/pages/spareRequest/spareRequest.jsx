@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import TitleHead from "../../components/TitleHead";
 import ReusableTable from "../../components/ui/reusableTable";
 import axios from "axios";
 import { API_URL } from "../../lib/constants/api";
 import { X, Calendar, User, Package, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import { useAuth } from "../../lib/hooks/useAuth";
+import { debounceSearch } from "../../utils/debounce";
 
 export default function SpareRequest() {
   const [fetchSpareData, setFetchSpareData] = useState([]);
@@ -13,6 +14,10 @@ export default function SpareRequest() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [notification, setNotification] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [filter, setFilter] = useState({ search: '', status: '' });
   
   // Use authentication hook
   const { user: currentUser, isAuthenticated, hasRole, canAccess } = useAuth();
@@ -26,13 +31,25 @@ export default function SpareRequest() {
   const isMacsoftAdmin = () => hasRole('MACSOFT_ADMIN');
   const isMacsoftHead = () => hasRole('MACSOFT_HEAD');
 
-  // GET spare requests
-  const getSpare = async () => {
+  // GET spare requests with server-side filtering
+  const getSpare = async ({ skip = 0, take = 10, filter: filterObj = {} } = {}) => {
     try {
-      const res = await axios.get(`${API_URL}/spare-requests`, {
+      setLoading(true);
+      const params = new URLSearchParams();
+      
+      if (skip > 0) params.append('skip', skip.toString());
+      if (take > 0) params.append('take', take.toString());
+      if (filterObj && Object.keys(filterObj).length > 0) {
+        params.append('filter', JSON.stringify(filterObj));
+      }
+      
+      const res = await axios.get(`${API_URL}/spare-requests?${params.toString()}`, {
         withCredentials: true,
       });
+      
       setFetchSpareData(res.data.spareRequests);
+      setTotalPages(res.data.totalPages);
+      setCurrentPage(res.data.currentPage);
     } catch (error) {
       console.error('Error fetching spare requests:', error);
       if (error.response?.status === 401) {
@@ -40,7 +57,38 @@ export default function SpareRequest() {
       } else {
         showNotification('Failed to fetch spare requests', 'error');
       }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Create debounced search function for server-side filtering
+  const debouncedSearch = useCallback(
+    debounceSearch((searchValue) => {
+      const newFilter = { ...filter, search: searchValue };
+      setFilter(newFilter);
+      getSpare({ skip: 0, take: 10, filter: newFilter });
+      setCurrentPage(0); // Reset to first page when searching
+    }, 500),
+    [filter]
+  );
+
+  // Handle search change
+  const handleSearchChange = (search) => {
+    debouncedSearch(search);
+  };
+
+  // Handle filter change
+  const handleFilterChange = (filterType, value) => {
+    const newFilter = { ...filter, [filterType]: value };
+    setFilter(newFilter);
+    getSpare({ skip: 0, take: 10, filter: newFilter });
+    setCurrentPage(0); // Reset to first page when filtering
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    getSpare({ skip: newPage, take: 10, filter });
   };
 
   // Status color mapping
@@ -126,7 +174,7 @@ export default function SpareRequest() {
       if (res.data.success) {
         showNotification(`Item ${newStatus} successfully!`, 'success');
         // Refresh the data to show updated status
-        await getSpare();
+        await getSpare({ skip: currentPage, take: 10, filter });
         
         // Update the selected spare data locally for immediate UI update
         if (selectedSpare) {
@@ -149,9 +197,16 @@ export default function SpareRequest() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      getSpare();
+      getSpare({ skip: currentPage, take: 10, filter });
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && Object.keys(filter).some(key => filter[key])) {
+      // Only refetch if there are active filters
+      getSpare({ skip: currentPage, take: 10, filter });
+    }
+  }, [filter, currentPage, isAuthenticated]);
 
   // Authentication guard
   if (!isAuthenticated) {
@@ -239,17 +294,37 @@ export default function SpareRequest() {
         
           <ReusableTable
             columns={[
-              { key: "ticketCode", label: "Ticketcode", align: "left" },
-              { key: "status", label: "Status", align: "left" },
+              { key: "ticketCode", label: "Ticket Code", align: "left" },
+              { 
+                key: "status", 
+                label: "Status", 
+                align: "center",
+                render: (value) => (
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    value === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                    value === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                    value === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {value}
+                  </span>
+                )
+              },
               { key: "createdBy", label: "Raised by", align: "left" },
               { key: "updatedBy", label: "Updated by", align: "left" },
+              { key: "createdAt", label: "Created Date", align: "center" },
             ]}
             data={fetchSpareData}
             title="Spare Request"
             headerColor="bg-gray-700"
             headerTextColor="text-white"
             bordered
-            searchPlaceholder="Search spare requests..."
+            loading={loading}
+            searchPlaceholder="Search by ticket code or user name..."
+            onSearchChange={handleSearchChange}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
             onAdd={hasApprovalRights() ? () => console.log("Add spare request") : undefined}
             onView={(row) => {
               setShowItems(true);
