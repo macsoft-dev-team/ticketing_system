@@ -127,6 +127,7 @@ const createTicketNotification = (action, ticket, userId, additionalData = {}) =
 
 const createUserNotification = (action, user, userId, additionalData = {}) => {
   const actions = {
+    'registered': `New user ${user.name} has registered with phone ${user.phone}`,
     'created': `New user ${user.name} has been added to the system`,
     'updated': `User ${user.name} profile has been updated`,
     'deleted': `User ${user.name} has been removed from the system`,

@@ -50,7 +50,11 @@ exports.register = async (req, res) => {
       const adminUserIds = adminUsers.map(user => user.id);
 
       // Create and broadcast user registration notification
-      const notificationData = createUserNotification('created', newUser, newUser.id);
+      const notificationData = createUserNotification(
+        "registered",
+        newUser,
+        newUser.id
+      );
 
       // Save and broadcast notification to all admins
       await saveAndBroadcastNotification(prisma, io, notificationData, adminUserIds);
