@@ -1,7 +1,6 @@
 import ReusableTable from "../../components/ui/reusableTable";
 import useProject from "../../lib/hooks/useProject";
 import { useEffect, useState, useCallback } from "react";
-import moment from "moment";
 import Header from "./components/header";
 import UploadModal from "../../components/UploadModal";
 import ProjectFormModal from "../../components/ProjectFormModal";
@@ -147,7 +146,9 @@ export default function Projects() {
 
     const handleFilterChange = (status) => {
         console.log('Filter projects by status:', status);
-        const newFilter = { ...filter, status };
+        // Get the current filter to preserve customer filter
+        const currentFilter = filter || {};
+        const newFilter = { ...currentFilter, status };
         setFilters(newFilter);
         getProjects({
             skip: 0,

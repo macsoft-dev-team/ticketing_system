@@ -2,8 +2,7 @@ const { prisma } = require("../lib/clients");
 
 const getAllProjects = async (skip, take, filter) => {
   try {
-    console.log('Projects service - params:', { skip, take, filter });
-    
+     
     const params = {};
     // skip should be used as-is, not calculated
     if (skip && parseInt(skip) > 0) {
@@ -24,6 +23,11 @@ const getAllProjects = async (skip, take, filter) => {
       }
     }
 
+    // Handle organisation filter
+    if (filter?.organisationId && filter.organisationId.trim() !== '') {
+      where.organisationId = parseInt(filter.organisationId);
+    }
+
     // Handle search filter
     if (filter?.search && filter.search.trim() !== '') {
       const searchTerm = filter.search.trim();
@@ -31,27 +35,18 @@ const getAllProjects = async (skip, take, filter) => {
         { name: { contains: searchTerm } },
         { projectCode: { contains: searchTerm } },
         { email: { contains: searchTerm } },
+        { 
+          organisation: {
+            OR: [
+              { name: { contains: searchTerm } },
+              { organisationId: { equals: parseInt(searchTerm) } }
+            ]
+          }
+        }
       ];
     }
 
-    // Handle legacy filter parameter (for backward compatibility)
-    if (filter && !filter?.status && !filter?.search) {
-      if (filter === "ACTIVE") {
-        where.isActive = true;
-      } else if (filter === "INACTIVE") {
-        where.isActive = false;
-      } else {
-        where.OR = [
-          { name: { contains: filter?.search } },
-          { projectCode: { contains: filter?.search } },
-          { email: { contains: filter?.search } },
-          { organisation:{
-            name: { contains: filter?.search },
-            orgCode: { contains: filter?.search }
-          }}
-        ];
-      }
-    }
+
 
     const _statusCount = await prisma.project.groupBy({
       by: ["isActive"],

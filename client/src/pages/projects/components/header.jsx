@@ -1,17 +1,24 @@
 import { Plus, Search, Filter, X, Upload } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useProject from "../../../lib/hooks/useProject";
+import useOrganisation from "../../../lib/hooks/useOrganisation";
+import Select from "../../../components/ui/select";
 
 export default function Header({ onAddProject, onUploadProjects, onFilterChange, onSearchChange }) {
     const { statusCount, filter, setFilters } = useProject();
+    const { organisations, getOrganisations } = useOrganisation();
     const [activeFilter, setActiveFilter] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCustomer, setSelectedCustomer] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    
- 
-         
+
+    // Fetch organisations on component mount
+    useEffect(() => {
+        getOrganisations({ skip: 0, take: 100, filter: null });
+    }, [getOrganisations]);
+
     const filterTabItems = [
         { id: '', label: 'All Projects', shortLabel: 'All', count: statusCount?.ALL || 0, key: 'ALL' },
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCount?.ACTIVE || 0, key: 'ACTIVE' },
@@ -32,10 +39,19 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
         onSearchChange(search);
     };
 
+    // Handle customer filter changes
+    const handleCustomerFilterChange = (e) => {
+        const customerId = e.target.value;
+        setSelectedCustomer(customerId);
+        const newFilter = { ...filter, organisationId: customerId || undefined };
+        setFilters(newFilter);
+        onFilterChange(newFilter.status || '');
+    };
+
     const headerVariants = {
         initial: { opacity: 0, y: -20 },
-        animate: { 
-            opacity: 1, 
+        animate: {
+            opacity: 1,
             y: 0,
             transition: {
                 duration: 0.5,
@@ -45,18 +61,18 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
     };
 
     const buttonVariants = {
-        hover: { 
+        hover: {
             scale: 1.05,
             transition: { duration: 0.2 }
         },
-        tap: { 
+        tap: {
             scale: 0.95,
             transition: { duration: 0.1 }
         }
     };
 
     return (
-        <motion.header 
+        <motion.header
             variants={headerVariants}
             initial="initial"
             animate="animate"
@@ -67,7 +83,7 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                 {/* Left Section */}
                 <div className="flex items-center space-x-2 sm:space-x-6">
                     {/* Title */}
-                    <motion.h1 
+                    <motion.h1
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
@@ -75,9 +91,31 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                     >
                         Projects
                     </motion.h1>
-                    
+
+                    {/* Customer Filter - Desktop */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.15 }}
+                        className="hidden md:block"
+                    >
+                        <Select
+                            value={selectedCustomer}
+                            onChange={handleCustomerFilterChange}
+                            placeholder="Filter by Customer"
+                            options={[
+                                { value: '', label: 'All Customers' },
+                                ...(organisations?.map(org => ({
+                                    value: org.id.toString(),
+                                    label: `${org.name} (${org.orgCode})`
+                                })) || [])
+                            ]}
+                            className="w-48 lg:w-56"
+                        />
+                    </motion.div>
+
                     {/* Filter Tabs - Hidden on small screens */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.2 }}
@@ -90,11 +128,10 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                                 whileHover="hover"
                                 whileTap="tap"
                                 onClick={() => handleFilterChange(filter.id)}
-                                className={`relative px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                                    activeFilter === filter.id
+                                className={`relative px-3 lg:px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${activeFilter === filter.id
                                         ? 'bg-white text-blue-600 shadow-sm'
                                         : 'text-gray-600 hover:text-gray-900'
-                                }`}
+                                    }`}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 * (index + 1) }}
@@ -102,15 +139,14 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                                 <span className="hidden xl:inline">{filter.label}</span>
                                 <span className="xl:hidden">{filter.shortLabel}</span>
                                 {filter.count > 0 && (
-                                    <motion.span 
+                                    <motion.span
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
                                         transition={{ delay: 0.2 * (index + 1) }}
-                                        className={`ml-1 lg:ml-2 px-1.5 lg:px-2 py-0.5 text-xs rounded-full ${
-                                            activeFilter === filter.id 
+                                        className={`ml-1 lg:ml-2 px-1.5 lg:px-2 py-0.5 text-xs rounded-full ${activeFilter === filter.id
                                                 ? 'bg-blue-100 text-blue-600'
                                                 : 'bg-gray-200 text-gray-600'
-                                        }`}
+                                            }`}
                                     >
                                         {filter.count}
                                     </motion.span>
@@ -130,7 +166,7 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                 {/* Right Section */}
                 <div className="flex items-center space-x-2 sm:space-x-3">
                     {/* Search Input - Desktop */}
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
@@ -202,7 +238,7 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                         <span className="hidden sm:inline">Add Project</span>
                         <span className="sm:hidden">Add</span>
                     </motion.button>
- 
+
                 </div>
             </div>
 
@@ -241,6 +277,26 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                         transition={{ duration: 0.3 }}
                         className="lg:hidden px-4 pb-4 border-t border-gray-200 bg-gray-50"
                     >
+                        {/* Customer Filter - Mobile */}
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Filter by Customer
+                            </label>
+                            <Select
+                                value={selectedCustomer}
+                                onChange={handleCustomerFilterChange}
+                                placeholder="All Customers"
+                                options={[
+                                    { value: '', label: 'All Customers' },
+                                    ...(organisations?.map(org => ({
+                                        value: org.id.toString(),
+                                        label: `${org.name} (${org.orgCode})`
+                                    })) || [])
+                                ]}
+                                className="w-full"
+                            />
+                        </div>
+
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
                             {filterTabItems.map((filter, index) => (
                                 <motion.button
@@ -252,21 +308,19 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                                         handleFilterChange(filter.id);
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className={`flex items-center justify-between px-3 py-3 rounded-lg border transition-all duration-200 ${
-                                        activeFilter === filter.id
+                                    className={`flex items-center justify-between px-3 py-3 rounded-lg border transition-all duration-200 ${activeFilter === filter.id
                                             ? 'bg-blue-600 text-white border-blue-600 shadow-md'
                                             : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                                    }`}
+                                        }`}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.05 * index }}
                                 >
                                     <span className="text-sm font-medium">{filter.label}</span>
-                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                        activeFilter === filter.id
+                                    <span className={`px-2 py-1 text-xs rounded-full ${activeFilter === filter.id
                                             ? 'bg-blue-500 text-white'
                                             : 'bg-gray-100 text-gray-600'
-                                    }`}>
+                                        }`}>
                                         {filter.count}
                                     </span>
                                 </motion.button>
