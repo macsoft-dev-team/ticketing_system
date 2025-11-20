@@ -294,7 +294,7 @@ export default function SpareRequest() {
         
           <ReusableTable
             columns={[
-              { key: "ticketCode", label: "Ticket Code", align: "left" },
+              { key: "ticketCode", label: "Ticket Code", align: "left" , textWrap: 'nowrap', },
               { 
                 key: "status", 
                 label: "Status", 
@@ -309,10 +309,10 @@ export default function SpareRequest() {
                     {value}
                   </span>
                 )
-              },
-              { key: "createdBy", label: "Raised by", align: "left" },
-              { key: "updatedBy", label: "Updated by", align: "left" },
-              { key: "createdAt", label: "Created Date", align: "center" },
+              , textWrap: 'nowrap', },
+              { key: "createdBy", label: "Raised by", align: "left" , textWrap: 'nowrap', },
+              { key: "updatedBy", label: "Updated by", align: "left" , textWrap: 'nowrap', },
+              { key: "createdAt", label: "Created Date", align: "center" , textWrap: 'nowrap', },
             ]}
             data={fetchSpareData}
             title="Spare Request"

@@ -12,20 +12,22 @@ export default function Projects() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const columns = [
-        { key: 'projectCode', label: 'Project Code', align: 'left' },
-        { key: 'name', label: 'Name', align: 'left' },
+        { key: 'projectCode', label: 'Project Code', align: 'left', textWrap: 'nowrap', },
+        { key: 'name', label: 'Name', align: 'left', textWrap: 'nowrap', },
         { key: 'email', label: 'Email', align: 'left' },
         {
             key: 'organizationCode',
             label: 'Customer Code',
+            textWrap: 'nowrap',
             align: 'left',
         },
         {
             key: 'organisationName',
             label: 'Customer Name',
             align: 'left',
+            textWrap: 'nowrap',
         },
-        { key: 'address', label: 'Address', align: 'left' },
+        { key: 'address', label: 'Address', align: 'left', textWrap: 'nowrap' },
         {
             key: 'status',
             label: 'Status',

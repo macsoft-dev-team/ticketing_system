@@ -14,10 +14,10 @@ export default function ServiceCenters() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const columns = [
-        { key: 'name', label: 'Name', align: 'left' },
+        { key: 'name', label: 'Name', align: 'left', textWrap: 'nowrap', },
         { key: 'centerCode', label: 'Center Code', align: 'left' },
         { key: 'email', label: 'Email', align: 'left' },
-        { key: 'address', label: 'Address', align: 'left' },
+        { key: 'address', label: 'Address', align: 'left', textWrap: 'nowrap', },
         {
             key: 'status',
             label: 'Status',
@@ -26,8 +26,8 @@ export default function ServiceCenters() {
         {
             key: 'createdAt',
             label: 'Created Date',
-            align: 'center',
-            render: (value) => value ? moment(value).format('DD MMM YYYY') : '-'
+            align: 'start',
+            textWrap: 'nowrap',
         },
     ];
 

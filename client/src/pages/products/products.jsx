@@ -29,14 +29,13 @@ export default function Products() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
 
-  const colomsData = [
-    { key: "name", label: "Product Name", align: "left" },
-    { key: "description", label: "Description", align: "left" },
-    { key: "brandName", label: "Brand", align: "left" },
-    { key: "productCode", label: "Code", align: "center" },
-    { key: "category", label: "Category", align: "left" },
-    { key: "status", label: "Status", align: "center" },
-  ];
+  const columnsData = [
+    { key: "name", label: "Product Name", align: "left", textWrap: 'nowrap', },
+    { key: "description", label: "Description", align: "left", textWrap: 'nowrap', },
+    { key: "brandName", label: "Brand", align: "left", textWrap: 'nowrap', },
+    { key: "productCode", label: "Code", align: "left", textWrap: 'nowrap', },
+    { key: "category", label: "Category", align: "left", textWrap: 'nowrap', },
+   ];
 
   const handleShow = () => {
     setFormData({
@@ -206,7 +205,7 @@ export default function Products() {
       />
       <section className="px-6 py-4 space-y-3">
         <ReusableTable
-          columns={colomsData}
+          columns={columnsData}
           data={products}
           title="Products"
           headerColor="bg-gray-700"

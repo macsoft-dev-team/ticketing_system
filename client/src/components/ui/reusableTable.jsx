@@ -107,7 +107,7 @@ export default function ReusableTable({
         : "inline-flex h-9 min-w-9 items-center justify-center border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed";
 
     return (
-        <div className={`overflow-x-auto ${tableChrome} ${darkMode ? "bg-white dark:bg-neutral-900" : "bg-white"}`}>
+        <div className={`overflow-x-auto w-full ${tableChrome} ${darkMode ? "bg-white dark:bg-neutral-900" : "bg-white"}`}>
             <table className={`w-full table-auto ${textSize}`}>
                 <thead className="sticky top-0 z-10">
                     <tr>
@@ -286,12 +286,12 @@ export default function ReusableTable({
             </table>
 
             {canPaginate && (
-                <div className={`flex items-center justify-between border-t px-3 py-2 ${darkMode ? "border-gray-200 bg-gray-50/40 dark:border-gray-800 dark:bg-neutral-900/60" : "border-gray-200 bg-gray-50/40"}`}>
-                    <div className={`text-xs ${darkMode ? "text-gray-600 dark:text-gray-400" : "text-gray-600"}`}>
+                <div className={`flex flex-col-reverse sm:flex-row items-center gap-2 w-full justify-between border-t px-3 py-2 ${darkMode ? "border-gray-200 bg-gray-50/40 dark:border-gray-800 dark:bg-neutral-900/60" : "border-gray-200 bg-gray-50/40"}`}>
+                    <div className={`text-xs text-nowrap ${darkMode ? "text-gray-600 dark:text-gray-400" : "text-gray-600"}`}>
                         Page {currentPage} of {totalPages}
                     </div>
 
-                    <nav className="flex items-center gap-1" aria-label="Pagination">
+                    <nav className="flex ms-auto items-center gap-1" aria-label="Pagination">
                         <button
                             type="button"
                             className={pageBtnBase}

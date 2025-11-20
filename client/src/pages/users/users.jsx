@@ -18,23 +18,23 @@ export default function UsersPage() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
     const { fetchOrganisations, organisations } = useOrganisation();
     const columns = [
-        { key: 'name', label: 'Name', align: 'left' },
+        { key: 'name', label: 'Name', align: 'left', textWrap: 'nowrap' },
         { key: 'phone', label: 'Phone', align: 'start' },
         { key: 'role', label: 'Role', align: 'left' },
         { key: 'status', label: 'Status', align: 'center' },
-        { key: 'organisation', label: 'Organisation', align: 'left' },
+        { key: 'organisation', label: 'Organisation', align: 'left', textWrap: 'nowrap' },
         {
             key: 'createdAt',
             label: 'Created Date',
-            align: 'center',
-            render: (value) => value ? moment(value).format('DD MMM YYYY') : '-'
-        },
+            align: 'left',
+            textWrap: 'nowrap',
+         },
         {
             key: 'lastLogin',
             label: 'Last Login',
-            align: 'center',
-            render: (value) => value ? moment(value).format('DD MMM YYYY, hh:mm A') : 'Never'
-        },
+            align: 'left',
+            textWrap: 'nowrap',
+         },
     ];
 
     const { users, fetchUsers, loading, filter, error, mode, setMode, createUser, updateUser, deleteUser, uploadUser, updateUserStatus, setFilters, currentPage, totalPages } = useUser();
@@ -117,10 +117,15 @@ export default function UsersPage() {
 
 
     const handleFilterChange = (status) => {
-        // TODO: Implement filtering logic based on status
         console.log('Filter users by status:', status);
-        // You can add filtering logic here when ready
-        // fetchUsers({ skip: 0, take: 10, status });
+        setFilters({ ...filter, status });
+        fetchUsers({ skip: 0, take: 10, filter: { ...filter, status } });
+    };
+
+    const handleRoleChange = (role) => {
+        console.log('Filter users by role:', role);
+        setFilters({ ...filter, role });
+        fetchUsers({ skip: 0, take: 10, filter: { ...filter, role } });
     };
 
     // Create a debounced search function
@@ -150,9 +155,10 @@ export default function UsersPage() {
                 onUploadUsers={handleUploadClick}
                 onFilterChange={handleFilterChange}
                 onSearchChange={handleSearchChange}
+                onRoleChange={handleRoleChange}
             />
 
-            <div className="px-6">
+            <div className="px-6 w-full">
                 {loading ? (
                     <div>Loading users...</div>
                 ) : error ? (

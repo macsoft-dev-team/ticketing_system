@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import Input from './ui/input';
+import PasswordInput from './ui/password-input';
 import Select from './ui/select';
 import MultiSelect from './ui/multi-select';
 import { Label } from './ui/label';
@@ -244,10 +245,9 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                                 Password {mode === 'create' && <span className="text-red-500">*</span>}
                                 {mode === 'edit' && <span className="text-xs text-gray-500">(leave blank to keep current)</span>}
                             </Label>
-                            <Input
+                            <PasswordInput
                                 id="password"
                                 name="password"
-                                type="password"
                                 value={formData.password}
                                 onChange={handleChange}
                                 placeholder={mode === 'create' ? 'Enter password' : 'Leave blank to keep current'}

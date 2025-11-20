@@ -1,25 +1,51 @@
-import { Plus, Search, Filter, X, Upload } from "lucide-react";
+import { Plus, Search, Filter, X, Upload, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import useUser from "../../../lib/hooks/useUser";
 
-export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSearchChange }) {
+export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSearchChange, onRoleChange }) {
     const { statusCounts, filters, setFilters } = useUser();
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [selectedRole, setSelectedRole] = useState(filters?.role || '');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+    const roleDropdownRef = useRef(null);
      const filterTabItems = [
         { id: '', label: 'All Users', shortLabel: 'All', count: statusCounts?.ALL || 0 ,key: 'ALL'},
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCounts?.ACTIVE || 0 ,key: 'ACTIVE'},
         { id: 'INACTIVE', label: 'Inactive', shortLabel: 'Inactive', count: statusCounts?.INACTIVE || 0 ,key: 'INACTIVE'},
      ];
 
+     const roleOptions = [
+        { value: '', label: 'All Roles' },
+        { value: 'MACSOFT_ADMIN', label: 'Macsoft Admin' },
+        { value: 'MACSOFT_HEAD', label: 'Macsoft Head' },
+        { value: 'MACSOFT_SUPPORT', label: 'Macsoft Support' },
+        { value: 'CUSTOMER_SERVICE_HEAD', label: 'Customer Service Head' },
+        { value: 'SERVICE_CENTER_TECHNICIAN', label: 'Service Center Technician' },
+        { value: 'CUSTOMER_FIELD_ENGINEER', label: 'Customer Field Engineer' },
+     ];
+
     // Sync local state with filter state
     useEffect(() => {
         setActiveFilter(filters?.status || '');
         setSearchTerm(filters?.search || '');
+        setSelectedRole(filters?.role || '');
     }, [filters]);
+
+    // Close role dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (roleDropdownRef.current && !roleDropdownRef.current.contains(event.target)) {
+                setIsRoleDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     // Handle filter changes
     const handleFilterChange = (status) => {
@@ -36,6 +62,16 @@ export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSea
         setFilters({ ...filters, search });
         if (onSearchChange) {
             onSearchChange(search);
+        }
+    };
+
+    // Handle role changes
+    const handleRoleChange = (role) => {
+        setSelectedRole(role);
+        setFilters({ ...filters, role });
+        setIsRoleDropdownOpen(false);
+        if (onRoleChange) {
+            onRoleChange(role);
         }
     };
 
@@ -136,6 +172,57 @@ export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSea
 
                 {/* Right Section */}
                 <div className="flex items-center space-x-2 sm:space-x-3">
+                    {/* Role Filter Dropdown - Desktop */}
+                    <motion.div 
+                        ref={roleDropdownRef}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.25 }}
+                        className="hidden md:block relative"
+                    >
+                        <motion.button
+                            variants={buttonVariants}
+                            whileHover="hover"
+                            whileTap="tap"
+                            onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+                            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 hover:border-gray-400 rounded-lg shadow-sm transition-all duration-200 min-w-[160px]"
+                        >
+                            <span className="truncate">
+                                {roleOptions.find(role => role.value === selectedRole)?.label || 'All Roles'}
+                            </span>
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                                isRoleDropdownOpen ? 'rotate-180' : ''
+                            }`} />
+                        </motion.button>
+
+                        <AnimatePresence>
+                            {isRoleDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                                >
+                                    {roleOptions.map((role, index) => (
+                                        <motion.button
+                                            key={role.value}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.05 * index }}
+                                            onClick={() => handleRoleChange(role.value)}
+                                            className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors duration-150 first:rounded-t-lg last:rounded-b-lg ${
+                                                selectedRole === role.value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+                                            }`}
+                                        >
+                                            {role.label}
+                                        </motion.button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+
                     {/* Search Input - Desktop */}
                     <motion.div 
                         initial={{ opacity: 0, x: 20 }}
@@ -248,36 +335,80 @@ export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSea
                         transition={{ duration: 0.3 }}
                         className="lg:hidden px-4 pb-4 border-t border-gray-200 bg-gray-50"
                     >
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
-                            {filterTabItems.map((filter, index) => (
-                                <motion.button
-                                    key={filter.id}
-                                    variants={buttonVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
-                                    onClick={() => {
-                                        handleFilterChange(filter.id);
-                                        setIsMobileMenuOpen(false);
-                                    }}
-                                    className={`flex items-center justify-between px-3 py-3 rounded-lg border transition-all duration-200 ${
-                                        activeFilter === filter.id
-                                            ? 'bg-blue-600 text-white border-blue-600 shadow-md'
-                                            : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                                    }`}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.05 * index }}
-                                >
-                                    <span className="text-sm font-medium">{filter.label}</span>
-                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                        activeFilter === filter.id
-                                            ? 'bg-blue-500 text-white'
-                                            : 'bg-gray-100 text-gray-600'
-                                    }`}>
-                                        {filter.count}
-                                    </span>
-                                </motion.button>
-                            ))}
+                        {/* Status Filter */}
+                        <div className="mt-4">
+                            <h3 className="text-sm font-medium text-gray-700 mb-2">Filter by Status</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {filterTabItems.map((filter, index) => (
+                                    <motion.button
+                                        key={filter.id}
+                                        variants={buttonVariants}
+                                        whileHover="hover"
+                                        whileTap="tap"
+                                        onClick={() => {
+                                            handleFilterChange(filter.id);
+                                        }}
+                                        className={`flex items-center justify-between px-3 py-3 rounded-lg border transition-all duration-200 ${
+                                            activeFilter === filter.id
+                                                ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                                                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+                                        }`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.05 * index }}
+                                    >
+                                        <span className="text-sm font-medium">{filter.label}</span>
+                                        <span className={`px-2 py-1 text-xs rounded-full ${
+                                            activeFilter === filter.id
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-100 text-gray-600'
+                                        }`}>
+                                            {filter.count}
+                                        </span>
+                                    </motion.button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Role Filter */}
+                        <div className="mt-4">
+                            <h3 className="text-sm font-medium text-gray-700 mb-2">Filter by Role</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {roleOptions.map((role, index) => (
+                                    <motion.button
+                                        key={role.value}
+                                        variants={buttonVariants}
+                                        whileHover="hover"
+                                        whileTap="tap"
+                                        onClick={() => {
+                                            handleRoleChange(role.value);
+                                        }}
+                                        className={`px-3 py-3 rounded-lg border transition-all duration-200 text-left ${
+                                            selectedRole === role.value
+                                                ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                                                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+                                        }`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.05 * (index + filterTabItems.length) }}
+                                    >
+                                        <span className="text-sm font-medium">{role.label}</span>
+                                    </motion.button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Close button */}
+                        <div className="mt-4 flex justify-center">
+                            <motion.button
+                                variants={buttonVariants}
+                                whileHover="hover"
+                                whileTap="tap"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg"
+                            >
+                                Close Filters
+                            </motion.button>
                         </div>
                     </motion.div>
                 )}

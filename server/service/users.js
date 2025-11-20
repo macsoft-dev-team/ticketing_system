@@ -53,6 +53,7 @@ const getAll = async (skip, take, filter, currentUser) => {
             { phone: { contains: searchTerm } },
             // Note: Email search is commented out until schema migration is run
             // { email: { contains: searchTerm, mode: 'insensitive' } }
+            { role: { contains: filterObj.role } },
           ];
         }
 

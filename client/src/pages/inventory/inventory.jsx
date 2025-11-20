@@ -243,14 +243,14 @@ export default function Inventory() {
       <div className="bg-white rounded-lg shadow">
         <ReusableTable
           columns={[
-            { key: 'productname', label: 'Product Name', align: 'left' },
-            { key: 'productCode', label: 'Product Code', align: 'left' },
-            { key: 'category', label: 'Category', align: 'left' },
-            { key: 'location', label: 'Location', align: 'left' },
-            { key: 'availableQuantity', label: 'Available Qty', align: 'center' },
-            { key: 'minQty', label: 'Min Stock', align: 'center' },
-            { key: 'maxQty', label: 'Max Stock', align: 'center' },
-            { key: 'status', label: 'Status', align: 'center' },
+            { key: 'productname', label: 'Product Name', align: 'left', textWrap: 'nowrap', },
+            { key: 'productCode', label: 'Product Code', align: 'left', textWrap: 'nowrap', },
+            { key: 'category', label: 'Category', align: 'left', textWrap: 'nowrap', },
+            { key: 'location', label: 'Location', align: 'left', textWrap: 'nowrap', },
+            { key: 'availableQuantity', label: 'Available Qty', align: 'center', textWrap: 'nowrap', },
+            { key: 'minQty', label: 'Min Stock', align: 'center', textWrap: 'nowrap', },
+            { key: 'maxQty', label: 'Max Stock', align: 'center', textWrap: 'nowrap', },
+            { key: 'status', label: 'Status', align: 'center', textWrap: 'nowrap', },
           ]}
           data={transformedInventoryData}
           title="Inventory"
