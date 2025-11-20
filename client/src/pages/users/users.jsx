@@ -19,6 +19,7 @@ export default function UsersPage() {
     const { fetchOrganisations, organisations } = useOrganisation();
     const columns = [
         { key: 'name', label: 'Name', align: 'left' },
+        { key: 'phone', label: 'Phone', align: 'start' },
         { key: 'role', label: 'Role', align: 'left' },
         { key: 'status', label: 'Status', align: 'center' },
         { key: 'organisation', label: 'Organisation', align: 'left' },

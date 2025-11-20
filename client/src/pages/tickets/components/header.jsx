@@ -112,20 +112,21 @@ export default function Header() {
                             >
                                 <span className="hidden xl:inline">{filter.label}</span>
                                 <span className="xl:hidden">{filter.shortLabel}</span>
-                                {filter.count > 0 && (
-                                    <motion.span 
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        transition={{ delay: 0.2 * (index + 1) }}
-                                        className={`ml-1 lg:ml-2 px-1.5 lg:px-2 py-0.5 text-xs rounded-full ${
-                                            activeFilter === filter.id 
-                                                ? 'bg-blue-100 text-blue-600'
-                                                : 'bg-gray-200 text-gray-600'
-                                        }`}
-                                    >
-                                        {statusCount && statusCount[filter?.key] || ''}
-                                    </motion.span>
-                                )}
+                               {statusCount?.[filter.key] > 0 && (
+    <motion.span 
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.2 * (index + 1) }}
+        className={`ml-1 lg:ml-2 px-1.5 lg:px-2 py-0.5 text-xs rounded-full ${
+            activeFilter === filter.id 
+                ? 'bg-blue-100 text-blue-600'
+                : 'bg-gray-200 text-gray-600'
+        }`}
+    >
+        {statusCount?.[filter.key]}
+    </motion.span>
+)}
+
                                 {activeFilter === filter.id && (
                                     <motion.div
                                         layoutId="activeTab"
