@@ -26,7 +26,7 @@ const Select = ({
   value,
   onChange,
   placeholder = "Select...",
-  className = "",
+  className = "text-truncate",
   disabled = false,
   id,
   name,

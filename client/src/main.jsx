@@ -5,6 +5,11 @@ import App from './App.jsx'
 import { Provider } from 'react-redux'
 import store from './lib/store'
 import { setStoreForInterceptor } from './lib/services/apiInterceptor'
+import { registerSW } from 'virtual:pwa-register'
+
+ registerSW({
+  immediate: true,
+})
 
 // Initialize API interceptors with store
 setStoreForInterceptor(store);

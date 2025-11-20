@@ -270,22 +270,6 @@ export default function Login() {
                             )}
                         </motion.button>
                     </form>
-
-                    {/* Demo Credentials */}
-                    <motion.div
-                        className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200"
-                        variants={itemVariants}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.8 }}
-                    >
-                        <p className="text-sm text-blue-800 font-medium mb-2">Demo Credentials:</p>
-                        <div className="text-xs text-blue-700 space-y-1">
-                            <p><strong>Phone:</strong> Enter your registered phone number</p>
-                            <p><strong>Password:</strong> Enter your password</p>
-                            <p className="text-blue-600 italic">Use your actual credentials from the system</p>
-                        </div>
-                    </motion.div>
                 </motion.div>
 
                 {/* Footer */}

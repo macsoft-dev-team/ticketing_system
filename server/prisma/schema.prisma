@@ -104,6 +104,7 @@ model Project {
   ServiceCenter  ServiceCenter[]
   organisation   Organisation?   @relation(fields: [organisationId], references: [id])
   organisationId Int?
+  users          User[]
 }
 
 model ServiceCenter {
@@ -150,6 +151,8 @@ model User {
   State                  State?                  @relation("PrimaryState", fields: [stateId], references: [id])
   stateId                Int?
   states                 State[]                 @relation("UserStates")
+  projectCode            String?
+  project                Project?                @relation(fields: [projectCode], references: [projectCode])
 }
 
 model Ticket {

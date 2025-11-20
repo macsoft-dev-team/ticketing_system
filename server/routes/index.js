@@ -22,6 +22,7 @@ const ticketCode = require("./ticketCode");
 const settings = require("./settings");
 const inventory = require("./inventory");
 const inboundActivity = require("./inboundActivity");
+const projectWA = require("./projectsWA");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -37,12 +38,14 @@ router.use("/milestones", authenticate, milestones);
 router.use("/spare-requests", authenticate, spareRequests);
 router.use("/products", authenticate, product);
 router.use("/projects", authenticate, projects);
-router.use("/states", states);
 router.use("/ticket-code", authenticate, ticketCode);
 router.use("/settings", authenticate, settings);
 router.use("/inventory", authenticate, inventory);
 router.use("/inbound-activities", authenticate, inboundActivity);
 
+// without authentication
+router.use("/states", states);
+router.use("/projectsWA", projectWA);
 //upload routes
 
 router.use("/uploads", authenticate, uploadRoutes);

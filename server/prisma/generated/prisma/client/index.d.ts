@@ -2437,10 +2437,12 @@ export namespace Prisma {
 
   export type ProjectCountOutputType = {
     ServiceCenter: number
+    users: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ServiceCenter?: boolean | ProjectCountOutputTypeCountServiceCenterArgs
+    users?: boolean | ProjectCountOutputTypeCountUsersArgs
   }
 
   // Custom InputTypes
@@ -2459,6 +2461,13 @@ export namespace Prisma {
    */
   export type ProjectCountOutputTypeCountServiceCenterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ServiceCenterWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
   }
 
 
@@ -5159,6 +5168,7 @@ export namespace Prisma {
     organisationId?: boolean
     ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
     organisation?: boolean | Project$organisationArgs<ExtArgs>
+    users?: boolean | Project$usersArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -5181,6 +5191,7 @@ export namespace Prisma {
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
     organisation?: boolean | Project$organisationArgs<ExtArgs>
+    users?: boolean | Project$usersArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -5189,6 +5200,7 @@ export namespace Prisma {
     objects: {
       ServiceCenter: Prisma.$ServiceCenterPayload<ExtArgs>[]
       organisation: Prisma.$OrganisationPayload<ExtArgs> | null
+      users: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -5543,6 +5555,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     ServiceCenter<T extends Project$ServiceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Project$ServiceCenterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     organisation<T extends Project$organisationArgs<ExtArgs> = {}>(args?: Subset<T, Project$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    users<T extends Project$usersArgs<ExtArgs> = {}>(args?: Subset<T, Project$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5965,6 +5978,30 @@ export namespace Prisma {
      */
     include?: OrganisationInclude<ExtArgs> | null
     where?: OrganisationWhereInput
+  }
+
+  /**
+   * Project.users
+   */
+  export type Project$usersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -7127,6 +7164,7 @@ export namespace Prisma {
     deletedAt: Date | null
     isActive: boolean | null
     stateId: number | null
+    projectCode: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -7142,6 +7180,7 @@ export namespace Prisma {
     deletedAt: Date | null
     isActive: boolean | null
     stateId: number | null
+    projectCode: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -7157,6 +7196,7 @@ export namespace Prisma {
     deletedAt: number
     isActive: number
     stateId: number
+    projectCode: number
     _all: number
   }
 
@@ -7184,6 +7224,7 @@ export namespace Prisma {
     deletedAt?: true
     isActive?: true
     stateId?: true
+    projectCode?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -7199,6 +7240,7 @@ export namespace Prisma {
     deletedAt?: true
     isActive?: true
     stateId?: true
+    projectCode?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -7214,6 +7256,7 @@ export namespace Prisma {
     deletedAt?: true
     isActive?: true
     stateId?: true
+    projectCode?: true
     _all?: true
   }
 
@@ -7316,6 +7359,7 @@ export namespace Prisma {
     deletedAt: Date | null
     isActive: boolean
     stateId: number | null
+    projectCode: string | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -7350,6 +7394,7 @@ export namespace Prisma {
     deletedAt?: boolean
     isActive?: boolean
     stateId?: boolean
+    projectCode?: boolean
     serviceCenter?: boolean | User$serviceCenterArgs<ExtArgs>
     createdTickets?: boolean | User$createdTicketsArgs<ExtArgs>
     updatedTickets?: boolean | User$updatedTicketsArgs<ExtArgs>
@@ -7363,6 +7408,7 @@ export namespace Prisma {
     TicketMilestone?: boolean | User$TicketMilestoneArgs<ExtArgs>
     State?: boolean | User$StateArgs<ExtArgs>
     states?: boolean | User$statesArgs<ExtArgs>
+    project?: boolean | User$projectArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -7381,9 +7427,10 @@ export namespace Prisma {
     deletedAt?: boolean
     isActive?: boolean
     stateId?: boolean
+    projectCode?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "password" | "role" | "centerCode" | "lastLogin" | "createdAt" | "updatedAt" | "deletedAt" | "isActive" | "stateId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "password" | "role" | "centerCode" | "lastLogin" | "createdAt" | "updatedAt" | "deletedAt" | "isActive" | "stateId" | "projectCode", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     serviceCenter?: boolean | User$serviceCenterArgs<ExtArgs>
     createdTickets?: boolean | User$createdTicketsArgs<ExtArgs>
@@ -7398,6 +7445,7 @@ export namespace Prisma {
     TicketMilestone?: boolean | User$TicketMilestoneArgs<ExtArgs>
     State?: boolean | User$StateArgs<ExtArgs>
     states?: boolean | User$statesArgs<ExtArgs>
+    project?: boolean | User$projectArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7417,6 +7465,7 @@ export namespace Prisma {
       TicketMilestone: Prisma.$TicketMilestonePayload<ExtArgs>[]
       State: Prisma.$StatePayload<ExtArgs> | null
       states: Prisma.$StatePayload<ExtArgs>[]
+      project: Prisma.$ProjectPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -7431,6 +7480,7 @@ export namespace Prisma {
       deletedAt: Date | null
       isActive: boolean
       stateId: number | null
+      projectCode: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -7784,6 +7834,7 @@ export namespace Prisma {
     TicketMilestone<T extends User$TicketMilestoneArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketMilestoneArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketMilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     State<T extends User$StateArgs<ExtArgs> = {}>(args?: Subset<T, User$StateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     states<T extends User$statesArgs<ExtArgs> = {}>(args?: Subset<T, User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    project<T extends User$projectArgs<ExtArgs> = {}>(args?: Subset<T, User$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7825,6 +7876,7 @@ export namespace Prisma {
     readonly deletedAt: FieldRef<"User", 'DateTime'>
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly stateId: FieldRef<"User", 'Int'>
+    readonly projectCode: FieldRef<"User", 'String'>
   }
     
 
@@ -8467,6 +8519,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: StateScalarFieldEnum | StateScalarFieldEnum[]
+  }
+
+  /**
+   * User.project
+   */
+  export type User$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Project
+     */
+    omit?: ProjectOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
   }
 
   /**
@@ -22356,7 +22427,8 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt',
     isActive: 'isActive',
-    stateId: 'stateId'
+    stateId: 'stateId',
+    projectCode: 'projectCode'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -22615,7 +22687,8 @@ export namespace Prisma {
     name: 'name',
     phone: 'phone',
     password: 'password',
-    centerCode: 'centerCode'
+    centerCode: 'centerCode',
+    projectCode: 'projectCode'
   };
 
   export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
@@ -22958,6 +23031,7 @@ export namespace Prisma {
     organisationId?: IntNullableFilter<"Project"> | number | null
     ServiceCenter?: ServiceCenterListRelationFilter
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
+    users?: UserListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -22973,6 +23047,7 @@ export namespace Prisma {
     organisationId?: SortOrderInput | SortOrder
     ServiceCenter?: ServiceCenterOrderByRelationAggregateInput
     organisation?: OrganisationOrderByWithRelationInput
+    users?: UserOrderByRelationAggregateInput
     _relevance?: ProjectOrderByRelevanceInput
   }
 
@@ -22992,6 +23067,7 @@ export namespace Prisma {
     organisationId?: IntNullableFilter<"Project"> | number | null
     ServiceCenter?: ServiceCenterListRelationFilter
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
+    users?: UserListRelationFilter
   }, "id" | "projectCode" | "email">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -23138,6 +23214,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
+    projectCode?: StringNullableFilter<"User"> | string | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     createdTickets?: TicketListRelationFilter
     updatedTickets?: TicketListRelationFilter
@@ -23151,6 +23228,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneListRelationFilter
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     states?: StateListRelationFilter
+    project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -23166,6 +23244,7 @@ export namespace Prisma {
     deletedAt?: SortOrderInput | SortOrder
     isActive?: SortOrder
     stateId?: SortOrderInput | SortOrder
+    projectCode?: SortOrderInput | SortOrder
     serviceCenter?: ServiceCenterOrderByWithRelationInput
     createdTickets?: TicketOrderByRelationAggregateInput
     updatedTickets?: TicketOrderByRelationAggregateInput
@@ -23179,6 +23258,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneOrderByRelationAggregateInput
     State?: StateOrderByWithRelationInput
     states?: StateOrderByRelationAggregateInput
+    project?: ProjectOrderByWithRelationInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -23198,6 +23278,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
+    projectCode?: StringNullableFilter<"User"> | string | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     createdTickets?: TicketListRelationFilter
     updatedTickets?: TicketListRelationFilter
@@ -23211,6 +23292,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneListRelationFilter
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     states?: StateListRelationFilter
+    project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
   }, "id" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -23226,6 +23308,7 @@ export namespace Prisma {
     deletedAt?: SortOrderInput | SortOrder
     isActive?: SortOrder
     stateId?: SortOrderInput | SortOrder
+    projectCode?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -23249,6 +23332,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     stateId?: IntNullableWithAggregatesFilter<"User"> | number | null
+    projectCode?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type TicketWhereInput = {
@@ -24479,6 +24563,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
+    users?: UserCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -24493,6 +24578,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     organisationId?: number | null
     ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
+    users?: UserUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -24506,6 +24592,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
+    users?: UserUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -24520,6 +24607,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     organisationId?: NullableIntFieldUpdateOperationsInput | number | null
     ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
+    users?: UserUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -24684,6 +24772,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -24699,6 +24788,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -24735,6 +24825,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -24750,6 +24841,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -24776,6 +24868,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -24803,6 +24896,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketCreateInput = {
@@ -26418,6 +26512,7 @@ export namespace Prisma {
     deletedAt?: SortOrder
     isActive?: SortOrder
     stateId?: SortOrder
+    projectCode?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -26438,6 +26533,7 @@ export namespace Prisma {
     deletedAt?: SortOrder
     isActive?: SortOrder
     stateId?: SortOrder
+    projectCode?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -26453,6 +26549,7 @@ export namespace Prisma {
     deletedAt?: SortOrder
     isActive?: SortOrder
     stateId?: SortOrder
+    projectCode?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -27503,11 +27600,25 @@ export namespace Prisma {
     connect?: OrganisationWhereUniqueInput
   }
 
+  export type UserCreateNestedManyWithoutProjectInput = {
+    create?: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput> | UserCreateWithoutProjectInput[] | UserUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutProjectInput | UserCreateOrConnectWithoutProjectInput[]
+    createMany?: UserCreateManyProjectInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type ServiceCenterUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput> | ServiceCenterCreateWithoutProjectInput[] | ServiceCenterUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: ServiceCenterCreateOrConnectWithoutProjectInput | ServiceCenterCreateOrConnectWithoutProjectInput[]
     createMany?: ServiceCenterCreateManyProjectInputEnvelope
     connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput> | UserCreateWithoutProjectInput[] | UserUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutProjectInput | UserCreateOrConnectWithoutProjectInput[]
+    createMany?: UserCreateManyProjectInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type ServiceCenterUpdateManyWithoutProjectNestedInput = {
@@ -27534,6 +27645,20 @@ export namespace Prisma {
     update?: XOR<XOR<OrganisationUpdateToOneWithWhereWithoutProjectInput, OrganisationUpdateWithoutProjectInput>, OrganisationUncheckedUpdateWithoutProjectInput>
   }
 
+  export type UserUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput> | UserCreateWithoutProjectInput[] | UserUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutProjectInput | UserCreateOrConnectWithoutProjectInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutProjectInput | UserUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: UserCreateManyProjectInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutProjectInput | UserUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutProjectInput | UserUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
   export type NullableIntFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -27554,6 +27679,20 @@ export namespace Prisma {
     update?: ServiceCenterUpdateWithWhereUniqueWithoutProjectInput | ServiceCenterUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: ServiceCenterUpdateManyWithWhereWithoutProjectInput | ServiceCenterUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput> | UserCreateWithoutProjectInput[] | UserUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutProjectInput | UserCreateOrConnectWithoutProjectInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutProjectInput | UserUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: UserCreateManyProjectInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutProjectInput | UserUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutProjectInput | UserUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type UserCreateNestedManyWithoutServiceCenterInput = {
@@ -27742,6 +27881,12 @@ export namespace Prisma {
     create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput> | StateCreateWithoutUsersInput[] | StateUncheckedCreateWithoutUsersInput[]
     connectOrCreate?: StateCreateOrConnectWithoutUsersInput | StateCreateOrConnectWithoutUsersInput[]
     connect?: StateWhereUniqueInput | StateWhereUniqueInput[]
+  }
+
+  export type ProjectCreateNestedOneWithoutUsersInput = {
+    create?: XOR<ProjectCreateWithoutUsersInput, ProjectUncheckedCreateWithoutUsersInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutUsersInput
+    connect?: ProjectWhereUniqueInput
   }
 
   export type TicketUncheckedCreateNestedManyWithoutCreatedByUserInput = {
@@ -27995,6 +28140,16 @@ export namespace Prisma {
     update?: StateUpdateWithWhereUniqueWithoutUsersInput | StateUpdateWithWhereUniqueWithoutUsersInput[]
     updateMany?: StateUpdateManyWithWhereWithoutUsersInput | StateUpdateManyWithWhereWithoutUsersInput[]
     deleteMany?: StateScalarWhereInput | StateScalarWhereInput[]
+  }
+
+  export type ProjectUpdateOneWithoutUsersNestedInput = {
+    create?: XOR<ProjectCreateWithoutUsersInput, ProjectUncheckedCreateWithoutUsersInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutUsersInput
+    upsert?: ProjectUpsertWithoutUsersInput
+    disconnect?: ProjectWhereInput | boolean
+    delete?: ProjectWhereInput | boolean
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutUsersInput, ProjectUpdateWithoutUsersInput>, ProjectUncheckedUpdateWithoutUsersInput>
   }
 
   export type TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput = {
@@ -29447,6 +29602,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutStateInput = {
@@ -29461,6 +29617,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     isActive?: boolean
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -29506,6 +29663,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutStatesInput = {
@@ -29521,6 +29679,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -29570,6 +29729,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
+    projectCode?: StringNullableFilter<"User"> | string | null
   }
 
   export type UserUpsertWithWhereUniqueWithoutStatesInput = {
@@ -29598,6 +29758,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
+    users?: UserCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutOrganisationInput = {
@@ -29611,6 +29772,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
+    users?: UserUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutOrganisationInput = {
@@ -29724,6 +29886,67 @@ export namespace Prisma {
     create: XOR<OrganisationCreateWithoutProjectInput, OrganisationUncheckedCreateWithoutProjectInput>
   }
 
+  export type UserCreateWithoutProjectInput = {
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutUsersInput
+    createdTickets?: TicketCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
+  }
+
+  export type UserUncheckedCreateWithoutProjectInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
+  }
+
+  export type UserCreateOrConnectWithoutProjectInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput>
+  }
+
+  export type UserCreateManyProjectInputEnvelope = {
+    data: UserCreateManyProjectInput | UserCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ServiceCenterUpsertWithWhereUniqueWithoutProjectInput = {
     where: ServiceCenterWhereUniqueInput
     update: XOR<ServiceCenterUpdateWithoutProjectInput, ServiceCenterUncheckedUpdateWithoutProjectInput>
@@ -29793,6 +30016,22 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type UserUpsertWithWhereUniqueWithoutProjectInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutProjectInput, UserUncheckedUpdateWithoutProjectInput>
+    create: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutProjectInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutProjectInput, UserUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutProjectInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutProjectInput>
+  }
+
   export type UserCreateWithoutServiceCenterInput = {
     name: string
     phone: string
@@ -29815,6 +30054,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutServiceCenterInput = {
@@ -29829,6 +30069,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -29862,6 +30103,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
+    users?: UserCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutServiceCenterInput = {
@@ -29875,6 +30117,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     organisationId?: number | null
+    users?: UserUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutServiceCenterInput = {
@@ -29988,6 +30231,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
+    users?: UserUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutServiceCenterInput = {
@@ -30001,6 +30245,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     organisationId?: NullableIntFieldUpdateOperationsInput | number | null
+    users?: UserUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type TicketUpsertWithWhereUniqueWithoutServiceCenterInput = {
@@ -30496,6 +30741,38 @@ export namespace Prisma {
     create: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput>
   }
 
+  export type ProjectCreateWithoutUsersInput = {
+    name: string
+    projectCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
+    organisation?: OrganisationCreateNestedOneWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutUsersInput = {
+    id?: number
+    name: string
+    projectCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    organisationId?: number | null
+    ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutUsersInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutUsersInput, ProjectUncheckedCreateWithoutUsersInput>
+  }
+
   export type ServiceCenterUpsertWithoutUsersInput = {
     update: XOR<ServiceCenterUpdateWithoutUsersInput, ServiceCenterUncheckedUpdateWithoutUsersInput>
     create: XOR<ServiceCenterCreateWithoutUsersInput, ServiceCenterUncheckedCreateWithoutUsersInput>
@@ -30841,6 +31118,44 @@ export namespace Prisma {
     stateCode?: StringNullableFilter<"State"> | string | null
   }
 
+  export type ProjectUpsertWithoutUsersInput = {
+    update: XOR<ProjectUpdateWithoutUsersInput, ProjectUncheckedUpdateWithoutUsersInput>
+    create: XOR<ProjectCreateWithoutUsersInput, ProjectUncheckedCreateWithoutUsersInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutUsersInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutUsersInput, ProjectUncheckedUpdateWithoutUsersInput>
+  }
+
+  export type ProjectUpdateWithoutUsersInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    projectCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
+    organisation?: OrganisationUpdateOneWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutUsersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    projectCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    organisationId?: NullableIntFieldUpdateOperationsInput | number | null
+    ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
   export type UserCreateWithoutCreatedTicketsInput = {
     name: string
     phone: string
@@ -30863,6 +31178,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutCreatedTicketsInput = {
@@ -30878,6 +31194,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
@@ -30917,6 +31234,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutUpdatedTicketsInput = {
@@ -30932,6 +31250,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
@@ -31185,6 +31504,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedTicketsInput = {
@@ -31200,6 +31520,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
@@ -31245,6 +31566,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUpdatedTicketsInput = {
@@ -31260,6 +31582,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
@@ -31493,6 +31816,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutTicketMilestoneInput = {
@@ -31508,6 +31832,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -31659,6 +31984,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTicketMilestoneInput = {
@@ -31674,6 +32000,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32002,6 +32329,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsCreatedInput = {
@@ -32017,6 +32345,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -32056,6 +32385,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsUpdatedInput = {
@@ -32071,6 +32401,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -32148,6 +32479,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsCreatedInput = {
@@ -32163,6 +32495,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32208,6 +32541,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsUpdatedInput = {
@@ -32223,6 +32557,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32640,6 +32975,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutProductTransactionsInput = {
@@ -32655,6 +32991,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -32811,6 +33148,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductTransactionsInput = {
@@ -32826,6 +33164,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32926,6 +33265,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -32941,6 +33281,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
@@ -33138,6 +33479,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -33153,6 +33495,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
@@ -33329,6 +33672,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutMessageSeensInput = {
@@ -33344,6 +33688,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -33424,6 +33769,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessageSeensInput = {
@@ -33439,6 +33785,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -33497,6 +33844,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSentNotificationsInput = {
@@ -33512,6 +33860,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -33679,6 +34028,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentNotificationsInput = {
@@ -33694,6 +34044,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -33840,6 +34191,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutNotificationRecipientsInput = {
@@ -33855,6 +34207,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -33937,6 +34290,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationRecipientsInput = {
@@ -33952,6 +34306,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -33976,6 +34331,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     isActive?: boolean
+    projectCode?: string | null
   }
 
   export type UserUpdateWithoutStateInput = {
@@ -34000,6 +34356,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStateInput = {
@@ -34014,6 +34371,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34039,6 +34397,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUpdateWithoutStatesInput = {
@@ -34063,6 +34422,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStatesInput = {
@@ -34078,6 +34438,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34103,6 +34464,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ProjectCreateManyOrganisationInput = {
@@ -34127,6 +34489,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
+    users?: UserUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutOrganisationInput = {
@@ -34140,6 +34503,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
+    users?: UserUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutOrganisationInput = {
@@ -34165,6 +34529,21 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
+  }
+
+  export type UserCreateManyProjectInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
   }
 
   export type ServiceCenterUpdateWithoutProjectInput = {
@@ -34209,6 +34588,72 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type UserUpdateWithoutProjectInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    serviceCenter?: ServiceCenterUpdateOneWithoutUsersNestedInput
+    createdTickets?: TicketUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutProjectInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutProjectInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
   export type UserCreateManyServiceCenterInput = {
     id?: number
     name: string
@@ -34221,6 +34666,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    projectCode?: string | null
   }
 
   export type TicketCreateManyServiceCenterInput = {
@@ -34270,6 +34716,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutServiceCenterInput = {
@@ -34284,6 +34731,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34309,6 +34757,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUpdateWithoutServiceCenterInput = {

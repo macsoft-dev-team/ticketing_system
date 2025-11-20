@@ -178,7 +178,8 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt',
   isActive: 'isActive',
-  stateId: 'stateId'
+  stateId: 'stateId',
+  projectCode: 'projectCode'
 };
 
 exports.Prisma.TicketScalarFieldEnum = {
@@ -377,7 +378,8 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   name: 'name',
   phone: 'phone',
   password: 'password',
-  centerCode: 'centerCode'
+  centerCode: 'centerCode',
+  projectCode: 'projectCode'
 };
 
 exports.Prisma.TicketOrderByRelevanceFieldEnum = {

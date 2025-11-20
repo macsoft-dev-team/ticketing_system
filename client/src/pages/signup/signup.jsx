@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Eye, EyeOff, Lock, Phone, User, ArrowRight, Loader2, CheckCircle, MapPin } from 'lucide-react';
+import { Eye, EyeOff, Lock, Phone, User, ArrowRight, Loader2, CheckCircle, MapPin, Briefcase } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '../../lib/services/apiInterceptor';
 import { API_ENDPOINTS } from '../../lib/constants/api';
@@ -10,6 +10,7 @@ export default function Signup() {
         name: '',
         phone: '',
         stateId: '',
+        projectCode: '',
         password: '',
         confirmPassword: ''
     });
@@ -20,23 +21,78 @@ export default function Signup() {
     const [success, setSuccess] = useState(false);
     const [states, setStates] = useState([]);
     const [loadingStates, setLoadingStates] = useState(true);
-
+    const [projects, setProjects] = useState([]);
+    const [loadingProjects, setLoadingProjects] = useState(true);
+ 
     const navigate = useNavigate();
 
-    // Fetch states on component mount
+    // Fetch states and projects on component mount
     useEffect(() => {
         const fetchStates = async () => {
             try {
-                const response = await axios.get(API_ENDPOINTS.states);
-                setStates(response.data);
+                console.log('Fetching states from:', API_ENDPOINTS.states);
+                const statesResponse = await axios.get(API_ENDPOINTS.states);
+                console.log('States response:', statesResponse.data);
+                
+                if (Array.isArray(statesResponse.data)) {
+                    setStates(statesResponse.data);
+                } else {
+                    console.warn('States response is not an array:', statesResponse.data);
+                    setStates([]);
+                }
             } catch (error) {
                 console.error('Error fetching states:', error);
+                if (error.code === 'ERR_NETWORK') {
+                    setErrors(prev => ({
+                        ...prev,
+                        general: 'Unable to connect to server. Please check if the server is running.'
+                    }));
+                } else {
+                    setErrors(prev => ({
+                        ...prev,
+                        general: `Failed to load states: ${error.response?.status || error.message}`
+                    }));
+                }
+                setStates([]);
             } finally {
                 setLoadingStates(false);
             }
         };
 
+        const fetchProjects = async () => {
+            try {
+                console.log('Fetching projects from:', API_ENDPOINTS.projectWA);
+                const projectsResponse = await axios.get(API_ENDPOINTS.projectWA);
+                console.log('Projects response:', projectsResponse.data);
+                
+                if (Array.isArray(projectsResponse.data)) {
+                    setProjects(projectsResponse.data);
+                } else {
+                    console.warn('Projects response is not an array:', projectsResponse.data);
+                    setProjects([]);
+                }
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+                if (error.code === 'ERR_NETWORK') {
+                    setErrors(prev => ({
+                        ...prev,
+                        general: 'Unable to connect to server. Please check if the server is running.'
+                    }));
+                } else {
+                    setErrors(prev => ({
+                        ...prev,
+                        general: `Failed to load projects: ${error.response?.status || error.message}`
+                    }));
+                }
+                setProjects([]);
+            } finally {
+                setLoadingProjects(false);
+            }
+        };
+
+        // Fetch both independently so if one fails, the other still works
         fetchStates();
+        fetchProjects();
     }, []);
 
     const handleInputChange = (e) => {
@@ -76,6 +132,11 @@ export default function Signup() {
             newErrors.stateId = 'Please select a state';
         }
 
+        // Project validation
+        if (!formData.projectCode || formData.projectCode === '') {
+            newErrors.projectCode = 'Please select a project';
+        }
+
         // Password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
@@ -109,6 +170,7 @@ export default function Signup() {
                 name: formData.name.trim(),
                 phone: formData.phone,
                 stateId: parseInt(formData.stateId),
+                projectCode: formData.projectCode,
                 password: formData.password
             });
 
@@ -184,15 +246,16 @@ export default function Signup() {
 
     if (success) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
-                <motion.div
-                    className="w-full max-w-md text-center"
-                    variants={successVariants}
-                    initial="hidden"
-                    animate="visible"
-                >
+            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-2 sm:px-4">
+                <div className="flex items-center justify-center min-h-full">
                     <motion.div
-                        className="inline-block p-4 rounded-full bg-green-100 mb-6"
+                        className="w-full max-w-md text-center"
+                        variants={successVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                    <motion.div
+                        className="inline-block p-3 sm:p-4 rounded-full bg-green-100 mb-4 sm:mb-6"
                         animate={{ 
                             scale: [1, 1.1, 1],
                             rotate: [0, 10, -10, 0]
@@ -203,56 +266,58 @@ export default function Signup() {
                             repeatDelay: 2
                         }}
                     >
-                        <CheckCircle className="w-16 h-16 text-green-600" />
+                        <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-green-600" />
                     </motion.div>
                     
-                    <h1 className="text-2xl font-bold text-gray-900 mb-4">Registration Successful!</h1>
-                    <p className="text-gray-600 mb-4">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 px-2">Registration Successful!</h1>
+                    <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 px-2">
                         Your account has been created successfully. You will be redirected to the login page shortly.
                     </p>
                     <div className="flex items-center justify-center space-x-2">
                         <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-                        <span className="text-blue-600">Redirecting...</span>
+                        <span className="text-sm sm:text-base text-blue-600">Redirecting...</span>
                     </div>
-                </motion.div>
+                    </motion.div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-            <motion.div
-                className="w-full max-w-md"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-            >
+        <div className="min-h-screen max-h-96 overflow-auto bg-gradient-to-br from-blue-50 via-white to-purple-50 py-4 sm:py-8">
+            <div className="container mx-auto px-2 sm:px-4 max-w-md">
+                <motion.div
+                    className="w-full"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
                 {/* Logo/Header Section */}
                 <motion.div
-                    className="text-center flex items-center justify-center mb-8"
+                    className="text-center flex flex-col sm:flex-row items-center justify-center mb-4 sm:mb-8 space-y-2 sm:space-y-0 sm:space-x-4"
                     variants={itemVariants}
                 >
                     <motion.div
-                        className="inline-block p-3 rounded-2xl mb-4 w-20"
+                        className="inline-block p-2 sm:p-3 rounded-2xl w-16 sm:w-20"
                         whileHover={{ rotate: 5, scale: 1.05 }}
                         transition={{ type: "spring", stiffness: 300 }}
                     >
                         <img className='object-contain' src="/macsoft-logo.png" alt="" />
                     </motion.div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
-                        <p className="text-gray-600">Join us to get started with your tickets</p>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Create Account</h1>
+                        <p className="text-sm sm:text-base text-gray-600">Join us to get started with your tickets</p>
                     </div>
                 </motion.div>
 
                 {/* Registration Form */}
                 <motion.div
-                    className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-8"
+                    className="bg-white/70 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-xl border border-white/20 p-4 sm:p-6 md:p-8"
                     variants={itemVariants}
                     whileHover={{ y: -2 }}
                     transition={{ type: "spring", stiffness: 300 }}
                 >
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                         {/* General Error Display */}
                         {errors.general && (
                             <motion.div
@@ -261,32 +326,37 @@ export default function Signup() {
                                 animate={{ opacity: 1, y: 0 }}
                             >
                                 <p className="text-sm text-red-600">{errors.general}</p>
+                                {errors.general.includes('server') && (
+                                    <p className="text-xs text-red-500 mt-1">
+                                        Make sure the server is running on port 4055
+                                    </p>
+                                )}
                             </motion.div>
                         )}
 
                         {/* Personal Information Section */}
-                        <motion.div className="space-y-6" variants={itemVariants}>
+                        <motion.div className="space-y-4 sm:space-y-6" variants={itemVariants}>
                             <div className="border-b border-gray-200 pb-2">
-                                <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
-                                <p className="text-sm text-gray-600">Please provide your basic details</p>
+                                <h3 className="text-base sm:text-lg font-medium text-gray-900">Personal Information</h3>
+                                <p className="text-xs sm:text-sm text-gray-600">Please provide your basic details</p>
                             </div>
                         </motion.div>
 
                         {/* Full Name Field */}
                         <motion.div variants={itemVariants}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Full Name *
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="w-5 h-5 text-gray-400" />
+                                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                                 </div>
                                 <motion.input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                                    className={`w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base ${
                                         errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                                     }`}
                                     placeholder="Enter your full name"
@@ -307,19 +377,19 @@ export default function Signup() {
 
                         {/* Mobile Number Field */}
                         <motion.div variants={itemVariants}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Mobile Number *
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Phone className="w-5 h-5 text-gray-400" />
+                                    <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                                 </div>
                                 <motion.input
                                     type="tel"
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                                    className={`w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base ${
                                         errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                                     }`}
                                     placeholder="Enter your mobile number"
@@ -340,26 +410,28 @@ export default function Signup() {
 
                         {/* State Selection Field */}
                         <motion.div variants={itemVariants}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 State *
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <MapPin className="w-5 h-5 text-gray-400" />
+                                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                                 </div>
                                 <motion.select
                                     name="stateId"
                                     value={formData.stateId}
                                     onChange={handleInputChange}
                                     disabled={loadingStates}
-                                    className={`w-full pl-10 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none bg-white ${
+                                    className={`w-full pl-9 sm:pl-10 pr-8 sm:pr-10 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none bg-white text-sm sm:text-base ${
                                         errors.stateId ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                     } ${loadingStates ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     whileFocus={{ scale: 1.02 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                 >
                                     <option value="">
-                                        {loadingStates ? 'Loading states...' : `Select your state${states.length > 0 ? ` (${states.length} available)` : ''}`}
+                                        {loadingStates ? 'Loading states...' : 
+                                         states.length > 0 ? `Select your state (${states.length} available)` : 
+                                         'No states available - Check server connection'}
                                     </option>
                                     {states.map((state) => (
                                         <option key={state.id} value={state.id}>
@@ -371,7 +443,7 @@ export default function Signup() {
                                     {loadingStates ? (
                                         <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
                                     ) : (
-                                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     )}
@@ -388,29 +460,81 @@ export default function Signup() {
                             )}
                         </motion.div>
 
+                        {/* Project Selection Field */}
+                        <motion.div variants={itemVariants}>
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
+                                Project *
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                                </div>
+                                <motion.select
+                                    name="projectCode"
+                                    value={formData.projectCode}
+                                    onChange={handleInputChange}
+                                    disabled={loadingProjects}
+                                    className={`w-full pl-9 sm:pl-10 pr-8 sm:pr-10 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none bg-white text-sm sm:text-base ${
+                                        errors.projectCode ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                    } ${loadingProjects ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    whileFocus={{ scale: 1.02 }}
+                                    transition={{ type: "spring", stiffness: 300 }}
+                                >
+                                    <option value="">
+                                        {loadingProjects ? 'Loading projects...' : 
+                                         projects.length > 0 ? `Select your project (${projects.length} available)` : 
+                                         'No projects available - Check server connection'}
+                                    </option>
+                                    {projects.map((project) => (
+                                        <option key={project.projectCode} value={project.projectCode}>
+                                            {project.name}
+                                        </option>
+                                    ))}
+                                </motion.select>
+                                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                    {loadingProjects ? (
+                                        <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                                    ) : (
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    )}
+                                </div>
+                            </div>
+                            {errors.projectCode && (
+                                <motion.p
+                                    className="mt-1 text-sm text-red-600"
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                >
+                                    {errors.projectCode}
+                                </motion.p>
+                            )}
+                        </motion.div>
+
                         {/* Account Security Section */}
-                        <motion.div className="space-y-6" variants={itemVariants}>
+                        <motion.div className="space-y-4 sm:space-y-6" variants={itemVariants}>
                             <div className="border-b border-gray-200 pb-2">
-                                <h3 className="text-lg font-medium text-gray-900">Account Security</h3>
-                                <p className="text-sm text-gray-600">Create a secure password for your account</p>
+                                <h3 className="text-base sm:text-lg font-medium text-gray-900">Account Security</h3>
+                                <p className="text-xs sm:text-sm text-gray-600">Create a secure password for your account</p>
                             </div>
                         </motion.div>
 
                         {/* Password Field */}
                         <motion.div variants={itemVariants}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Password *
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="w-5 h-5 text-gray-400" />
+                                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                                 </div>
                                 <motion.input
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     value={formData.password}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                                    className={`w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base ${
                                         errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                                     }`}
                                     placeholder="Create a password"
@@ -424,7 +548,7 @@ export default function Signup() {
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                                 </motion.button>
                             </div>
                             {errors.password && (
@@ -440,19 +564,19 @@ export default function Signup() {
 
                         {/* Confirm Password Field */}
                         <motion.div variants={itemVariants}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                                 Confirm Password *
                             </label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="w-5 h-5 text-gray-400" />
+                                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                                 </div>
                                 <motion.input
                                     type={showConfirmPassword ? 'text' : 'password'}
                                     name="confirmPassword"
                                     value={formData.confirmPassword}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                                    className={`w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base ${
                                         errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                                     }`}
                                     placeholder="Confirm your password"
@@ -466,7 +590,7 @@ export default function Signup() {
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    {showConfirmPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                                 </motion.button>
                             </div>
                             {errors.confirmPassword && (
@@ -482,21 +606,21 @@ export default function Signup() {
 
                         {/* Password Requirements */}
                         <motion.div
-                            className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg"
+                            className="text-xs sm:text-sm text-gray-500 bg-gray-50 p-2 sm:p-3 rounded-lg"
                             variants={itemVariants}
                         >
-                            <p className="font-medium mb-1">Password requirements:</p>
+                            <p className="font-medium mb-1 text-xs sm:text-sm">Password requirements:</p>
                             <ul className="space-y-1">
-                                <li className={`flex items-center space-x-2 ${
+                                <li className={`flex items-center space-x-2 text-xs sm:text-sm ${
                                     formData.password.length >= 6 ? 'text-green-600' : 'text-gray-500'
                                 }`}>
-                                    <span className="w-1 h-1 bg-current rounded-full"></span>
+                                    <span className="w-1 h-1 bg-current rounded-full flex-shrink-0"></span>
                                     <span>At least 6 characters</span>
                                 </li>
-                                <li className={`flex items-center space-x-2 ${
+                                <li className={`flex items-center space-x-2 text-xs sm:text-sm ${
                                     /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password) ? 'text-green-600' : 'text-gray-500'
                                 }`}>
-                                    <span className="w-1 h-1 bg-current rounded-full"></span>
+                                    <span className="w-1 h-1 bg-current rounded-full flex-shrink-0"></span>
                                     <span>One uppercase, lowercase, and number</span>
                                 </li>
                             </ul>
@@ -506,18 +630,18 @@ export default function Signup() {
                         <motion.button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                            className="w-full bg-blue-600 text-white py-2.5 sm:py-3 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-sm sm:text-base"
                             variants={buttonVariants}
                             initial="idle"
                             whileHover="hover"
                             whileTap="tap"
                         >
                             {isLoading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                             ) : (
                                 <>
                                     <span>Create Account</span>
-                                    <ArrowRight className="w-5 h-5" />
+                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </>
                             )}
                         </motion.button>
@@ -526,10 +650,10 @@ export default function Signup() {
 
                 {/* Footer */}
                 <motion.div
-                    className="text-center mt-8"
+                    className="text-center mt-4 sm:mt-8 pb-4"
                     variants={itemVariants}
                 >
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 text-xs sm:text-sm">
                         Already have an account?
                         <Link
                             to="/login"
@@ -539,7 +663,8 @@ export default function Signup() {
                         </Link>
                     </p>
                 </motion.div>
-            </motion.div>
+                </motion.div>
+            </div>
         </div>
     );
 }
