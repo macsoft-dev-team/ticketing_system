@@ -1,9 +1,9 @@
 const { prisma } = require("../lib/clients");
 const { generateTicketFileUrl } = require("../lib/ticket_file_handler");
-const { 
-  createNotification, 
+const {
+  createNotification,
   saveAndBroadcastNotification,
-  NOTIFICATION_TYPES 
+  NOTIFICATION_TYPES,
 } = require("../lib/notificationUtils");
 
 const getConversations = async (ticketId) => {
@@ -24,7 +24,7 @@ const getConversations = async (ticketId) => {
         seenBy: true,
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: "asc",
       },
     });
     return conversations;
@@ -56,26 +56,30 @@ const createConversation = async (conversation, userId, io, files = []) => {
         attachments: true,
       },
     });
-    
+
     // Create attachments if any files were uploaded
     if (files && files.length > 0) {
       // Get ticket code for generating proper file URLs
       const ticket = await prisma.ticket.findUnique({
         where: { id: ticketId },
-        select: { ticketCode: true }
+        select: { ticketCode: true },
       });
-      
+
       await prisma.attachments.createMany({
         data: files.map((file) => ({
           fileName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,
-          fileUrl: generateTicketFileUrl(ticket.ticketCode, file.filename, 'conversations'),
+          fileUrl: generateTicketFileUrl(
+            ticket.ticketCode,
+            file.filename,
+            "conversations"
+          ),
           messageId: newMessage.id,
           ticketId: ticketId,
         })),
       });
-      
+
       // Fetch the message again with attachments
       const messageWithAttachments = await prisma.message.findUnique({
         where: { id: newMessage.id },
@@ -93,7 +97,7 @@ const createConversation = async (conversation, userId, io, files = []) => {
           attachments: true,
         },
       });
-      
+
       // Replace the message object with the one that includes attachments
       Object.assign(newMessage, messageWithAttachments);
     }
@@ -101,7 +105,9 @@ const createConversation = async (conversation, userId, io, files = []) => {
     const notificationData = createNotification(
       NOTIFICATION_TYPES.MESSAGE_RECEIVED,
       `New message in ticket #${newMessage.ticket?.ticketCode}`,
-      `New message from ${newMessage.sender?.name} in ticket #${newMessage.ticket?.ticketCode}: "${message.substring(0, 100)}${message.length > 100 ? '...' : ''}"`,
+      `New message from ${newMessage.sender?.name} in ticket #${
+        newMessage.ticket?.ticketCode
+      }: "${message.substring(0, 100)}${message.length > 100 ? "..." : ""}"`,
       {
         ticketId: ticketId,
         messageId: newMessage.id,
@@ -113,43 +119,80 @@ const createConversation = async (conversation, userId, io, files = []) => {
     // Get target users (all roles, excluding the sender)
     const targetUsers = await prisma.user.findMany({
       where: {
-      AND: [
-        { id: { not: userId } }, // Exclude the sender
-        { role: { in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT", "CUSTOMER_SERVICE_HEAD", "SERVICE_CENTER_TECHNICIAN", "CUSTOMER_FIELD_ENGINEER"] } },
-      ],
+        AND: [
+          { id: { not: userId } }, // Exclude the sender
+          {
+            role: {
+              in: [
+                "MACSOFT_ADMIN",
+                "MACSOFT_HEAD",
+                "MACSOFT_SUPPORT",
+                "CUSTOMER_SERVICE_HEAD",
+                "SERVICE_CENTER_TECHNICIAN",
+              ],
+              not: "CUSTOMER_FIELD_ENGINEER",
+            },
+          },
+        ],
       },
       select: { id: true, name: true, role: true },
     });
 
-    const targetUserIds = targetUsers.map(user => user.id);
-    
+    //if userId not equal to createdby then add createdby to target users
+    const ticketDetails = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      select: { createdBy: true },
+    });
+
+    const targetUserIds = targetUsers.map((user) => user.id);
+    if (ticketDetails.createdBy !== userId) {
+      targetUserIds.push(ticketDetails.createdBy);
+    }
+
     console.log(`💬 Message notification targeting:`);
     console.log(`   Sender: ${newMessage.sender?.name} (ID: ${userId})`);
     console.log(`   Target users (${targetUsers.length}):`);
-    targetUsers.forEach(user => {
+    targetUsers.forEach((user) => {
       console.log(`     - ${user.name} (${user.role}) - ID: ${user.id}`);
     });
-    
+
     // Verify sender is not in target list
     const senderInTargets = targetUserIds.includes(userId);
-    console.log(`   ✅ Sender excluded from notifications: ${!senderInTargets ? 'YES' : 'NO (ERROR!)'}`);
-    
+    console.log(
+      `   ✅ Sender excluded from notifications: ${
+        !senderInTargets ? "YES" : "NO (ERROR!)"
+      }`
+    );
+
     if (senderInTargets) {
-      console.error(`   ❌ CRITICAL ERROR: Sender ${newMessage.sender?.name} is receiving their own notification!`);
+      console.error(
+        `   ❌ CRITICAL ERROR: Sender ${newMessage.sender?.name} is receiving their own notification!`
+      );
     }
 
     // Save and broadcast notification using the standardized utility
-    await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+    await saveAndBroadcastNotification(
+      prisma,
+      io,
+      notificationData,
+      targetUserIds
+    );
     if (io) {
       // Emit to conversation room for this specific ticket
       const conversationRoom = `conversation-${ticketId}`;
       io.to(conversationRoom).emit("conversation", newMessage);
-      
+
       // Also emit to all clients as fallback
       io.emit("conversation", newMessage);
-      
-      console.log(`💬 Emitted conversation message to room: ${conversationRoom} and all clients`);
-      console.log('Message content:', { id: newMessage.id, content: newMessage.content, senderId: newMessage.senderId });
+
+      console.log(
+        `💬 Emitted conversation message to room: ${conversationRoom} and all clients`
+      );
+      console.log("Message content:", {
+        id: newMessage.id,
+        content: newMessage.content,
+        senderId: newMessage.senderId,
+      });
     }
     return newMessage;
   } catch (error) {

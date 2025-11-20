@@ -8,8 +8,7 @@ import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { debounceSearch } from "../../utils/debounce";
 
 export default function Projects() {
-    const [selectedProject, setSelectedProject] = useState(null);
-    const [projectToDelete, setProjectToDelete] = useState(null);
+     const [projectToDelete, setProjectToDelete] = useState(null);
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const columns = [
@@ -44,12 +43,14 @@ export default function Projects() {
 
     const {
         projects,
+        project,
         getProjects,
         loading,
         filter,
         error,
         mode,
         setMode,
+        setProject,
         createProject,
         updateProject,
         deleteProject,
@@ -66,12 +67,12 @@ export default function Projects() {
     }, [getProjects]);
 
     const handleCreate = () => {
-        setSelectedProject(null);
+        setProject(null);
         setMode('create');
     };
 
     const handleEdit = (row) => {
-        setSelectedProject(row);
+        setProject(row);
         setMode('edit');
     };
 
@@ -105,12 +106,12 @@ export default function Projects() {
             } else if (mode === 'edit') {
                 await updateProject({
                     ...formData,
-                    id: selectedProject.id
+                    id: project.id
                 });
             }
 
             // Close the modal after successful submission
-            setSelectedProject(null);
+            setProject(null);
             setMode(null);
 
             // Refresh the list
@@ -217,12 +218,12 @@ export default function Projects() {
                 open={mode === 'create' || mode === 'edit'}
                 onOpenChange={(isOpen) => {
                     if (!isOpen) {
-                        setSelectedProject(null);
+                        setProject(null);
                         setMode(null);
                     }
                 }}
                 onSubmit={handleFormSubmit}
-                initialData={selectedProject}
+                initialData={project}
                 mode={mode === 'edit' ? 'edit' : 'create'}
             />
 

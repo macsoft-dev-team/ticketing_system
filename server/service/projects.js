@@ -31,18 +31,12 @@ const getAllProjects = async (skip, take, filter) => {
     // Handle search filter
     if (filter?.search && filter.search.trim() !== '') {
       const searchTerm = filter.search.trim();
+      const organisationId = parseInt(filter.organisationId);
       where.OR = [
         { name: { contains: searchTerm } },
         { projectCode: { contains: searchTerm } },
         { email: { contains: searchTerm } },
-        { 
-          organisation: {
-            OR: [
-              { name: { contains: searchTerm } },
-              { organisationId: { equals: parseInt(searchTerm) } }
-            ]
-          }
-        }
+        { organisationId: isNaN(organisationId) ? undefined : organisationId },
       ];
     }
 

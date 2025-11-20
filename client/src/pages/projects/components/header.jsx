@@ -106,7 +106,7 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
                             options={[
                                 { value: '', label: 'All Customers' },
                                 ...(organisations?.map(org => ({
-                                    value: org.id.toString(),
+                                    value: org.id,
                                     label: `${org.name} (${org.orgCode})`
                                 })) || [])
                             ]}
