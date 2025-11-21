@@ -67,6 +67,22 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        // Increase the maximum file size limit to 5MB to handle large bundles
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+        // Runtime caching for better performance
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\./,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+              },
+            },
+          },
+        ],
       },
       // Optional but useful for testing PWA in dev:
       devOptions: {
@@ -80,6 +96,34 @@ export default defineConfig({
     "import.meta.env.MODE": JSON.stringify(
       process.env.NODE_ENV || "development"
     ),
+  },
+  build: {
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Manual chunking for better code splitting
+        manualChunks: {
+          // Vendor chunks for large dependencies
+          'react-vendor': ['react', 'react-dom'],
+          'router-vendor': ['react-router-dom'],
+          'redux-vendor': ['@reduxjs/toolkit', 'react-redux'],
+          'ui-vendor': ['lucide-react', 'motion'],
+          'chart-vendor': ['recharts'],
+          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'yup'],
+          'socket-vendor': ['socket.io-client'],
+          'moment-vendor': ['moment'],
+          'utils-vendor': ['axios', 'xlsx', '@zxing/library', 'bcryptjs', 'tailwind-merge'],
+        },
+      },
+    },
+    // Enable source maps for production debugging (optional, can be disabled for smaller builds)
+    sourcemap: false,
+    // Optimize CSS
+    cssCodeSplit: true,
+    // Minification settings
+    minify: 'esbuild',
+    target: 'es2020',
   },
   server: {
     port: 5173,
