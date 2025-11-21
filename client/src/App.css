@@ -21,8 +21,7 @@ html, body {
 
 /* Prevent touch gestures that might cause movement */
 * {
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
+   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
 }
 

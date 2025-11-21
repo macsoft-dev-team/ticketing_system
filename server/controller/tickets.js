@@ -175,6 +175,35 @@ const deleteTicket = async (req, res) => {
   }
 };
 
+const searchByControllerNumber = async (req, res) => {
+  try {
+    const { controllerNo } = req.params;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    const ticket = await ticketService.searchByControllerNumber(
+      controllerNo,
+      userId,
+      userRole
+    );
+
+    if (!ticket) {
+      return res.status(404).json({ 
+        message: "No ticket found with this controller number to receive at service center",
+        controllerNo 
+      });
+    }
+
+    res.status(200).json(ticket);
+  } catch (error) {
+    console.error("Error searching by controller number:", error);
+    res.status(500).json({ 
+      message: "Internal server error",
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {
   getTickets,
   createTicket,
@@ -182,4 +211,5 @@ module.exports = {
   updateStatus,
   getTicketById,
   deleteTicket,
+  searchByControllerNumber,
 };

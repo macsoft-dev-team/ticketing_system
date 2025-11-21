@@ -678,6 +678,124 @@ const updateMilestone = async (milestoneId, milestoneData, userId) => {
   }
 };
 
+const receiveControllerAtServiceCenter = async (
+  controllerNo,
+  userId,
+  userRole,
+  attachments,
+  io
+) => {
+  const fs = require('fs').promises;
+  const path = require('path');
+  
+  try {
+    // Find ticket by controller number
+    const ticket = await prisma.ticket.findFirst({
+      where: {
+        controllerNo: {
+          contains: controllerNo,
+         }
+      },
+      include: {
+        ticketMilestones: {
+          orderBy: {
+            order: 'asc'
+          }
+        },
+        serviceCenter: true,
+      }
+    });
+
+    if (!ticket) {
+      throw new Error(`No ticket found with controller number: ${controllerNo}`);
+    }
+
+    // Check if user has permission to receive at service center
+    if (!canRoleTransitionToStage(userRole, 'RECEIVED_AT_SERVICE_CENTER')) {
+      throw new Error(`Your role (${userRole}) does not have permission to receive controllers`);
+    }
+
+    // Check if user is from the assigned service center
+    if (userRole === 'SERVICE_CENTER_TECHNICIAN' || userRole === 'CUSTOMER_SERVICE_HEAD') {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { serviceCenterCode: true },
+      });
+
+      if (!user?.serviceCenterCode || ticket.assignedServiceCenter !== user.serviceCenterCode) {
+        throw new Error('This ticket is not assigned to your service center');
+      }
+    }
+
+    // Validate that photos are provided (mandatory for RECEIVED_AT_SERVICE_CENTER)
+    if (!attachments || attachments.length === 0) {
+      throw new Error('Photos are mandatory when receiving controller at service center');
+    }
+
+    const config = getStageConfig('RECEIVED_AT_SERVICE_CENTER');
+    if (config.minPhotos && attachments.length < config.minPhotos) {
+      throw new Error(`At least ${config.minPhotos} photos are required (${config.requiredPhotos?.join(', ') || 'Controller Front, Controller Bottom, Full View Open, MCB Close Up'})`);
+    }
+
+    // Move files from temp to proper location
+    const baseDir = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads');
+    const targetDir = path.join(baseDir, ticket.ticketCode, 'milestones');
+    
+    // Ensure target directory exists
+    await fs.mkdir(targetDir, { recursive: true });
+
+    // Move files and update attachment paths
+    const processedAttachments = await Promise.all(attachments.map(async (attachment) => {
+      const sourcePath = attachment.path;
+      const targetPath = path.join(targetDir, attachment.filename);
+      
+      try {
+        await fs.rename(sourcePath, targetPath);
+      } catch (error) {
+        // If rename fails (cross-device), try copy and delete
+        await fs.copyFile(sourcePath, targetPath);
+        await fs.unlink(sourcePath);
+      }
+      
+      return {
+        filename: attachment.filename,
+        originalName: attachment.originalName,
+        mimetype: attachment.mimetype,
+        size: attachment.size,
+        path: targetPath,
+        label: attachment.label, // Preserve the label
+        type: attachment.type    // Preserve the type
+      };
+    }));
+
+    // Transition to RECEIVED_AT_SERVICE_CENTER
+    const milestone = await transitionMilestone(
+      ticket.id,
+      'RECEIVED_AT_SERVICE_CENTER',
+      userId,
+      userRole,
+      {
+        notes: `Controller received at service center. Serial: ${controllerNo}`,
+        attachments: processedAttachments,
+      },
+      io
+    );
+
+    return {
+      ticket: {
+        id: ticket.id,
+        ticketCode: ticket.ticketCode,
+        controllerNo: ticket.controllerNo,
+        status: ticket.status,
+      },
+      milestone,
+    };
+  } catch (error) {
+    console.error('Error receiving controller at service center:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getTicketMilestones,
   getCurrentMilestone,
@@ -687,4 +805,5 @@ module.exports = {
   updateMilestoneNotes,
   addPhotosToCurrentMilestone,
   createMilestone,
+  receiveControllerAtServiceCenter,
 };

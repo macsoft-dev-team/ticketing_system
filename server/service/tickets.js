@@ -97,7 +97,10 @@ const getTickets = async (skip, take, filter, userId, role) => {
     }
 
     // CUSTOMER_SERVICE_HEAD and SERVICE_CENTER_TECHNICIAN should only see tickets assigned to their service center
-    if (role === "CUSTOMER_SERVICE_HEAD" || role === "SERVICE_CENTER_TECHNICIAN") {
+    if (
+      role === "CUSTOMER_SERVICE_HEAD" ||
+      role === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Get user's service center code
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -123,7 +126,10 @@ const getTickets = async (skip, take, filter, userId, role) => {
     let statusCountWhere = {};
     if (role === "CUSTOMER_FIELD_ENGINEER") {
       statusCountWhere = { createdBy: userId };
-    } else if (role === "SERVICE_CENTER_HEAD" || role === "SERVICE_CENTER_TECHNICIAN") {
+    } else if (
+      role === "SERVICE_CENTER_HEAD" ||
+      role === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Get user's service center code for status count
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -148,15 +154,24 @@ const getTickets = async (skip, take, filter, userId, role) => {
     // For FIELD_ENGINEER, only count milestones for their own tickets
     // For SERVICE_CENTER users, only count milestones for tickets assigned to their service center
     let milestoneCountWhere = {
-      stage: { in: ["TICKET_RAISED", "SENT_TO_SERVICE_CENTER", "RECEIVED_AT_SERVICE_CENTER"] },
-      ticket: { 
-        status: { not: "CLOSED" }
+      stage: {
+        in: [
+          "TICKET_RAISED",
+          "SENT_TO_SERVICE_CENTER",
+          "RECEIVED_AT_SERVICE_CENTER",
+        ],
+      },
+      ticket: {
+        status: { not: "CLOSED" },
       },
     };
 
     if (role === "FIELD_ENGINEER") {
       milestoneCountWhere.ticket.createdBy = userId;
-    } else if (role === "SERVICE_CENTER_HEAD" || role === "SERVICE_CENTER_TECHNICIAN") {
+    } else if (
+      role === "SERVICE_CENTER_HEAD" ||
+      role === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Get user's service center code for milestone count
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -194,12 +209,15 @@ const getTickets = async (skip, take, filter, userId, role) => {
     _transformedStatusCount.ALL = await prisma.ticket.count({
       where: statusCountWhere,
     });
-    
+
     // Add milestone counts to statusCount object
-    _transformedStatusCount.TICKET_RAISED = _transformedMilestoneCount.TICKET_RAISED || 0;
-    _transformedStatusCount.SENT_TO_SERVICE_CENTER = _transformedMilestoneCount.SENT_TO_SERVICE_CENTER || 0;
-    _transformedStatusCount.RECEIVED_AT_SERVICE_CENTER = _transformedMilestoneCount.RECEIVED_AT_SERVICE_CENTER || 0;
-    
+    _transformedStatusCount.TICKET_RAISED =
+      _transformedMilestoneCount.TICKET_RAISED || 0;
+    _transformedStatusCount.SENT_TO_SERVICE_CENTER =
+      _transformedMilestoneCount.SENT_TO_SERVICE_CENTER || 0;
+    _transformedStatusCount.RECEIVED_AT_SERVICE_CENTER =
+      _transformedMilestoneCount.RECEIVED_AT_SERVICE_CENTER || 0;
+
     const count = await prisma.ticket.count({ where: params.where });
     const tickets = await prisma.ticket.findMany(params);
     return {
@@ -259,7 +277,7 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
         },
       },
     });
-    
+
     if (!ticket) {
       throw new Error("Ticket not found");
     }
@@ -270,7 +288,10 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
       if (ticket.createdBy !== userId) {
         throw new Error("Access denied: You can only view tickets you created");
       }
-    } else if (userRole === "SERVICE_CENTER_HEAD" || userRole === "SERVICE_CENTER_TECHNICIAN") {
+    } else if (
+      userRole === "SERVICE_CENTER_HEAD" ||
+      userRole === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Service center users can only see tickets assigned to their service center
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -278,11 +299,15 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
       });
 
       if (!user?.centerCode) {
-        throw new Error("Access denied: No service center assigned to your account");
+        throw new Error(
+          "Access denied: No service center assigned to your account"
+        );
       }
 
       if (ticket.assignedServiceCenter !== user.centerCode) {
-        throw new Error("Access denied: This ticket is not assigned to your service center");
+        throw new Error(
+          "Access denied: This ticket is not assigned to your service center"
+        );
       }
     }
     // For other roles (MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT), no restrictions
@@ -397,8 +422,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     const milestonesData = {
       stage: "TICKET_RAISED", // Updated to use new stage name
       order: 0,
-      notes:
-        "Ticket has been raised and awaiting service center assignment.",
+      notes: "Ticket has been raised and awaiting service center assignment.",
       status: "IN_PROGRESS",
       startedAt: new Date(),
       eta: null,
@@ -501,7 +525,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
           },
         ],
       },
-      select: { id: true, name: true, role: true},
+      select: { id: true, name: true, role: true },
     });
 
     const targetUserIds = targetUsers.map((user) => user.id);
@@ -533,15 +557,21 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
   }
 };
 
-const updateTicket = async (ticketId, ticketData, userId, io, userRole = null) => {
+const updateTicket = async (
+  ticketId,
+  ticketData,
+  userId,
+  io,
+  userRole = null
+) => {
   try {
     // First, verify the user has access to this ticket
     const existingTicket = await prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { 
-        id: true, 
-        createdBy: true, 
-        assignedServiceCenter: true 
+      select: {
+        id: true,
+        createdBy: true,
+        assignedServiceCenter: true,
       },
     });
 
@@ -553,9 +583,14 @@ const updateTicket = async (ticketId, ticketData, userId, io, userRole = null) =
     if (userRole === "FIELD_ENGINEER") {
       // Field engineers can only update their own tickets
       if (existingTicket.createdBy !== userId) {
-        throw new Error("Access denied: You can only update tickets you created");
+        throw new Error(
+          "Access denied: You can only update tickets you created"
+        );
       }
-    } else if (userRole === "SERVICE_CENTER_HEAD" || userRole === "SERVICE_CENTER_TECHNICIAN") {
+    } else if (
+      userRole === "SERVICE_CENTER_HEAD" ||
+      userRole === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Service center users can only update tickets assigned to their service center
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -563,11 +598,15 @@ const updateTicket = async (ticketId, ticketData, userId, io, userRole = null) =
       });
 
       if (!user?.centerCode) {
-        throw new Error("Access denied: No service center assigned to your account");
+        throw new Error(
+          "Access denied: No service center assigned to your account"
+        );
       }
 
       if (existingTicket.assignedServiceCenter !== user.centerCode) {
-        throw new Error("Access denied: This ticket is not assigned to your service center");
+        throw new Error(
+          "Access denied: This ticket is not assigned to your service center"
+        );
       }
     }
     // For other roles (MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT), no restrictions
@@ -681,11 +720,11 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
     // First, verify the user has access to this ticket
     const existingTicket = await prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { 
-        id: true, 
-        createdBy: true, 
+      select: {
+        id: true,
+        createdBy: true,
         assignedServiceCenter: true,
-        status: true 
+        status: true,
       },
     });
 
@@ -697,9 +736,14 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
     if (userRole === "FIELD_ENGINEER") {
       // Field engineers can only update their own tickets
       if (existingTicket.createdBy !== userId) {
-        throw new Error("Access denied: You can only update tickets you created");
+        throw new Error(
+          "Access denied: You can only update tickets you created"
+        );
       }
-    } else if (userRole === "SERVICE_CENTER_HEAD" || userRole === "SERVICE_CENTER_TECHNICIAN") {
+    } else if (
+      userRole === "SERVICE_CENTER_HEAD" ||
+      userRole === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Service center users can only update tickets assigned to their service center
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -707,11 +751,15 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
       });
 
       if (!user?.centerCode) {
-        throw new Error("Access denied: No service center assigned to your account");
+        throw new Error(
+          "Access denied: No service center assigned to your account"
+        );
       }
 
       if (existingTicket.assignedServiceCenter !== user.centerCode) {
-        throw new Error("Access denied: This ticket is not assigned to your service center");
+        throw new Error(
+          "Access denied: This ticket is not assigned to your service center"
+        );
       }
     }
     // For other roles (MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT), no restrictions
@@ -759,12 +807,12 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
     // Get ticket details before deletion for notification and access control
     const ticketToDelete = await prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { 
-        id: true, 
-        ticketCode: true, 
+      select: {
+        id: true,
+        ticketCode: true,
         customerName: true,
         createdBy: true,
-        assignedServiceCenter: true 
+        assignedServiceCenter: true,
       },
     });
 
@@ -776,9 +824,14 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
     if (userRole === "FIELD_ENGINEER") {
       // Field engineers can only delete their own tickets
       if (ticketToDelete.createdBy !== userId) {
-        throw new Error("Access denied: You can only delete tickets you created");
+        throw new Error(
+          "Access denied: You can only delete tickets you created"
+        );
       }
-    } else if (userRole === "SERVICE_CENTER_HEAD" || userRole === "SERVICE_CENTER_TECHNICIAN") {
+    } else if (
+      userRole === "SERVICE_CENTER_HEAD" ||
+      userRole === "SERVICE_CENTER_TECHNICIAN"
+    ) {
       // Service center users can only delete tickets assigned to their service center
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -786,11 +839,15 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
       });
 
       if (!user?.centerCode) {
-        throw new Error("Access denied: No service center assigned to your account");
+        throw new Error(
+          "Access denied: No service center assigned to your account"
+        );
       }
 
       if (ticketToDelete.assignedServiceCenter !== user.centerCode) {
-        throw new Error("Access denied: This ticket is not assigned to your service center");
+        throw new Error(
+          "Access denied: This ticket is not assigned to your service center"
+        );
       }
     }
     // For other roles (MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT), no restrictions
@@ -839,6 +896,89 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
   }
 };
 
+const searchByControllerNumber = async (controllerNo, userId, userRole) => {
+  try {
+    // Find ticket by controller number
+    const ticket = await prisma.ticket.findFirst({
+      where: {
+        controllerNo: {
+          contains: controllerNo,
+        },
+        ticketMilestones: {
+          some: {
+            stage: {
+              in: ["SENT_TO_SERVICE_CENTER"],
+            },
+            status: {
+              in:[ "IN_PROGRESS"],
+            },
+          },
+        },
+      },
+      include: {
+        createdByUser: true,
+        updatedByUser: true,
+        serviceCenter: {
+          select: {
+            id: true,
+            name: true,
+            centerCode: true,
+            address: true,
+          },
+        },
+        attachments: true,
+        ticketMilestones: {
+          include: {
+            changer: {
+              select: {
+                id: true,
+                name: true,
+                role: true,
+              },
+            },
+            attachments: true,
+          },
+          orderBy: {
+            order: "asc",
+          },
+        },
+      },
+    });
+
+    if (!ticket) {
+      return null;
+    }
+
+    // Check role-based access
+    if (userRole === "CUSTOMER_FIELD_ENGINEER" && ticket.createdBy !== userId) {
+      throw new Error("Access denied: You can only view your own tickets");
+    }
+
+    if (
+      userRole === "CUSTOMER_SERVICE_HEAD" ||
+      userRole === "SERVICE_CENTER_TECHNICIAN"
+    ) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { serviceCenterCode: true },
+      });
+
+      if (
+        !user?.serviceCenterCode ||
+        ticket.assignedServiceCenter !== user.serviceCenterCode
+      ) {
+        throw new Error(
+          "Access denied: This ticket is not assigned to your service center"
+        );
+      }
+    }
+
+    return ticket;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getTickets,
   getTicketById,
@@ -846,4 +986,5 @@ module.exports = {
   updateTicket,
   updateStatus,
   deleteTicket,
+  searchByControllerNumber,
 };

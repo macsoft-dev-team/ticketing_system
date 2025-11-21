@@ -322,6 +322,134 @@ const createMilestone = async (req, res) => {
   }
 };
 
+const receiveControllerAtServiceCenter = async (req, res) => {
+  try {
+    const { controllerNo } = req.body;
+    const { id: userId, role: userRole } = req.user;
+    const io = req.io;
+    const files = req.files; // Uploaded photos, videos, and audio
+
+    // Parse photoLabels array from form data (photoLabels[0], photoLabels[1], etc.)
+    const photoLabels = [];
+    Object.keys(req.body).forEach(key => {
+      const match = key.match(/^photoLabels\[(\d+)\]$/);
+      if (match) {
+        const index = parseInt(match[1]);
+        photoLabels[index] = req.body[key];
+      }
+    });
+
+    console.log('Receive controller request:', { 
+      controllerNo, 
+      photoLabels,
+      bodyKeys: Object.keys(req.body),
+      userRole,
+      userId,
+      filesCount: files ? {
+        photos: files.photos?.length || 0,
+        videos: files.videos?.length || 0,
+        audio: files.audio?.length || 0
+      } : 'no files'
+    });
+
+    if (!controllerNo) {
+      return res.status(400).json({ 
+        message: "Controller number is required",
+        debug: { bodyKeys: Object.keys(req.body) }
+      });
+    }
+
+    // Validate photo count
+    if (!files || !files.photos || files.photos.length < 4) {
+      return res.status(400).json({ 
+        message: "At least 4 photos are required",
+        received: files?.photos?.length || 0,
+        required: 4
+      });
+    }
+
+    // Process uploaded files if any (handle multiple file fields)
+    let attachments = [];
+    if (files) {
+      // Handle photos with labels
+      if (files.photos && files.photos.length > 0) {
+        files.photos.forEach((file, index) => {
+          // Get the corresponding label for this photo
+          const label = photoLabels[index] || null;
+          
+          attachments.push({
+            filename: file.filename,
+            originalName: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size,
+            path: file.path,
+            type: 'photo',
+            label: label // Add the label to the attachment
+          });
+        });
+      }
+      
+      // Handle videos
+      if (files.videos && files.videos.length > 0) {
+        files.videos.forEach((file) => {
+          attachments.push({
+            filename: file.filename,
+            originalName: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size,
+            path: file.path,
+            type: 'video'
+          });
+        });
+      }
+      
+      // Handle audio
+      if (files.audio && files.audio.length > 0) {
+        attachments.push({
+          filename: files.audio[0].filename,
+          originalName: files.audio[0].originalname,
+          mimetype: files.audio[0].mimetype,
+          size: files.audio[0].size,
+          path: files.audio[0].path,
+          type: 'audio'
+        });
+      }
+    }
+
+    const result = await milestoneService.receiveControllerAtServiceCenter(
+      controllerNo,
+      userId,
+      userRole,
+      attachments,
+      io
+    );
+
+    res.status(200).json({
+      message: "Controller received at service center successfully",
+      ticket: result.ticket,
+      milestone: result.milestone,
+    });
+  } catch (error) {
+    console.error("Error receiving controller at service center:", error);
+    
+    // Determine appropriate status code based on error type
+    let statusCode = 400;
+    if (error.message.includes('not found') || error.message.includes('No ticket found')) {
+      statusCode = 404;
+    } else if (error.message.includes('permission') || error.message.includes('not have permission')) {
+      statusCode = 403;
+    } else if (error.message.includes('not assigned to your service center')) {
+      statusCode = 403;
+    }
+    
+    res.status(statusCode).json({
+      message: error.message || "Failed to receive controller",
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
 module.exports = {
   getTicketMilestones,
   getCurrentMilestone,
@@ -332,4 +460,5 @@ module.exports = {
   addPhotosToCurrentMilestone,
   handleMilestoneFileUpload,
   createMilestone,
+  receiveControllerAtServiceCenter,
 };

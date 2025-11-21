@@ -9,7 +9,11 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "favicon/apple-touch-icon.png", "favicon/favicon-96x96.png"],
+      includeAssets: [
+        "favicon.ico",
+        "favicon/apple-touch-icon.png",
+        "favicon/favicon-96x96.png",
+      ],
       manifest: {
         name: "Macsoft CMS",
         short_name: "CMS",
@@ -42,7 +46,7 @@ export default defineConfig({
             sizes: "256x256",
             type: "image/png",
             purpose: "any",
-          }
+          },
         ],
         screenshots: [
           {
@@ -50,20 +54,25 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
             form_factor: "wide",
-            label: "Macsoft CMS Desktop View"
+            label: "Macsoft CMS Desktop View",
           },
           {
             src: "/favicon/web-app-manifest-192x192.png",
-            sizes: "192x192", 
+            sizes: "192x192",
             type: "image/png",
             form_factor: "narrow",
-            label: "Macsoft CMS Mobile View"
-          }
+            label: "Macsoft CMS Mobile View",
+          },
         ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
       },
       // Optional but useful for testing PWA in dev:
       devOptions: {
         enabled: true,
+        type: "module",
+        navigateFallback: "index.html",
       },
     }),
   ],
@@ -78,5 +87,6 @@ export default defineConfig({
     proxy: {
       "/api": "http://localhost:4055",
     },
+    allowedHosts: ["localhost", "aphyllous-unseducibly-solange.ngrok-free.dev"],
   },
 });

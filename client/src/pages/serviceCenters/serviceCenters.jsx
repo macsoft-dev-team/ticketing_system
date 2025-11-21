@@ -1,7 +1,6 @@
 import ReusableTable from "../../components/ui/reusableTable";
 import useServiceCenter from "../../lib/hooks/useServiceCenter";
 import { useEffect, useState, useCallback } from "react";
-import moment from "moment";
 import Header from "./components/header";
 import UploadModal from "../../components/UploadModal";
 import ServiceCenterFormModal from "../../components/ServiceCenterFormModal";

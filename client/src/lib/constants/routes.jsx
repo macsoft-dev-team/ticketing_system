@@ -18,7 +18,7 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/layout/layout';
 import TicketForm from '../../pages/tickets/components/ticketForm';
 import ServiceCenters from '../../pages/serviceCenters/serviceCenters';
-import { Tickets, TicketDashboard, SpareRequest, Inventory } from '../../pages';
+import { Tickets, TicketDashboard, SpareRequest, Inventory, ReceiveController } from '../../pages';
 import Products from '../../pages/products/products';
 import OrganisationPage from '../../pages/organisation/organisation';
 import ProfilePage from '../../pages/profile/Profile';
@@ -55,6 +55,13 @@ const BASE_ITEMS = {
     hidden: true,
     category: 'main',
     element: <TicketForm />,
+  },
+  receiveController: {
+    path: '/receive-controller',
+    icon: Settings,
+    label: 'Receive Controller',
+    category: 'technical',
+    element: <ReceiveController />,
   },
   users: {
     path: '/users',
@@ -129,6 +136,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
+    BASE_ITEMS.receiveController,
     BASE_ITEMS.organisation,
     BASE_ITEMS.project,
     BASE_ITEMS.serviceCenter,
@@ -143,6 +151,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
+    BASE_ITEMS.receiveController,
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.products,
     BASE_ITEMS.serviceCenter, 
@@ -153,6 +162,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
+    BASE_ITEMS.receiveController,
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.products,
     BASE_ITEMS.serviceCenter,
@@ -161,7 +171,8 @@ const ROLE_ITEMS = {
   CUSTOMER_SERVICE_HEAD: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
-    BASE_ITEMS.inventory, 
+    BASE_ITEMS.inventory,
+    BASE_ITEMS.receiveController,
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
@@ -169,6 +180,7 @@ const ROLE_ITEMS = {
   SERVICE_CENTER_TECHNICIAN: [ 
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
+    BASE_ITEMS.receiveController,
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,

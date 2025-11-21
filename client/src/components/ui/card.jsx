@@ -6,14 +6,14 @@ export const Card = ({ children, className = '' }) => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.2 }}
   >
-  <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 ${className}`}>
+  <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
     {children}
   </div>
   </motion.div>
 );
 
 export const CardHeader = ({ children, className = '' }) => (
-  <div className={`px-4 sm:px-6 py-2 min-h-14 flex items-center border-b border-gray-200 dark:border-gray-700 ${className}`}>
+  <div className={`px-4 sm:px-6 py-2 min-h-14 flex items-center border-b border-gray-200 ${className}`}>
     {children}
   </div>
 );
@@ -25,7 +25,7 @@ export const CardTitle = ({ children, className = '' }) => (
 );
 
 export const CardDescription = ({ children, className = '' }) => (
-  <p className={`text-sm text-gray-600 dark:text-gray-400 ${className}`}>
+  <p className={`text-sm text-gray-600 ${className}`}>
     {children}
   </p>
 );
