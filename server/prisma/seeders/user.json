@@ -1,121 +1,45 @@
 [
   {
-    "id": 28,
-    "name": "Kaleshwaran",
-    "phone": "8870837216",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "MACSOFT_HEAD"
-  },
-  {
-    "id": 30,
-    "name": "Sushil Kumar",
-    "phone": "9871445800",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "MACSOFT_HEAD"
-  },
-  {
-    "id": 33,
-    "name": "Macsoft",
-    "phone": "8940788800",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
+    "id": 1,
+    "name": "Venkat Kumar",
+    "phone": "9876543210",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
     "role": "MACSOFT_ADMIN"
   },
   {
-    "id": 34,
-    "name": "Shiv Ram",
-    "phone": "8302128026",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 35,
-    "name": "Rakesh Kumar sain",
-    "phone": "8441935047",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 36,
-    "name": "Venket",
-    "phone": "7094458402",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
+    "id": 2,
+    "name": "Kaleeshwaran",
+    "phone": "9876543211",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
     "role": "MACSOFT_HEAD"
   },
   {
-    "id": 39,
-    "name": "Rohitash",
-    "phone": "8005802259",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
+    "id": 3,
+    "name": "Mathi",
+    "phone": "9876543212",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
+    "role": "MACSOFT_SUPPORT"
   },
   {
-    "id": 40,
-    "name": "Janarth",
-    "phone": "8489326738",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "MACSOFT_HEAD"
+    "id": 4,
+    "name": "Gopal",
+    "phone": "9876543213",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
+    "role": "SERVICE_CENTER_TECHNICIAN"
   },
   {
-    "id": 41,
-    "name": "Hemraj",
-    "phone": "8368024488",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
+    "id": 5,
+    "name": "Kavin",
+    "phone": "9876543214",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
+    "role": "CUSTOMER_SERVICE_HEAD"
   },
   {
-    "id": 42,
-    "name": "Harish swami",
-    "phone": "8104607248",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 43,
-    "name": "Akash",
-    "phone": "9143446444",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 44,
-    "name": "Sunil Rahangdale",
-    "phone": "9049986024",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 45,
-    "name": "Akash Patil",
-    "phone": "8275705753",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 47,
-    "name": "Krishna Electricals",
-    "phone": "9982215442",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 48,
-    "name": "waa motors",
-    "phone": "9585552729",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 49,
-    "name": "Ram prasad",
-    "phone": "9694297501",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
-    "role": "CUSTOMER_FIELD_ENGINEER"
-  },
-  {
-    "id": 50,
-    "name": "Krishna",
-    "phone": "9460554248",
-    "password": "$2b$10$IPiBPRTdm5eXKzIoRQ3PkOrD6/A6OwLcOcVEeonYLG4cU7OjRDPsy",
+    "id": 6,
+    "name": "Levi Ackerman",
+    "phone": "9876543215",
+    "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
     "role": "CUSTOMER_FIELD_ENGINEER"
   }
 ]
+
