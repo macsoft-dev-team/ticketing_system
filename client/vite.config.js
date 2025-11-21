@@ -84,11 +84,9 @@ export default defineConfig({
           },
         ],
       },
-      // Optional but useful for testing PWA in dev:
+      // Disable dev options to prevent dev-dist folder creation
       devOptions: {
-        enabled: true,
-        type: "module",
-        navigateFallback: "index.html",
+        enabled: false,
       },
     }),
   ],
@@ -98,6 +96,8 @@ export default defineConfig({
     ),
   },
   build: {
+    // Clean output directory before build
+    emptyOutDir: true,
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
