@@ -15,16 +15,17 @@ export default function OrganisationPage() {
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
     
     const columns = [
-        { key: 'name', label: 'Name', align: 'left' },
-        { key: 'orgCode', label: 'Customer Code', align: 'left' },
-        { key: 'address', label: 'Address', align: 'left' },
-        { key: 'email', label: 'Email', align: 'left' },
-        { key: 'phone', label: 'Phone', align: 'left' },
-        { key: 'status', label: 'Status', align: 'center' },
+        { key: 'name', label: 'Name', align: 'left' ,textWrap:"nowrap"},
+        { key: 'orgCode', label: 'Customer Code', align: 'left' ,textWrap:"nowrap"},
+        { key: 'address', label: 'Address', align: 'left' ,textWrap:"nowrap"},
+        { key: 'email', label: 'Email', align: 'left' ,textWrap:"nowrap"},
+        { key: 'phone', label: 'Phone', align: 'left' ,textWrap:"nowrap"},
+        { key: 'status', label: 'Status', align: 'center' ,textWrap:"nowrap"},
         {
             key: 'createdAt',
             label: 'Created Date',
             align: 'start ',
+            textWrap:"nowrap"
          },
     ];
 

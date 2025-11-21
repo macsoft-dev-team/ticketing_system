@@ -635,30 +635,29 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     )}
                                 </motion.div>
 
-                                {/* Category */}
+                                {/* Project */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="block text-xs sm:text-sm font-medium text-gray-700">
-                                        Category *
+                                        Project *
                                     </label>
                                     <select
-                                        {...register('category')}
-                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.category ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                        {...register('project')}
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.project ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
                                     >
-                                        {categoryOptions.map(option => (
-                                            <option key={option.value} value={option.value}>
-                                                {option.label}
-                                            </option>
-                                        ))}
+                                        <option value="">Select Project</option>
+                                        <option value="project1">Project 1</option>
+                                        <option value="project2">Project 2</option>
+                                        <option value="project3">Project 3</option>
                                     </select>
-                                    {errors.category && (
+                                    {errors.project && (
                                         <motion.p
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
                                         >
                                             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                            {errors.category.message}
+                                            {errors.project.message}
                                         </motion.p>
                                     )}
                                 </motion.div>
@@ -698,21 +697,48 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     <MapPin className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
                                     <span className="truncate">Location Information</span>
                                 </h4>
-                                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
+                                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
                                     {/* State */}
                                     <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
-                                        <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
+                                        <label className="block text-xs sm:text-sm font-medium text-gray-700">
                                             State *
-                                            {watchedValues.state && controllerNo && (
-                                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled</span>
-                                            )}
                                         </label>
-                                        <input
+                                        <select
                                             {...register('state')}
                                             className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.state ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                                 }`}
-                                            placeholder="State"
-                                        />
+                                        >
+                                            <option value="">Select State</option>
+                                            <option value="andhra-pradesh">Andhra Pradesh</option>
+                                            <option value="arunachal-pradesh">Arunachal Pradesh</option>
+                                            <option value="assam">Assam</option>
+                                            <option value="bihar">Bihar</option>
+                                            <option value="chhattisgarh">Chhattisgarh</option>
+                                            <option value="goa">Goa</option>
+                                            <option value="gujarat">Gujarat</option>
+                                            <option value="haryana">Haryana</option>
+                                            <option value="himachal-pradesh">Himachal Pradesh</option>
+                                            <option value="jharkhand">Jharkhand</option>
+                                            <option value="karnataka">Karnataka</option>
+                                            <option value="kerala">Kerala</option>
+                                            <option value="madhya-pradesh">Madhya Pradesh</option>
+                                            <option value="maharashtra">Maharashtra</option>
+                                            <option value="manipur">Manipur</option>
+                                            <option value="meghalaya">Meghalaya</option>
+                                            <option value="mizoram">Mizoram</option>
+                                            <option value="nagaland">Nagaland</option>
+                                            <option value="odisha">Odisha</option>
+                                            <option value="punjab">Punjab</option>
+                                            <option value="rajasthan">Rajasthan</option>
+                                            <option value="sikkim">Sikkim</option>
+                                            <option value="tamil-nadu">Tamil Nadu</option>
+                                            <option value="telangana">Telangana</option>
+                                            <option value="tripura">Tripura</option>
+                                            <option value="uttar-pradesh">Uttar Pradesh</option>
+                                            <option value="uttarakhand">Uttarakhand</option>
+                                            <option value="west-bengal">West Bengal</option>
+                                            <option value="delhi">Delhi</option>
+                                        </select>
                                         {errors.state && (
                                             <motion.p
                                                 initial={{ opacity: 0, y: -10 }}
@@ -721,32 +747,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             >
                                                 <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 {errors.state.message}
-                                            </motion.p>
-                                        )}
-                                    </motion.div>
-
-                                    {/* District */}
-                                    <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
-                                        <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
-                                            District *
-                                            {watchedValues.district && controllerNo && (
-                                                <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Auto-filled</span>
-                                            )}
-                                        </label>
-                                        <input
-                                            {...register('district')}
-                                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.district ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                                                }`}
-                                            placeholder="District"
-                                        />
-                                        {errors.district && (
-                                            <motion.p
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
-                                            >
-                                                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                                {errors.district.message}
                                             </motion.p>
                                         )}
                                     </motion.div>

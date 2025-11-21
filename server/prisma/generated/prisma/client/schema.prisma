@@ -165,7 +165,7 @@ model Ticket {
   hp                    String?
   motorType             String?
   state                 String
-  district              String
+  district              String?
   village               String?
   block                 String?
   complaintType         String
@@ -176,9 +176,13 @@ model Ticket {
   assignedServiceCenter String? // Service center code assigned based on state
   createdBy             Int
   updatedBy             Int?
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
-  deletedAt             DateTime?    @map("deleted_at")
+  // addon
+  code                  String?
+  projectName           String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map("deleted_at")
 
   // Relations
   createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
