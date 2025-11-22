@@ -155,7 +155,7 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
             where: { id: existingMilestone.id },
             data: {
               changedBy: assignedByUserId,
-              notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to clear at field or send to service center`,
+              notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
               status: 'IN_PROGRESS'
             }
           });
@@ -176,7 +176,7 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
             stage: 'SERVICE_CENTER_ASSIGNED',
             order: stageConfig.order,
             changedBy: assignedByUserId,
-            notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to clear at field or send to service center`,
+            notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
             status: 'IN_PROGRESS'
           });
           

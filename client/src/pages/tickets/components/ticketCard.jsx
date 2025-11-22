@@ -173,6 +173,19 @@ export default function TicketCard({
                     <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">
                         {ticket.description}
                     </p>
+                    {/* ticket ticketMilestones is array */}
+                    {ticket.ticketMilestones    && ticket.ticketMilestones.length > 0 && (
+                        <div className="mt-3 flex items-center gap-2">
+                            {ticket.ticketMilestones.filter((m) => m.status === "IN_PROGRESS").map((milestone) => (
+                                <span
+                                    key={milestone.id}
+                                    className="text-xs bg-blue-50 text-blue-800 px-2 py-1 rounded-tr-xl rounded-bl-xl font-medium"
+                                >
+                                    {milestone.stage.replace(/_/g, ' ')} by <span className='text-yellow-500'>{milestone.changer?.name || ''}</span>
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Metadata Grid */}
@@ -181,7 +194,7 @@ export default function TicketCard({
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg flex-1 mr-2">
                             <User className="w-4 h-4 text-slate-400" />
-                            <span className="truncate font-medium">{ticket.assignedTo}</span>
+                            <span className="truncate font-medium">{ticket.createdByUser?.name}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                             <Tag className="w-4 h-4 text-slate-400" />

@@ -18,7 +18,7 @@ import {
 const STAGE_ROLE_PERMISSIONS = {
   // ticket creation / field actions
   TICKET_RAISED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-  REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+  REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
 
   // assigning / submitting to service centre (image shows Macsoft roles + support/head)
   SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
@@ -108,7 +108,7 @@ const MilestoneActionButton = ({
     const configs = {
       TICKET_RAISED: [
         {
-          title: 'Clear at Field',
+          title: 'Issue Solved',
           shortTitle: 'Field Clear',
           icon: CheckCircle,
           color: 'green',
@@ -139,7 +139,7 @@ const MilestoneActionButton = ({
       ] : [],
       SERVICE_CENTER_ASSIGNED: [
         {
-          title: 'Clear at Field',
+          title: 'Issue Solved',
           shortTitle: 'Field Clear',
           icon: CheckCircle,
           color: 'green',
@@ -228,7 +228,7 @@ const MilestoneActionButton = ({
               requiresPhotos: false,
             },
             {
-              title: 'Clear at Field',
+              title: 'Issue Solved',
               shortTitle: 'Field Clear',
               icon: CheckCircle,
               color: 'green',
@@ -250,7 +250,7 @@ const MilestoneActionButton = ({
               requiresPhotos: false,
             },
             {
-              title: 'Clear at Field',
+              title: 'Issue Solved',
               shortTitle: 'Field Clear',
               icon: CheckCircle,
               color: 'green',
@@ -295,7 +295,7 @@ const MilestoneActionButton = ({
           requiresPhotos: true,
         },
         {
-          title: 'Clear at Field',
+          title: 'Issue Solved',
           shortTitle: 'Field Clear',
           icon: CheckCircle,
           color: 'green',

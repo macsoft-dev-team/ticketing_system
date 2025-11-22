@@ -47,11 +47,11 @@ const milestoneStageConfig = [
     order: 1,
     label: "Service Center Assigned",
     description:
-      "Service center assigned - field engineer can clear at field or submit to service center",
+      "Service center assigned - field engineer can issue solved or submit to service center",
     allowedRoles: ["MACSOFT_SUPPORT", "MACSOFT_ADMIN", "MACSOFT_HEAD"],
     photoRequired: false,
     notes:
-      "Service center has been assigned - choose to clear at field or submit to service center",
+      "Service center has been assigned - choose to issue solved or submit to service center",
   },
   {
     stage: ServiceStages.REQUEST_CLEARED_AT_FIELD,
