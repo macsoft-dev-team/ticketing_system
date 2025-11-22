@@ -11,9 +11,10 @@ const { createMilestone } = require("./milestones");
 const { generateTicketCode } = require("../lib/ticketCodeGenerator");
 const fs = require("fs");
 const path = require("path");
-
+ 
 const getTickets = async (skip, take, filter, userId, role) => {
   try {
+    // Base params (includes + ordering)
     const params = {
       include: {
         createdByUser: true,
@@ -49,110 +50,115 @@ const getTickets = async (skip, take, filter, userId, role) => {
             },
             attachments: true,
           },
-          orderBy: {
-            order: "asc",
-          },
+          orderBy: { order: "asc" },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     };
 
-    if (skip) params.skip = (parseInt(skip) - 1) * parseInt(take || 10);
-    if (take) params.take = parseInt(take);
+    // Pagination: treat `skip` as 1-based page number (same semantics as before)
+    const pageNum = Number.isFinite(parseInt(skip, 10))
+      ? parseInt(skip, 10)
+      : 0;
+    const pageSize = Number.isFinite(parseInt(take, 10))
+      ? parseInt(take, 10)
+      : 10;
+    if (pageNum > 0) params.skip = (pageNum - 1) * pageSize;
+    if (pageSize > 0) params.take = pageSize;
 
-    // Initialize where clause
-    params.where = {};
+    // Start composing where clause
+    const where = {};
 
+    // Text search (trim + case-insensitive where supported)
     if (filter && filter.search) {
-      params.where.OR = [
-        { ticketCode: { contains: filter.search } },
-        { description: { contains: filter.search } },
-        { customerName: { contains: filter.search } },
-        { controllerNo: { contains: filter.search } },
-        { imei: { contains: filter.search } },
-        { hp: { contains: filter.search } },
-        { motorType: { contains: filter.search } },
-        { state: { contains: filter.search } },
-        { district: { contains: filter.search } },
-        { village: { contains: filter.search } },
-        { block: { contains: filter.search } },
-        { complaintType: { contains: filter.search } },
-        { faultCode: { contains: filter.search } },
-      ];
+      const s = String(filter.search).trim();
+      if (s.length > 0) {
+        // `mode: "insensitive"` works on supported connectors (MySQL/Postgres)
+        where.OR = [
+          { ticketCode: { contains: s} },
+          { description: { contains: s} },
+          { customerName: { contains: s} },
+          { controllerNo: { contains: s} },
+          { imei: { contains: s} },
+          { hp: { contains: s} },
+          { motorType: { contains: s} },
+          { state: { contains: s} },
+          { district: { contains: s} },
+          { village: { contains: s} },
+          { block: { contains: s} },
+          { complaintType: { contains: s} },
+          { faultCode: { contains: s} },
+        ];
+      }
     }
+
+    // status filter
     if (filter && filter.status) {
-      params.where = {
-        ...params.where,
-        status: filter.status,
-      };
-    }
-    // CUSTOMER_FIELD_ENGINEER should only see their own tickets
-    if (role === "CUSTOMER_FIELD_ENGINEER") {
-      params.where = {
-        ...params.where,
-        createdBy: userId,
-      };
+      where.status = filter.status;
     }
 
-    // CUSTOMER_SERVICE_HEAD and SERVICE_CENTER_TECHNICIAN should only see tickets assigned to their service center
-    if (
-      role === "CUSTOMER_SERVICE_HEAD" ||
-      role === "SERVICE_CENTER_TECHNICIAN"
-    ) {
-      // Get user's service center code
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { centerCode: true },
-      });
-
-      if (user?.centerCode) {
-        params.where = {
-          ...params.where,
-          assignedServiceCenter: user.centerCode,
-        };
-      } else {
-        // If user doesn't have a service center assigned, they see no tickets
-        params.where = {
-          ...params.where,
-          id: -1, // This ensures no tickets are returned
-        };
-      }
-    }
-
-    // For CUSTOMER_FIELD_ENGINEER, only count their own tickets
-    // For SERVICE_CENTER users, only count tickets assigned to their service center
-    let statusCountWhere = {};
-    if (role === "CUSTOMER_FIELD_ENGINEER") {
-      statusCountWhere = { createdBy: userId };
-    } else if (
-      role === "SERVICE_CENTER_HEAD" ||
-      role === "SERVICE_CENTER_TECHNICIAN"
-    ) {
-      // Get user's service center code for status count
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { centerCode: true },
-      });
-
-      if (user?.centerCode) {
-        statusCountWhere = { assignedServiceCenter: user.centerCode };
-      } else {
-        // If user doesn't have a service center assigned, they see no tickets
-        statusCountWhere = { id: -1 };
-      }
-    }
-
-    const ticketsStatusCount = await prisma.ticket.groupBy({
-      by: ["status"],
-      _count: { status: true },
-      where: statusCountWhere,
+    // Fetch the calling user (we need centerCode + primary State + assigned states)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        centerCode: true,
+        State: { select: { id: true, name: true, stateCode: true } }, // primary state
+        states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
+      },
     });
 
-    // Get count of tickets at each milestone stage (only for live/active tickets, not closed)
-    // For FIELD_ENGINEER, only count milestones for their own tickets
-    // For SERVICE_CENTER users, only count milestones for tickets assigned to their service center
+    // Build allowed states set from Customer Service Head: primary state + states array
+    const allowedStateNames = new Set();
+    const allowedStateIds = new Set();
+
+    if (user?.State?.name) allowedStateNames.add(user.State.name);
+    if (user?.State?.id) allowedStateIds.add(user.State.id);
+    (user?.states || []).forEach((s) => {
+      if (s?.name) allowedStateNames.add(s.name);
+      if (s?.id) allowedStateIds.add(s.id);
+    });
+
+    const allowedStateNamesArr = Array.from(allowedStateNames);
+    const allowedStateIdsArr = Array.from(allowedStateIds);
+
+    // -------------------------
+    // Role-based RBAC on `where` (applies to the ticket list & count)
+    if (role === "CUSTOMER_FIELD_ENGINEER") {
+      // Only tickets created by this user
+      where.createdBy = userId;
+    } else if (role === "SERVICE_CENTER_TECHNICIAN") {
+      // Only tickets assigned to technician's service center
+      if (user?.centerCode) {
+        where.assignedServiceCenter = user.centerCode;
+      } else {
+        // No center => no tickets
+        where.id = -1;
+      }
+    } else if (role === "CUSTOMER_SERVICE_HEAD") {
+      // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
+      // is in the CSH's allowed state IDs (primary + assigned states).
+      if (allowedStateIdsArr.length) {
+        where.AND = [
+          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
+        ];
+        // NOTE:
+        // - If you also want to restrict by the ticket.state string (the ticket's own state name),
+        //   add `{ state: { in: allowedStateNamesArr } }` into the AND array.
+        // - Current behavior enforces: creator's primary state must be one of CSH's allowed states.
+      } else {
+        // head has no allowed states => no tickets
+        where.id = -1;
+      }
+    } else {
+      // MACSOFT_ADMIN / MACSOFT_HEAD / MACSOFT_SUPPORT -> no additional filters (global)
+    }
+
+    // Important: attach composed where to params
+    params.where = where;
+
+    // -------------------------
+    // Build statusCountWhere and milestoneCountWhere using same RBAC rules
+    let statusCountWhere = {};
     let milestoneCountWhere = {
       stage: {
         in: [
@@ -166,51 +172,79 @@ const getTickets = async (skip, take, filter, userId, role) => {
       },
     };
 
-    if (role === "FIELD_ENGINEER") {
+    if (role === "CUSTOMER_FIELD_ENGINEER") {
+      statusCountWhere = { createdBy: userId };
       milestoneCountWhere.ticket.createdBy = userId;
-    } else if (
-      role === "SERVICE_CENTER_HEAD" ||
-      role === "SERVICE_CENTER_TECHNICIAN"
-    ) {
-      // Get user's service center code for milestone count
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { centerCode: true },
-      });
-
+    } else if (role === "SERVICE_CENTER_TECHNICIAN") {
       if (user?.centerCode) {
+        statusCountWhere = { assignedServiceCenter: user.centerCode };
         milestoneCountWhere.ticket.assignedServiceCenter = user.centerCode;
       } else {
-        // If user doesn't have a service center assigned, they see no milestones
+        statusCountWhere = { id: -1 };
         milestoneCountWhere.ticket.id = -1;
       }
+    } else if (role === "CUSTOMER_SERVICE_HEAD") {
+      if (allowedStateIdsArr.length) {
+        // Mirror logic used for fetching tickets: only counts for tickets
+        // where createdByUser.stateId is in allowedStateIdsArr.
+        statusCountWhere = {
+          AND: [{ createdByUser: { stateId: { in: allowedStateIdsArr } } }],
+        };
+
+        // Also apply same AND within milestone ticket filter (plus stage + not closed)
+        milestoneCountWhere.ticket = {
+          ...milestoneCountWhere.ticket,
+          AND: [{ createdByUser: { stateId: { in: allowedStateIdsArr } } }],
+        };
+      } else {
+        statusCountWhere = { id: -1 };
+        milestoneCountWhere.ticket.id = -1;
+      }
+    } else {
+      // MACSOFT_*: global counts (no filter)
+      statusCountWhere = {};
+      // milestoneCountWhere stays as-is (stage + ticket.status not closed)
     }
 
-    const ticketsMilestoneCount = await prisma.ticketMilestone.groupBy({
-      by: ["stage"],
-      _count: { id: true },
-      where: milestoneCountWhere,
-    });
+    // -------------------------
+    // Run queries in parallel for speed
+    const [
+      ticketsStatusCount,
+      ticketsMilestoneCount,
+      totalFilteredCount,
+      tickets,
+    ] = await Promise.all([
+      prisma.ticket.groupBy({
+        by: ["status"],
+        _count: { status: true },
+        where: statusCountWhere,
+      }),
+      prisma.ticketMilestone.groupBy({
+        by: ["stage"],
+        _count: { id: true },
+        where: milestoneCountWhere,
+      }),
+      prisma.ticket.count({ where: params.where }), // respects RBAC + filters
+      prisma.ticket.findMany(params),
+    ]);
 
-    console.log("Milestone counts:", ticketsMilestoneCount);
-
+    // transform grouped results into simple objects
     const _transformedMilestoneCount = {};
-    ticketsMilestoneCount.forEach((milestoneGroup) => {
-      _transformedMilestoneCount[milestoneGroup.stage] =
-        milestoneGroup._count.id;
+    ticketsMilestoneCount.forEach((m) => {
+      _transformedMilestoneCount[m.stage] = m._count.id;
     });
-    console.log("Transformed milestone counts:", _transformedMilestoneCount);
 
     const _transformedStatusCount = {};
-    ticketsStatusCount.forEach((statusGroup) => {
-      _transformedStatusCount[statusGroup.status] = statusGroup._count.status;
+    ticketsStatusCount.forEach((s) => {
+      _transformedStatusCount[s.status] = s._count.status;
     });
-    // For FIELD_ENGINEER and SERVICE_CENTER users, only count their respective tickets for ALL count
+
+    // ALL count (respecting RBAC for counts)
     _transformedStatusCount.ALL = await prisma.ticket.count({
       where: statusCountWhere,
     });
 
-    // Add milestone counts to statusCount object
+    // attach milestone-specific counts into statusCount response
     _transformedStatusCount.TICKET_RAISED =
       _transformedMilestoneCount.TICKET_RAISED || 0;
     _transformedStatusCount.SENT_TO_SERVICE_CENTER =
@@ -218,17 +252,17 @@ const getTickets = async (skip, take, filter, userId, role) => {
     _transformedStatusCount.RECEIVED_AT_SERVICE_CENTER =
       _transformedMilestoneCount.RECEIVED_AT_SERVICE_CENTER || 0;
 
-    const count = await prisma.ticket.count({ where: params.where });
-    const tickets = await prisma.ticket.findMany(params);
     return {
       tickets,
-      count,
+      count: totalFilteredCount,
       statusCount: _transformedStatusCount,
     };
   } catch (error) {
+    // rethrow so caller can handle/log
     throw error;
   }
 };
+
 
 const getTicketById = async (ticketId, userId, userRole = null) => {
   try {

@@ -16,7 +16,7 @@ import useProduct from '../../lib/hooks/useProducts';
 const spareRequestSchema = yup.object({
   requestReason: yup.string().required('Request reason is required'),
   urgencyLevel: yup.string().required('Urgency level is required'),
-  expectedDelivery: yup.string().required('Expected delivery date is required'),
+  expectedDelivery: yup.string(),
   products: yup.array().of(
     yup.object({
       productId: yup.string().required('Product is required'),

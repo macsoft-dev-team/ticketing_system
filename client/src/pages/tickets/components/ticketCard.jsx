@@ -181,7 +181,7 @@ export default function TicketCard({
                                     key={milestone.id}
                                     className="text-xs bg-blue-50 text-blue-800 px-2 py-1 rounded-tr-xl rounded-bl-xl font-medium"
                                 >
-                                    {milestone.stage.replace(/_/g, ' ')} by <span className='text-yellow-500'>{milestone.changer?.name || ''}</span>
+                                    {milestone.stage.replace(/_/g, ' ')}{/*  by <span className='text-yellow-500'>{milestone.changer?.name || ''}</span> */}
                                 </span>
                             ))}
                         </div>
