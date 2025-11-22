@@ -45,7 +45,7 @@ const getAll = async (skip, take, filter, currentUser) => {
           where.isActive = filterObj.status === "ACTIVE";
         }
 
-        // Search filter (name, phone, email)
+        // Search filter (name, phone)
         if (filterObj.search && filterObj.search.trim() !== "") {
           const searchTerm = filterObj.search.trim();
           where.OR = [
@@ -53,7 +53,6 @@ const getAll = async (skip, take, filter, currentUser) => {
             { phone: { contains: searchTerm } },
             // Note: Email search is commented out until schema migration is run
             // { email: { contains: searchTerm, mode: 'insensitive' } }
-            { role: { contains: filterObj.role } },
           ];
         }
 

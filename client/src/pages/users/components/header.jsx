@@ -1,7 +1,8 @@
 import { Plus, Search, Filter, X, Upload, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import useUser from "../../../lib/hooks/useUser";
+import { useDebounce } from "../../../lib/hooks/ticketHooks";
 
 export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSearchChange, onRoleChange }) {
     const { statusCounts, filters, setFilters } = useUser();
@@ -12,6 +13,9 @@ export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSea
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
     const roleDropdownRef = useRef(null);
+    
+    // Debounce the search term with 300ms delay
+    const debouncedSearchTerm = useDebounce(searchTerm, 300);
      const filterTabItems = [
         { id: '', label: 'All Users', shortLabel: 'All', count: statusCounts?.ALL || 0 ,key: 'ALL'},
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCounts?.ACTIVE || 0 ,key: 'ACTIVE'},
@@ -47,33 +51,47 @@ export default function Header({ onAddUser, onUploadUsers, onFilterChange, onSea
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Update filters when debounced search term changes
+    useEffect(() => {
+        // Only update if the values have actually changed and setFilters is available
+        const currentSearch = debouncedSearchTerm || '';
+        if (setFilters && (filters?.search !== currentSearch)) {
+            setFilters({ 
+                ...filters, 
+                search: currentSearch, 
+                status: activeFilter, 
+                role: selectedRole 
+            });
+        }
+    }, [debouncedSearchTerm, activeFilter, selectedRole, filters?.search, setFilters]);
+
     // Handle filter changes
-    const handleFilterChange = (status) => {
+    const handleFilterChange = useCallback((status) => {
         setActiveFilter(status);
-        setFilters({ ...filters, status });
+        setFilters({ ...filters, status, search: debouncedSearchTerm || '', role: selectedRole });
         if (onFilterChange) {
             onFilterChange(status);
         }
-    };
+    }, [debouncedSearchTerm, selectedRole, filters, setFilters, onFilterChange]);
 
     // Handle search changes
-    const handleSearchChange = (search) => {
+    const handleSearchChange = useCallback((search) => {
         setSearchTerm(search);
-        setFilters({ ...filters, search });
+        // Don't immediately update filters - let the debounced effect handle it
         if (onSearchChange) {
             onSearchChange(search);
         }
-    };
+    }, [onSearchChange]);
 
     // Handle role changes
-    const handleRoleChange = (role) => {
+    const handleRoleChange = useCallback((role) => {
         setSelectedRole(role);
-        setFilters({ ...filters, role });
+        setFilters({ ...filters, role, search: debouncedSearchTerm || '', status: activeFilter });
         setIsRoleDropdownOpen(false);
         if (onRoleChange) {
             onRoleChange(role);
         }
-    };
+    }, [debouncedSearchTerm, activeFilter, filters, setFilters, onRoleChange]);
 
     const headerVariants = {
         initial: { opacity: 0, y: -20 },
