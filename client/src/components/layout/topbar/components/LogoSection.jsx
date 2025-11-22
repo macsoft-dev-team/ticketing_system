@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleSidebar } from '../../../../lib/features/uiSlice';
-import logo from "../../../../assets/macsoft-logo.png";
+const logo = "/macsoft-logo.png";
 
 const LogoSection = () => {
   const dispatch = useDispatch();

@@ -10,7 +10,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: [
-        "favicon.ico",
+        "favicon/favicon.ico",
         "favicon/apple-touch-icon.png",
         "favicon/favicon-96x96.png",
       ],
@@ -24,14 +24,14 @@ export default defineConfig({
         theme_color: "#ffffff",
         icons: [
           {
-            src: "/favicon/web-app-manifest-192x192.png",
+            src: "/assets/icon-192x192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "/assets/icon-512x512.png",
-            sizes: "512x512",
+            src: "/assets/icon-256x256.png",
+            sizes: "256x256",
             type: "image/png",
             purpose: "any",
           },
@@ -42,8 +42,8 @@ export default defineConfig({
             purpose: "any",
           },
           {
-            src: "/assets/icon-256x256.png",
-            sizes: "256x256",
+            src: "/assets/icon-512x512.png",
+            sizes: "512x512",
             type: "image/png",
             purpose: "any",
           },
@@ -57,7 +57,7 @@ export default defineConfig({
             label: "Macsoft CMS Desktop View",
           },
           {
-            src: "/favicon/web-app-manifest-192x192.png",
+            src: "/assets/icon-192x192.png",
             sizes: "192x192",
             type: "image/png",
             form_factor: "narrow",
@@ -66,10 +66,23 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-        // Increase the maximum file size limit to 5MB to handle large bundles
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
-        // Runtime caching for better performance
+        globPatterns: ["**/*.{js,css,html}"],
+        // Further reduce the maximum file size limit to 1MB for minimal cache
+        maximumFileSizeToCacheInBytes: 1 * 1024 * 1024, // 1MB
+        // Skip caching large files and media
+        globIgnores: [
+          '**/node_modules/**/*',
+          '**/sounds/**/*',
+          '**/images/**/*',
+          '**/assets/icon-512x512.png',
+          '**/assets/icon-384x384.png',
+          '**/assets/icon-256x256.png',
+          '**/*.{mp3,wav,ogg,mp4,webm,avi}',
+          '**/file-utils-*.js', // Skip large file utility chunks
+          '**/excel-utils-*.js', // Skip Excel utilities
+          '**/charts-*.js', // Skip chart libraries from precaching
+        ],
+        // Minimal runtime caching
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\./,
@@ -77,12 +90,31 @@ export default defineConfig({
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+                maxEntries: 25, // Further reduced
+                maxAgeSeconds: 60 * 60 * 6, // 6 hours only
               },
+
+            },
+          },
+          {
+            // Cache only small images
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'img-cache',
+              expiration: {
+                maxEntries: 15, // Very limited image cache
+                maxAgeSeconds: 60 * 60 * 24 * 3, // 3 days only
+              },
+
             },
           },
         ],
+        // Clean up old caches
+        cleanupOutdatedCaches: true,
+        // Skip waiting for faster updates
+        skipWaiting: true,
+        clientsClaim: true,
       },
       // Disable dev options to prevent dev-dist folder creation
       devOptions: {
@@ -98,32 +130,64 @@ export default defineConfig({
   build: {
     // Clean output directory before build
     emptyOutDir: true,
-    // Increase chunk size warning limit
-    chunkSizeWarningLimit: 1000,
+    // Reduce chunk size warning limit for smaller bundles
+    chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        // Manual chunking for better code splitting
+        // Manual chunking for better code splitting and smaller chunks
         manualChunks: {
-          // Vendor chunks for large dependencies
-          'react-vendor': ['react', 'react-dom'],
-          'router-vendor': ['react-router-dom'],
-          'redux-vendor': ['@reduxjs/toolkit', 'react-redux'],
-          'ui-vendor': ['lucide-react', 'motion'],
-          'chart-vendor': ['recharts'],
-          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'yup'],
-          'socket-vendor': ['socket.io-client'],
-          'moment-vendor': ['moment'],
-          'utils-vendor': ['axios', 'xlsx', '@zxing/library', 'bcryptjs', 'tailwind-merge'],
+          // Core React (keep small and separate)
+          'react-core': ['react', 'react-dom'],
+          // Router (frequently used)
+          'router': ['react-router-dom'],
+          // State management
+          'redux': ['@reduxjs/toolkit', 'react-redux'],
+          // UI components (split into smaller chunks)
+          'ui-icons': ['lucide-react'],
+          'ui-motion': ['motion'],
+          // Charts (large, keep separate and lazy load)
+          'charts': ['recharts'],
+          // Forms (moderate size)
+          'forms': ['react-hook-form', '@hookform/resolvers', 'yup'],
+          // Socket (keep separate as it's not always needed)
+          'socket': ['socket.io-client'],
+          // Date utilities
+          'date-utils': ['moment'],
+          // Split large file utilities
+          'excel-utils': ['xlsx'],
+          'qr-utils': ['@zxing/library'],
+          // HTTP utilities
+          'http-utils': ['axios'],
+          'crypto-utils': ['bcryptjs'],
+          'style-utils': ['tailwind-merge'],
+        },
+        // Add chunk size limits to prevent large chunks from being cached
+        chunkFileNames: (chunkInfo) => {
+          // Use shorter names for smaller cache footprint
+          return `[name]-[hash:6].js`;
+        },
+        assetFileNames: (assetInfo) => {
+          // Organize assets for better cache management
+          const extType = assetInfo.name.split('.').at(1);
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            return `images/[name]-[hash:6][extname]`;
+          }
+          if (/css/i.test(extType)) {
+            return `styles/[name]-[hash:6][extname]`;
+          }
+          return `assets/[name]-[hash:6][extname]`;
         },
       },
     },
-    // Enable source maps for production debugging (optional, can be disabled for smaller builds)
+    // Disable source maps for smaller builds and reduced cache
     sourcemap: false,
-    // Optimize CSS
+    // Optimize CSS with better splitting
     cssCodeSplit: true,
-    // Minification settings
+    // Aggressive minification
     minify: 'esbuild',
     target: 'es2020',
+    // Optimize assets
+    assetsInlineLimit: 4096, // Inline small assets (4KB limit)
   },
   server: {
     port: 5173,

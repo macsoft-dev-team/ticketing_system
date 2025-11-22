@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import logo from "../../assets/macsoft-logo.png";
+const logo = "/macsoft-logo.png";
 
 const Header = ({ handleMessageFilter, newMessage }) => {
   const navigate = useNavigate();

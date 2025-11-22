@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Button, Col, Layout, Menu, Popover, Row, Typography } from 'antd';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import logo from "../../assets/macsoft-logo.png";
+const logo = "/macsoft-logo.png";
 import { logout } from '../../lib/features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import useCrud from '../../lib/hooks/useCrud';

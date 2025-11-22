@@ -11,7 +11,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '../../lib/utils';
 import { setSidebarCollapsed, toggleSidebar } from '../../lib/features/uiSlice';
-import logo from "../../assets/macsoft-logo.png";
+const logo = "/macsoft-logo.png";
 import { menu } from '../../lib/constants/variables';
 import useAuth from '../../lib/hooks/useAuth';
 import { switchMenuItems } from '../../lib/constants/routes';
