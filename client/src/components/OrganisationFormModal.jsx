@@ -60,11 +60,11 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
         const newErrors = {};
 
         if (!formData.name.trim()) {
-            newErrors.name = 'Organisation name is required';
+            newErrors.name = 'Customer name is required';
         }
 
         if (!formData.orgCode.trim()) {
-            newErrors.orgCode = 'Organisation code is required';
+            newErrors.orgCode = 'Customer code is required';
         }
 
         if (!formData.address.trim()) {
@@ -112,23 +112,23 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
                 <DialogHeader>
                     <DialogTitle className="uppercase">
-                        {mode === 'create' ? 'Create New Organisation' : 'Edit Organisation'}
+                        {mode === 'create' ? 'Create New Customer' : 'Edit Customer'}
                     </DialogTitle>
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Organisation Name */}
+                        {/* Customer Name */}
                         <div className="space-y-2">
                             <Label htmlFor="name">
-                                Organisation Name <span className="text-red-500">*</span>
+                                Customer Name <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="name"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                placeholder="Enter organisation name"
+                                placeholder="Enter customer name"
                                 disabled={isSubmitting}
                                 className={errors.name ? 'border-red-500' : ''}
                             />
@@ -137,17 +137,17 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                             )}
                         </div>
 
-                        {/* Organisation Code */}
+                        {/* Customer Code */}
                         <div className="space-y-2">
                             <Label htmlFor="orgCode">
-                                Organisation Code <span className="text-red-500">*</span>
+                                Customer Code <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="orgCode"
                                 name="orgCode"
                                 value={formData.orgCode}
                                 onChange={handleChange}
-                                placeholder="Enter organisation code"
+                                placeholder="Enter customer code"
                                 disabled={isSubmitting}
                                 className={errors.orgCode ? 'border-red-500' : ''}
                             />
@@ -166,7 +166,7 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                                 name="address"
                                 value={formData.address}
                                 onChange={handleChange}
-                                placeholder="Enter organisation address"
+                                placeholder="Enter customer address"
                                 disabled={isSubmitting}
                                 className={errors.address ? 'border-red-500' : ''}
                             />
@@ -271,7 +271,7 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                                     {mode === 'create' ? 'Creating...' : 'Updating...'}
                                 </>
                             ) : (
-                                mode === 'create' ? 'Create Organisation' : 'Update Organisation'
+                                mode === 'create' ? 'Create Customer' : 'Update Customer'
                             )}
                         </Button>
                     </div>

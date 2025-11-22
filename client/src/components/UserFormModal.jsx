@@ -8,10 +8,12 @@ import MultiSelect from './ui/multi-select';
 import { Label } from './ui/label';
 import { useSelector } from 'react-redux';
 import useOrganisation from '../lib/hooks/useOrganisation';
+import useServiceCenter from '../lib/hooks/useServiceCenter';
 import { SORTED_INDIAN_STATES } from '../utils/states';
 
 const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode = 'create' }) => {
     const { organisations ,getOrganisationById,getOrganisations} = useOrganisation();
+    const { serviceCenters, getServiceCenters } = useServiceCenter();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -19,6 +21,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
         password: '',
         role: 'SCE_USER',
         orgCode: '',
+        centerCode: '',
         status: 'ACTIVE',
         primaryState: '',
         multipleStates: [],
@@ -29,13 +32,20 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
 
     useEffect(() => {
         if (initialData) {
+            // Handle both orgCode and centerCode from initialData
+            // If the user has a centerCode, they're likely a service center technician
+            // If they have orgCode, they're likely customer-related roles
+            const hasExistingServiceCenter = initialData.centerCode;
+            const hasExistingCustomer = initialData.orgCode;
+            
             setFormData({
                 name: initialData.name || '',
                 email: initialData.email || '',
                 phone: initialData.phone || '',
                 password: '', // Don't populate password for edit
                 role: initialData.role || 'SCE_USER',
-                orgCode: initialData.orgCode || '',
+                orgCode: hasExistingCustomer ? initialData.orgCode : '',
+                centerCode: hasExistingServiceCenter ? initialData.centerCode : '',
                 status: initialData.status || 'ACTIVE',
                 primaryState: initialData.primaryState || '',
                 multipleStates: initialData.multipleStates || [],
@@ -48,6 +58,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                 password: '',
                 role: 'SCE_USER',
                 orgCode: '',
+                centerCode: '',
                 status: 'ACTIVE',
                 primaryState: '',
                 multipleStates: [],
@@ -99,7 +110,18 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
             newErrors.role = 'Role is required';
         }
 
-        // Organisation is optional - no validation required
+        // Validate organisation/customer selection for specific roles
+        if (['CUSTOMER_SERVICE_HEAD', 'CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(formData.role)) {
+            if (formData.role === 'SERVICE_CENTER_TECHNICIAN') {
+                if (!formData.centerCode.trim()) {
+                    newErrors.centerCode = 'Service Center is required for this role';
+                }
+            } else {
+                if (!formData.orgCode.trim()) {
+                    newErrors.orgCode = 'Customer is required for this role';
+                }
+            }
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -113,6 +135,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
             password: '',
             role: 'SCE_USER',
             orgCode: '',
+            centerCode: '',
             status: 'ACTIVE',
             primaryState: '',
             multipleStates: [],
@@ -135,6 +158,14 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
             if (!submitData.password) {
                 delete submitData.password;
             }
+            
+            // Clean up data based on role - only send relevant field
+            if (formData.role === 'SERVICE_CENTER_TECHNICIAN') {
+                delete submitData.orgCode; // Remove orgCode for service center technicians
+            } else {
+                delete submitData.centerCode; // Remove centerCode for non-service center roles
+            }
+            
             await onSubmit(submitData);
             handleClose();
         } catch (error) {
@@ -158,17 +189,85 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
         { label: 'Inactive', value: 'INACTIVE' },
     ];
 
-    const organisationOptions = [
-        { label: 'No Organisation', value: '' },
-        ...(organisations?.map((org) => ({
+    // Determine if role should show organization/customer selection
+    const shouldShowOrganisation = () => {
+        const macsoftRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+        return !macsoftRoles.includes(formData.role);
+    };
+
+    // Determine the label and options based on role
+    const getOrganisationConfig = () => {
+        if (formData.role === 'SERVICE_CENTER_TECHNICIAN') {
+            return {
+                label: 'Service Center',
+                placeholder: 'Select service center',
+                noSelectionLabel: 'No Service Center'
+            };
+        } else if (['CUSTOMER_SERVICE_HEAD', 'CUSTOMER_FIELD_ENGINEER'].includes(formData.role)) {
+            return {
+                label: 'Customer',
+                placeholder: 'Select customer',
+                noSelectionLabel: 'No Customer'
+            };
+        } else {
+            return {
+                label: 'Customer',
+                placeholder: 'Select customer (optional)',
+                noSelectionLabel: 'No Customer'
+            };
+        }
+    };
+
+    const orgConfig = getOrganisationConfig();
+    
+    // Use service centers for SERVICE_CENTER_TECHNICIAN, otherwise use organisations
+    const getOptionsData = () => {
+        if (formData.role === 'SERVICE_CENTER_TECHNICIAN') {
+            return serviceCenters?.map((center) => ({
+                label: center.name,
+                value: center.centerCode,
+            })) || [];
+        }
+        return organisations?.map((org) => ({
             label: org.name,
             value: org.orgCode,
-        })) || [])
+        })) || [];
+    };
+    
+    const organisationOptions = [
+        { label: orgConfig.noSelectionLabel, value: '' },
+        ...getOptionsData()
     ];
 
     useEffect(() => {
         getOrganisations({});
+        getServiceCenters({});
     }, []);
+
+    // Additional useEffect to fetch service centers when role changes to SERVICE_CENTER_TECHNICIAN
+    useEffect(() => {
+        if (formData.role === 'SERVICE_CENTER_TECHNICIAN') {
+            getServiceCenters({});
+        }
+    }, [formData.role]);
+
+    // Handle role changes - clear inappropriate field and preserve existing value if switching back
+    useEffect(() => {
+        // Don't run on initial mount or when initialData is being set
+        if (!initialData) {
+            if (formData.role === 'SERVICE_CENTER_TECHNICIAN') {
+                // Clear orgCode when switching to service center technician
+                if (formData.orgCode) {
+                    setFormData(prev => ({ ...prev, orgCode: '' }));
+                }
+            } else {
+                // Clear centerCode when switching away from service center technician
+                if (formData.centerCode) {
+                    setFormData(prev => ({ ...prev, centerCode: '' }));
+                }
+            }
+        }
+    }, [formData.role, initialData]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -280,26 +379,33 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
                             )}
                         </div>
 
-                        {/* Organisation */}
-                        <div className="space-y-2">
-                            <Label htmlFor="orgCode">
-                                Organisation <span className="text-xs text-gray-500">(optional)</span>
-                            </Label>
-                            <Select
-                                id="orgCode"
-                                name="orgCode"
-                                value={formData.orgCode}
-                                onChange={handleChange}
-                                options={organisationOptions}
-                                placeholder="Select organisation (optional)"
-                                disabled={isSubmitting}
-                                direction="down"
-                                className={errors.orgCode ? 'border-red-500' : ''}
-                            />
-                            {errors.orgCode && (
-                                <p className="text-red-500 text-xs mt-1">{errors.orgCode}</p>
-                            )}
-                        </div>
+                        {/* Customer/Service Center - Only show for non-Macsoft roles */}
+                        {shouldShowOrganisation() && (
+                            <div className="space-y-2">
+                                <Label htmlFor={formData.role === 'SERVICE_CENTER_TECHNICIAN' ? 'centerCode' : 'orgCode'}>
+                                    {orgConfig.label}
+                                    {['CUSTOMER_SERVICE_HEAD', 'CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(formData.role) ? (
+                                        <span className="text-red-500"> *</span>
+                                    ) : (
+                                        <span className="text-xs text-gray-500"> (optional)</span>
+                                    )}
+                                </Label>
+                                <Select
+                                    id={formData.role === 'SERVICE_CENTER_TECHNICIAN' ? 'centerCode' : 'orgCode'}
+                                    name={formData.role === 'SERVICE_CENTER_TECHNICIAN' ? 'centerCode' : 'orgCode'}
+                                    value={formData.role === 'SERVICE_CENTER_TECHNICIAN' ? (formData.centerCode || '') : (formData.orgCode || '')}
+                                    onChange={handleChange}
+                                    options={organisationOptions}
+                                    placeholder={orgConfig.placeholder}
+                                    disabled={isSubmitting}
+                                    direction="down"
+                                    className={(formData.role === 'SERVICE_CENTER_TECHNICIAN' ? errors.centerCode : errors.orgCode) ? 'border-red-500' : ''}
+                                />
+                                {(formData.role === 'SERVICE_CENTER_TECHNICIAN' ? errors.centerCode : errors.orgCode) && (
+                                    <p className="text-red-500 text-xs mt-1">{formData.role === 'SERVICE_CENTER_TECHNICIAN' ? errors.centerCode : errors.orgCode}</p>
+                                )}
+                            </div>
+                        )}
 
                         {/* Status */}
                         <div className="space-y-2">

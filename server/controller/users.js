@@ -20,8 +20,8 @@ const getAll = async (req, res) => {
           ...user,
           password: undefined, // Remove password from response
           status: user.isActive ? "ACTIVE" : "INACTIVE",
-          organisation: user.serviceCenter?.organisation?.name || "N/A",
-          orgCode: user.serviceCenter?.orgCode || null,
+          organisation: user?.organisation?.name ? user.organisation.name : (user.serviceCenter?.organisation?.name || "N/A"),
+          orgCode: user.orgCode || null,
           centerCode: user.centerCode || null,
           state: user.State?.name || null,
           primaryState: user.State?.stateCode || null,
@@ -158,8 +158,7 @@ const update = async (req, res) => {
         const transformedUser = {
             ...updatedUser,
             status: updatedUser.isActive ? 'ACTIVE' : 'INACTIVE',
-            organisation: updatedUser.serviceCenter?.organisation?.name || 'N/A',
-            orgCode: updatedUser.serviceCenter?.orgCode || null,
+            organisation: updatedUser?.organisation?.name ? updatedUser.organisation.name : (updatedUser.serviceCenter?.organisation?.name || 'N/A'),
             state: updatedUser.State?.name || null,
             primaryState: updatedUser.State?.stateCode || null,
             multipleStates: updatedUser.states?.map(state => state.stateCode) || [],

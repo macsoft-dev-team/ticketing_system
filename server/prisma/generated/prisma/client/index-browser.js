@@ -179,7 +179,8 @@ exports.Prisma.UserScalarFieldEnum = {
   deletedAt: 'deletedAt',
   isActive: 'isActive',
   stateId: 'stateId',
-  projectCode: 'projectCode'
+  projectCode: 'projectCode',
+  orgCode: 'orgCode'
 };
 
 exports.Prisma.TicketScalarFieldEnum = {
@@ -203,6 +204,8 @@ exports.Prisma.TicketScalarFieldEnum = {
   assignedServiceCenter: 'assignedServiceCenter',
   createdBy: 'createdBy',
   updatedBy: 'updatedBy',
+  code: 'code',
+  projectName: 'projectName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
@@ -379,7 +382,8 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   phone: 'phone',
   password: 'password',
   centerCode: 'centerCode',
-  projectCode: 'projectCode'
+  projectCode: 'projectCode',
+  orgCode: 'orgCode'
 };
 
 exports.Prisma.TicketOrderByRelevanceFieldEnum = {
@@ -398,7 +402,9 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   faultCode: 'faultCode',
   faultType: 'faultType',
   priority: 'priority',
-  assignedServiceCenter: 'assignedServiceCenter'
+  assignedServiceCenter: 'assignedServiceCenter',
+  code: 'code',
+  projectName: 'projectName'
 };
 
 exports.Prisma.TicketMilestoneOrderByRelevanceFieldEnum = {

@@ -91,6 +91,7 @@ const getAll = async (skip, take, filter, currentUser) => {
             project: true,
           },
         },
+        organisation: true,
         State: true,
         states: true,
       },
@@ -334,20 +335,15 @@ const update = async (id, userData) => {
     if (userData.password && userData.password.trim() !== '') {
       updateData.password = await hashPassword(userData.password);
     }
-
-    // Handle organization/service center relationship
-    if (userData.projectCode) {
-      const serviceCenter = await prisma.serviceCenter.findFirst({
-        where: { projectCode: userData.projectCode }
-      });
-      
-      if (serviceCenter) {
-        updateData.centerCode = serviceCenter.centerCode;
-      } else {
-        updateData.centerCode = null;
-      }
+    //Handle service center code update
+    if(userData.centerCode){
+      updateData.centerCode = userData.centerCode;
     }
-
+    
+    //Handle Organization code update 
+    if (userData.orgCode ) {
+      updateData.orgCode = userData.orgCode;
+    }
     // Handle primary state relationship
     if (userData.hasOwnProperty('primaryState')) {
       if (userData.primaryState) {
@@ -394,6 +390,7 @@ const update = async (id, userData) => {
             project: true
           }
         },
+        organisation: true,
         State: true,
         states: true
       }

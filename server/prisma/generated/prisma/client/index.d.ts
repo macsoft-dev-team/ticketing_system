@@ -2405,11 +2405,13 @@ export namespace Prisma {
    */
 
   export type OrganisationCountOutputType = {
-    Project: number
+    project: number
+    users: number
   }
 
   export type OrganisationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    Project?: boolean | OrganisationCountOutputTypeCountProjectArgs
+    project?: boolean | OrganisationCountOutputTypeCountProjectArgs
+    users?: boolean | OrganisationCountOutputTypeCountUsersArgs
   }
 
   // Custom InputTypes
@@ -2428,6 +2430,13 @@ export namespace Prisma {
    */
   export type OrganisationCountOutputTypeCountProjectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ProjectWhereInput
+  }
+
+  /**
+   * OrganisationCountOutputType without action
+   */
+  export type OrganisationCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
   }
 
 
@@ -4118,7 +4127,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
-    Project?: boolean | Organisation$ProjectArgs<ExtArgs>
+    project?: boolean | Organisation$projectArgs<ExtArgs>
+    users?: boolean | Organisation$usersArgs<ExtArgs>
     _count?: boolean | OrganisationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organisation"]>
 
@@ -4139,14 +4149,16 @@ export namespace Prisma {
 
   export type OrganisationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "orgCode" | "email" | "phone" | "address" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["organisation"]>
   export type OrganisationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    Project?: boolean | Organisation$ProjectArgs<ExtArgs>
+    project?: boolean | Organisation$projectArgs<ExtArgs>
+    users?: boolean | Organisation$usersArgs<ExtArgs>
     _count?: boolean | OrganisationCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $OrganisationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Organisation"
     objects: {
-      Project: Prisma.$ProjectPayload<ExtArgs>[]
+      project: Prisma.$ProjectPayload<ExtArgs>[]
+      users: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -4499,7 +4511,8 @@ export namespace Prisma {
    */
   export interface Prisma__OrganisationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    Project<T extends Organisation$ProjectArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$ProjectArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    project<T extends Organisation$projectArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$projectArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    users<T extends Organisation$usersArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4882,9 +4895,9 @@ export namespace Prisma {
   }
 
   /**
-   * Organisation.Project
+   * Organisation.project
    */
-  export type Organisation$ProjectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Organisation$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Project
      */
@@ -4903,6 +4916,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ProjectScalarFieldEnum | ProjectScalarFieldEnum[]
+  }
+
+  /**
+   * Organisation.users
+   */
+  export type Organisation$usersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -7165,6 +7202,7 @@ export namespace Prisma {
     isActive: boolean | null
     stateId: number | null
     projectCode: string | null
+    orgCode: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -7181,6 +7219,7 @@ export namespace Prisma {
     isActive: boolean | null
     stateId: number | null
     projectCode: string | null
+    orgCode: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -7197,6 +7236,7 @@ export namespace Prisma {
     isActive: number
     stateId: number
     projectCode: number
+    orgCode: number
     _all: number
   }
 
@@ -7225,6 +7265,7 @@ export namespace Prisma {
     isActive?: true
     stateId?: true
     projectCode?: true
+    orgCode?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -7241,6 +7282,7 @@ export namespace Prisma {
     isActive?: true
     stateId?: true
     projectCode?: true
+    orgCode?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -7257,6 +7299,7 @@ export namespace Prisma {
     isActive?: true
     stateId?: true
     projectCode?: true
+    orgCode?: true
     _all?: true
   }
 
@@ -7360,6 +7403,7 @@ export namespace Prisma {
     isActive: boolean
     stateId: number | null
     projectCode: string | null
+    orgCode: string | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -7395,6 +7439,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: boolean
     projectCode?: boolean
+    orgCode?: boolean
     serviceCenter?: boolean | User$serviceCenterArgs<ExtArgs>
     createdTickets?: boolean | User$createdTicketsArgs<ExtArgs>
     updatedTickets?: boolean | User$updatedTicketsArgs<ExtArgs>
@@ -7409,6 +7454,7 @@ export namespace Prisma {
     State?: boolean | User$StateArgs<ExtArgs>
     states?: boolean | User$statesArgs<ExtArgs>
     project?: boolean | User$projectArgs<ExtArgs>
+    organisation?: boolean | User$organisationArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -7428,9 +7474,10 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: boolean
     projectCode?: boolean
+    orgCode?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "password" | "role" | "centerCode" | "lastLogin" | "createdAt" | "updatedAt" | "deletedAt" | "isActive" | "stateId" | "projectCode", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "password" | "role" | "centerCode" | "lastLogin" | "createdAt" | "updatedAt" | "deletedAt" | "isActive" | "stateId" | "projectCode" | "orgCode", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     serviceCenter?: boolean | User$serviceCenterArgs<ExtArgs>
     createdTickets?: boolean | User$createdTicketsArgs<ExtArgs>
@@ -7446,6 +7493,7 @@ export namespace Prisma {
     State?: boolean | User$StateArgs<ExtArgs>
     states?: boolean | User$statesArgs<ExtArgs>
     project?: boolean | User$projectArgs<ExtArgs>
+    organisation?: boolean | User$organisationArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7466,6 +7514,7 @@ export namespace Prisma {
       State: Prisma.$StatePayload<ExtArgs> | null
       states: Prisma.$StatePayload<ExtArgs>[]
       project: Prisma.$ProjectPayload<ExtArgs> | null
+      organisation: Prisma.$OrganisationPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -7481,6 +7530,7 @@ export namespace Prisma {
       isActive: boolean
       stateId: number | null
       projectCode: string | null
+      orgCode: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -7835,6 +7885,7 @@ export namespace Prisma {
     State<T extends User$StateArgs<ExtArgs> = {}>(args?: Subset<T, User$StateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     states<T extends User$statesArgs<ExtArgs> = {}>(args?: Subset<T, User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     project<T extends User$projectArgs<ExtArgs> = {}>(args?: Subset<T, User$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    organisation<T extends User$organisationArgs<ExtArgs> = {}>(args?: Subset<T, User$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7877,6 +7928,7 @@ export namespace Prisma {
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly stateId: FieldRef<"User", 'Int'>
     readonly projectCode: FieldRef<"User", 'String'>
+    readonly orgCode: FieldRef<"User", 'String'>
   }
     
 
@@ -8541,6 +8593,25 @@ export namespace Prisma {
   }
 
   /**
+   * User.organisation
+   */
+  export type User$organisationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Organisation
+     */
+    select?: OrganisationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Organisation
+     */
+    omit?: OrganisationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrganisationInclude<ExtArgs> | null
+    where?: OrganisationWhereInput
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8604,6 +8675,8 @@ export namespace Prisma {
     assignedServiceCenter: string | null
     createdBy: number | null
     updatedBy: number | null
+    code: string | null
+    projectName: string | null
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
@@ -8630,6 +8703,8 @@ export namespace Prisma {
     assignedServiceCenter: string | null
     createdBy: number | null
     updatedBy: number | null
+    code: string | null
+    projectName: string | null
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
@@ -8656,6 +8731,8 @@ export namespace Prisma {
     assignedServiceCenter: number
     createdBy: number
     updatedBy: number
+    code: number
+    projectName: number
     createdAt: number
     updatedAt: number
     deletedAt: number
@@ -8696,6 +8773,8 @@ export namespace Prisma {
     assignedServiceCenter?: true
     createdBy?: true
     updatedBy?: true
+    code?: true
+    projectName?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -8722,6 +8801,8 @@ export namespace Prisma {
     assignedServiceCenter?: true
     createdBy?: true
     updatedBy?: true
+    code?: true
+    projectName?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -8748,6 +8829,8 @@ export namespace Prisma {
     assignedServiceCenter?: true
     createdBy?: true
     updatedBy?: true
+    code?: true
+    projectName?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -8850,7 +8933,7 @@ export namespace Prisma {
     hp: string | null
     motorType: string | null
     state: string
-    district: string
+    district: string | null
     village: string | null
     block: string | null
     complaintType: string
@@ -8861,6 +8944,8 @@ export namespace Prisma {
     assignedServiceCenter: string | null
     createdBy: number
     updatedBy: number | null
+    code: string | null
+    projectName: string | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -8906,6 +8991,8 @@ export namespace Prisma {
     assignedServiceCenter?: boolean
     createdBy?: boolean
     updatedBy?: boolean
+    code?: boolean
+    projectName?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -8943,12 +9030,14 @@ export namespace Prisma {
     assignedServiceCenter?: boolean
     createdBy?: boolean
     updatedBy?: boolean
+    code?: boolean
+    projectName?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "imei" | "hp" | "motorType" | "state" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "imei" | "hp" | "motorType" | "state" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
@@ -8983,7 +9072,7 @@ export namespace Prisma {
       hp: string | null
       motorType: string | null
       state: string
-      district: string
+      district: string | null
       village: string | null
       block: string | null
       complaintType: string
@@ -8994,6 +9083,8 @@ export namespace Prisma {
       assignedServiceCenter: string | null
       createdBy: number
       updatedBy: number | null
+      code: string | null
+      projectName: string | null
       createdAt: Date
       updatedAt: Date
       deletedAt: Date | null
@@ -9394,6 +9485,8 @@ export namespace Prisma {
     readonly assignedServiceCenter: FieldRef<"Ticket", 'String'>
     readonly createdBy: FieldRef<"Ticket", 'Int'>
     readonly updatedBy: FieldRef<"Ticket", 'Int'>
+    readonly code: FieldRef<"Ticket", 'String'>
+    readonly projectName: FieldRef<"Ticket", 'String'>
     readonly createdAt: FieldRef<"Ticket", 'DateTime'>
     readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
     readonly deletedAt: FieldRef<"Ticket", 'DateTime'>
@@ -22428,7 +22521,8 @@ export namespace Prisma {
     deletedAt: 'deletedAt',
     isActive: 'isActive',
     stateId: 'stateId',
-    projectCode: 'projectCode'
+    projectCode: 'projectCode',
+    orgCode: 'orgCode'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -22455,6 +22549,8 @@ export namespace Prisma {
     assignedServiceCenter: 'assignedServiceCenter',
     createdBy: 'createdBy',
     updatedBy: 'updatedBy',
+    code: 'code',
+    projectName: 'projectName',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt'
@@ -22688,7 +22784,8 @@ export namespace Prisma {
     phone: 'phone',
     password: 'password',
     centerCode: 'centerCode',
-    projectCode: 'projectCode'
+    projectCode: 'projectCode',
+    orgCode: 'orgCode'
   };
 
   export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
@@ -22710,7 +22807,9 @@ export namespace Prisma {
     faultCode: 'faultCode',
     faultType: 'faultType',
     priority: 'priority',
-    assignedServiceCenter: 'assignedServiceCenter'
+    assignedServiceCenter: 'assignedServiceCenter',
+    code: 'code',
+    projectName: 'projectName'
   };
 
   export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
@@ -22946,7 +23045,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Organisation"> | Date | string
     updatedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
-    Project?: ProjectListRelationFilter
+    project?: ProjectListRelationFilter
+    users?: UserListRelationFilter
   }
 
   export type OrganisationOrderByWithRelationInput = {
@@ -22960,7 +23060,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
-    Project?: ProjectOrderByRelationAggregateInput
+    project?: ProjectOrderByRelationAggregateInput
+    users?: UserOrderByRelationAggregateInput
     _relevance?: OrganisationOrderByRelevanceInput
   }
 
@@ -22978,7 +23079,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Organisation"> | Date | string
     updatedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
-    Project?: ProjectListRelationFilter
+    project?: ProjectListRelationFilter
+    users?: UserListRelationFilter
   }, "id" | "orgCode" | "email" | "phone">
 
   export type OrganisationOrderByWithAggregationInput = {
@@ -23215,6 +23317,7 @@ export namespace Prisma {
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
     projectCode?: StringNullableFilter<"User"> | string | null
+    orgCode?: StringNullableFilter<"User"> | string | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     createdTickets?: TicketListRelationFilter
     updatedTickets?: TicketListRelationFilter
@@ -23229,6 +23332,7 @@ export namespace Prisma {
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     states?: StateListRelationFilter
     project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
+    organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -23245,6 +23349,7 @@ export namespace Prisma {
     isActive?: SortOrder
     stateId?: SortOrderInput | SortOrder
     projectCode?: SortOrderInput | SortOrder
+    orgCode?: SortOrderInput | SortOrder
     serviceCenter?: ServiceCenterOrderByWithRelationInput
     createdTickets?: TicketOrderByRelationAggregateInput
     updatedTickets?: TicketOrderByRelationAggregateInput
@@ -23259,6 +23364,7 @@ export namespace Prisma {
     State?: StateOrderByWithRelationInput
     states?: StateOrderByRelationAggregateInput
     project?: ProjectOrderByWithRelationInput
+    organisation?: OrganisationOrderByWithRelationInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -23279,6 +23385,7 @@ export namespace Prisma {
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
     projectCode?: StringNullableFilter<"User"> | string | null
+    orgCode?: StringNullableFilter<"User"> | string | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     createdTickets?: TicketListRelationFilter
     updatedTickets?: TicketListRelationFilter
@@ -23293,6 +23400,7 @@ export namespace Prisma {
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     states?: StateListRelationFilter
     project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
+    organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
   }, "id" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -23309,6 +23417,7 @@ export namespace Prisma {
     isActive?: SortOrder
     stateId?: SortOrderInput | SortOrder
     projectCode?: SortOrderInput | SortOrder
+    orgCode?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -23333,6 +23442,7 @@ export namespace Prisma {
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     stateId?: IntNullableWithAggregatesFilter<"User"> | number | null
     projectCode?: StringNullableWithAggregatesFilter<"User"> | string | null
+    orgCode?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type TicketWhereInput = {
@@ -23348,7 +23458,7 @@ export namespace Prisma {
     hp?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     state?: StringFilter<"Ticket"> | string
-    district?: StringFilter<"Ticket"> | string
+    district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
     complaintType?: StringFilter<"Ticket"> | string
@@ -23359,6 +23469,8 @@ export namespace Prisma {
     assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
     createdBy?: IntFilter<"Ticket"> | number
     updatedBy?: IntNullableFilter<"Ticket"> | number | null
+    code?: StringNullableFilter<"Ticket"> | string | null
+    projectName?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
@@ -23382,7 +23494,7 @@ export namespace Prisma {
     hp?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
     state?: SortOrder
-    district?: SortOrder
+    district?: SortOrderInput | SortOrder
     village?: SortOrderInput | SortOrder
     block?: SortOrderInput | SortOrder
     complaintType?: SortOrder
@@ -23393,6 +23505,8 @@ export namespace Prisma {
     assignedServiceCenter?: SortOrderInput | SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
+    code?: SortOrderInput | SortOrder
+    projectName?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -23420,7 +23534,7 @@ export namespace Prisma {
     hp?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     state?: StringFilter<"Ticket"> | string
-    district?: StringFilter<"Ticket"> | string
+    district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
     complaintType?: StringFilter<"Ticket"> | string
@@ -23431,6 +23545,8 @@ export namespace Prisma {
     assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
     createdBy?: IntFilter<"Ticket"> | number
     updatedBy?: IntNullableFilter<"Ticket"> | number | null
+    code?: StringNullableFilter<"Ticket"> | string | null
+    projectName?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
@@ -23454,7 +23570,7 @@ export namespace Prisma {
     hp?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
     state?: SortOrder
-    district?: SortOrder
+    district?: SortOrderInput | SortOrder
     village?: SortOrderInput | SortOrder
     block?: SortOrderInput | SortOrder
     complaintType?: SortOrder
@@ -23465,6 +23581,8 @@ export namespace Prisma {
     assignedServiceCenter?: SortOrderInput | SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
+    code?: SortOrderInput | SortOrder
+    projectName?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -23488,7 +23606,7 @@ export namespace Prisma {
     hp?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     motorType?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     state?: StringWithAggregatesFilter<"Ticket"> | string
-    district?: StringWithAggregatesFilter<"Ticket"> | string
+    district?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     village?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     block?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     complaintType?: StringWithAggregatesFilter<"Ticket"> | string
@@ -23499,6 +23617,8 @@ export namespace Prisma {
     assignedServiceCenter?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     createdBy?: IntWithAggregatesFilter<"Ticket"> | number
     updatedBy?: IntNullableWithAggregatesFilter<"Ticket"> | number | null
+    code?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    projectName?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Ticket"> | Date | string | null
@@ -24470,7 +24590,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    Project?: ProjectCreateNestedManyWithoutOrganisationInput
+    project?: ProjectCreateNestedManyWithoutOrganisationInput
+    users?: UserCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateInput = {
@@ -24484,7 +24605,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    Project?: ProjectUncheckedCreateNestedManyWithoutOrganisationInput
+    project?: ProjectUncheckedCreateNestedManyWithoutOrganisationInput
+    users?: UserUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUpdateInput = {
@@ -24497,7 +24619,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Project?: ProjectUpdateManyWithoutOrganisationNestedInput
+    project?: ProjectUpdateManyWithoutOrganisationNestedInput
+    users?: UserUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateInput = {
@@ -24511,7 +24634,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
+    project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
+    users?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationCreateManyInput = {
@@ -24773,6 +24897,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -24789,6 +24914,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -24826,6 +24952,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -24842,6 +24969,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -24869,6 +24997,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -24897,6 +25026,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketCreateInput = {
@@ -24908,7 +25038,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -24916,6 +25046,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -24939,7 +25071,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -24950,6 +25082,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -24969,7 +25103,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -24977,6 +25111,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25000,7 +25136,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -25011,6 +25147,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25031,7 +25169,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -25042,6 +25180,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -25056,7 +25196,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -25064,6 +25204,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25079,7 +25221,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -25090,6 +25232,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26513,6 +26657,7 @@ export namespace Prisma {
     isActive?: SortOrder
     stateId?: SortOrder
     projectCode?: SortOrder
+    orgCode?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -26534,6 +26679,7 @@ export namespace Prisma {
     isActive?: SortOrder
     stateId?: SortOrder
     projectCode?: SortOrder
+    orgCode?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -26550,6 +26696,7 @@ export namespace Prisma {
     isActive?: SortOrder
     stateId?: SortOrder
     projectCode?: SortOrder
+    orgCode?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -26621,6 +26768,8 @@ export namespace Prisma {
     assignedServiceCenter?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
+    code?: SortOrder
+    projectName?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -26653,6 +26802,8 @@ export namespace Prisma {
     assignedServiceCenter?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
+    code?: SortOrder
+    projectName?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -26679,6 +26830,8 @@ export namespace Prisma {
     assignedServiceCenter?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
+    code?: SortOrder
+    projectName?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -27540,11 +27693,25 @@ export namespace Prisma {
     connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
   }
 
+  export type UserCreateNestedManyWithoutOrganisationInput = {
+    create?: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput> | UserCreateWithoutOrganisationInput[] | UserUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
+    createMany?: UserCreateManyOrganisationInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type ProjectUncheckedCreateNestedManyWithoutOrganisationInput = {
     create?: XOR<ProjectCreateWithoutOrganisationInput, ProjectUncheckedCreateWithoutOrganisationInput> | ProjectCreateWithoutOrganisationInput[] | ProjectUncheckedCreateWithoutOrganisationInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutOrganisationInput | ProjectCreateOrConnectWithoutOrganisationInput[]
     createMany?: ProjectCreateManyOrganisationInputEnvelope
     connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutOrganisationInput = {
+    create?: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput> | UserCreateWithoutOrganisationInput[] | UserUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
+    createMany?: UserCreateManyOrganisationInputEnvelope
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -27573,6 +27740,20 @@ export namespace Prisma {
     deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
   }
 
+  export type UserUpdateManyWithoutOrganisationNestedInput = {
+    create?: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput> | UserCreateWithoutOrganisationInput[] | UserUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutOrganisationInput | UserUpsertWithWhereUniqueWithoutOrganisationInput[]
+    createMany?: UserCreateManyOrganisationInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutOrganisationInput | UserUpdateWithWhereUniqueWithoutOrganisationInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutOrganisationInput | UserUpdateManyWithWhereWithoutOrganisationInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
   export type ProjectUncheckedUpdateManyWithoutOrganisationNestedInput = {
     create?: XOR<ProjectCreateWithoutOrganisationInput, ProjectUncheckedCreateWithoutOrganisationInput> | ProjectCreateWithoutOrganisationInput[] | ProjectUncheckedCreateWithoutOrganisationInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutOrganisationInput | ProjectCreateOrConnectWithoutOrganisationInput[]
@@ -27585,6 +27766,20 @@ export namespace Prisma {
     update?: ProjectUpdateWithWhereUniqueWithoutOrganisationInput | ProjectUpdateWithWhereUniqueWithoutOrganisationInput[]
     updateMany?: ProjectUpdateManyWithWhereWithoutOrganisationInput | ProjectUpdateManyWithWhereWithoutOrganisationInput[]
     deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutOrganisationNestedInput = {
+    create?: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput> | UserCreateWithoutOrganisationInput[] | UserUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutOrganisationInput | UserUpsertWithWhereUniqueWithoutOrganisationInput[]
+    createMany?: UserCreateManyOrganisationInputEnvelope
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutOrganisationInput | UserUpdateWithWhereUniqueWithoutOrganisationInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutOrganisationInput | UserUpdateManyWithWhereWithoutOrganisationInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type ServiceCenterCreateNestedManyWithoutProjectInput = {
@@ -27889,6 +28084,12 @@ export namespace Prisma {
     connect?: ProjectWhereUniqueInput
   }
 
+  export type OrganisationCreateNestedOneWithoutUsersInput = {
+    create?: XOR<OrganisationCreateWithoutUsersInput, OrganisationUncheckedCreateWithoutUsersInput>
+    connectOrCreate?: OrganisationCreateOrConnectWithoutUsersInput
+    connect?: OrganisationWhereUniqueInput
+  }
+
   export type TicketUncheckedCreateNestedManyWithoutCreatedByUserInput = {
     create?: XOR<TicketCreateWithoutCreatedByUserInput, TicketUncheckedCreateWithoutCreatedByUserInput> | TicketCreateWithoutCreatedByUserInput[] | TicketUncheckedCreateWithoutCreatedByUserInput[]
     connectOrCreate?: TicketCreateOrConnectWithoutCreatedByUserInput | TicketCreateOrConnectWithoutCreatedByUserInput[]
@@ -28150,6 +28351,16 @@ export namespace Prisma {
     delete?: ProjectWhereInput | boolean
     connect?: ProjectWhereUniqueInput
     update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutUsersInput, ProjectUpdateWithoutUsersInput>, ProjectUncheckedUpdateWithoutUsersInput>
+  }
+
+  export type OrganisationUpdateOneWithoutUsersNestedInput = {
+    create?: XOR<OrganisationCreateWithoutUsersInput, OrganisationUncheckedCreateWithoutUsersInput>
+    connectOrCreate?: OrganisationCreateOrConnectWithoutUsersInput
+    upsert?: OrganisationUpsertWithoutUsersInput
+    disconnect?: OrganisationWhereInput | boolean
+    delete?: OrganisationWhereInput | boolean
+    connect?: OrganisationWhereUniqueInput
+    update?: XOR<XOR<OrganisationUpdateToOneWithWhereWithoutUsersInput, OrganisationUpdateWithoutUsersInput>, OrganisationUncheckedUpdateWithoutUsersInput>
   }
 
   export type TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput = {
@@ -29603,6 +29814,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutStateInput = {
@@ -29618,6 +29830,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -29664,6 +29877,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutStatesInput = {
@@ -29680,6 +29894,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -29730,6 +29945,7 @@ export namespace Prisma {
     isActive?: BoolFilter<"User"> | boolean
     stateId?: IntNullableFilter<"User"> | number | null
     projectCode?: StringNullableFilter<"User"> | string | null
+    orgCode?: StringNullableFilter<"User"> | string | null
   }
 
   export type UserUpsertWithWhereUniqueWithoutStatesInput = {
@@ -29785,6 +30001,69 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserCreateWithoutOrganisationInput = {
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutUsersInput
+    createdTickets?: TicketCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
+  }
+
+  export type UserUncheckedCreateWithoutOrganisationInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    projectCode?: string | null
+    createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
+  }
+
+  export type UserCreateOrConnectWithoutOrganisationInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput>
+  }
+
+  export type UserCreateManyOrganisationInputEnvelope = {
+    data: UserCreateManyOrganisationInput | UserCreateManyOrganisationInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProjectUpsertWithWhereUniqueWithoutOrganisationInput = {
     where: ProjectWhereUniqueInput
     update: XOR<ProjectUpdateWithoutOrganisationInput, ProjectUncheckedUpdateWithoutOrganisationInput>
@@ -29815,6 +30094,22 @@ export namespace Prisma {
     updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutOrganisationInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutOrganisationInput, UserUncheckedUpdateWithoutOrganisationInput>
+    create: XOR<UserCreateWithoutOrganisationInput, UserUncheckedCreateWithoutOrganisationInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutOrganisationInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutOrganisationInput, UserUncheckedUpdateWithoutOrganisationInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutOrganisationInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutOrganisationInput>
   }
 
   export type ServiceCenterCreateWithoutProjectInput = {
@@ -29866,6 +30161,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
+    users?: UserCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateWithoutProjectInput = {
@@ -29879,6 +30175,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
+    users?: UserUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationCreateOrConnectWithoutProjectInput = {
@@ -29909,6 +30206,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutProjectInput = {
@@ -29924,6 +30222,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -30001,6 +30300,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateWithoutProjectInput = {
@@ -30014,6 +30314,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutProjectInput = {
@@ -30055,6 +30356,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutServiceCenterInput = {
@@ -30070,6 +30372,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -30134,7 +30437,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -30142,6 +30445,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -30164,7 +30469,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -30174,6 +30479,8 @@ export namespace Prisma {
     priority?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -30277,7 +30584,7 @@ export namespace Prisma {
     hp?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     state?: StringFilter<"Ticket"> | string
-    district?: StringFilter<"Ticket"> | string
+    district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
     complaintType?: StringFilter<"Ticket"> | string
@@ -30288,6 +30595,8 @@ export namespace Prisma {
     assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
     createdBy?: IntFilter<"Ticket"> | number
     updatedBy?: IntNullableFilter<"Ticket"> | number | null
+    code?: StringNullableFilter<"Ticket"> | string | null
+    projectName?: StringNullableFilter<"Ticket"> | string | null
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
@@ -30336,7 +30645,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -30344,6 +30653,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -30366,7 +30677,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -30376,6 +30687,8 @@ export namespace Prisma {
     priority?: string | null
     assignedServiceCenter?: string | null
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -30405,7 +30718,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -30413,6 +30726,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -30435,7 +30750,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -30445,6 +30760,8 @@ export namespace Prisma {
     priority?: string | null
     assignedServiceCenter?: string | null
     createdBy: number
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -30771,6 +31088,38 @@ export namespace Prisma {
   export type ProjectCreateOrConnectWithoutUsersInput = {
     where: ProjectWhereUniqueInput
     create: XOR<ProjectCreateWithoutUsersInput, ProjectUncheckedCreateWithoutUsersInput>
+  }
+
+  export type OrganisationCreateWithoutUsersInput = {
+    name: string
+    orgCode: string
+    email: string
+    phone: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    project?: ProjectCreateNestedManyWithoutOrganisationInput
+  }
+
+  export type OrganisationUncheckedCreateWithoutUsersInput = {
+    id?: number
+    name: string
+    orgCode: string
+    email: string
+    phone: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    project?: ProjectUncheckedCreateNestedManyWithoutOrganisationInput
+  }
+
+  export type OrganisationCreateOrConnectWithoutUsersInput = {
+    where: OrganisationWhereUniqueInput
+    create: XOR<OrganisationCreateWithoutUsersInput, OrganisationUncheckedCreateWithoutUsersInput>
   }
 
   export type ServiceCenterUpsertWithoutUsersInput = {
@@ -31156,6 +31505,44 @@ export namespace Prisma {
     ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
   }
 
+  export type OrganisationUpsertWithoutUsersInput = {
+    update: XOR<OrganisationUpdateWithoutUsersInput, OrganisationUncheckedUpdateWithoutUsersInput>
+    create: XOR<OrganisationCreateWithoutUsersInput, OrganisationUncheckedCreateWithoutUsersInput>
+    where?: OrganisationWhereInput
+  }
+
+  export type OrganisationUpdateToOneWithWhereWithoutUsersInput = {
+    where?: OrganisationWhereInput
+    data: XOR<OrganisationUpdateWithoutUsersInput, OrganisationUncheckedUpdateWithoutUsersInput>
+  }
+
+  export type OrganisationUpdateWithoutUsersInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    orgCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    project?: ProjectUpdateManyWithoutOrganisationNestedInput
+  }
+
+  export type OrganisationUncheckedUpdateWithoutUsersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    orgCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
+  }
+
   export type UserCreateWithoutCreatedTicketsInput = {
     name: string
     phone: string
@@ -31179,6 +31566,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutCreatedTicketsInput = {
@@ -31195,6 +31583,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
@@ -31235,6 +31624,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutUpdatedTicketsInput = {
@@ -31251,6 +31641,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
     messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
@@ -31505,6 +31896,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedTicketsInput = {
@@ -31521,6 +31913,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
@@ -31567,6 +31960,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUpdatedTicketsInput = {
@@ -31583,6 +31977,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
     messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
@@ -31739,7 +32134,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -31747,6 +32142,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -31769,7 +32166,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -31780,6 +32177,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -31817,6 +32216,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutTicketMilestoneInput = {
@@ -31833,6 +32233,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -31901,7 +32302,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -31909,6 +32310,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -31931,7 +32334,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -31942,6 +32345,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -31985,6 +32390,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTicketMilestoneInput = {
@@ -32001,6 +32407,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32104,7 +32511,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -32112,6 +32519,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -32134,7 +32543,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -32145,6 +32554,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -32257,7 +32668,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -32265,6 +32676,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32287,7 +32700,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -32298,6 +32711,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -32330,6 +32745,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsCreatedInput = {
@@ -32346,6 +32762,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -32386,6 +32803,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsUpdatedInput = {
@@ -32402,6 +32820,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -32480,6 +32899,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsCreatedInput = {
@@ -32496,6 +32916,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32542,6 +32963,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsUpdatedInput = {
@@ -32558,6 +32980,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -32898,7 +33321,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -32906,6 +33329,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -32928,7 +33353,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -32939,6 +33364,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -32976,6 +33403,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutProductTransactionsInput = {
@@ -32992,6 +33420,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -33065,7 +33494,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -33073,6 +33502,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33095,7 +33526,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -33106,6 +33537,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33149,6 +33582,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductTransactionsInput = {
@@ -33165,6 +33599,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -33266,6 +33701,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -33282,6 +33718,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
@@ -33308,7 +33745,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -33316,6 +33753,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -33338,7 +33777,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -33349,6 +33788,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -33480,6 +33921,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -33496,6 +33938,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
@@ -33528,7 +33971,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -33536,6 +33979,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33558,7 +34003,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -33569,6 +34014,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33673,6 +34120,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutMessageSeensInput = {
@@ -33689,6 +34137,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -33770,6 +34219,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessageSeensInput = {
@@ -33786,6 +34236,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -33845,6 +34296,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutSentNotificationsInput = {
@@ -33861,6 +34313,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -33887,7 +34340,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -33895,6 +34348,8 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -33917,7 +34372,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -33928,6 +34383,8 @@ export namespace Prisma {
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -34029,6 +34486,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentNotificationsInput = {
@@ -34045,6 +34503,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34077,7 +34536,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -34085,6 +34544,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34107,7 +34568,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -34118,6 +34579,8 @@ export namespace Prisma {
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34192,6 +34655,7 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateWithoutNotificationRecipientsInput = {
@@ -34208,6 +34672,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
     createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
     updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
     messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
@@ -34291,6 +34756,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationRecipientsInput = {
@@ -34307,6 +34773,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34332,6 +34799,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     projectCode?: string | null
+    orgCode?: string | null
   }
 
   export type UserUpdateWithoutStateInput = {
@@ -34357,6 +34825,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStateInput = {
@@ -34372,6 +34841,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34398,6 +34868,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUpdateWithoutStatesInput = {
@@ -34423,6 +34894,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStatesInput = {
@@ -34439,6 +34911,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34465,6 +34938,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ProjectCreateManyOrganisationInput = {
@@ -34477,6 +34951,22 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
+  }
+
+  export type UserCreateManyOrganisationInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    projectCode?: string | null
   }
 
   export type ProjectUpdateWithoutOrganisationInput = {
@@ -34518,6 +35008,75 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type UserUpdateWithoutOrganisationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    serviceCenter?: ServiceCenterUpdateOneWithoutUsersNestedInput
+    createdTickets?: TicketUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutOrganisationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutOrganisationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type ServiceCenterCreateManyProjectInput = {
     id?: number
     name: string
@@ -34544,6 +35103,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     isActive?: boolean
     stateId?: number | null
+    orgCode?: string | null
   }
 
   export type ServiceCenterUpdateWithoutProjectInput = {
@@ -34611,6 +35171,7 @@ export namespace Prisma {
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProjectInput = {
@@ -34626,6 +35187,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34652,6 +35214,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserCreateManyServiceCenterInput = {
@@ -34667,6 +35230,7 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     projectCode?: string | null
+    orgCode?: string | null
   }
 
   export type TicketCreateManyServiceCenterInput = {
@@ -34679,7 +35243,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -34689,6 +35253,8 @@ export namespace Prisma {
     priority?: string | null
     createdBy: number
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -34717,6 +35283,7 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateWithoutServiceCenterInput = {
@@ -34732,6 +35299,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
     updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
@@ -34758,6 +35326,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUpdateWithoutServiceCenterInput = {
@@ -34769,7 +35338,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -34777,6 +35346,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34799,7 +35370,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -34809,6 +35380,8 @@ export namespace Prisma {
     priority?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34829,7 +35402,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -34839,6 +35412,8 @@ export namespace Prisma {
     priority?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -34854,7 +35429,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -34864,6 +35439,8 @@ export namespace Prisma {
     priority?: string | null
     assignedServiceCenter?: string | null
     updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -34879,7 +35456,7 @@ export namespace Prisma {
     hp?: string | null
     motorType?: string | null
     state: string
-    district: string
+    district?: string | null
     village?: string | null
     block?: string | null
     complaintType: string
@@ -34889,6 +35466,8 @@ export namespace Prisma {
     priority?: string | null
     assignedServiceCenter?: string | null
     createdBy: number
+    code?: string | null
+    projectName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -34980,7 +35559,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -34988,6 +35567,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35010,7 +35591,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -35020,6 +35601,8 @@ export namespace Prisma {
     priority?: NullableStringFieldUpdateOperationsInput | string | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35040,7 +35623,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -35050,6 +35633,8 @@ export namespace Prisma {
     priority?: NullableStringFieldUpdateOperationsInput | string | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35064,7 +35649,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -35072,6 +35657,8 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35094,7 +35681,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -35104,6 +35691,8 @@ export namespace Prisma {
     priority?: NullableStringFieldUpdateOperationsInput | string | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35124,7 +35713,7 @@ export namespace Prisma {
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     state?: StringFieldUpdateOperationsInput | string
-    district?: StringFieldUpdateOperationsInput | string
+    district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
     complaintType?: StringFieldUpdateOperationsInput | string
@@ -35134,6 +35723,8 @@ export namespace Prisma {
     priority?: NullableStringFieldUpdateOperationsInput | string | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
