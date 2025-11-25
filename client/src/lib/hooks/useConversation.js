@@ -62,7 +62,7 @@ export const useConversation = (ticketId) => {
 
     try {
       const baseUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:4052/api";
+        import.meta.env.VITE_API_URL || "http:import.meta.env.VITE_WS_URL/api";
       const url = `${baseUrl}/conversations/${ticketId}`;
 
       const response = await fetch(url, {
@@ -126,7 +126,7 @@ export const useConversation = (ticketId) => {
         }
 
         const baseUrl =
-          import.meta.env.VITE_API_URL || "http://localhost:4052/api";
+          import.meta.env.VITE_API_URL || "http:import.meta.env.VITE_WS_URL/api";
         const url = `${baseUrl}/conversations/${ticketId}`;
          const response = await fetch(url, {
           method: "POST",
@@ -227,7 +227,7 @@ export const useConversation = (ticketId) => {
   const testConnection = useCallback(async () => {
     try {
       const baseUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:4052/api";
+        import.meta.env.VITE_API_URL || "http:import.meta.env.VITE_WS_URL/api";
       const response = await fetch(`${baseUrl.replace("/api", "")}/`, {
         method: "GET",
       });

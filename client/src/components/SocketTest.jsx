@@ -30,7 +30,7 @@ const SocketTest = () => {
 
       // Test 2: Test Socket.IO server accessibility
       try {
-        const response = await fetch('http://localhost:4052/socket.io/?EIO=4&transport=polling');
+        const response = await fetch(`${import.meta.env.VITE_WS_URL}/socket.io/?EIO=4&transport=polling`);
         if (response.ok) {
           addLog('✅ Socket.IO server is accessible', 'success');
           setTestResults(prev => ({ ...prev, serverAccessible: true }));

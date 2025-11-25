@@ -55,7 +55,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
     setIsDownloading(true);
     
     try {
-      const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4052/api';
+      const baseApiUrl = import.meta.env.VITE_API_URL || 'http:import.meta.env.VITE_WS_URL/api';
       const baseUrl = baseApiUrl.replace('/api', ''); // Remove /api for file URLs
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       let downloadUrl;

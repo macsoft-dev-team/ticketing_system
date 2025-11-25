@@ -17,7 +17,7 @@ export default function SpareReqForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 w-full max-h-[95vh] sm:max-h-[90vh]">
             {/* Header */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -34,7 +34,7 @@ export default function SpareReqForm() {
                         <ArrowLeft size={20} />
                     </motion.button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Spare Parts Request</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Spare Request</h1>
                         <p className="text-gray-600">Request spare parts for maintenance and repairs</p>
                     </div>
                 </div>

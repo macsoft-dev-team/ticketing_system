@@ -13,58 +13,7 @@ export default defineConfig({
         "favicon/favicon.ico",
         "favicon/apple-touch-icon.png",
         "favicon/favicon-96x96.png",
-      ],
-      manifest: {
-        name: "Macsoft CMS",
-        short_name: "CMS",
-        description: "Macsoft Customer Management System",
-        start_url: "/", // 👈 important for installability
-        display: "standalone", // 👈 opens like an app (no browser UI)
-        background_color: "#ffffff",
-        theme_color: "#ffffff",
-        icons: [
-          {
-            src: "/assets/icon-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-            purpose: "any",
-          },
-          {
-            src: "/assets/icon-256x256.png",
-            sizes: "256x256",
-            type: "image/png",
-            purpose: "any",
-          },
-          {
-            src: "/assets/icon-384x384.png",
-            sizes: "384x384",
-            type: "image/png",
-            purpose: "any",
-          },
-          {
-            src: "/assets/icon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any",
-          },
-        ],
-        screenshots: [
-          {
-            src: "/assets/icon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            form_factor: "wide",
-            label: "Macsoft CMS Desktop View",
-          },
-          {
-            src: "/assets/icon-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-            form_factor: "narrow",
-            label: "Macsoft CMS Mobile View",
-          },
-        ],
-      },
+      ],    
       workbox: {
         globPatterns: ["**/*.{js,css,html}"],
         // Further reduce the maximum file size limit to 1MB for minimal cache

@@ -1,0 +1,41 @@
+ 
+
+ {
+        "name": "Macsoft CMS",
+        "short_name": "CMS",
+        "description": "Macsoft Compliant Management System",
+        "start_url": "/", 
+        "display": "standalone",  
+        "background_color": "#ffffff",
+        "theme_color": "#ffffff",
+        "icons": [
+          {
+            "src": "/favicon/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+          }, 
+          {
+            "src": "/favicon/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+          }
+        ],
+        "screenshots": [
+          {
+            "src": "/favicon/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Macsoft CMS Desktop View"
+          },
+          {
+            "src": "/favicon/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Macsoft CMS Mobile View"
+          }
+        ]
+      }

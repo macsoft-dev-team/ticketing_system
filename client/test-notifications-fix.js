@@ -1,6 +1,6 @@
 // Test notification API with new format handling
 const testNotificationAPI = async () => {
-  const baseUrl = 'http://localhost:4052/api';
+  const baseUrl = import.meta.env.VITE_WS_URL;
   
   // User credentials
   const loginData = {

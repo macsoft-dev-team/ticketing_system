@@ -1056,7 +1056,7 @@ export default function TicketDashboard() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+              className="max-w-6xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto bg-white rounded-lg shadow-lg p-4 sm:p-6"
             >
               <SpareRequestForm
                 onSubmit={handleSpareRequestSubmit}

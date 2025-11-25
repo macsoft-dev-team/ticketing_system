@@ -280,25 +280,18 @@ export const SpareRequestForm = ({ onSubmit, onCancel, isLoading = false }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6"
+      className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6 overflow-y-auto max-h-full"
     >
       <div className="mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+        <h2 className="text-xl uppercase tracking-wider sm:text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
           <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
-          Spare Parts Request
+          Spare Request
         </h2>
         <p className="text-sm sm:text-base text-gray-600">Request spare parts for ticket resolution</p>
       </div>
 
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4 sm:space-y-6">
-        {/* Debug information */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-gray-100 p-3 rounded text-sm">
-            <p>Form errors: {JSON.stringify(errors)}</p>
-            <p>Products count: {watchedProducts?.length || 0}</p>
-            <p>Is submitting: {isSubmitting.toString()}</p>
-          </div>
-        )}
+ 
         
         {/* Basic Request Information */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">          <div>
@@ -324,7 +317,7 @@ export const SpareRequestForm = ({ onSubmit, onCancel, isLoading = false }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Expected Delivery Date *
+              Expected Delivery Date
             </label>
             <Controller
               name="expectedDelivery"

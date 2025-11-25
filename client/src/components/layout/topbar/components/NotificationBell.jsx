@@ -20,7 +20,7 @@ const NotificationBell = () => {
 
       setLoading(true);
       try {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4052/api';
+        const baseUrl = import.meta.env.VITE_API_URL;
         const response = await fetch(`${baseUrl}/notifications`, {
           method: 'GET',
           headers: {
@@ -74,7 +74,7 @@ const NotificationBell = () => {
         // Import socket.io client dynamically
         const { io } = await import('socket.io-client');
 
-        notificationSocket = io('http://localhost:4052', {
+        notificationSocket = io(import.meta.env.VITE_WS_URL, {
           auth: { token },
           transports: ['websocket', 'polling']
         });
@@ -243,7 +243,7 @@ const NotificationBell = () => {
       // Mark notifications as read on server
       await Promise.all(
         unreadNotifications.map(async (notification) => {
-          const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4052/api';
+          const baseUrl = import.meta.env.VITE_API_URL;
           return fetch(`${baseUrl}/notifications/${notification.id}`, {
             method: 'PUT',
             headers: {
@@ -267,7 +267,7 @@ const NotificationBell = () => {
     // Mark as read if unread
     if (notification.unread) {
       try {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:4052/api';
+        const baseUrl = import.meta.env.VITE_API_URL;
         await fetch(`${baseUrl}/notifications/${notification.id}`, {
           method: 'PUT',
           headers: {

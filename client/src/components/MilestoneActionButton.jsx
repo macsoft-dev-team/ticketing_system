@@ -217,16 +217,7 @@ const MilestoneActionButton = ({
               action: 'transition',
               targetStage: 'REPAIRED',
               requiresPhotos: false,
-            },
-            {
-              title: 'Issue Solved',
-              shortTitle: 'Field Clear',
-              icon: CheckCircle,
-              color: 'green',
-              action: 'transition',
-              targetStage: 'REQUEST_CLEARED_AT_FIELD',
-              requiresPhotos: true,
-            },
+            }, 
           ];
         } else {
           // If no spare request yet, show spare request option
@@ -239,16 +230,7 @@ const MilestoneActionButton = ({
               action: 'spare_request',
               targetStage: 'SPARE_REQUESTED',
               requiresPhotos: false,
-            },
-            {
-              title: 'Issue Solved',
-              shortTitle: 'Field Clear',
-              icon: CheckCircle,
-              color: 'green',
-              action: 'transition',
-              targetStage: 'REQUEST_CLEARED_AT_FIELD',
-              requiresPhotos: true,
-            },
+            }, 
           ];
         }
       })(),
@@ -284,16 +266,7 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'READY_FOR_DISPATCH',
           requiresPhotos: true,
-        },
-        {
-          title: 'Issue Solved',
-          shortTitle: 'Field Clear',
-          icon: CheckCircle,
-          color: 'green',
-          action: 'transition',
-          targetStage: 'REQUEST_CLEARED_AT_FIELD',
-          requiresPhotos: true,
-        }
+        }, 
       ],
       REPAIR_IN_PROGRESS: [
         {
@@ -319,7 +292,7 @@ const MilestoneActionButton = ({
       ],
       READY_FOR_DISPATCH: needsPhotos ? [
         {
-          title: 'Add Dispatch Photos',
+          title: 'Add Spare Photos',
           shortTitle: 'Add Photos',
           icon: Camera,
           color: 'orange',

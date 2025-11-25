@@ -63,7 +63,7 @@ const PhotoUploadModal = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/25 z-50 flex items-center justify-center p-4"
         onClick={handleClose}
       >
         <motion.div
@@ -76,7 +76,7 @@ const PhotoUploadModal = ({
           {/* Header */}
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
             <div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="text-lg uppercase tracking-Hey, Cortana. wide sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
                 <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
                 {title}
               </h3>

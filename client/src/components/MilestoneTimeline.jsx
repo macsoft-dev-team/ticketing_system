@@ -102,7 +102,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
         setIsDownloading(true);
 
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+            const baseUrl = import.meta.env.VITE_API_URL;
             let downloadUrl;
 
             // Use dedicated download endpoint if attachment has an ID
@@ -160,7 +160,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
 
             // Final fallback - try direct URL in new tab
             if (attachment.fileUrl) {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+                const baseUrl = import.meta.env.VITE_API_URL;
                 const fallbackUrl = `${baseUrl}${attachment.fileUrl}`;
                 window.open(fallbackUrl, '_blank');
                 if (addToast) addToast({
@@ -216,7 +216,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                 {isImage && !imageError ? (
                     <div className="relative w-12 h-12 flex-shrink-0">
                         <img
-                            src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${attachment.fileUrl}`}
+                            src={`${import.meta.env.VITE_API_URL}${attachment.fileUrl}`}
                             alt={attachment.fileName}
                             className="w-full h-full object-cover rounded"
                             onError={() => setImageError(true)}
@@ -314,7 +314,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                                 </motion.div>
                             )}
                             <motion.img
-                                src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${attachment.fileUrl}`}
+                                src={`${import.meta.env.VITE_API_URL}${attachment.fileUrl}`}
                                 alt={attachment.fileName}
                                 className="max-w-[90vw] max-h-[80vh] rounded border"
                                 style={{ objectFit: 'contain', display: showImage ? 'block' : 'none' }}
@@ -871,7 +871,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
         try {
             setLoading(true);
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const url = `${baseUrl}/milestones/${ticketId}`;
             const response = await axios.get(url, {
                 headers: {
@@ -898,7 +898,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         if (!ticketId || !token) return;
 
         try {
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const url = `${baseUrl}/milestones/ticket/${ticketId}/available-transitions`;
             const response = await axios.get(url, {
                 headers: {
@@ -922,7 +922,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         try {
 
             // Get ticket data
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const ticketResponse = await axios.get(
                 `${baseUrl}/tickets/${ticketId}`,
                 {
@@ -998,7 +998,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
         try {
             setUploadingPhotos(true);
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const formData = new FormData();
             photos.forEach((photo) => {
                 formData.append('photos', photo);
@@ -1056,7 +1056,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         }
 
         try {
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const formData = new FormData();
             formData.append('targetStage', selectedTargetStage);
             if (transitionNotes) formData.append('notes', transitionNotes);
@@ -1154,7 +1154,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
     const handleUpdateNotes = async (milestoneId, notes) => {
         try {
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             await axios.put(
                 `${baseUrl}/milestones/${milestoneId}/notes`,
                 { notes },
@@ -1191,7 +1191,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
     const handleBlock = async (milestoneId, reason) => {
         try {
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const response = await fetch(
                 `${baseUrl}/milestones/${milestoneId}/block`,
                 {
@@ -1232,7 +1232,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
     const handleUnblock = async (milestoneId) => {
         try {
-            const baseUrl = API_URL || 'http://localhost:3001';
+            const baseUrl = API_URL;
             const response = await fetch(
                 `${baseUrl}/milestones/${milestoneId}/unblock`,
                 {
@@ -1332,7 +1332,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 READY_FOR_DISPATCH: {
                     title: 'Ready for Dispatch',
                     message: 'Mark this item as ready for dispatch to customer?',
-                    confirmText: 'Ready to Dispatch'
+                    confirmText: 'Ready to Dispatch',
                 },
                 DELIVERED: {
                     title: 'Mark as Delivered',
