@@ -81,6 +81,7 @@ const getErrorMessage = (error) => {
 };
 
 // Milestone Attachment Component
+const ERROR_TOAST_ID = 'milestone-error-toast';
 const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [imageError, setImageError] = useState(false);
@@ -168,11 +169,19 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                     variant: 'success'
                 });
             } else {
-                if (addToast) addToast({
-                    title: 'Download failed',
-                    description: 'Please check your connection and try again',
-                    variant: 'error'
-                });
+                if (addToast) {
+                    if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                    addToast({
+                        title: 'Download failed',
+                        description: 'Please check your connection and try again',
+                        variant: 'error',
+                        toastId: ERROR_TOAST_ID,
+                        autoClose: 5000,
+                        onClose: () => {
+                            if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                        }
+                    });
+                }
                 else console.error('Download failed');
             }
         } finally {
@@ -1011,11 +1020,19 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             await fetchMilestones();
         } catch (error) {
             console.error('Error uploading photos:', error);
-            addToast({
-                title: 'Upload Failed',
-                description: getErrorMessage(error),
-                variant: 'error'
-            });
+            if (addToast) {
+                if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                addToast({
+                    title: 'Upload Failed',
+                    description: getErrorMessage(error),
+                    variant: 'error',
+                    toastId: ERROR_TOAST_ID,
+                    autoClose: 5000,
+                    onClose: () => {
+                        if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                    }
+                });
+            }
         } finally {
             setUploadingPhotos(false);
         }
@@ -1096,11 +1113,19 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                         variant: 'success'
                     });
                 } catch (err) {
-                    addToast({
-                        title: 'Next Milestone Creation Failed',
-                        description: 'Could not create next milestone.',
-                        variant: 'error'
-                    });
+                    if (addToast) {
+                        if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                        addToast({
+                            title: 'Next Milestone Creation Failed',
+                            description: 'Could not create next milestone.',
+                            variant: 'error',
+                            toastId: ERROR_TOAST_ID,
+                            autoClose: 5000,
+                            onClose: () => {
+                                if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                            }
+                        });
+                    }
                 }
             }
             setShowTransitionModal(false);
@@ -1111,11 +1136,19 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             await fetchAvailableTransitions();
         } catch (error) {
             console.error('Error transitioning milestone:', error);
-            addToast({
-                title: 'Transition Failed',
-                description: getErrorMessage(error),
-                variant: 'error'
-            });
+            if (addToast) {
+                if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                addToast({
+                    title: 'Transition Failed',
+                    description: getErrorMessage(error),
+                    variant: 'error',
+                    toastId: ERROR_TOAST_ID,
+                    autoClose: 5000,
+                    onClose: () => {
+                        if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                    }
+                });
+            }
         }
     };
 
@@ -1140,11 +1173,19 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             await fetchMilestones();
         } catch (error) {
             console.error('Error updating notes:', error);
-            addToast({
-                title: 'Update Failed',
-                description: getErrorMessage(error),
-                variant: 'error'
-            });
+            if (addToast) {
+                if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                addToast({
+                    title: 'Update Failed',
+                    description: getErrorMessage(error),
+                    variant: 'error',
+                    toastId: ERROR_TOAST_ID,
+                    autoClose: 5000,
+                    onClose: () => {
+                        if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                    }
+                });
+            }
         }
     };
 
@@ -1173,11 +1214,19 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             await fetchMilestones();
         } catch (error) {
             console.error('Error blocking milestone:', error);
-            addToast({
-                title: 'Block Failed',
-                description: getErrorMessage(error),
-                variant: 'error'
-            });
+            if (addToast) {
+                if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                addToast({
+                    title: 'Block Failed',
+                    description: getErrorMessage(error),
+                    variant: 'error',
+                    toastId: ERROR_TOAST_ID,
+                    autoClose: 5000,
+                    onClose: () => {
+                        if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                    }
+                });
+            }
         }
     };
 
@@ -1204,11 +1253,19 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             await fetchMilestones();
         } catch (error) {
             console.error('Error unblocking milestone:', error);
-            addToast({
-                title: 'Unblock Failed',
-                description: getErrorMessage(error),
-                variant: 'error'
-            });
+            if (addToast) {
+                if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                addToast({
+                    title: 'Unblock Failed',
+                    description: getErrorMessage(error),
+                    variant: 'error',
+                    toastId: ERROR_TOAST_ID,
+                    autoClose: 5000,
+                    onClose: () => {
+                        if (addToast.dismiss) addToast.dismiss(ERROR_TOAST_ID);
+                    }
+                });
+            }
         }
     };
 

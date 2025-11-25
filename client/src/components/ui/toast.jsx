@@ -6,8 +6,14 @@ const ToastContext = createContext();
 export const ToastProvider = ({ children, placement = "top-right" }) => {
   const [toasts, setToasts] = useState([]);
 
+  // Add or replace toast by id
   const addToast = useCallback((toast) => {
-    setToasts((prev) => [...prev, { ...toast, id: Date.now() }]);
+    const id = toast.id || (toast.title + toast.description + toast.variant);
+    setToasts((prev) => {
+      // Remove any existing toast with same id
+      const filtered = prev.filter((t) => t.id !== id);
+      return [...filtered, { ...toast, id, duration: toast.duration }];
+    });
   }, []);
 
   const removeToast = useCallback((id) => {
@@ -76,13 +82,18 @@ const Toast = ({
   onClose,
   className,
   removeToast,
+  duration,
 }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      removeToast(id);
-    }, 3000); // 3 seconds
-    return () => clearTimeout(timer);
-  }, [id]); // Remove removeToast from dependencies to prevent re-running effect
+    // Default: 3s, error: 7s, or custom
+    let autoClose = typeof duration === 'number' ? duration : (variant === 'error' ? 7000 : 3000);
+    if (autoClose > 0) {
+      const timer = setTimeout(() => {
+        removeToast(id);
+      }, autoClose);
+      return () => clearTimeout(timer);
+    }
+  }, [id, duration, variant, removeToast]);
 
   const base =
     "group m-2 pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-md p-4 pr-6 shadow-lg transition-all";

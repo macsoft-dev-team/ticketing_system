@@ -192,7 +192,9 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) =>
         if (addToast) addToast({
           title: 'Download failed',
           description: 'Please check your connection and try again',
-          variant: 'error'
+          variant: 'error',
+          id: 'download-error',
+          duration: 7000
         });
         else alert('Download failed. Please try again.');
       }
@@ -334,7 +336,9 @@ export default function TicketDashboard() {
       addToast({
         title: 'Failed to send message',
         description: error.message || 'Please try again',
-        variant: 'error'
+        variant: 'error',
+        id: 'send-message-error',
+        duration: 7000
       });
     }
   }, [sendConversationMessage, addToast, ticketId, user, token]);
@@ -387,7 +391,9 @@ export default function TicketDashboard() {
       addToast({
         title: 'Submission Failed',
         description: error.message || 'Failed to submit spare request. Please try again.',
-        variant: 'error'
+        variant: 'error',
+        id: 'spare-request-error',
+        duration: 7000
       });
     }
   }, [ticketData.ticketCode, token, addToast, fetchTicketById, ticketId]);
@@ -451,7 +457,9 @@ export default function TicketDashboard() {
       addToast({
         title: 'Action Failed',
         description: error.message || 'An error occurred',
-        variant: 'error'
+        variant: 'error',
+        id: 'milestone-action-error',
+        duration: 7000
       });
     }
   }, [ticketId, updateMilestone, addToast, fetchTicketById]);
