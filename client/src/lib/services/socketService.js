@@ -14,10 +14,7 @@ class SocketService {
     }
 
     const serverUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
-    console.log('🔌 Connecting to Socket.IO server:', serverUrl);
-    console.log('🔑 Using token:', token ? 'Present' : 'Missing');
-    
-    this.socket = io(serverUrl, {
+     this.socket = io(serverUrl, {
       auth: {
         token: token
       },
@@ -27,13 +24,11 @@ class SocketService {
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ Socket.IO connected:', this.socket.id);
-      this.isConnected = true;
+       this.isConnected = true;
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('❌ Socket.IO disconnected:', reason);
-      this.isConnected = false;
+       this.isConnected = false;
     });
 
     this.socket.on('connect_error', (error) => {
@@ -52,8 +47,7 @@ class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
-      console.log('Socket.IO disconnected manually');
-    }
+     }
   }
 
   // Listen to conversation messages for a specific ticket
@@ -76,8 +70,7 @@ class SocketService {
     }
     this.listeners.get(ticketId).push({ eventName, callback: wrappedCallback });
 
-    console.log(`👂 Listening to conversations for ticket ${ticketId}`);
-  }
+   }
 
   // Notification listeners removed - conversations only
 
@@ -86,8 +79,7 @@ class SocketService {
     if (!this.socket) return;
 
     this.socket.on('ticket', callback);
-    console.log('👂 Listening to ticket updates');
-  }
+   }
 
   // Stop listening to conversation for a specific ticket
   stopListeningToConversation(ticketId) {
@@ -99,8 +91,7 @@ class SocketService {
     });
 
     this.listeners.delete(ticketId);
-    console.log(`🔇 Stopped listening to conversations for ticket ${ticketId}`);
-  }
+   }
 
   // Remove all listeners
   removeAllListeners() {
@@ -108,8 +99,7 @@ class SocketService {
 
     this.socket.removeAllListeners();
     this.listeners.clear();
-    console.log('🔇 Removed all socket listeners');
-  }
+   }
 
   // Check if socket is connected
   isSocketConnected() {

@@ -4,9 +4,7 @@ const getAllProjects = async (req, res) => {
   try {
     const { skip, take, filter } = req.query;
     const _transformedFilter = filter ? JSON.parse(filter) : undefined;
-    
-    console.log('Projects controller - params:', { skip, take, filter: _transformedFilter });
-    
+        
     const { projects, count, statusCount } =
       await projectService.getAllProjects(skip, take, _transformedFilter);
 

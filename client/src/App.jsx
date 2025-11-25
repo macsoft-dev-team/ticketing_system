@@ -25,8 +25,7 @@ function App() {
         
         // Check if session is expired first
         if (SessionManager.isSessionExpired()) {
-          console.log('Session expired, clearing data');
-          SessionManager.logout();
+           SessionManager.logout();
           setInitializing(false);
           return;
         }

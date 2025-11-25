@@ -292,8 +292,7 @@ export default function Inventory() {
           fetchInventoryData();
           fetchLowStockItems();
           // You could show a success message here
-          console.log('Inbound activity processed:', data);
-        }}
+         }}
       />
 
       {/* Details Modal - You can implement this later for viewing item details */}

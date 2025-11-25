@@ -1,9 +1,7 @@
 const { prisma } = require("../lib/clients");
 
 const getAll = async (skip, take, filter, currentUser) => {
-  try {
-    console.log('Service centers getAll called with:', { skip, take, filter, currentUserRole: currentUser?.role });
-    
+  try {    
     // Check if current user is authorized
     if (!currentUser) {
       throw new Error("Authentication required: User not found");
@@ -81,11 +79,8 @@ const getAll = async (skip, take, filter, currentUser) => {
     
     const count = await prisma.serviceCenter.count({ where: params.where });
 
-    console.log(`Successfully fetched ${serviceCenters.length} service centers`);
     return { serviceCenters, count, statusCount: _transformedStatusCount };
-  } catch (error) {
-    console.error('Service center getAll error:', error);
-    
+  } catch (error) {    
     // Provide more specific error messages
     if (error.message.includes('Unauthorized') || error.message.includes('Authentication required')) {
       throw error; // Re-throw auth errors as-is

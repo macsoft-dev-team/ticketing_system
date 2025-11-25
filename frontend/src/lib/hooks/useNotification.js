@@ -25,13 +25,11 @@ export default function useNotification() {
 
   useEffect(() => {
     const handleNotification = (notification) => {
-      console.log(user.id, "notification.userId");
-      const _notificationForUser = notification.find(
+       const _notificationForUser = notification.find(
         (n) => n.userId === user.id
       );
       if (_notificationForUser) {
-        console.log("_notificationForUser", _notificationForUser);
-        if (user.id === _notificationForUser.userId) {
+         if (user.id === _notificationForUser.userId) {
           playSound();
           if (_notificationForUser) {
             dispatch(appendNotification(_notificationForUser));

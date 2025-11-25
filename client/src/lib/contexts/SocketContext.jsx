@@ -24,18 +24,15 @@ export const SocketProvider = ({ children }) => {
 
   const connect = () => {
     if (token && !socket) {
-      console.log('Connecting socket for conversations only');
-      const socketInstance = socketService.connect(token);
+       const socketInstance = socketService.connect(token);
       setSocket(socketInstance);
       
       if (socketInstance) {
         socketInstance.on('connect', () => {
-          console.log('Socket connected - conversations only');
-          setIsConnected(true);
+           setIsConnected(true);
         });
         
         socketInstance.on('disconnect', () => {
-          console.log('Socket disconnected');
           setIsConnected(false);
         });
 

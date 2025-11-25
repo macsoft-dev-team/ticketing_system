@@ -13,18 +13,13 @@ export const fetchProjects = createAsyncThunk(
       if (filter && Object.keys(filter).length > 0) {
         params.filter = JSON.stringify(filter);
       }
-
-      console.log('Fetching projects with params:', params);
       
       const response = await axios.get(API_ENDPOINTS.project, {
         params: params,
         withCredentials: true,
       });
-      
-      console.log('fetchProjects response statusCount:', response.data.statusCount);
-      return response.data;
+            return response.data;
     } catch (error) {
-      console.error('Projects fetch error:', error);
       return rejectWithValue(error.response?.data || error.message);
     }
   }

@@ -143,8 +143,7 @@ const authSlice = createSlice({
       state.error = action.payload;
     },
     logout: (state) => {
-      console.log('Auth logout reducer called');
-      state.user = null;
+       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.permissions = [];
@@ -153,8 +152,7 @@ const authSlice = createSlice({
       try {
         SessionManager.logout();
         delete axios.defaults.headers.common['Authorization'];
-        console.log('Session cleared successfully');
-      } catch (error) {
+       } catch (error) {
         console.error('Error during session cleanup:', error);
       }
     },

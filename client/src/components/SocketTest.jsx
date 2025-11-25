@@ -11,8 +11,7 @@ const SocketTest = () => {
   const addLog = (message, type = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs(prev => [...prev, { message, type, timestamp }]);
-    console.log(`[${type.toUpperCase()}] ${message}`);
-  };
+   };
 
   const runConnectionTest = async () => {
     addLog('Starting WebSocket connection test...', 'info');

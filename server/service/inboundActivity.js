@@ -15,8 +15,6 @@ async function createInboundActivity(data) {
       createdBy,
     } = data;
 
-    console.log(`📦 Creating inbound activity with ${items.length} items`);
-
     // Validate all products exist
     const productIds = items.map((item) => item.productId);
     const products = await prisma.product.findMany({
@@ -35,11 +33,6 @@ async function createInboundActivity(data) {
         supplier ? ` from ${supplier}` : ""
       }${notes ? ` - ${notes}` : ""}`,
       createdBy
-    );
-
-    // Log the activity details
-    console.log(
-      `✅ Inbound activity completed: ${inventoryResults.length} items processed`
     );
 
     return {
@@ -140,10 +133,6 @@ async function processBulkInboundActivity(data) {
       notes,
       createdBy,
     } = data;
-
-    console.log(
-      `📦 Processing bulk inbound activity with ${items.length} items`
-    );
 
     // Resolve product IDs from product codes if needed
     const processedItems = [];

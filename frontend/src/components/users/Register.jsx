@@ -28,12 +28,11 @@ const Register = () => {
         try{
             // const response=await axios.post('http://localhost:8080/api/adduser',{name,phoneNo,password})
            const response=await axios.post(`${API_URL}/api/adduser`,{name,phoneNo,password})
-            console.log(response.data)
-            Navigate('/')
+             Navigate('/')
             reset()
         }catch(error){
-            console.log("Error while Inserting",error)
-        }
+            
+         }
     }
     const reset=()=>{
         setname('')

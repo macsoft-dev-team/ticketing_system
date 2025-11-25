@@ -20,8 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCallback } from "react";
 
 export const useNotification = () => {
-    console.log('🎣 useNotification hook initialized');
-    const dispatch = useDispatch();
+     const dispatch = useDispatch();
     const {
         notifications,
         notification,

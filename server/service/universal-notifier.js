@@ -82,10 +82,7 @@ async function notifyCRUD(ctx, input) {
           "notification",
           rec.notification
         );
-      }
-      console.log(
-        `📢 ${recipientRecords.length} users notified for ${entityType}_${action}`
-      );
+      } 
     }
 
     return { notification, recipients: recipientRecords };

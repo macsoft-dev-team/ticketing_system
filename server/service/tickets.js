@@ -11,7 +11,7 @@ const { createMilestone } = require("./milestones");
 const { generateTicketCode } = require("../lib/ticketCodeGenerator");
 const fs = require("fs");
 const path = require("path");
- 
+
 const getTickets = async (skip, take, filter, userId, role) => {
   try {
     // Base params (includes + ordering)
@@ -75,19 +75,19 @@ const getTickets = async (skip, take, filter, userId, role) => {
       if (s.length > 0) {
         // `mode: "insensitive"` works on supported connectors (MySQL/Postgres)
         where.OR = [
-          { ticketCode: { contains: s} },
-          { description: { contains: s} },
-          { customerName: { contains: s} },
-          { controllerNo: { contains: s} },
-          { imei: { contains: s} },
-          { hp: { contains: s} },
-          { motorType: { contains: s} },
-          { state: { contains: s} },
-          { district: { contains: s} },
-          { village: { contains: s} },
-          { block: { contains: s} },
-          { complaintType: { contains: s} },
-          { faultCode: { contains: s} },
+          { ticketCode: { contains: s } },
+          { description: { contains: s } },
+          { customerName: { contains: s } },
+          { controllerNo: { contains: s } },
+          { imei: { contains: s } },
+          { hp: { contains: s } },
+          { motorType: { contains: s } },
+          { state: { contains: s } },
+          { district: { contains: s } },
+          { village: { contains: s } },
+          { block: { contains: s } },
+          { complaintType: { contains: s } },
+          { faultCode: { contains: s } },
         ];
       }
     }
@@ -263,7 +263,6 @@ const getTickets = async (skip, take, filter, userId, role) => {
   }
 };
 
-
 const getTicketById = async (ticketId, userId, userRole = null) => {
   try {
     const ticket = await prisma.ticket.findUnique({
@@ -377,9 +376,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     const ticketCode = await generateTicketCode(
       ticketCodePrefix,
       ticketCodeSuffix
-    );
-    console.log("Generated ticket code:", ticketCode);
-
+    ); 
     // Process attachments - move from temp folder to ticket folder
     let processedAttachments = [];
     if (attachments && attachments.length > 0) {
@@ -538,14 +535,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         customerName: completeTicket.customerName,
         description: completeTicket.description,
       }
-    );
-
-    console.log("📢 Creating notification:", {
-      type: notificationData.type,
-      title: notificationData.title,
-      message: notificationData.message,
-      ticketCode: completeTicket.ticketCode,
-    });
+    ); 
 
     // Get target users (ADMIN, HEAD, and SUPPORT roles)
     const targetUsers = await prisma.user.findMany({
@@ -563,13 +553,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     });
 
     const targetUserIds = targetUsers.map((user) => user.id);
-
-    console.log("🔔 Notifying users for new ticket:", {
-      ticketCode: ticketCode,
-      targetUsers: targetUsers.map((u) => ({ name: u.name, role: u.role })),
-      totalCount: targetUsers.length,
-    });
-
+ 
     // Save and broadcast notification
     await saveAndBroadcastNotification(
       prisma,
@@ -581,9 +565,6 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     if (io) {
       io.emit("ticket", completeTicket);
       io.emit("conversation", conversation);
-      console.log(
-        `📄 New ticket created: ${completeTicket.ticketCode} by user ${userId}`
-      );
     }
     return completeTicket;
   } catch (error) {
@@ -738,10 +719,7 @@ const updateTicket = async (
 
     if (io) {
       io.emit("ticket", updatedTicket);
-      io.emit("conversation", conversation);
-      console.log(
-        `📝 Ticket updated: ${updatedTicket.ticketCode} by user ${userId}`
-      );
+      io.emit("conversation", conversation); 
     }
     return updatedTicket;
   } catch (error) {
@@ -826,9 +804,6 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
 
     if (io) {
       io.emit("ticket", updatedTicket);
-      console.log(
-        `🔄 Ticket status updated: ${updatedTicket.ticketCode} → ${status} by user ${userId}`
-      );
     }
     return updatedTicket;
   } catch (error) {
@@ -919,9 +894,6 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
         ticketId: ticketId,
         ticketCode: ticketToDelete.ticketCode,
       });
-      console.log(
-        `🗑️ Ticket deleted: ${ticketToDelete.ticketCode} by user ${userId}`
-      );
     }
 
     return deletedTicket;
@@ -944,7 +916,7 @@ const searchByControllerNumber = async (controllerNo, userId, userRole) => {
               in: ["SENT_TO_SERVICE_CENTER"],
             },
             status: {
-              in:[ "IN_PROGRESS"],
+              in: ["IN_PROGRESS"],
             },
           },
         },

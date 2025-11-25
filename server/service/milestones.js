@@ -61,7 +61,6 @@ const createMilestone = async (milestoneData, io) => {
           );
           
           await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
-          console.log(`📢 Milestone creation notification sent to ${targetUserIds.length} users`);
         }
       }
     } catch (notificationError) {
@@ -215,9 +214,6 @@ const transitionMilestone = async (
             ticket.ticketCode,
             userId
           );
-        console.log(
-          `✅ Bulk approved ${spareApprovalResult.approvedRequests} spare requests with ${spareApprovalResult.approvedItems} items for ticket ${ticket.ticketCode}`
-        );
       } catch (spareApprovalError) {
         console.error(
           "❌ Error auto-approving spare requests during milestone transition:",
@@ -352,7 +348,6 @@ const transitionMilestone = async (
         );
         
         await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
-        console.log(`📢 Milestone notification sent to ${targetUserIds.length} users for stage transition to ${targetConfig.label}`);
       }
     } catch (notificationError) {
       console.error('❌ Error sending milestone notification:', notificationError);
@@ -498,7 +493,6 @@ const updateMilestoneNotes = async (milestoneId, notes, userId) => {
         
         // Note: We don't have io here, so pass null - notifications will still be saved to DB
         await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
-        console.log(`📢 Milestone notes update notification sent to ${targetUserIds.length} users`);
       }
     } catch (notificationError) {
       console.error('❌ Error sending milestone notes update notification:', notificationError);
@@ -608,7 +602,6 @@ const addPhotosToCurrentMilestone = async (
         
         // Note: We don't have io here, so pass null - notifications will still be saved to DB
         await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
-        console.log(`📢 Milestone photos update notification sent to ${targetUserIds.length} users`);
       }
     } catch (notificationError) {
       console.error('❌ Error sending milestone photos update notification:', notificationError);

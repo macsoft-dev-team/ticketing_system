@@ -30,14 +30,12 @@ const Login = () => {
          //   const response=await axios.post('http://localhost:8080/api/loginuser', {phone,password});
             const response = await axios.post(`${API_URL}/api/login`, { phone, password });
             const token=response.data.token
-            console.log("JWT Token:", token);
-            sessionStorage.setItem('authtoken', token)
+             sessionStorage.setItem('authtoken', token)
               // navigate('/dashboard')
               navigate('/statusdashboard')
             reset()
         }catch(error){
-            console.log(error)
-            setFinalError('Invalid credentials')
+             setFinalError('Invalid credentials')
         }
     }
     const reset=()=>{

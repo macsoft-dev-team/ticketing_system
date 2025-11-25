@@ -61,7 +61,6 @@ exports.register = async (req, res) => {
 
       if (io) {
         io.emit("user", newUser);
-        console.log(`👤 New user registered: ${newUser.name} (${newUser.phone})`);
       }
     }
     return res.status(201).json({

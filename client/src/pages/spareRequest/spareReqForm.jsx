@@ -7,8 +7,7 @@ export default function SpareReqForm() {
     const navigate = useNavigate();
 
     const handleSubmit = (formData) => {
-        console.log('Spare request submitted:', formData);
-        // Handle form submission here - send to API
+         // Handle form submission here - send to API
         // navigate back or show success message
         navigate('/tickets'); // or wherever you want to redirect
     };

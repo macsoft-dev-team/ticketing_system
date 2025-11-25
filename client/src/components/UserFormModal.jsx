@@ -82,9 +82,7 @@ const UserFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode 
         }
     };
 
-    const validateForm = () => {
-        console.log(formData);
-        
+    const validateForm = () => {        
         const newErrors = {};
 
         if (!formData.name.trim()) {

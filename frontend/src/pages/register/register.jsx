@@ -14,11 +14,7 @@ export default function RegisterUser() {
 
     const handleSubmit = async (values) => {
         try {
-            console.log("Form Submitted:", values);
-
-            const result = await dispatch(register(values)).unwrap(); // .unwrap() for Redux Toolkit
-            console.log("Registration Result:", result);
-            
+            const result = await dispatch(register(values)).unwrap(); // .unwrap() for Redux Toolkit            
             message.success(result.message || "Registration successful. Please login.");
             navigate("/login"); 
             form.resetFields();

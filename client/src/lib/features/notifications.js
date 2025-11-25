@@ -7,20 +7,16 @@ export const fetchNotifications = createAsyncThunk(
   "notifications/fetchNotifications",
   async ({ skip = 0, take = 10, filter = "all" }, { rejectWithValue }) => {
     try {
-      console.log('📡 Fetching notifications with params:', { skip, take, filter });
-      const params = {};
+       const params = {};
       if (skip !== 0) params.skip = skip;
       if (take !== 0) params.take = take;
       if (filter) params.filter = filter;
       
-      console.log('📡 Making API call to:', API_ENDPOINTS.notifications, 'with params:', params);
-      const response = await axios.get(API_ENDPOINTS.notifications, {
+       const response = await axios.get(API_ENDPOINTS.notifications, {
         params,
         withCredentials: true,
       });
-      
-      console.log('📡 API Response:', response.data);
-      return response.data;
+            return response.data;
     } catch (error) {
       console.error('❌ Fetch notifications error:', error);
       return rejectWithValue(error.response?.data?.message || error.message);

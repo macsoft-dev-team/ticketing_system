@@ -61,8 +61,7 @@ export default function Products() {
   // submit & create product
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("data", formData);
-    try {
+     try {
       const res = await axios.post(`${API_URL}/products`, formData, {
         withCredentials: true,
       });
@@ -162,8 +161,7 @@ export default function Products() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('Upload successful:', res.data);
-      getProduct({ skip: 0, take: 10 }); // Refresh products list
+       getProduct({ skip: 0, take: 10 }); // Refresh products list
       setCurrentPage(0);
       setShowUploadModal(false);
       setUploadFile(null);
@@ -182,8 +180,7 @@ export default function Products() {
   // Create a debounced search function
   const debouncedSearch = useCallback(
     debounceSearch((searchTerm) => {
-      console.log('Debounced search products:', searchTerm);
-      setSearchFilter(searchTerm);
+       setSearchFilter(searchTerm);
       setCurrentPage(0); // Reset to first page when searching
     }, 500),
     []

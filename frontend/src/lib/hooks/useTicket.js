@@ -114,9 +114,7 @@ export default function useTicket() {
   }, []);
 
   useEffect(() => {
-    if (filter) {
-      console.log(filter, "filter");
-      
+    if (filter) {   
       dispatch(fetchTickets({ page: currentPage, size: 10, filter: filter }));
     }
   }, [filter]);

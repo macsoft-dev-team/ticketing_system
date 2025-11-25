@@ -57,9 +57,7 @@ export default function Login() {
             const result = await loginAction(mobileNumber, password);
 
             if (result.meta.requestStatus === 'fulfilled') {
-                // Login successful - navigation will be handled by App.jsx route update
-                console.log('Login successful, user:', result.payload.user);
-            } else {
+              } else {
                 // Handle login error
                 setErrors({ general: result.payload || 'Login failed' });
                 setIsLoading(false);

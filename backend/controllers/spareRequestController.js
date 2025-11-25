@@ -89,8 +89,7 @@ const createSpareRequest = async (req, res) => {
         message: "Spare request created successfully",
       });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send({ message: "Error creating spare request" });
+     return res.status(500).send({ message: "Error creating spare request" });
   }
 };
 
@@ -102,8 +101,7 @@ const getSpareRequests = async (req, res) => {
     const result = await db.query(sql, [userId]);
     return res.status(200).send(result[0]);
   } catch (error) {
-    console.log(error);
-    return res.status(500).send({ message: "Error fetching spare requests" });
+     return res.status(500).send({ message: "Error fetching spare requests" });
   }
 };
 
@@ -115,8 +113,7 @@ const getSpareRequestPhotos = async (req, res) => {
     const result = await db.query(sql, [id]);
     return res.status(200).send(result[0]);
   } catch (error) {
-    console.log(error);
-    return res
+     return res
       .status(500)
       .send({ message: "Error fetching spare request photos" });
   }
@@ -196,8 +193,7 @@ const updateSpareRequest = async (req, res) => {
           parseInt(id),
           newFilePath
         ]);
-        console.log(result);
-      });
+       });
     }
 
     sql = "SELECT * FROM spare_requests WHERE id = ?";
@@ -217,8 +213,7 @@ const updateSpareRequest = async (req, res) => {
         message: "Spare request updated successfully",
       });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send({ message: "Error updating spare request" });
+     return res.status(500).send({ message: "Error updating spare request" });
   }
 };
 
@@ -232,8 +227,7 @@ const deleteSpareRequest = async (req, res) => {
       .status(200)
       .send({ message: "Spare request deleted successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send({ message: "Error deleting spare request" });
+     return res.status(500).send({ message: "Error deleting spare request" });
   }
 };
 
@@ -247,8 +241,7 @@ const closeSpareRequest = async (req, res) => {
       .status(200)
       .send({ message: "Spare request closed successfully" });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send({ message: "Error closing spare request" });
+     return res.status(500).send({ message: "Error closing spare request" });
   }
 };
 

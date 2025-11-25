@@ -13,19 +13,8 @@ const NotificationBell = () => {
 
     // Fetch notifications on component mount
     useEffect(() => {
-        console.log('🔔 NotificationBell mounting, fetching notifications...');
-        fetchNotifications({ skip: 0, take: 20, filter: "all" });
+         fetchNotifications({ skip: 0, take: 20, filter: "all" });
     }, [fetchNotifications]);
-
-    // Debug notifications data
-    useEffect(() => {
-        console.log('🔔 Notifications data:', {
-            count: notifications.length,
-            unreadCount,
-            loading,
-            notifications: notifications.slice(0, 3) // First 3 for debugging
-        });
-    }, [notifications, unreadCount, loading]);
 
     // Close dropdown when clicking outside
     useEffect(() => {

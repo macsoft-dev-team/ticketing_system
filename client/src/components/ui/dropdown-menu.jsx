@@ -128,8 +128,7 @@ const DropdownMenuItem = ({
   const { setOpen } = useContext(DropdownContext);
 
   const handleClick = (event) => {
-    console.log('DropdownMenuItem handleClick called');
-    
+     
     if (disabled) {
       event.preventDefault();
       event.stopPropagation();
@@ -139,13 +138,11 @@ const DropdownMenuItem = ({
     // Execute custom handlers first
     try {
       if (onClick) {
-        console.log('Calling onClick handler');
-        onClick(event);
+         onClick(event);
       }
       
       if (onSelect) {
-        console.log('Calling onSelect handler');  
-        onSelect(event);
+         onSelect(event);
       }
     } catch (error) {
       console.error('Error in dropdown item handlers:', error);

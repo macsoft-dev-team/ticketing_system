@@ -23,9 +23,7 @@ export const fetchTickets = createAsyncThunk(
       const params = {};
       if (page !== 0) params.skip = page;
       if (size !== 0) params.take = size;
-      if (filter) params.filter = filter;
-      console.log(params, "params");
-      
+      if (filter) params.filter = filter;      
       const response = await axios.get(`${API_URL}/ticket`, {
         params: params,
       });

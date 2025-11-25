@@ -1,9 +1,7 @@
 const notificationService = require('../service/notification');
 
 const getNotifications = async (req, res) => {
-    try {
-        console.log(`🔔 API: Getting notifications - req.user:`, req.user);
-        
+    try {        
         if (!req.user || !req.user.id) {
             console.error('❌ No user ID in request');
             return res.status(401).json({ 
@@ -12,27 +10,16 @@ const getNotifications = async (req, res) => {
             });
         }
         
-        const userId = req.user.id;
-        console.log(`🔔 API: Getting notifications for user ${userId} (${req.user.name}, ${req.user.role})`);
-        
+        const userId = req.user.id;        
         const notifications = await notificationService.getNotifications(userId);
-        console.log(`🔔 API: Successfully retrieved ${notifications.length} notifications for user ${req.user.name}`);
-        
-        // Add detailed logging for debugging
-        if (notifications.length === 0) {
-            console.log(`⚠️  No notifications found for user ${userId} (${req.user.name}, ${req.user.role})`);
-            console.log(`⚠️  This user should receive notifications if they have role: MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT, or CUSTOMER_SERVICE_HEAD`);
-        }
-        
+ 
         res.status(200).json({
             success: true,
             data: notifications,
             count: notifications.length
         });
     } catch (error) {
-        console.error('❌ Error in getNotifications:', error);
-        console.error('❌ Error stack:', error.stack);
-        res.status(500).json({ 
+         res.status(500).json({ 
             success: false,
             message: "Internal server error",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined,
@@ -46,16 +33,14 @@ const updateNotification = async (req, res) => {
     const io = req.io;
     const userId = req.user.id;
     try {
-        console.log(`✅ API: Updating notification ${id} for user ${userId}`);
-        const notification = await notificationService.updateNotification(parseInt(id), userId, io);
+         const notification = await notificationService.updateNotification(parseInt(id), userId, io);
         res.status(200).json({
             success: true,
             data: notification,
             message: "Notification marked as seen"
         });
     } catch (error) {
-        console.error('❌ Error in updateNotification:', error);
-        res.status(500).json({ 
+         res.status(500).json({ 
             success: false,
             message: error.message || "Internal server error",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -66,8 +51,7 @@ const updateNotification = async (req, res) => {
 const getNotificationCounts = async (req, res) => {
     const userId = req.user.id;
     try {
-        console.log(`📊 API: Getting notification counts for user ${userId}`);
-        const counts = await notificationService.getNotificationCounts(userId);
+         const counts = await notificationService.getNotificationCounts(userId);
         res.status(200).json({
             success: true,
             data: counts

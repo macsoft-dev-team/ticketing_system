@@ -20,8 +20,7 @@ export default function Tickets() {
     };
 
     const handleView = (ticketId) => {
-        console.log('Viewing ticket:', ticketId);
-        // Navigate to ticket detail page
+         // Navigate to ticket detail page
     };
 
     const containerVariants = {
@@ -38,8 +37,7 @@ export default function Tickets() {
     useEffect(() => {
         fetchTickets({ skip: currentPage, take: 8, filter: filters });
     }, [filters, totalPages, currentPage]);
-    console.log(totalPages, currentPage);
-    const handlePageChange = (newPage) => {
+     const handlePageChange = (newPage) => {
         fetchTickets({ skip: newPage, take: 8, filter: filters });
     }
     return (

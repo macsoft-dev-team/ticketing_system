@@ -75,8 +75,6 @@ export const fetchTicketById = createAsyncThunk(
   "tickets/fetchTicketById",
   async (ticketId, { rejectWithValue }) => {
     try {
-      console.log("Fetching ticket with ID:", ticketId);
-
       const response = await axios.get(`${API_ENDPOINTS.ticket}/${ticketId}`);
       return response.data;
     } catch (error) {

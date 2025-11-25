@@ -221,9 +221,7 @@ export const controllerAPI = {
       });
 
       // Replace :serialnumber placeholder with actual controller number
-      const url = API_ENDPOINTS.LMS_BASE_URL.replace(':serialnumber', controllerNo);
-      console.log('Fetching from LMS URL:', url);
-      
+      const url = API_ENDPOINTS.LMS_BASE_URL.replace(':serialnumber', controllerNo);      
       const response = await lmsClient.get(url);
       return response.data;
     } catch (error) {
@@ -239,8 +237,7 @@ export const createWebSocketConnection = (ticketId, onMessage, onError) => {
   const socket = new WebSocket(`${wsUrl}/tickets/${ticketId}`);
 
   socket.onopen = () => {
-    console.log('WebSocket connection opened for ticket:', ticketId);
-  };
+   };
 
   socket.onmessage = (event) => {
     try {
@@ -257,8 +254,7 @@ export const createWebSocketConnection = (ticketId, onMessage, onError) => {
   };
 
   socket.onclose = (event) => {
-    console.log('WebSocket connection closed:', event.code, event.reason);
-  };
+   };
 
   return socket;
 };

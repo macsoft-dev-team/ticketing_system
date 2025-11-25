@@ -93,16 +93,7 @@ const MilestoneActionButton = ({
       stage === 'RECEIVED_AT_SERVICE_CENTER' ? photoCount < 4 : photoCount === 0
     );
 
-    // Debug logging for SPARE_REQUESTED
-    if (stage === 'SPARE_REQUESTED') {
-      console.log('SPARE_REQUESTED Debug:', {
-        stage,
-        photoCount,
-        needsPhotos,
-        userRole,
-        canApprove: canUserTransitionToStage(userRole, 'SPARE_APPROVED')
-      });
-    }
+    
 
     // Configuration for each stage - now returns array of possible actions
     const configs = {
@@ -434,15 +425,7 @@ const MilestoneActionButton = ({
   const handleClick = (actionConfig) => {
     if (disabled || actionConfig.disabled) return;
 
-    console.log('MilestoneActionButton - Button clicked:', {
-      action: actionConfig.action,
-      targetStage: actionConfig.targetStage,
-      requiresPhotos: actionConfig.requiresPhotos,
-      currentStage: currentMilestone.stage,
-      userRole: userRole
-    });
-
-    onAction({
+     onAction({
       action: actionConfig.action,
       targetStage: actionConfig.targetStage,
       requiresPhotos: actionConfig.requiresPhotos,

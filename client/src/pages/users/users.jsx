@@ -92,18 +92,14 @@ export default function UsersPage() {
     const handleUpload = async (data) => {
         try {
             // Hash passwords before sending to server
-            console.log("Original data:", data);
-
-            const hashedData = await hashDevicePasswords(
+             const hashedData = await hashDevicePasswords(
                 data,
                 (progress) => {
-                    console.log(`Hashing progress: ${progress.current}/${progress.total}`);
-                },
+                 },
                 10 // saltRounds
             );
 
-            console.log("Hashed data:", hashedData);
-
+ 
             await uploadUser(hashedData);
             // Close modal and refresh the list
             setUploadModalOpen(false);
@@ -117,22 +113,19 @@ export default function UsersPage() {
 
 
     const handleFilterChange = (status) => {
-        console.log('Filter users by status:', status);
-        setFilters({ ...filter, status });
+         setFilters({ ...filter, status });
         fetchUsers({ skip: 0, take: 10, filter: { ...filter, status } });
     };
 
     const handleRoleChange = (role) => {
-        console.log('Filter users by role:', role);
-        setFilters({ ...filter, role });
+         setFilters({ ...filter, role });
         fetchUsers({ skip: 0, take: 10, filter: { ...filter, role } });
     };
 
     // Create a debounced search function
     const debouncedSearch = useCallback(
         debounceSearch((searchTerm) => {
-            console.log('Debounced search users:', searchTerm);
-            setFilters({ ...filter, search: searchTerm });
+             setFilters({ ...filter, search: searchTerm });
             fetchUsers({ skip: 0, take: 10, filter: { ...filter, search: searchTerm } });
         }, 500),
         [filter, fetchUsers, setFilters]
@@ -199,10 +192,8 @@ export default function UsersPage() {
                 description="Upload an Excel file to add multiple users at once."
                 open={uploadModalOpen && mode === 'upload'}
                 onOpenChange={(isOpen) => {
-                    console.log('Users upload modal onOpenChange called with isOpen:', isOpen);
-                    if (!isOpen) {
-                        console.log('Closing users upload modal, setting mode to null');
-                        // Use local state to immediately close the modal
+                     if (!isOpen) {
+                         // Use local state to immediately close the modal
                         setUploadModalOpen(false);
                         // Also update Redux state
                         setMode(null);

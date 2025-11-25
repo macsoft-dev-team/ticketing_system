@@ -338,20 +338,7 @@ const receiveControllerAtServiceCenter = async (req, res) => {
         photoLabels[index] = req.body[key];
       }
     });
-
-    console.log('Receive controller request:', { 
-      controllerNo, 
-      photoLabels,
-      bodyKeys: Object.keys(req.body),
-      userRole,
-      userId,
-      filesCount: files ? {
-        photos: files.photos?.length || 0,
-        videos: files.videos?.length || 0,
-        audio: files.audio?.length || 0
-      } : 'no files'
-    });
-
+ 
     if (!controllerNo) {
       return res.status(400).json({ 
         message: "Controller number is required",

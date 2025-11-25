@@ -279,10 +279,7 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
                             variant="outline"
                             onClick={(e) => {
                                 e.preventDefault();
-                                e.stopPropagation();
-                                console.log('ServiceCenter Cancel button clicked, isSubmitting:', isSubmitting);
-                                console.log('About to close modal by calling onOpenChange(false)');
-                                
+                                e.stopPropagation();                                
                                 // Reset form data
                                 setFormData({
                                     name: '',

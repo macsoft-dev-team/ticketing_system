@@ -1,16 +1,13 @@
 // Notification broadcasting utility
 const broadcastNotification = (io, notificationData) => {
-  console.log('📢 Broadcasting notification:', notificationData);
   
   // If targetUserId is specified, send to specific user's notification room
   if (notificationData.targetUserId) {
     const userRoom = `notifications-${notificationData.targetUserId}`;
     io.to(userRoom).emit('notification', notificationData);
-    console.log(`📤 Notification sent to user room: ${userRoom}`);
   } else {
     // Broadcast to all connected clients
     io.emit('notification', notificationData);
-    console.log('📤 Notification broadcasted to all clients');
   }
 };
 
@@ -347,7 +344,6 @@ const saveAndBroadcastNotification = async (prisma, io, notificationData, target
     // Broadcast via socket
     if (io && recipients.length > 0) {
       io.emit('notification', recipients);
-      console.log(`📢 Broadcasted ${notificationData.type} notification to ${recipients.length} users`);
     }
 
     return { notification, recipients };

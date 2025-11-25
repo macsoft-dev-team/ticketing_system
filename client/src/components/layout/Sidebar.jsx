@@ -30,8 +30,7 @@ const Sidebar = () => {
     dispatch(setSidebarCollapsed(false));
   };
   const handleLogout = () => {
-    console.log('Logout button clicked');
-
+ 
     // Emergency logout - clear everything immediately
     try {
       // Clear session storage directly
@@ -46,8 +45,6 @@ const Sidebar = () => {
       if (window.axios && window.axios.defaults && window.axios.defaults.headers) {
         delete window.axios.defaults.headers.common['Authorization'];
       }
-
-      console.log('Local logout completed, redirecting...');
 
       // Navigate to login
       navigate('/login', { replace: true });

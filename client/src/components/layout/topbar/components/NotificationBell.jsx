@@ -31,8 +31,7 @@ const NotificationBell = () => {
 
         if (response.ok) {
           const responseData = await response.json();
-          console.log('📡 Notification API response:', responseData);
-
+ 
           // Handle the new API response format {success: true, data: [...], count: 70}
           const notificationsArray = responseData.success ? responseData.data : responseData;
 
@@ -50,16 +49,12 @@ const NotificationBell = () => {
 
             setNotifications(transformedNotifications);
             setUnreadCount(transformedNotifications.filter(n => n.unread).length);
-            console.log('✅ Notifications loaded:', transformedNotifications.length, 'total,', transformedNotifications.filter(n => n.unread).length, 'unread');
-          } else {
-            console.error('❌ Expected array of notifications, got:', typeof notificationsArray);
-          }
+           } else {
+           }
         } else {
-          console.error('❌ Failed to fetch notifications:', response.status, response.statusText);
-        }
+         }
       } catch (error) {
-        console.error('Error fetching notifications:', error);
-      } finally {
+       } finally {
         setLoading(false);
       }
     };
@@ -85,16 +80,13 @@ const NotificationBell = () => {
         });
 
         notificationSocket.on('connect', () => {
-          console.log('🔔 Connected to notification socket');
-          // Join user's notification room
+           // Join user's notification room
           if (user.id) {
             notificationSocket.emit('join-notifications', user.id);
           }
         });
 
         notificationSocket.on('notification', (notificationData) => {
-          console.log('📨 Received real-time notification:', notificationData);
-
           // Handle array of notifications (from conversation service)
           if (Array.isArray(notificationData)) {
             notificationData.forEach(item => {
@@ -149,8 +141,7 @@ const NotificationBell = () => {
         });
 
         notificationSocket.on('disconnect', () => {
-          console.log('🔕 Disconnected from notification socket');
-        });
+         });
 
       } catch (error) {
         console.error('Error connecting to notification socket:', error);

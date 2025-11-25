@@ -245,10 +245,8 @@ const OrganisationFormModal = ({ open, onOpenChange, onSubmit, initialData = nul
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                console.log('Cancel button clicked, isSubmitting:', isSubmitting);
-                                if (!isSubmitting) {
-                                    console.log('Resetting form data and closing modal');
-                                    setFormData({
+                                 if (!isSubmitting) {
+                                     setFormData({
                                         name: '',
                                         orgCode: '',
                                         address: '',

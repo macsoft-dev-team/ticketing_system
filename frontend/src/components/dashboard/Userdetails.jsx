@@ -54,19 +54,11 @@ const Userdetails = () => {
     }
   };
   const handleEdit = async (id, currentRole) => {
-    const newRole = currentRole === "admin" ? "user" : "admin";
-    setrole(role);
+     setrole(role);
     try {
-      const response = await axios.put(
-      //   `http://localhost:8080/api/updateuser/${id}`,
-          `${API_URL}/api/updateuser/${id}`,
-        { role: newRole }
-      );
-      console.log(response.data);
-      fetchUserDta();
+        fetchUserDta();
     } catch (error) {
-      console.log(error);
-    }
+     }
   };
 
   const columns = [

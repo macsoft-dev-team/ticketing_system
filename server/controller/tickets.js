@@ -82,11 +82,7 @@ const createTicket = async (req, res) => {
       attachments
     );
     
-    console.log('✅ Ticket created successfully:', {
-      id: newTicket.id,
-      ticketCode: newTicket.ticketCode,
-      status: 'success'
-    });
+
     
     res.status(201).json(newTicket);
   } catch (error) {

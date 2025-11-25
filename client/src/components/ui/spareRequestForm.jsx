@@ -267,16 +267,13 @@ export const SpareRequestForm = ({ onSubmit, onCancel, isLoading = false }) => {
   };
 
   const onFormSubmit = (data) => {
-    console.log('📝 Form data being submitted:', data);
-    
+     
     // Additional validation
     if (!data.products || data.products.length === 0) {
       console.error('❌ No products selected');
       return;
     }
-    
-    console.log('✅ Form validation passed, calling onSubmit');
-    onSubmit({ ...data, attachments });
+     onSubmit({ ...data, attachments });
   };
 
   return (
@@ -408,11 +405,7 @@ export const SpareRequestForm = ({ onSubmit, onCancel, isLoading = false }) => {
             whileTap={{ scale: 0.95 }}
             disabled={isSubmitting || isLoading}
             onClick={(e) => {
-              console.log('🖱️ Submit button clicked');
-              console.log('📋 Current form data:', watchedProducts);
-              console.log('🚫 Form errors:', errors);
-              // Don't prevent default - let the form handle submission
-            }}
+             }}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting || isLoading ? 'Submitting...' : 'Submit Request'}

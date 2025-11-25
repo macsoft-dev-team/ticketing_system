@@ -70,8 +70,7 @@ const Tickets = () => {
             message.success('Ticket deleted successfully');
         };
         const cancel = e => {
-            console.log(e);
-            message.error('Ticket deletion cancelled');
+             message.error('Ticket deletion cancelled');
           };
 
         if(user.role.toLowerCase() !== "admin") return null;
@@ -101,14 +100,11 @@ const Tickets = () => {
 
     const onSearch = (value = {}) => {
         const updatedFilter = { ...filter };
-        console.log(value, "value");
-            console.log(updatedFilter, "updatedFilter");
-            
+             
         // Update status
         if (value.status) {            
             if (value.status) updatedFilter.status = value.status;
             else delete updatedFilter.status;
-            console.log(updatedFilter, "updatedFilter");
             
         }
 
@@ -116,8 +112,7 @@ const Tickets = () => {
         if (value.search) {
             if (value.search) updatedFilter.search = value.search;
             else delete updatedFilter.search;
-            console.log(updatedFilter, "updatedFilter");
-        }
+         }
 
         setFilter(updatedFilter);
     };

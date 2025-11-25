@@ -148,8 +148,7 @@ export default function Projects() {
     };
 
     const handleFilterChange = (status) => {
-        console.log('Filter projects by status:', status);
-        // Get the current filter to preserve customer filter
+         // Get the current filter to preserve customer filter
         const currentFilter = filter || {};
         const newFilter = { ...currentFilter, status };
         setFilters(newFilter);
@@ -163,8 +162,7 @@ export default function Projects() {
     // Create a debounced search function
     const debouncedSearch = useCallback(
         debounceSearch((searchTerm) => {
-            console.log('Debounced search projects:', searchTerm);
-            const newFilter = { ...filter, search: searchTerm };
+             const newFilter = { ...filter, search: searchTerm };
             setFilters(newFilter);
             getProjects({
                 skip: 0,

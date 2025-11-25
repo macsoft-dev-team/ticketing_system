@@ -113,9 +113,7 @@ export default function OrganisationPage() {
             formData.append('organisations', JSON.stringify(data));
 
             // Note: Upload functionality would need to be implemented in the hook
-            // await uploadOrganisation(formData);
-            console.log("Upload organisations:", data);
-            
+            // await uploadOrganisation(formData);         
             // Close modal and refresh the list
             setUploadModalOpen(false);
             setMode(null);
@@ -148,8 +146,7 @@ export default function OrganisationPage() {
     };
 
     const handleFilterChange = (status) => {
-        console.log('Filter organisations by status:', status);
-        const updatedFilter = { ...filter, status };
+         const updatedFilter = { ...filter, status };
         setFilters(updatedFilter);
         fetchOrganisations({ skip: 0, take: 10, filter: updatedFilter });
     };
@@ -157,8 +154,7 @@ export default function OrganisationPage() {
     // Create a debounced search function
     const debouncedSearch = useCallback(
         debounceSearch((searchTerm) => {
-            console.log('Debounced search organisations:', searchTerm);
-            const updatedFilter = { ...filter, search: searchTerm };
+             const updatedFilter = { ...filter, search: searchTerm };
             setFilters(updatedFilter);
             fetchOrganisations({ skip: 0, take: 10, filter: updatedFilter });
         }, 500),
@@ -232,10 +228,8 @@ export default function OrganisationPage() {
                 description="Upload an Excel file to add multiple Customers at once."
                 open={uploadModalOpen && mode === 'upload'}
                 onOpenChange={(isOpen) => {
-                    console.log('Upload modal onOpenChange called with isOpen:', isOpen);
-                    if (!isOpen) {
-                        console.log('Closing upload modal, setting mode to null');
-                        // Use local state to immediately close the modal
+                     if (!isOpen) {
+                         // Use local state to immediately close the modal
                         setUploadModalOpen(false);
                         // Also update Redux state
                         setMode(null);

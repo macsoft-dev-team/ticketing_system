@@ -7,8 +7,7 @@ const { generateTicketFileUrl } = require("../lib/ticket_file_handler");
  * Migration script to move existing files to ticket-specific folders
  */
 async function migrateFilesToTicketStructure() {
-  console.log("🚀 Starting file migration to ticket-specific structure...");
-  
+   
   try {
     // Get all attachments with their ticket information
     const attachments = await prisma.attachments.findMany({
@@ -30,8 +29,7 @@ async function migrateFilesToTicketStructure() {
       }
     });
 
-    console.log(`📄 Found ${attachments.length} attachments to migrate`);
-
+ 
     const baseUploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads');
     let migratedCount = 0;
     let errorCount = 0;
@@ -42,8 +40,7 @@ async function migrateFilesToTicketStructure() {
         const ticketCode = attachment.ticket?.ticketCode || attachment.message?.ticket?.ticketCode;
         
         if (!ticketCode) {
-          console.log(`⚠️  Skipping attachment ${attachment.id} - no ticket code found`);
-          continue;
+           continue;
         }
 
         // Determine if this is a conversation attachment or ticket attachment
@@ -61,8 +58,7 @@ async function migrateFilesToTicketStructure() {
 
         // Check if file exists
         if (!fs.existsSync(currentFilePath)) {
-          console.log(`❌ File not found: ${currentFilePath}`);
-          errorCount++;
+           errorCount++;
           continue;
         }
 
@@ -84,12 +80,10 @@ async function migrateFilesToTicketStructure() {
         if (currentFilePath !== newFilePath) {
           // Check if target file already exists
           if (fs.existsSync(newFilePath)) {
-            console.log(`⚠️  Target file already exists: ${newFilePath}`);
-          } else {
+           } else {
             // Move the file
             fs.renameSync(currentFilePath, newFilePath);
-            console.log(`📁 Moved: ${currentFilePath} -> ${newFilePath}`);
-          }
+           }
         }
 
         // Update database with new file URL
@@ -101,24 +95,14 @@ async function migrateFilesToTicketStructure() {
           }
         });
 
-        console.log(`✅ Updated attachment ${attachment.id} URL: ${newFileUrl}`);
-        migratedCount++;
+         migratedCount++;
 
       } catch (error) {
-        console.error(`❌ Error migrating attachment ${attachment.id}:`, error.message);
-        errorCount++;
+         errorCount++;
       }
     }
-
-    console.log(`\n📊 Migration Summary:`);
-    console.log(`✅ Successfully migrated: ${migratedCount} files`);
-    console.log(`❌ Errors: ${errorCount} files`);
-    console.log(`📁 Total processed: ${attachments.length} attachments`);
-    console.log(`🎉 Migration completed!`);
-
   } catch (error) {
-    console.error("❌ Migration failed:", error);
-    throw error;
+     throw error;
   }
 }
 
@@ -126,12 +110,10 @@ async function migrateFilesToTicketStructure() {
 if (require.main === module) {
   migrateFilesToTicketStructure()
     .then(() => {
-      console.log("✅ Migration script completed successfully");
-      process.exit(0);
+       process.exit(0);
     })
     .catch((error) => {
-      console.error("❌ Migration script failed:", error);
-      process.exit(1);
+       process.exit(1);
     });
 }
 

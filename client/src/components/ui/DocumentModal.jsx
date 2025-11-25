@@ -19,9 +19,7 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
   // Construct the proper file URL
   const getFileUrl = () => {
     let fileUrl;
-    console.log('Document URL:', document.url);
-    console.log('Base URL:', baseUrl);
-    
+     
     if (document.url?.startsWith('/uploads/')) {
       fileUrl = `${baseUrl}${document.url}`;
     } else if (document.url?.startsWith('http')) {
@@ -31,7 +29,6 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
       fileUrl = `${baseUrl}/uploads/${document.url}`;
     }
     
-    console.log('Constructed file URL:', fileUrl);
     return fileUrl;
   };
 
@@ -41,9 +38,7 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
     
     try {
       let downloadUrl;
-      
-      console.log('Document info for download:', document);
-      
+            
       // Try multiple download strategies
       const downloadStrategies = [];
       
@@ -72,32 +67,26 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
           name: 'API uploads'
         });
       }
-      
-      console.log('Trying download strategies:', downloadStrategies);
-      
+            
       // Try each strategy until one works
       let testResponse;
       let lastError;
       
       for (const strategy of downloadStrategies) {
         try {
-          console.log(`Trying strategy "${strategy.name}":`, strategy.url);
-          testResponse = await fetch(strategy.url, {
+           testResponse = await fetch(strategy.url, {
             method: 'GET',
             headers: strategy.headers,
           });
           
           if (testResponse.ok) {
-            console.log(`Success with strategy "${strategy.name}"`);
-            downloadUrl = strategy.url;
+             downloadUrl = strategy.url;
             break;
           } else {
-            console.log(`Strategy "${strategy.name}" failed:`, testResponse.status, testResponse.statusText);
-            lastError = new Error(`${strategy.name}: ${testResponse.status} ${testResponse.statusText}`);
+             lastError = new Error(`${strategy.name}: ${testResponse.status} ${testResponse.statusText}`);
           }
         } catch (error) {
-          console.log(`Strategy "${strategy.name}" error:`, error);
-          lastError = error;
+           lastError = error;
         }
       }
       
@@ -111,9 +100,7 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
           'Authorization': `Bearer ${token}`,
         } : {},
       });
-      
-      console.log('Download response status:', response.status, response.statusText);
-      
+            
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
         console.error('Download failed response:', errorText);

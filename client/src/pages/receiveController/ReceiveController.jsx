@@ -23,12 +23,12 @@ import { useToast } from '../../components/ui/toast';
 import { useAuth } from '../../lib/hooks/useAuth';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL ;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ReceiveController = () => {
     const { token } = useAuth();
     const toastContext = useToast();
-    
+
     // Safe toast function with fallback
     const addToast = toastContext?.addToast || ((toast) => {
         console.warn('Toast not available:', toast);
@@ -44,7 +44,7 @@ const ReceiveController = () => {
     const [isRecording, setIsRecording] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [scannerStream, setScannerStream] = useState(null);
-    
+
     // NEW: Camera capture state
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
@@ -87,12 +87,10 @@ const ReceiveController = () => {
                     codeReaderRef.current = new BrowserMultiFormatReader();
                 }
                 const devices = await codeReaderRef.current.listVideoInputDevices();
-                console.log('Available video devices:', devices);
                 setVideoDevices(devices || []);
                 if (devices && devices.length > 0 && !selectedDeviceId) {
                     const defaultId = pickVideoDeviceId(devices);
                     setSelectedDeviceId(defaultId);
-                    console.log('Default device selected:', defaultId);
                 }
             } catch (err) {
                 console.warn('Could not enumerate devices on mount:', err);
@@ -147,9 +145,7 @@ const ReceiveController = () => {
                 }
             );
 
-            console.log('API Response:', response.data);
             setSearchedTicket(response.data);
-            console.log('Search ticket state updated:', response.data);
             addToast({
                 title: 'Ticket Found',
                 description: `Ticket ${response.data.ticketCode} found`,
@@ -182,10 +178,9 @@ const ReceiveController = () => {
 
     // NEW: Open camera to capture photos one by one
     const openCameraForCapture = async () => {
-        console.log('📷 Opening camera for photo capture...');
         setIsCameraOpen(true);
         setCurrentPhotoIndex(0);
-        
+
         // Wait a bit for modal to render
         setTimeout(async () => {
             try {
@@ -196,15 +191,13 @@ const ReceiveController = () => {
                         height: { ideal: 1080 }
                     }
                 });
-                
-                console.log('✅ Camera stream obtained');
+
                 setCameraStream(stream);
-                
+
                 // Attach stream to video element
                 if (cameraVideoRef.current) {
                     cameraVideoRef.current.srcObject = stream;
                     await cameraVideoRef.current.play();
-                    console.log('✅ Video playing');
                 }
             } catch (error) {
                 console.error('❌ Camera access error:', error);
@@ -221,15 +214,15 @@ const ReceiveController = () => {
     // NEW: Capture current photo from camera
     const capturePhoto = () => {
         if (!cameraVideoRef.current || !cameraStream) return;
-        
+
         const video = cameraVideoRef.current;
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        
+
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0);
-        
+
         canvas.toBlob((blob) => {
             const file = new File([blob], `${requiredPhotos[currentPhotoIndex]}-${Date.now()}.jpg`, { type: 'image/jpeg' });
             const newPhoto = {
@@ -238,15 +231,15 @@ const ReceiveController = () => {
                 label: requiredPhotos[currentPhotoIndex],
                 id: Math.random().toString(36)
             };
-            
+
             setPhotos(prev => [...prev, newPhoto]);
-            
+
             addToast({
                 title: 'Photo Captured',
                 description: `${requiredPhotos[currentPhotoIndex]} captured`,
                 variant: 'success'
             });
-            
+
             // Move to next photo or close camera
             if (currentPhotoIndex < requiredPhotos.length - 1) {
                 setCurrentPhotoIndex(prev => prev + 1);
@@ -287,10 +280,9 @@ const ReceiveController = () => {
 
     // NEW: Start video recording with camera
     const startVideoRecording = async () => {
-        console.log('🎥 Starting video recording...');
         setIsVideoRecording(true);
         setRecordingTime(0);
-        
+
         setTimeout(async () => {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -301,15 +293,13 @@ const ReceiveController = () => {
                     },
                     audio: true
                 });
-                
-                console.log('✅ Video recording stream obtained');
+
                 setVideoRecordingStream(stream);
-                
+
                 // Attach stream to video element
                 if (videoRecordingVideoRef.current) {
                     videoRecordingVideoRef.current.srcObject = stream;
                     await videoRecordingVideoRef.current.play();
-                    console.log('✅ Video preview playing');
                 }
 
                 // Start MediaRecorder
@@ -332,9 +322,9 @@ const ReceiveController = () => {
                         preview: URL.createObjectURL(videoBlob),
                         id: Math.random().toString(36)
                     };
-                    
+
                     setVideos(prev => [...prev, newVideo]);
-                    
+
                     addToast({
                         title: 'Video Saved',
                         description: `Video recorded (${recordingTime}s)`,
@@ -346,7 +336,7 @@ const ReceiveController = () => {
                 };
 
                 videoRecorderRef.current.start();
-                
+
                 // Start timer
                 recordingTimerRef.current = setInterval(() => {
                     setRecordingTime(prev => prev + 1);
@@ -372,8 +362,6 @@ const ReceiveController = () => {
 
     // NEW: Stop video recording
     const stopVideoRecording = () => {
-        console.log('🛑 Stopping video recording...');
-        
         if (recordingTimerRef.current) {
             clearInterval(recordingTimerRef.current);
             recordingTimerRef.current = null;
@@ -502,12 +490,6 @@ const ReceiveController = () => {
 
     // Single unified barcode scanning function
     const startBarcodeScanning = async (deviceId = null) => {
-        console.log('🎥 Starting unified barcode scanner...');
-        console.log('Device ID requested:', deviceId);
-        console.log('Selected device ID:', selectedDeviceId);
-        console.log('Available devices:', videoDevices.length);
-        console.log('is secure context?', window.isSecureContext);
-        console.log('navigator.mediaDevices present?', !!navigator.mediaDevices);
 
         // Check secure context - but don't close scanner yet
         const isSecureContext = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost';
@@ -523,7 +505,6 @@ const ReceiveController = () => {
 
         // Detect mobile device
         const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        console.log('Is mobile device:', isMobile);
 
         // Check API support
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -543,13 +524,12 @@ const ReceiveController = () => {
             // Ensure code reader exists
             if (!codeReaderRef.current) {
                 codeReaderRef.current = new BrowserMultiFormatReader();
-                
+
                 // Configure hints for better detection
                 const hints = new Map();
                 hints.set(2, true); // TRY_HARDER
                 hints.set(3, [128, 39, 93, 25, 6]); // POSSIBLE_FORMATS: Code128, Code39, Code93, ITF, EAN-13
                 codeReaderRef.current.hints = hints;
-                console.log('📋 ZXing configured with detection hints');
             }
 
             // Re-enumerate devices if needed
@@ -559,7 +539,6 @@ const ReceiveController = () => {
 
             // Determine which device to use
             const chosenId = deviceId || selectedDeviceId || pickVideoDeviceId(videoDevices);
-            console.log('Chosen device ID:', chosenId);
 
             // Get the video element
             const videoEl = scannerVideoRef.current;
@@ -588,11 +567,8 @@ const ReceiveController = () => {
                             frameRate: { min: 10, ideal: 15, max: 30 }
                         }
                     };
-                    console.log('Attempt 1: Requesting camera with specific device...');
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    console.log('✅ Camera stream obtained with specific device');
                 } catch (err1) {
-                    console.warn('⚠️ Specific device failed:', err1.message);
                     // Attempt 2: Try with ideal instead of exact
                     try {
                         const constraints = {
@@ -604,9 +580,7 @@ const ReceiveController = () => {
                                 height: { ideal: isMobile ? 480 : 720 }
                             }
                         };
-                        console.log('Attempt 2: Requesting camera with ideal constraints...');
                         stream = await navigator.mediaDevices.getUserMedia(constraints);
-                        console.log('✅ Camera stream obtained with ideal constraints');
                     } catch (err2) {
                         console.warn('⚠️ Ideal constraints failed:', err2.message);
                         throw err2;
@@ -625,11 +599,8 @@ const ReceiveController = () => {
                             }
                         }
                         : { video: true, audio: false };
-                    console.log('Attempt: Requesting camera without specific device...');
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    console.log('✅ Camera stream obtained with generic constraints');
                 } catch (err) {
-                    console.warn('⚠️ Generic constraints failed:', err.message);
                     throw err;
                 }
             }
@@ -637,13 +608,11 @@ const ReceiveController = () => {
             // Attach stream to video element
 
             videoEl.srcObject = stream;
-            
+
             // Wait for video to be ready
             try {
                 await videoEl.play();
-                console.log('✅ Video element playing');
             } catch (playErr) {
-                console.warn('⚠️ Video play failed:', playErr);
                 // Sometimes mobile needs user interaction, but we'll try anyway
             }
 
@@ -654,7 +623,6 @@ const ReceiveController = () => {
             try {
                 codeReaderRef.current.reset();
             } catch (e) {
-                console.log('No previous reader to reset');
             }
 
             // Single decode callback for consistency
@@ -662,35 +630,28 @@ const ReceiveController = () => {
             const onDecodeResult = (result, error) => {
                 frameCount++;
                 if (frameCount % 30 === 0) { // Log every 30 frames to reduce noise
-                    console.log('🔍 Scanning... (frame', frameCount, ')');
                 }
-                
+
                 if (result) {
                     const detectedValue = result.getText();
                     const barcodeFormat = result.getBarcodeFormat();
-                    console.log('✅✅✅ BARCODE DETECTED! ✅✅✅');
-                    console.log('   Value:', detectedValue);
-                    console.log('   Format:', barcodeFormat);
-                    console.log('   Frame:', frameCount);
-                    
                     const upperValue = detectedValue.toUpperCase();
                     setControllerNo(upperValue);
                     stopBarcodeScanning();
-                    
+
                     addToast({
                         title: '✅ Barcode Detected!',
                         description: `Controller: ${upperValue}`,
                         variant: 'success'
                     });
-                    
+
                     // Vibrate on mobile if supported
                     if (navigator.vibrate) {
                         navigator.vibrate([200, 100, 200]);
                     }
                 } else if (frameCount % 30 === 0) {
-                    console.log('🔍 No barcode in frame', frameCount);
                 }
-                
+
                 if (error) {
                     if (error instanceof NotFoundException) {
                         // Normal - no barcode in this frame
@@ -699,23 +660,12 @@ const ReceiveController = () => {
                     }
                 }
             };
-
-            // Start continuous decoding - prefer decodeFromVideoDevice if we have deviceId
-            console.log('📹 Attempting to start ZXing continuous decode...');
-            console.log('   Video element ready:', videoEl.readyState);
-            console.log('   Video dimensions:', videoEl.videoWidth, 'x', videoEl.videoHeight);
-            console.log('   Stream active:', stream.active);
-            console.log('   Stream tracks:', stream.getTracks().map(t => `${t.kind}: ${t.label}`));
-            
             try {
                 if (chosenId) {
-                    console.log('🎯 Starting decodeFromVideoDevice with ID:', chosenId);
                     await codeReaderRef.current.decodeFromVideoDevice(chosenId, videoEl, onDecodeResult);
                 } else {
-                    console.log('🎯 Starting decodeFromVideoElement (no specific device)');
                     await codeReaderRef.current.decodeFromVideoElement(videoEl, onDecodeResult);
                 }
-                console.log('✅ ZXing decoder started successfully - scanning continuously...');
             } catch (decodeErr) {
                 console.error('❌ Failed to start decoder:', decodeErr);
                 throw decodeErr;
@@ -725,7 +675,7 @@ const ReceiveController = () => {
             console.error('❌ Barcode scanning error:', error);
             console.error('Error name:', error.name);
             console.error('Error message:', error.message);
-            
+
             let errorMessage = 'Could not start barcode scanner.';
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
@@ -758,7 +708,6 @@ const ReceiveController = () => {
 
     // Stop barcode scanning
     const stopBarcodeScanning = () => {
-        console.log('Stopping ZXing barcode scanner...');
 
         try {
             if (codeReaderRef.current) {
@@ -772,7 +721,6 @@ const ReceiveController = () => {
                     try {
                         track.stop();
                     } catch (e) { console.warn('Error stopping track', e); }
-                    console.log('Stopped track:', track.kind);
                 });
                 setScannerStream(null);
             }
@@ -802,10 +750,6 @@ const ReceiveController = () => {
     // Handle user selects a different camera from dropdown
     const handleDeviceChange = async (e) => {
         const newDeviceId = e.target.value || null;
-        console.log('📹 Camera change requested to:', newDeviceId);
-        
-        // First, stop current scanner and free resources
-        console.log('🛑 Stopping current camera...');
         if (codeReaderRef.current) {
             try {
                 codeReaderRef.current.reset();
@@ -813,27 +757,23 @@ const ReceiveController = () => {
                 console.warn('Error resetting reader:', err);
             }
         }
-        
+
         if (scannerStream) {
             scannerStream.getTracks().forEach(track => {
                 track.stop();
-                console.log('✅ Stopped track:', track.kind, track.label);
             });
             setScannerStream(null);
         }
-        
+
         if (scannerVideoRef.current) {
             scannerVideoRef.current.srcObject = null;
         }
-        
+
         // Update selected device
         setSelectedDeviceId(newDeviceId);
-        
+
         // Wait a bit for resources to be fully released, then start new camera
-        console.log('⏳ Waiting for resources to free...');
         await new Promise(resolve => setTimeout(resolve, 500));
-        
-        console.log('🎬 Starting new camera...');
         await startBarcodeScanning(newDeviceId);
     };
 
@@ -855,24 +795,19 @@ const ReceiveController = () => {
     // NEW: Ensure camera stream is attached to video element when it's available
     useEffect(() => {
         if (cameraStream && cameraVideoRef.current && isCameraOpen) {
-            console.log('📹 Attaching camera stream to video element');
-            cameraVideoRef.current.srcObject = cameraStream;
+             cameraVideoRef.current.srcObject = cameraStream;
             cameraVideoRef.current.play().then(() => {
-                console.log('✅ Camera video playing');
-            }).catch(err => {
-                console.error('❌ Error playing video:', err);
-            });
+             }).catch(err => {
+             });
         }
     }, [cameraStream, isCameraOpen]);
 
     // NEW: Ensure video recording stream is attached
     useEffect(() => {
         if (videoRecordingStream && videoRecordingVideoRef.current && isVideoRecording) {
-            console.log('📹 Attaching video recording stream to video element');
-            videoRecordingVideoRef.current.srcObject = videoRecordingStream;
+             videoRecordingVideoRef.current.srcObject = videoRecordingStream;
             videoRecordingVideoRef.current.play().then(() => {
-                console.log('✅ Video recording preview playing');
-            }).catch(err => {
+             }).catch(err => {
                 console.error('❌ Error playing video:', err);
             });
         }
@@ -967,8 +902,6 @@ const ReceiveController = () => {
         setAudioRecording(null);
     };
 
-    console.log('Render - searchedTicket:', searchedTicket);
-
     return (
         <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
 
@@ -1007,8 +940,7 @@ const ReceiveController = () => {
                                 <Button
                                     type="button"
                                     onClick={(e) => {
-                                        console.log('Barcode scan button clicked');
-                                        e.preventDefault();
+                                         e.preventDefault();
 
                                         if (isScanning) {
                                             stopBarcodeScanning();
@@ -1268,7 +1200,7 @@ const ReceiveController = () => {
                                         <Camera className="w-4 h-4" />
                                         Capture Photos
                                     </Button>
-                                    
+
                                     <Button
                                         onClick={() => photoInputRef.current?.click()}
                                         variant="outline"
@@ -1338,7 +1270,7 @@ const ReceiveController = () => {
                                         <Video className="w-4 h-4" />
                                         Record Video
                                     </Button>
-                                    
+
                                     <Button
                                         onClick={() => videoInputRef.current?.click()}
                                         variant="outline"
@@ -1474,7 +1406,7 @@ const ReceiveController = () => {
                                         muted
                                         autoPlay
                                     />
-                                    
+
                                     {/* Capture guide overlay */}
                                     <div className="absolute inset-0 pointer-events-none">
                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-4 border-dashed border-white rounded-lg w-4/5 h-3/4 opacity-50"></div>
@@ -1513,13 +1445,12 @@ const ReceiveController = () => {
                                     {requiredPhotos.map((_, idx) => (
                                         <div
                                             key={idx}
-                                            className={`w-3 h-3 rounded-full transition-colors ${
-                                                idx < currentPhotoIndex
+                                            className={`w-3 h-3 rounded-full transition-colors ${idx < currentPhotoIndex
                                                     ? 'bg-green-500'
                                                     : idx === currentPhotoIndex
-                                                    ? 'bg-blue-500 animate-pulse'
-                                                    : 'bg-gray-300'
-                                            }`}
+                                                        ? 'bg-blue-500 animate-pulse'
+                                                        : 'bg-gray-300'
+                                                }`}
                                         />
                                     ))}
                                 </div>
@@ -1531,13 +1462,12 @@ const ReceiveController = () => {
                                         {requiredPhotos.map((label, idx) => (
                                             <div
                                                 key={idx}
-                                                className={`text-sm flex items-center gap-2 ${
-                                                    idx < currentPhotoIndex
+                                                className={`text-sm flex items-center gap-2 ${idx < currentPhotoIndex
                                                         ? 'text-green-600 line-through'
                                                         : idx === currentPhotoIndex
-                                                        ? 'text-blue-600 font-medium'
-                                                        : 'text-gray-500'
-                                                }`}
+                                                            ? 'text-blue-600 font-medium'
+                                                            : 'text-gray-500'
+                                                    }`}
                                             >
                                                 {idx < currentPhotoIndex ? (
                                                     <CheckCircle className="w-4 h-4" />
@@ -1598,7 +1528,7 @@ const ReceiveController = () => {
                                         muted
                                         autoPlay
                                     />
-                                    
+
                                     {/* Recording indicator overlay */}
                                     <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-full shadow-lg">
                                         <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
@@ -1632,7 +1562,7 @@ const ReceiveController = () => {
                                         <X className="w-4 h-4" />
                                         Cancel
                                     </Button>
-                                    
+
                                     <Button
                                         onClick={() => {
                                             if (videoRecorderRef.current && videoRecorderRef.current.state === 'recording') {

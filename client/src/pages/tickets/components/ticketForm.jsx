@@ -57,16 +57,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
     // Debug: Log form state
     useEffect(() => {
-        console.log('=== FORM DEBUG ===');
-        console.log('Is valid:', isValid);
-        console.log('Is dirty:', isDirty);
-        console.log('Is submitting:', isSubmitting);
-        console.log('Ticket loading:', ticketLoading);
-        console.log('Ticket error:', ticketError);
-        console.log('Error count:', Object.keys(errors).length);
-        console.log('Errors:', errors);
-        console.log('Values:', getValues());
-        console.log('==================');
+ 
     }, [errors, isValid, isDirty, isSubmitting, ticketLoading, ticketError, getValues]);
 
     const watchedValues = watch();
@@ -82,30 +73,11 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         setControllerError('');
 
         try {
-            console.log('Fetching controller details for:', controllerNumber);
-            const controllerData = await controllerAPI.getControllerFromLMS(controllerNumber);
-            
-            console.log('Received controller data:', controllerData);
-            
+             const controllerData = await controllerAPI.getControllerFromLMS(controllerNumber);            
             // Set the fetched data to form fields
             // Handle the specific LMS API response structure
             const data = controllerData.data || controllerData;
-            
-            console.log('Available data fields:', {
-                imei: data.imeinumber,
-                simnumber: data.simnumber,
-                powerrating: data.lot?.product?.powerrating,
-                motortype: data.lot?.product?.motortype,
-                productname: data.lot?.product?.name,
-                customer: {
-                    name: data.lot?.product?.customer?.name,
-                    address: data.lot?.product?.customer?.address,
-                    email: data.lot?.product?.customer?.email,
-                    phone: data.lot?.product?.customer?.phone,
-                    contact: data.lot?.product?.customer?.contact
-                }
-            });
-            
+ 
             // Extract IMEI from imeinumber field
             setValue('imei', data.imeinumber || '');
             
@@ -322,26 +294,14 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             };
 
             // Use the Redux action to create the ticket (includes authentication)
-            console.log('📝 Submitting ticket data:', {
-                ...ticketData,
-                attachments: ticketData.attachments?.map(f => ({
-                    name: f.name,
-                    size: f.size,
-                    type: f.type
-                })) || 'No attachments'
-            });
+       
             const resultAction = await createTicket(ticketData);
             
-            console.log('🔍 Result action:', resultAction);
-            console.log('🔍 Meta status:', resultAction.meta?.requestStatus);
-            console.log('🔍 Payload:', resultAction.payload);
-            console.log('🔍 Error:', resultAction.error);
-            
+             
             // Check if the action was fulfilled by checking the meta.requestStatus
             if (resultAction.meta.requestStatus === 'fulfilled') {
                 const result = resultAction.payload;
-                console.log('Ticket created successfully:', result);
-                
+                 
                 // Call the onSubmit prop if provided (for parent component handling)
                 if (onSubmit) {
                     await onSubmit(result);
@@ -995,105 +955,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                             )}
                         </div>
                     </motion.div>
-                </div>
-
-                {/* Debug Info - Remove in production 
-                {import.meta.env.MODE === 'development' && (
-                    <motion.div
-                        variants={itemVariants}
-                        className="bg-gray-100 p-4 rounded-lg mt-6"
-                    >
-                        <h4 className="text-sm font-semibold mb-2">Debug Info:</h4>
-                        <p className="text-xs">Form Valid: {isValid ? 'Yes' : 'No'}</p>
-                        <p className="text-xs">Is Dirty: {isDirty ? 'Yes' : 'No'}</p>
-                        <p className="text-xs">Is Submitting: {isSubmitting ? 'Yes' : 'No'}</p>
-                        <p className="text-xs">Ticket Loading: {ticketLoading ? 'Yes' : 'No'}</p>
-                        <p className="text-xs">Ticket Error: {ticketError || 'None'}</p>
-                        <p className="text-xs">Submit Disabled: {(!isValid || isSubmitting || ticketLoading) ? 'Yes' : 'No'}</p>
-                        <p className="text-xs">Errors: {Object.keys(errors).length}</p>
-                        {Object.keys(errors).length > 0 && (
-                            <div className="mt-2">
-                                <p className="text-xs font-medium">Validation Errors:</p>
-                                {Object.entries(errors).map(([field, error]) => (
-                                    <p key={field} className="text-xs text-red-600">
-                                        {field}: {error?.message}
-                                    </p>
-                                ))}
-                            </div>
-                        )}
-                        <div className="flex gap-2 mt-2">
-                            <button 
-                                type="button"
-                                onClick={() => console.log('Current values:', getValues())}
-                                className="px-3 py-1 bg-blue-500 text-white text-xs rounded"
-                            >
-                                Log Form Values
-                            </button>
-                            <button 
-                                type="button"
-                                onClick={() => {
-                                    // ticketCode will be auto-generated
-                                    setValue('customerName', ''); // Clear to test auto-fill
-                                    setValue('controllerNo', '251010147290011');
-                                    setValue('state', ''); // Clear to test auto-fill
-                                    setValue('district', ''); // Clear to test auto-fill
-                                    setValue('faultType', 'Motor Not Running');
-                                    setValue('faultCode', 'ERR001');
-                                    setValue('description', 'This is a test description for the ticket form validation.');
-                                    setValue('priority', 'medium');
-                                    setValue('category', 'hardware');
-                                    setValue('motorType', ''); // Clear to test auto-fill
-                                    setValue('imei', ''); // Clear to test auto-fill
-                                    setValue('hp', ''); // Clear to test auto-fill
-                                    setControllerError(''); // Clear any error
-                                }}
-                                className="px-3 py-1 bg-green-500 text-white text-xs rounded"
-                            >
-                                Fill Test Data (with real serial)
-                            </button>
-                            <button 
-                                type="button"
-                                onClick={async () => {
-                                    try {
-                                        const values = getValues();
-                                        await ticketFormSchema.validate(values, { abortEarly: false });
-                                        console.log('Schema validation passed!');
-                                    } catch (error) {
-                                        console.log('Schema validation failed:', error.errors);
-                                    }
-                                }}
-                                className="px-3 py-1 bg-purple-500 text-white text-xs rounded"
-                            >
-                                Test Schema
-                            </button>
-                            <button 
-                                type="button"
-                                onClick={() => handleFormSubmit(getValues())}
-                                className="px-3 py-1 bg-red-500 text-white text-xs rounded"
-                            >
-                                Force Submit
-                            </button>
-                            <button 
-                                type="button"
-                                onClick={() => {
-                                    const token = sessionStorage.getItem('token');
-                                    const user = sessionStorage.getItem('user');
-                                    console.log('🔐 Auth Debug:', {
-                                        hasToken: !!token,
-                                        tokenLength: token?.length,
-                                        tokenPreview: token?.substring(0, 30) + '...',
-                                        hasUser: !!user,
-                                        userInfo: user ? JSON.parse(user) : null
-                                    });
-                                }}
-                                className="px-3 py-1 bg-purple-500 text-white text-xs rounded"
-                            >
-                                Check Auth
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-*/}
+                </div>              
                 {/* Action Buttons */}
                 <motion.div
                     variants={itemVariants}

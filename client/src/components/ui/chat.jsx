@@ -68,9 +68,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
         const fileUrl = attachment.url.startsWith('/uploads/') ? attachment.url : `/uploads/${attachment.url}`;
         downloadUrl = `${baseUrl}${fileUrl}`;
       }
-      
-      console.log('Downloading from:', downloadUrl);
-      
+            
       const response = await fetch(downloadUrl, {
         method: 'GET',
         headers: token ? {
@@ -337,8 +335,6 @@ export const ChatWindow = ({
   };
 
   const handlePreviewAttachment = (attachment) => {
-    console.log('Previewing attachment:', attachment);
-    console.log('Attachment structure:', JSON.stringify(attachment, null, 2));
     setSelectedDocument(attachment);
     setIsDocumentModalOpen(true);
   };

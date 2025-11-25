@@ -10,8 +10,7 @@ const PrivateRouter = ({ children}) => {
     }
 
     // const decodedToken = JSON.parse(atob(token.split('.')[1]));
-    // console.log("Decoded Token:", decodedToken); 
-
+ 
     return children;
 };
 

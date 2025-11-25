@@ -48,8 +48,7 @@ const ServiceCenterAssignmentModal = ({
       
       getServiceCenters(searchFilters)
         .then(result => {
-          console.log('📥 Service centers loaded:', result);
-        })
+         })
         .catch(err => {
           console.error('❌ Error loading service centers:', err);
           setError(err.message || 'Failed to load service centers');
@@ -108,10 +107,7 @@ const ServiceCenterAssignmentModal = ({
     }
   };
 
-  if (!isOpen) return null;
-
-  console.log( serviceCenters);
-  
+  if (!isOpen) return null;  
 
   return (
     <AnimatePresence>

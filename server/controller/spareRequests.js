@@ -1,10 +1,6 @@
 const spareRequestService = require("../service/spareRequests");
 const moment = require("moment");
-async function createSpareRequest(req, res) {
-  console.log('🚀 Spare request creation started');
-  console.log('📥 Request body:', JSON.stringify(req.body, null, 2));
-  console.log('👤 User ID:', req.user?.id, 'Role:', req.user?.role);
-  
+async function createSpareRequest(req, res) {  
   try {
     const userId = req.user.id; // From authentication middleware
     const userRole = req.user.role; // Get user role

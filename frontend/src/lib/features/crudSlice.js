@@ -42,8 +42,7 @@ export const createData = createAsyncThunk(
   async ({ entity, newData }, { rejectWithValue }) => {
     try {
       const response = await axios.post(`${API_URL}/${entity}`, newData);
-      console.log(response.data);
-      return { entity, data: response.data };
+       return { entity, data: response.data };
       
     } catch (error) {
       return rejectWithValue({ entity, message: error.message });

@@ -148,21 +148,9 @@ const createConversation = async (conversation, userId, io, files = []) => {
     if (ticketDetails.createdBy !== userId) {
       targetUserIds.push(ticketDetails.createdBy);
     }
-
-    console.log(`💬 Message notification targeting:`);
-    console.log(`   Sender: ${newMessage.sender?.name} (ID: ${userId})`);
-    console.log(`   Target users (${targetUsers.length}):`);
-    targetUsers.forEach((user) => {
-      console.log(`     - ${user.name} (${user.role}) - ID: ${user.id}`);
-    });
-
     // Verify sender is not in target list
     const senderInTargets = targetUserIds.includes(userId);
-    console.log(
-      `   ✅ Sender excluded from notifications: ${
-        !senderInTargets ? "YES" : "NO (ERROR!)"
-      }`
-    );
+  
 
     if (senderInTargets) {
       console.error(
@@ -184,15 +172,6 @@ const createConversation = async (conversation, userId, io, files = []) => {
 
       // Also emit to all clients as fallback
       io.emit("conversation", newMessage);
-
-      console.log(
-        `💬 Emitted conversation message to room: ${conversationRoom} and all clients`
-      );
-      console.log("Message content:", {
-        id: newMessage.id,
-        content: newMessage.content,
-        senderId: newMessage.senderId,
-      });
     }
     return newMessage;
   } catch (error) {

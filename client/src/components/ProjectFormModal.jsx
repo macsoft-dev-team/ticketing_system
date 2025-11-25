@@ -248,10 +248,7 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                console.log('Project Cancel button clicked, isSubmitting:', isSubmitting);
-                                console.log('About to close modal by calling onOpenChange(false)');
-                                
-                                // Reset form data
+                                 // Reset form data
                                 setFormData({
                                     name: '',
                                     projectCode: '',

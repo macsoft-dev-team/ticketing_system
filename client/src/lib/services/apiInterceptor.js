@@ -12,17 +12,10 @@ export const setStoreForInterceptor = (storeInstance) => {
 axios.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem('token');
-    console.log('🔐 API Interceptor - Token check:', {
-      hasToken: !!token,
-      tokenPreview: token ? `${token.substring(0, 20)}...` : 'No token',
-      url: config.url,
-      method: config.method
-    });
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Authorization header set');
-    } else {
+     } else {
       console.warn('❌ No token found in sessionStorage');
     }
     return config;
@@ -36,11 +29,6 @@ axios.interceptors.request.use(
 // Response interceptor to handle expired tokens
 axios.interceptors.response.use(
   (response) => {
-    console.log('✅ API Response Success:', {
-      status: response.status,
-      url: response.config.url,
-      method: response.config.method
-    });
     return response;
   },
   (error) => {

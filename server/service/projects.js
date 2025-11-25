@@ -59,17 +59,12 @@ const getAllProjects = async (skip, take, filter) => {
 
     params.where = where;
     params.include = { organisation: true };
-    console.log('Projects service - final params:', JSON.stringify(params, null, 2));
-    console.log('Projects service - where clause:', JSON.stringify(where, null, 2));
-    
     const count = await prisma.project.count({ where: params.where });
     const projects = await prisma.project.findMany({
       ...params,
       orderBy: [{ createdAt: "desc" }]
     });
-    
-    console.log(`Projects service - found ${projects.length} projects, total count: ${count}`);
-    
+        
     return { projects, count, statusCount };
   } catch (error) {
     console.error("Error fetching projects:", error);

@@ -18,8 +18,7 @@ const checkUnique=async(ticketcode)=>{
         const [result]=await db.query(checkTicket,[ticketcode])
         return result.length===0
     }catch(error){
-        console.log(error)
-    }
+     }
 }
 
 const storage=multer.diskStorage({
@@ -37,8 +36,6 @@ const upload=multer({storage:storage})
 const postticket = async (req, res) => {
     const { customername, controllerno,head,imei,hp,motortype, state, district, village, block, faultcode, complainttype, details,user_id,status } = req.body;
     const picture = req.file ? req.file.path: null;
-    console.log(customername)
-
     try {
         const ticketcode = "TICK" + await autoTicketCode();
         const isUnique=await checkUnique(ticketcode)
@@ -49,16 +46,14 @@ const postticket = async (req, res) => {
         }
 
             const sql = "INSERT INTO ticketdetails (ticketcode, customername, controllerno,head,imei,hp,motortype, state, district, village, block, faultcode, complainttype, details, picture,user_id,status) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            console.log("console",sql)
-            await db.query(sql, [ticketcode, customername, controllerno,head,imei,hp,motortype, state, district, village, block, faultcode, complainttype, details, picture,user_id,status]);
+             await db.query(sql, [ticketcode, customername, controllerno,head,imei,hp,motortype, state, district, village, block, faultcode, complainttype, details, picture,user_id,status]);
             const consql="Insert INTO conversation (tickcode,message,messageby,status,isread) Values(?,?,?,?,?)"
             await db.query(consql,[ticketcode,complainttype,user_id,status,0])
             return res.status(200).send({ message: 'Ticket inserted successfully', ticketcode });
 
        
     } catch (error) {
-        console.log(error);
-        return res.status(400).send("Error while inserting ticket details");
+         return res.status(400).send("Error while inserting ticket details");
     }
 };
 
@@ -68,9 +63,6 @@ const getTicketUser = async (req, res) => {
     const id = req.user.id;  
     const userRole = req.user.role;  
     const { ticketStatus } = req.query;  
- 
-    console.log("Ticket Status:", ticketStatus);
-
     let sql = "SELECT * FROM ticketdetails WHERE user_id = ?";
    // let user_sql='SELECT * FROM userdetails WHERE id=?'
     
@@ -99,8 +91,7 @@ const getTicketUser = async (req, res) => {
         }
         const [result] = await db.query(sql, params);
       //  const [userdeatils]=await db.query(user_sql,[id])
-       //console.log(userdeatils,result)
-        res.status(200).json(result);
+         res.status(200).json(result);
     } catch (error) {
         console.error("Error retrieving ticket details:", error);
         res.status(500).send({ message: "Error retrieving ticket details", error });
@@ -134,8 +125,7 @@ const updateCloseTicket = async (req, res) => {
       }  
       res.status(200).send(`Ticket ${ticketcode} is closed successfully`);
     } catch (error) {
-      console.log(error);
-      res.status(500).send(`Error while closing the ticket: ${error.message}`);
+       res.status(500).send(`Error while closing the ticket: ${error.message}`);
     }
   };
   
@@ -158,8 +148,7 @@ const postMessage=async(req,res)=>{
         await db.query(sql,[ticketcode,message,messageby,status,0,user_id])
         res.status(200).send("message send successfully")
     }catch(error){
-        console.log(error)
-        res.status(400).send("error occurred while message")
+         res.status(400).send("error occurred while message")
     }
 }
 
@@ -172,8 +161,7 @@ const getMessage = async (req, res) => {
         const [result]=await db.query(sql,[ticketcode])
         res.status(200).send(result);
     } catch (error) {
-        console.log(error);
-        res.status(400).send("Error while getting message");
+         res.status(400).send("Error while getting message");
     }
 };
 
@@ -185,8 +173,7 @@ const getAllMessage = async (req, res) => {
         const [result]=await db.query(sql,[ticketcode])
         res.status(200).send(result);
     } catch (error) {
-        console.log(error);
-        res.status(400).send("Error while getting message");
+         res.status(400).send("Error while getting message");
     }
 };
 
@@ -199,8 +186,7 @@ const markMessageAsRead = async (req, res) => {
         await db.query(sql, [ticketcode, messageby]);
         res.status(200).send("Message marked as read");
     } catch (error) {
-        console.log(error);
-        res.status(400).send("Error marking message as read");
+         res.status(400).send("Error marking message as read");
     }
 };
 
@@ -209,8 +195,7 @@ const openTicketForPico=async(req,res)=>{
         const sql= 'SELECT * FROM ticketdetails WHERE status=?'
         const [user]=await db.query(sql,['open'])
         const newticket=user[user.length-1]
-        console.log(newticket)
-        if(user.length===0){
+         if(user.length===0){
             return res.status(400).send('No Ticket is Open')
         }
         res.status(200).send(newticket)

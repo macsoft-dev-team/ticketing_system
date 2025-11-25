@@ -4,8 +4,6 @@ const prisma = new PrismaClient();
 
 async function migrateToTicketInitialized() {
   try {
-    console.log('🔄 Starting migration to add TICKET_INITIALIZED stage...');
-
     // Find all tickets that have REQUEST_SUBMISSION as their first milestone
     const ticketsWithRequestSubmission = await prisma.ticket.findMany({
       include: {
@@ -17,8 +15,6 @@ async function migrateToTicketInitialized() {
         }
       }
     });
-
-    console.log(`📋 Found ${ticketsWithRequestSubmission.length} tickets to migrate`);
 
     for (const ticket of ticketsWithRequestSubmission) {
       if (ticket.ticketMilestones.length > 0) {
@@ -48,14 +44,11 @@ async function migrateToTicketInitialized() {
           }
         });
 
-        console.log(`✅ Migrated ticket ${ticket.ticketCode}`);
       }
     }
 
-    console.log('🎉 Migration completed successfully!');
     
     // Update all other milestones' orders to account for the new first stage
-    console.log('🔄 Updating milestone orders...');
     
     // Increment all milestone orders by 1 to make room for TICKET_INITIALIZED at order 0
     await prisma.$executeRaw`
@@ -63,9 +56,6 @@ async function migrateToTicketInitialized() {
       SET \`order\` = \`order\` + 1 
       WHERE stage != 'TICKET_INITIALIZED' AND \`order\` < 99
     `;
-
-    console.log('✅ All milestone orders updated!');
-
   } catch (error) {
     console.error('❌ Migration failed:', error);
     throw error;

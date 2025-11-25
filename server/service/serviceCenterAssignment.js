@@ -85,15 +85,12 @@ const getSuggestedServiceCentersForState = async (state) => {
  
 const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserId) => {
   try {
-    console.log(`🔄 Starting service center assignment: ticketId=${ticketId}, centerCode=${centerCode}, userId=${assignedByUserId}`);
-    
-    // Verify the service center exists and is active
+     // Verify the service center exists and is active
     const serviceCenter = await prisma.serviceCenter.findUnique({
       where: { centerCode },
       select: { id: true, name: true, isActive: true }
     });
 
-    console.log(`📋 Service center lookup result:`, serviceCenter);
 
     if (!serviceCenter) {
       throw new Error(`Service center with code ${centerCode} not found`);
@@ -113,7 +110,6 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
       throw new Error(`Ticket with ID ${ticketId} not found`);
     }
     
-    console.log(`📝 Updating ticket ${ticketId} (${ticketExists.ticketCode}) with service center assignment...`);
 
     // Update ticket with service center assignment
     const updatedTicket = await prisma.ticket.update({
@@ -129,14 +125,11 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
       }
     });
 
-    console.log(`✅ Ticket updated successfully, creating milestone...`);
 
     // Create SERVICE_CENTER_ASSIGNED milestone
     try {
       const stageConfig = getStageConfig('SERVICE_CENTER_ASSIGNED');
-      
-      console.log(`📋 Stage config for SERVICE_CENTER_ASSIGNED:`, stageConfig);
-      
+            
       if (!stageConfig) {
         console.warn(`⚠️ No stage config found for SERVICE_CENTER_ASSIGNED, skipping milestone creation`);
       } else {
@@ -148,9 +141,7 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
           }
         });
         
-        if (existingMilestone) {
-          console.log(`📋 SERVICE_CENTER_ASSIGNED milestone already exists, updating instead of creating new one`);
-          
+        if (existingMilestone) {          
           const updatedMilestone = await prisma.ticketMilestone.update({
             where: { id: existingMilestone.id },
             data: {
@@ -159,17 +150,7 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
               status: 'IN_PROGRESS'
             }
           });
-          
-          console.log(`📋 SERVICE_CENTER_ASSIGNED milestone updated successfully:`, updatedMilestone);
         } else {
-          console.log(`📋 About to create milestone with data:`, {
-            ticketId: ticketId,
-            stage: 'SERVICE_CENTER_ASSIGNED',
-            order: stageConfig.order,
-            changedBy: assignedByUserId,
-            notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket`,
-            completedAt: new Date(),
-          });
           
           const milestone = await createMilestone({
             ticketId: ticketId,
@@ -179,9 +160,7 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
             notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
             status: 'IN_PROGRESS'
           });
-          
-          console.log(`📋 SERVICE_CENTER_ASSIGNED milestone created successfully:`, milestone);
-        }
+                  }
         
         // Also mark TICKET_RAISED milestone as DONE if it exists and is still IN_PROGRESS
         try {
@@ -204,11 +183,9 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
               }
             });
             
-            console.log(`📋 TICKET_RAISED milestone marked as DONE`);
           }
         } catch (ticketRaisedError) {
-          console.error(`⚠️ Error updating TICKET_RAISED milestone:`, ticketRaisedError);
-          // Don't throw - this is not critical
+
         }
         
       }
@@ -221,8 +198,6 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
       });
       // Don't throw - allow the assignment to succeed even if milestone fails
     }
-
-    console.log(`✅ Service center ${centerCode} assigned to ticket ${ticketId} by user ${assignedByUserId}`);
     
     return updatedTicket;
   } catch (error) {
@@ -437,11 +412,9 @@ const removeServiceCenterAssignment = async (ticketId, removedByUserId) => {
       }
     });
 
-    console.log(`🔄 Service center assignment removed from ticket ${ticketId} by user ${removedByUserId}`);
-    return updatedTicket;
+     return updatedTicket;
   } catch (error) {
-    console.error('Error removing service center assignment:', error);
-    throw error;
+     throw error;
   }
 };
 

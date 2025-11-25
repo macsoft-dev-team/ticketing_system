@@ -64,8 +64,7 @@ const getUser = async (req, res) => {
         });
 
         res.status(200).send(userWithTicketCount);
-      //  console.log(userWithTicketCount)
-    } catch (error) {
+     } catch (error) {
         res.status(400).send(error);
     }
 };

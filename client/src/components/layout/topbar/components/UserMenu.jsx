@@ -25,8 +25,7 @@ const UserMenu = () => {
   }, []);
 
   const handleLogout = () => {
-    console.log('Logout button clicked');
-
+ 
     // Emergency logout - clear everything immediately
     try {
       // Clear session storage directly
@@ -41,8 +40,6 @@ const UserMenu = () => {
       if (window.axios && window.axios.defaults && window.axios.defaults.headers) {
         delete window.axios.defaults.headers.common['Authorization'];
       }
-
-      console.log('Local logout completed, redirecting...');
 
       // Navigate to login
       navigate('/login', { replace: true });
@@ -111,8 +108,7 @@ const UserMenu = () => {
           <div className="border-t border-gray-200 py-2 dark:border-gray-600">
             <button
               onClick={() => {
-                console.log('Manual dropdown logout clicked');
-                setShowUserMenu(false);
+                 setShowUserMenu(false);
                 handleLogout();
               }}
               className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"

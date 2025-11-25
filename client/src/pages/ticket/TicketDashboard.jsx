@@ -135,10 +135,6 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) =>
         // Fallback to direct file URL
         downloadUrl = `${baseUrl}${attachment.url}`;
       }
-
-      console.log('Downloading from:', downloadUrl);
-      console.log('Using token:', token ? 'Present' : 'Missing');
-
       const headers = {};
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -149,14 +145,11 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) =>
         headers,
       });
 
-      console.log('Response status:', response.status);
-
       if (!response.ok) {
         // Try fallback method - direct link
         if (attachment.url) {
           const fallbackUrl = `${baseUrl}${attachment.url}`;
-          console.log('Trying fallback URL:', fallbackUrl);
-          window.open(fallbackUrl, '_blank');
+           window.open(fallbackUrl, '_blank');
           if (addToast) addToast({
             title: `Opening ${attachment.name}`,
             description: 'File opened in new tab',
@@ -190,8 +183,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) =>
       if (attachment.url) {
         const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
         const fallbackUrl = `${baseUrl}${attachment.url}`;
-        console.log('Final fallback - opening URL:', fallbackUrl);
-        window.open(fallbackUrl, '_blank');
+         window.open(fallbackUrl, '_blank');
         if (addToast) addToast({
           title: `Opening ${attachment.name}`,
           description: 'File opened in new tab',
@@ -349,8 +341,7 @@ export default function TicketDashboard() {
   }, [sendConversationMessage, addToast, ticketId, user, token]);
 
   const handleSpareRequestSubmit = useCallback(async (formData) => {
-    console.log('🚀 Form submission started with data:', formData);
-    try {
+     try {
       const spareItems = formData.products.map(product => {
         return {
           productId: parseInt(product.productId, 10),

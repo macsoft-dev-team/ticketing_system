@@ -50,8 +50,7 @@ export default function ServiceCenters() {
     } = useServiceCenter();
 
     // Debug statusCount
-    console.log('ServiceCenters statusCount:', statusCount);
-
+ 
     useEffect(() => {
         getServiceCenters({ skip: currentPage, take: 10, filter: filter });
     }, [getServiceCenters, currentPage]);
@@ -130,8 +129,7 @@ export default function ServiceCenters() {
     };
 
     const handleFilterChange = (status) => {
-        console.log('Filter service centers by status:', status);
-        const newFilter = { ...filter, status };
+         const newFilter = { ...filter, status };
         setFilters(newFilter);
         getServiceCenters({ skip: 0, take: 10, filter: newFilter });
     };
@@ -144,8 +142,7 @@ export default function ServiceCenters() {
     // Create a debounced search function
     const debouncedSearch = useCallback(
         debounceSearch((searchTerm) => {
-            console.log('Debounced search service centers:', searchTerm);
-            const newFilter = { ...filter, search: searchTerm };
+             const newFilter = { ...filter, search: searchTerm };
             setFilters(newFilter);
             getServiceCenters({ skip: 0, take: 10, filter: newFilter });
         }, 500),

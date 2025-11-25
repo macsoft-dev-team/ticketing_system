@@ -15,13 +15,11 @@ async function main() {
 
   for (const file of files) {
     const dataPath = path.join(__dirname, `./seeders/${file}.json`);
-    console.log(dataPath);
     if (fs.existsSync(dataPath)) {
       try {
         const data = fs.readFileSync(dataPath, "utf8");
         const json = JSON.parse(data);
         const model = prisma[file];
-        console.log("file", file);
         for (const item of json) {
           const { id, ...rest } = item; // Extract id and the rest of the fields
           await model.upsert({

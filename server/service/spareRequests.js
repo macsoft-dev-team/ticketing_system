@@ -38,10 +38,7 @@ async function createSpareRequest(data) {
     if (products.length !== productIds.length) {
       throw new Error("One or more products not found");
     }
-
-    // Check inventory availability for each item
-    console.log(`📦 Checking inventory availability for ${spareItems.length} items...`);
-    const stockCheck = await inventoryService.checkStockAvailability(spareItems);
+     const stockCheck = await inventoryService.checkStockAvailability(spareItems);
     
     if (!stockCheck.allAvailable) {
       const insufficientItems = stockCheck.insufficientItems.map(item => 
@@ -84,12 +81,7 @@ async function createSpareRequest(data) {
       },
     });
 
-    console.log(
-      `✅ Spare request created for ticket ${ticketCode}:`,
-      spareRequest.id
-    );
-
-    // Update milestone - Mark current milestone as completed and create SPARE_REQUESTED
+     // Update milestone - Mark current milestone as completed and create SPARE_REQUESTED
     try {
       if (spareRequest) {
         // Find the current active milestone (should be REPLACEMENT_IN_PROGRESS)
@@ -98,9 +90,7 @@ async function createSpareRequest(data) {
         );
         
         if (currentMilestone && currentMilestone.stage === "REPLACEMENT_IN_PROGRESS") {
-          console.log(`📋 Found current milestone: ${currentMilestone.stage}, transitioning to SPARE_REQUESTED`);
-          
-          // Complete the current milestone (REPLACEMENT_IN_PROGRESS)
+           // Complete the current milestone (REPLACEMENT_IN_PROGRESS)
           await prisma.ticketMilestone.update({
             where: { id: currentMilestone.id },
             data: {
@@ -123,9 +113,7 @@ async function createSpareRequest(data) {
               startedAt: new Date(),
             },
           });
-          
-          console.log(`✅ Milestone transition completed: ${currentMilestone.stage} → SPARE_REQUESTED`);
-        } else if (currentMilestone) {
+         } else if (currentMilestone) {
           console.warn(`⚠️ Spare requests can only be made from REPLACEMENT_IN_PROGRESS stage, current stage: ${currentMilestone.stage}`);
           throw new Error(`Spare requests can only be made during replacement process. Current stage: ${currentMilestone.stage}`);
         } else {
@@ -205,8 +193,7 @@ async function updateSpareRequestStatus(id, data) {
       },
     });
 
-    console.log(`✅ Spare request ${id} status updated to ${status}`);
-    return spareRequest;
+     return spareRequest;
   } catch (error) {
     console.error("❌ Error updating spare request:", error);
     throw error;
@@ -248,16 +235,13 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
     // If item is approved, deduct from inventory
     if (status === 'approved') {
       try {
-        console.log(`📦 Deducting inventory for approved item: ${item.product.name} (${item.quantity} units)`);
-        
-        await inventoryService.deductInventory(
+         await inventoryService.deductInventory(
           [{ productId: item.productId, quantity: item.quantity }],
           item.spareRequest.ticketCode,
           updatedBy
         );
 
-        console.log(`✅ Inventory deducted successfully for ${item.product.name}`);
-      } catch (inventoryError) {
+       } catch (inventoryError) {
         console.error(`❌ Failed to deduct inventory for item ${itemId}:`, inventoryError);
         
         // Revert the item status if inventory deduction fails
@@ -333,8 +317,7 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
                 },
               });
               
-              console.log(`✅ Milestone transitioned: SPARE_REQUESTED → SPARE_APPROVED for ticket ${ticket.ticketCode}`);
-            }
+             }
           }
         } catch (milestoneError) {
           console.error('❌ Error transitioning milestone after spare approval:', milestoneError);
@@ -343,8 +326,7 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
       }
     }
 
-    console.log(`✅ Spare request item ${itemId} status updated to ${status} by user ${updatedBy}`);
-    return item;
+     return item;
   } catch (error) {
     console.error("❌ Error updating spare request item:", error);
     throw error;
@@ -447,9 +429,7 @@ async function getAllSpareRequests(skip, take, filters) {
  */
 async function bulkApproveSpareRequestsByTicket(ticketCode, approvedBy = null) {
   try {
-    console.log(`🔄 Starting bulk approval of spare requests for ticket ${ticketCode}`);
-
-    // Get all pending spare requests for this ticket
+     // Get all pending spare requests for this ticket
     const pendingSpareRequests = await prisma.spareRequest.findMany({
       where: {
         ticketCode,
@@ -465,8 +445,7 @@ async function bulkApproveSpareRequestsByTicket(ticketCode, approvedBy = null) {
     });
 
     if (pendingSpareRequests.length === 0) {
-      console.log(`ℹ️ No pending spare requests found for ticket ${ticketCode}`);
-      return { approvedRequests: 0, approvedItems: 0 };
+       return { approvedRequests: 0, approvedItems: 0 };
     }
 
     let totalApprovedRequests = 0;
@@ -481,8 +460,6 @@ async function bulkApproveSpareRequestsByTicket(ticketCode, approvedBy = null) {
             productId: item.productId,
             quantity: item.quantity
           }));
-
-          console.log(`📦 Checking inventory for bulk approval of request ${spareRequest.id}...`);
           
           // Deduct inventory for all items
           await inventoryService.deductInventory(inventoryItems, ticketCode, approvedBy);
@@ -512,10 +489,7 @@ async function bulkApproveSpareRequestsByTicket(ticketCode, approvedBy = null) {
           totalApprovedRequests++;
           totalApprovedItems += updatedItems.count;
 
-          console.log(`✅ Auto-approved spare request ${spareRequest.id} with ${updatedItems.count} items and deducted inventory`);
-        } catch (inventoryError) {
-          console.error(`❌ Failed to process spare request ${spareRequest.id} due to inventory issue:`, inventoryError);
-          
+         } catch (inventoryError) {          
           // Skip this spare request if inventory deduction fails
           // Optionally, you could mark it as 'PENDING_INVENTORY' status
           await prisma.spareRequest.update({
@@ -526,14 +500,11 @@ async function bulkApproveSpareRequestsByTicket(ticketCode, approvedBy = null) {
               updatedAt: new Date()
             }
           });
-          
-          console.log(`⚠️ Spare request ${spareRequest.id} marked as PENDING_INVENTORY due to insufficient stock`);
-        }
+         }
       }
     }
 
-    console.log(`✅ Bulk approval completed for ticket ${ticketCode}: ${totalApprovedRequests} requests, ${totalApprovedItems} items`);
-    
+     
     return {
       approvedRequests: totalApprovedRequests,
       approvedItems: totalApprovedItems,

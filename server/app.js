@@ -61,10 +61,7 @@ app.use("/api", appRouter);
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
-    console.log(
-      "🔐 Socket authentication - Token received:",
-      token ? "Yes" : "No"
-    );
+ 
 
     // Allow connection without token for development/testing
     // In production, you should enforce token validation

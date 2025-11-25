@@ -61,16 +61,13 @@ export const createOrganisation = createAsyncThunk(
   "organisations/createOrganisation",
   async (organisationData, { rejectWithValue }) => {
     try {
-      console.log('Creating organisation with data:', organisationData);
-      const response = await axios.post(
+       const response = await axios.post(
         API_ENDPOINTS.organisation,
         organisationData
       );
-      console.log('Create organisation response:', response.data);
-      return response.data;
+       return response.data;
     } catch (error) {
-      console.error('Create organisation error:', error);
-      return rejectWithValue(error.response?.data || error.message);
+       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -79,16 +76,13 @@ export const updateOrganisation = createAsyncThunk(
   "organisations/updateOrganisation",
   async ({ id, organisationData }, { rejectWithValue }) => {
     try {
-      console.log('Updating organisation with id:', id, 'data:', organisationData);
-      const response = await axios.put(
+       const response = await axios.put(
         `${API_ENDPOINTS.organisation}/${id}`,
         organisationData
       );
-      console.log('Update organisation response:', response.data);
-      return response.data;
+       return response.data;
     } catch (error) {
-      console.error('Update organisation error:', error);
-      return rejectWithValue(error.response?.data || error.message);
+       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -97,12 +91,10 @@ export const deleteOrganisation = createAsyncThunk(
   "organisations/deleteOrganisation",
   async (id, { rejectWithValue }) => {
     try {
-      console.log('Deleting organisation with id:', id);
-      const response = await axios.delete(
+       const response = await axios.delete(
         `${API_ENDPOINTS.organisation}/${id}`
       );
-      console.log('Delete organisation response:', response.data);
-      return { ...response.data, id }; // Include id in response for proper removal from state
+       return { ...response.data, id }; // Include id in response for proper removal from state
     } catch (error) {
       console.error('Delete organisation error:', error);
       return rejectWithValue(error.response?.data || error.message);

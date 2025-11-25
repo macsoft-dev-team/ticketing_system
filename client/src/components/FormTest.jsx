@@ -19,8 +19,7 @@ export default function FormTest() {
   });
 
   const onSubmit = (data) => {
-    console.log('Form submitted:', data);
-  };
+   };
 
   return (
     <div className="p-8">

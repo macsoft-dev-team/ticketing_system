@@ -23,8 +23,7 @@ const TestServiceCenterFlow = () => {
     
     try {
       // Test 1: Get suggested service centers
-      console.log('🧪 Testing getSuggestedServiceCenters...');
-      try {
+       try {
         const suggestedResult = await getSuggestedServiceCenters('Maharashtra');
         results.getSuggestedServiceCenters = {
           success: true,
@@ -39,8 +38,7 @@ const TestServiceCenterFlow = () => {
       }
 
       // Test 2: Get unassigned tickets
-      console.log('🧪 Testing getUnassignedTickets...');
-      try {
+       try {
         const unassignedResult = await getUnassignedTickets();
         results.getUnassignedTickets = {
           success: true,
@@ -55,8 +53,7 @@ const TestServiceCenterFlow = () => {
       }
 
       // Test 3: Get service center stats
-      console.log('🧪 Testing getServiceCenterStats...');
-      try {
+       try {
         const statsResult = await getServiceCenterStats();
         results.getServiceCenterStats = {
           success: true,
@@ -71,8 +68,7 @@ const TestServiceCenterFlow = () => {
       }
 
       // Test 4: Test service center assignment (will fail without valid ticket ID)
-      console.log('🧪 Testing assignServiceCenter (expect failure)...');
-      try {
+       try {
         await assignServiceCenter(999999, 'TEST-CENTER-001');
         results.assignServiceCenter = {
           success: false,

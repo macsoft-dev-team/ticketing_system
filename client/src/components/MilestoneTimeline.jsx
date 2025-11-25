@@ -111,8 +111,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                 downloadUrl = `${baseUrl}${attachment.fileUrl}`;
             }
 
-            console.log('Downloading milestone attachment from:', downloadUrl);
-
+ 
             const headers = {};
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
@@ -127,8 +126,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                 // Try fallback method - direct link
                 if (attachment.fileUrl) {
                     const fallbackUrl = `${baseUrl}${attachment.fileUrl}`;
-                    console.log('Trying fallback URL:', fallbackUrl);
-                    window.open(fallbackUrl, '_blank');
+                     window.open(fallbackUrl, '_blank');
                     if (addToast) addToast({
                         title: `Opening ${attachment.fileName}`,
                         description: 'File opened in new tab',
@@ -162,8 +160,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
             if (attachment.fileUrl) {
                 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
                 const fallbackUrl = `${baseUrl}${attachment.fileUrl}`;
-                console.log('Final fallback - opening URL:', fallbackUrl);
-                window.open(fallbackUrl, '_blank');
+                 window.open(fallbackUrl, '_blank');
                 if (addToast) addToast({
                     title: `Opening ${attachment.fileName}`,
                     description: 'File opened in new tab',
@@ -846,8 +843,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     // Handle spare request submission
     const handleSpareRequestSubmit = async (formData) => {
         try {
-            console.log('Submitting spare request:', formData);
-
+ 
             // Get ticket data
             const baseUrl = API_URL || 'http://localhost:3001';
             const ticketResponse = await axios.get(
@@ -860,8 +856,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             );
 
             const ticketData = ticketResponse.data;
-            console.log('Ticket Data:', ticketData);
-
             // Prepare spare items data - convert product IDs from P001 format to integer
             const spareItems = formData.products.map(product => {
                 // Extract numeric part from product ID (P001 -> 1, P002 -> 2, etc.)
@@ -881,9 +875,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 expectedDelivery: formData.expectedDelivery,
                 additionalNotes: formData.additionalNotes
             };
-
-            console.log('Request Data:', requestData);
-
             // Submit spare request to API
             const response = await fetch(`${baseUrl}/spare-requests`, {
                 method: 'POST',
@@ -895,8 +886,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             });
 
             const result = await response.json();
-            console.log('API Response:', result);
-
             if (!response.ok) {
                 throw new Error(result.message || 'Failed to submit spare request');
             }
@@ -917,8 +906,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
             // Clear pending transition since backend handles it
             setPendingSpareTransition(null);
-
-            console.log('✅ Spare request submitted successfully');
         } catch (error) {
             console.error('❌ Error submitting spare request:', error);
             addToast({
@@ -1161,8 +1148,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     const handleMilestoneAction = (actionData) => {
         const { action, targetStage, requiresPhotos, currentStage } = actionData;
 
-        console.log('MilestoneTimeline - handleMilestoneAction called:', actionData);
-
         // First, check if this action should be handled by the parent component
         if (action === 'service_center_assignment' || action === 'upload_photos') {
             if (onAction) {
@@ -1269,8 +1254,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             setShowConfirmDialog(true);
         } else if (action === 'transition' && targetStage) {
             // Fallback for transitions without specific confirmation messages
-            console.log('No specific confirmation message found for:', targetStage, 'using default');
-            setConfirmDialogData({
+             setConfirmDialogData({
                 title: `Advance to ${targetStage.replace(/_/g, ' ').toLowerCase()}`,
                 message: `Proceed with this milestone transition?`,
                 confirmText: 'Proceed',

@@ -11,8 +11,6 @@ const { prisma } = require('../lib/clients');
 const { createInitialMilestones } = require('../service/milestones');
 
 async function addMilestonesToExistingTickets() {
-  console.log('🚀 Starting milestone migration...\n');
-
   try {
     // Get all tickets
     const tickets = await prisma.ticket.findMany({
@@ -22,8 +20,6 @@ async function addMilestonesToExistingTickets() {
       },
     });
 
-    console.log(`📊 Found ${tickets.length} total tickets\n`);
-
     let migratedCount = 0;
     let skippedCount = 0;
     let errorCount = 0;
@@ -32,33 +28,19 @@ async function addMilestonesToExistingTickets() {
       try {
         // Check if ticket already has milestones
         if (ticket.ticketMilestones && ticket.ticketMilestones.length > 0) {
-          console.log(`⏭️  Skipping ${ticket.ticketCode} - already has ${ticket.ticketMilestones.length} milestones`);
-          skippedCount++;
+           skippedCount++;
           continue;
         }
 
         // Create milestones for this ticket
-        console.log(`✨ Creating milestones for ${ticket.ticketCode}...`);
-        await createInitialMilestones(ticket.id, ticket.createdBy);
-        console.log(`✅ Created milestones for ${ticket.ticketCode}`);
-        migratedCount++;
+         await createInitialMilestones(ticket.id, ticket.createdBy);
+         migratedCount++;
       } catch (error) {
-        console.error(`❌ Error creating milestones for ${ticket.ticketCode}:`, error.message);
-        errorCount++;
+         errorCount++;
       }
     }
 
-    console.log('\n' + '='.repeat(60));
-    console.log('📈 Migration Summary:');
-    console.log('='.repeat(60));
-    console.log(`✅ Migrated:  ${migratedCount} tickets`);
-    console.log(`⏭️  Skipped:   ${skippedCount} tickets (already have milestones)`);
-    console.log(`❌ Errors:    ${errorCount} tickets`);
-    console.log(`📊 Total:     ${tickets.length} tickets`);
-    console.log('='.repeat(60) + '\n');
-
-    console.log('✨ Migration completed successfully!\n');
-  } catch (error) {
+   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);
   } finally {
@@ -69,8 +51,7 @@ async function addMilestonesToExistingTickets() {
 // Run the migration
 addMilestonesToExistingTickets()
   .then(() => {
-    console.log('👋 Goodbye!');
-    process.exit(0);
+     process.exit(0);
   })
   .catch((error) => {
     console.error('💥 Fatal error:', error);

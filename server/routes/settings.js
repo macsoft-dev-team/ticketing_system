@@ -80,10 +80,7 @@ router.put('/notifications', async (req, res) => {
     // In a real implementation, you would save these to a database
     // For now, we'll just acknowledge the update
     
-    console.log('System notification settings updated by admin:', userId);
-    console.log('New settings:', notificationSettings);
-
-    res.status(200).json({
+     res.status(200).json({
       message: 'Notification settings updated successfully',
       settings: notificationSettings
     });

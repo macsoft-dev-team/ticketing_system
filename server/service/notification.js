@@ -2,17 +2,12 @@ const { prisma } = require("../lib/clients");
 
 const getNotifications = async (userId) => {
   try {
-    console.log(`📋 Fetching notifications for user: ${userId}`);
-    console.log(`📋 UserId type: ${typeof userId}, Value: ${userId}`);
-    
     // Ensure userId is a number
     const userIdNum = parseInt(userId);
     if (isNaN(userIdNum)) {
       throw new Error(`Invalid userId: ${userId}`);
     }
-    
-    console.log(`📋 Converted userId to: ${userIdNum}`);
-    
+        
     const notifications = await prisma.notificationRecipient.findMany({
       where: {
         userId: userIdNum,
@@ -57,9 +52,7 @@ const getNotifications = async (userId) => {
         },
       ],
     });
-    
-    console.log(`📋 Found ${notifications.length} notifications for user ${userIdNum}`);
-    return notifications;
+        return notifications;
   } catch (error) {
     console.error('❌ Error fetching notifications:', error);
     console.error('❌ Error stack:', error.stack);
@@ -68,9 +61,7 @@ const getNotifications = async (userId) => {
 };
 
 const updateNotification = async (notificationId, userId, io) => {
-  try {
-    console.log(`✅ Marking notification ${notificationId} as seen for user ${userId}`);
-    
+  try {    
     // First check if the notification recipient exists and belongs to the user
     const existingRecipient = await prisma.notificationRecipient.findFirst({
       where: {
@@ -125,7 +116,6 @@ const updateNotification = async (notificationId, userId, io) => {
     if (io) {
       // Emit updated notification to the specific user
       io.to(`notifications-${userId}`).emit("notificationUpdate", notification);
-      console.log(`📤 Emitted notification update to user ${userId}`);
     }
 
     return notification;
@@ -136,9 +126,7 @@ const updateNotification = async (notificationId, userId, io) => {
 };
 
 const getNotificationCounts = async (userId) => {
-  try {
-    console.log(`📊 Getting notification counts for user: ${userId}`);
-    
+  try {    
     const total = await prisma.notificationRecipient.count({
       where: {
         userId: userId,
@@ -153,7 +141,6 @@ const getNotificationCounts = async (userId) => {
     });
 
     const counts = { total, unread, read: total - unread };
-    console.log(`📊 Notification counts for user ${userId}:`, counts);
     return counts;
   } catch (error) {
     console.error('❌ Error getting notification counts:', error);

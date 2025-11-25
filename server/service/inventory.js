@@ -95,12 +95,6 @@ async function upsertInventory(data) {
         product: true,
       },
     });
-
-    console.log(
-      `✅ Inventory ${
-        inventory.id ? "updated" : "created"
-      } for product ${productId}`
-    );
     return inventory;
   } catch (error) {
     console.error("❌ Error upserting inventory:", error);
@@ -214,10 +208,6 @@ async function deductInventory(items, ticketCode = null, updatedBy = null) {
         newQuantity: updatedInventory.quantity,
         deductedQuantity: item.quantity,
       });
-
-      console.log(
-        `📦 Inventory deducted: ${updatedInventory.product.name} - ${item.quantity} units (${currentInventory.quantity} → ${updatedInventory.quantity})`
-      );
     }
 
     return results;
@@ -293,18 +283,10 @@ async function addInventory(items, notes = null, updatedBy = null) {
         },
       });
 
-      console.log(
-        `📦 Inventory added: ${results[results.length - 1].product.name} - ${
-          item.quantity
-        } units (${results[results.length - 1].previousQuantity} → ${
-          results[results.length - 1].newQuantity
-        })`
-      );
     }
 
     return results;
   } catch (error) {
-    console.error("❌ Error adding inventory:", error);
     throw error;
   }
 }
@@ -419,9 +401,7 @@ async function deleteInventory(productId) {
       where: { productId: parseInt(productId) },
     });
 
-    console.log(`✅ Inventory deleted for product ${productId}`);
   } catch (error) {
-    console.error("❌ Error deleting inventory:", error);
     throw error;
   }
 }

@@ -16,8 +16,6 @@ export default function TicketForm({
                     formData.append(key, values[key]);
                 }
             });
-
-            console.log(formData, "Form Values");
             handleSubmit(formData);
         });
     };
