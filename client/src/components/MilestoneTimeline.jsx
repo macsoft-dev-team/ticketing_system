@@ -351,8 +351,8 @@ const MILESTONE_CONFIG = {
         order: 11,
     },
     DELIVERED_TO_FIELD: {
-        label: 'Delivered to Field',
-        description: 'Controller delivered/dispatched back to field - Final completion',
+        label: 'Delivered',
+        description: 'Controller delivered/dispatched',
         photoRequired: false,
         order: 12,
         isFinal: true,

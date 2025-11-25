@@ -816,10 +816,31 @@ const ReceiveController = () => {
     // Handle form submission
     const handleSubmit = async () => {
         // Validate photos
-        if (photos.length < 4) {
+        if (photos.length < requiredPhotos.length) {
             addToast({
                 title: 'Photos Required',
-                description: 'Please upload at least 4 photos (Controller Front, Controller Bottom, Full View Open, MCB Close Up)',
+                description: `Please upload all required photos (${requiredPhotos.join(', ')})`,
+                variant: 'warning'
+            });
+            return;
+        }
+
+        // Check that all photos have a label
+        const labels = photos.map(p => p.label && p.label.trim());
+        if (labels.some(l => !l)) {
+            addToast({
+                title: 'Label Required',
+                description: 'Please select a label for each photo before submitting.',
+                variant: 'warning'
+            });
+            return;
+        }
+        // Check for duplicate labels
+        const labelSet = new Set(labels);
+        if (labelSet.size !== requiredPhotos.length) {
+            addToast({
+                title: 'Unique Labels Required',
+                description: 'Each required photo must have a unique label.',
                 variant: 'warning'
             });
             return;

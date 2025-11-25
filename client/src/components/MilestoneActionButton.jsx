@@ -328,8 +328,8 @@ const MilestoneActionButton = ({
         }
       ] : [
         {
-          title: 'Deliver to Field',
-          shortTitle: 'Deliver',
+          title: 'Mark as Delivered',
+          shortTitle: 'Mark Delivered',
           icon: Truck,
           color: 'blue',
           action: 'transition',

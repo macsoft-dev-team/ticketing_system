@@ -182,7 +182,7 @@ model Ticket {
   // addon
   code                  String?
   projectName           String?
-
+  isReceving           Boolean     @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? @map("deleted_at")
