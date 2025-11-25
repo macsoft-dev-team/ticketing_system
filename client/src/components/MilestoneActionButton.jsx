@@ -292,7 +292,7 @@ const MilestoneActionButton = ({
       ],
       READY_FOR_DISPATCH: needsPhotos ? [
         {
-          title: 'Add Spare Photos',
+          title: 'Add Dispatch Photos',
           shortTitle: 'Add Photos',
           icon: Camera,
           color: 'orange',
