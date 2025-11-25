@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
     CheckCircle,
@@ -35,21 +36,21 @@ const STAGE_ROLE_PERMISSIONS = {
     SENT_TO_SERVICE_CENTER: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
 
     // service centre arrival / work
-    RECEIVED_AT_SERVICE_CENTER: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-    DIAGNOSIS_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    RECEIVED_AT_SERVICE_CENTER: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    DIAGNOSIS_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
 
     // spares workflow
     SPARE_REQUESTED: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN', 'CUSTOMER_SERVICE_HEAD', 'CUSTOMER_FIELD_ENGINEER'],
     SPARE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
 
     // repair / replacement
-    REPAIR_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-    REPLACEMENT_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-    REPAIRED: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    REPAIR_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    REPLACEMENT_IN_PROGRESS: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
+    REPAIRED: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
 
     // dispatch / field delivery / final clearance
-    READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','MACSOFT_ADMIN'],
-    DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN'],
+    READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN'],
+    DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN'],
     FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
@@ -111,7 +112,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                 downloadUrl = `${baseUrl}${attachment.fileUrl}`;
             }
 
- 
+
             const headers = {};
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
@@ -126,7 +127,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                 // Try fallback method - direct link
                 if (attachment.fileUrl) {
                     const fallbackUrl = `${baseUrl}${attachment.fileUrl}`;
-                     window.open(fallbackUrl, '_blank');
+                    window.open(fallbackUrl, '_blank');
                     if (addToast) addToast({
                         title: `Opening ${attachment.fileName}`,
                         description: 'File opened in new tab',
@@ -160,7 +161,7 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
             if (attachment.fileUrl) {
                 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
                 const fallbackUrl = `${baseUrl}${attachment.fileUrl}`;
-                 window.open(fallbackUrl, '_blank');
+                window.open(fallbackUrl, '_blank');
                 if (addToast) addToast({
                     title: `Opening ${attachment.fileName}`,
                     description: 'File opened in new tab',
@@ -179,10 +180,14 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
         }
     };
 
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewLoading, setPreviewLoading] = useState(false);
+    const [showImage, setShowImage] = useState(false);
+    const previewTimeout = useRef(null);
     const handlePreview = () => {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-        const previewUrl = `${baseUrl}${attachment.fileUrl}`;
-        window.open(previewUrl, '_blank');
+        setShowPreview(true);
+        setPreviewLoading(true);
+        setShowImage(false);
     };
 
     const formatFileSize = (bytes) => {
@@ -194,72 +199,135 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
     };
 
     return (
-        <motion.div
-            whileHover={{ scale: 1.02 }}
-            className="group flex items-center gap-2 p-2 bg-gray-50 rounded border hover:bg-gray-100 transition-colors"
-        >
-            {isImage && !imageError ? (
-                <div className="relative w-12 h-12 flex-shrink-0">
-                    <img
-                        src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${attachment.fileUrl}`}
-                        alt={attachment.fileName}
-                        className="w-full h-full object-cover rounded"
-                        onError={() => setImageError(true)}
-                    />
-                </div>
-            ) : (
-                <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gray-200 rounded">
-                    <span className="text-xs font-medium text-gray-600">{getFileExtension()}</span>
-                </div>
-            )}
+        <>
+            <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="group flex items-center gap-2 p-2 bg-gray-50 rounded border hover:bg-gray-100 transition-colors"
+            >
+                {isImage && !imageError ? (
+                    <div className="relative w-12 h-12 flex-shrink-0">
+                        <img
+                            src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${attachment.fileUrl}`}
+                            alt={attachment.fileName}
+                            className="w-full h-full object-cover rounded"
+                            onError={() => setImageError(true)}
+                        />
+                    </div>
+                ) : (
+                    <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gray-200 rounded">
+                        <span className="text-xs font-medium text-gray-600">{getFileExtension()}</span>
+                    </div>
+                )}
 
-            <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-900 truncate text-sm">{attachment.fileName}</h4>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                    {attachment.fileSize && (
-                        <span>{formatFileSize(attachment.fileSize)}</span>
-                    )}
-                    {attachment.createdAt && (
-                        <span>{moment(attachment.createdAt).fromNow()}</span>
-                    )}
+                <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 truncate text-sm">{attachment.fileName}</h4>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                        {attachment.fileSize && (
+                            <span>{formatFileSize(attachment.fileSize)}</span>
+                        )}
+                        {attachment.createdAt && (
+                            <span>{moment(attachment.createdAt).fromNow()}</span>
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                {isImage && (
+                <div className="flex items-center gap-1 transition-opacity">
+                    {isImage && (
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={handlePreview}
+                            className="p-1 text-gray-500 hover:text-blue-600 transition-colors cursor-pointer"
+                            title="Preview"
+                        >
+                            <Eye size={14} />
+                        </motion.button>
+                    )}
                     <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={handlePreview}
-                        className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                        title="Preview"
-                    >
-                        <Eye size={14} />
-                    </motion.button>
-                )}
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={handleDownload}
-                    disabled={isDownloading}
-                    className={`p-1 transition-colors ${isDownloading
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className={`p-1 transition-colors ${isDownloading
                             ? 'text-gray-400 cursor-not-allowed'
-                            : 'text-blue-600 hover:text-blue-800'
-                        }`}
-                    title={isDownloading ? 'Downloading...' : 'Download'}
+                            : 'text-blue-600 hover:text-blue-800 cursor-pointer'
+                            }`}
+                        title={isDownloading ? 'Downloading...' : 'Download'}
+                    >
+                        {isDownloading ? (
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full"
+                            />
+                        ) : (
+                            <Download size={14} />
+                        )}
+                    </motion.button>
+                </div>
+            </motion.div>
+            {/* Photo Preview Dialog */}
+            {showPreview && isImage && !imageError && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center bg-black/15"
+                    onClick={() => setShowPreview(false)}
                 >
-                    {isDownloading ? (
-                        <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full"
-                        />
-                    ) : (
-                        <Download size={14} />
+                    <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        transition={{ duration: 0.25, delay: 0.05 }}
+                        className="relative rounded-lg p-4 max-w-full max-h-full flex flex-col items-center justify-center"
+                        onClick={e => e.stopPropagation()}
+                    >{!previewLoading && (
+                        <button
+                            className="absolute top-0 right-2 text-white bg-red-500 rounded-lg text-xl font-bold cursor-pointer"
+                            onClick={() => setShowPreview(false)}
+                            aria-label="Close preview"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
                     )}
-                </motion.button>
-            </div>
-        </motion.div>
+                        <div className="flex items-center justify-center w-full h-fu">
+                            {previewLoading && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="flex items-center justify-center h-screen w-full z-10"
+                                >
+                                    <div className="animate-spin rounded-full sm:h-42 sm:w-42 border-b-2 border-blue-600"></div>
+                                </motion.div>
+                            )}
+                            <motion.img
+                                src={`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${attachment.fileUrl}`}
+                                alt={attachment.fileName}
+                                className="max-w-[90vw] max-h-[80vh] rounded border"
+                                style={{ objectFit: 'contain', display: showImage ? 'block' : 'none' }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: showImage ? 1 : 0 }}
+                                transition={{ duration: 0.3, delay: 0.1 }}
+                                onLoad={() => {
+                                    setTimeout(() => {
+                                        setPreviewLoading(false);
+                                        setShowImage(true);
+                                    }, 250);
+                                }}
+                                onError={() => { setPreviewLoading(false); setImageError(true); }}
+                            />
+                        </div>
+                        <div className="mt-2 text-sm text-gray-700 text-center break-all">
+                            {/*   {attachment.fileName} */}
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </>
     );
 };
 
@@ -843,7 +911,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     // Handle spare request submission
     const handleSpareRequestSubmit = async (formData) => {
         try {
- 
+
             // Get ticket data
             const baseUrl = API_URL || 'http://localhost:3001';
             const ticketResponse = await axios.get(
@@ -1254,7 +1322,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             setShowConfirmDialog(true);
         } else if (action === 'transition' && targetStage) {
             // Fallback for transitions without specific confirmation messages
-             setConfirmDialogData({
+            setConfirmDialogData({
                 title: `Advance to ${targetStage.replace(/_/g, ' ').toLowerCase()}`,
                 message: `Proceed with this milestone transition?`,
                 confirmText: 'Proceed',
@@ -1562,10 +1630,10 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                             transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
                                         }
                                         className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' &&
-                                                MILESTONE_CONFIG[selectedTargetStage]?.photoRequired &&
-                                                transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
-                                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                            MILESTONE_CONFIG[selectedTargetStage]?.photoRequired &&
+                                            transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
+                                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700'
                                             }`}
                                     >
                                         <ArrowRight className="w-4 h-4" />

@@ -32,7 +32,6 @@ import { useToast } from '../../components/ui/toast';
 import useTickets from '../../lib/hooks/useTickets';
 import { useAuth } from '../../lib/hooks/useAuth';
 import useConversation from '../../lib/hooks/useConversation';
-import useServiceCenter from '../../lib/hooks/useServiceCenter';
 
 // Helper function to format file size
 const formatFileSize = (bytes) => {
