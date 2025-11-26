@@ -16,6 +16,7 @@ import organisationSlice from "../features/organisations";
 import serviceCenterSlice from "../features/serviceCenters";
 import projectsSlice from "../features/projects";
 import productSlice from "../features/products";
+import notificationSocketMiddleware from "../services/notificationSocketMiddleware";
 export const store = configureStore({
   reducer: {
     ui: uiSlice,
@@ -27,7 +28,11 @@ export const store = configureStore({
     servicecenter: serviceCenterSlice,
     project: projectsSlice,
     product: productSlice,
-  },
+  },/* 
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).concat(notificationSocketMiddleware), */
 });
 
 export default store;

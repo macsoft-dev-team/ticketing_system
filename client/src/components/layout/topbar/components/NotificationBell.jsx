@@ -61,104 +61,7 @@ const NotificationBell = () => {
 
     fetchNotifications();
   }, [token]);
-
-  // Socket connection for real-time notifications using existing context
-  useEffect(() => {
-    // We'll use the existing socket service for this
-    let notificationSocket = null;
-
-    const connectToNotifications = async () => {
-      if (!token || !user) return;
-
-      try {
-        // Import socket.io client dynamically
-        const { io } = await import('socket.io-client');
-
-        notificationSocket = io(import.meta.env.VITE_WS_URL, {
-          auth: { token },
-          transports: ['websocket', 'polling']
-        });
-
-        notificationSocket.on('connect', () => {
-           // Join user's notification room
-          if (user.id) {
-            notificationSocket.emit('join-notifications', user.id);
-          }
-        });
-
-        notificationSocket.on('notification', (notificationData) => {
-          // Handle array of notifications (from conversation service)
-          if (Array.isArray(notificationData)) {
-            notificationData.forEach(item => {
-              const newNotification = {
-                id: item.id || Date.now(),
-                title: item.notification?.title || 'New Message',
-                message: item.notification?.description || 'You have a new notification',
-                type: getNotificationType(item.notification?.type),
-                time: 'Just now',
-                unread: !item.seen,
-                ticketId: item.notification?.ticketId,
-                ticketCode: item.notification?.ticket?.ticketCode,
-              };
-
-              setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
-              setUnreadCount(prev => prev + 1);
-
-              // Play notification sound
-              try {
-                const audio = new Audio('/sounds/notification-sound-269266.mp3');
-                audio.volume = 0.3;
-                audio.play().catch(console.error);
-              } catch (error) {
-                console.warn('Could not play notification sound:', error);
-              }
-            });
-          } else {
-            // Handle single notification
-            const newNotification = {
-              id: notificationData.id || Date.now(),
-              title: notificationData.title || 'Notification',
-              message: notificationData.message || notificationData.description,
-              type: getNotificationType(notificationData.type),
-              time: 'Just now',
-              unread: true,
-              ticketId: notificationData.ticketId,
-              ticketCode: notificationData.ticketCode,
-            };
-
-            setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
-            setUnreadCount(prev => prev + 1);
-
-            // Play notification sound
-            try {
-              const audio = new Audio('/sounds/notification-sound-269266.mp3');
-              audio.volume = 0.3;
-              audio.play().catch(console.error);
-            } catch (error) {
-              console.warn('Could not play notification sound:', error);
-            }
-          }
-        });
-
-        notificationSocket.on('disconnect', () => {
-         });
-
-      } catch (error) {
-        console.error('Error connecting to notification socket:', error);
-      }
-    };
-
-    connectToNotifications();
-
-    return () => {
-      if (notificationSocket) {
-        if (user.id) {
-          notificationSocket.emit('leave-notifications', user.id);
-        }
-        notificationSocket.disconnect();
-      }
-    };
-  }, [token, user]);
+  
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -436,8 +339,8 @@ const NotificationBell = () => {
           {/* Notifications List */}
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <div className="p-8 text-center text-gray-800">
+                <Bell className="w-8 h-8 mx-auto mb-2 opacity-50 animate-pulse" />
                 <p className="text-sm">No notifications yet</p>
               </div>
             ) : (

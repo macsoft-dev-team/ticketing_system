@@ -13,7 +13,7 @@ class SocketService {
       this.disconnect();
     }
 
-    const serverUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3001';
+    const serverUrl = import.meta.env.VITE_WS_URL;
      this.socket = io(serverUrl, {
       auth: {
         token: token
@@ -32,9 +32,6 @@ class SocketService {
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('❌ Socket.IO connection error:', error);
-      console.error('Server URL was:', serverUrl);
-      console.error('Token was:', token ? 'Present' : 'Missing');
       this.isConnected = false;
     });
 

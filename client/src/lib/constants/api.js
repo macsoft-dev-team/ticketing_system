@@ -1,6 +1,6 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+export const API_URL = import.meta.env.VITE_API_URL;
 export const APP_TITLE = import.meta.env.VITE_APP_TITLE;
-
+export const APP_WS_URL = import.meta.env.VITE_WS_URL ;
 export const API_ENDPOINTS = {
   login: `${API_URL}/auth/login`,
   register: `${API_URL}/auth/register`,

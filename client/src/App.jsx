@@ -7,12 +7,12 @@ import { ToastProvider } from './components/ui/toast';
 import { SocketProvider } from './lib/contexts/SocketContext';
 import useAuth from './lib/hooks/useAuth';
 import { SessionManager } from './lib/utils/sessionManager';
-
+ 
 function App() {
   const [router, setRouter] = React.useState(null);
   const [initializing, setInitializing] = React.useState(true);
   const { user, loading, token, setUser, setToken, isAuthenticated, checkAuth } = useAuth();
-  
+
   // Initialize authentication on app start
   React.useEffect(() => {
     const initializeAuth = async () => {

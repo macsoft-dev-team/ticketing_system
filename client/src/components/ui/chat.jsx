@@ -23,11 +23,11 @@ const TicketClosedView = ({ onViewChat }) => {
             <span className="text-white text-xs font-bold">✓</span>
           </motion.div>
         </div>
-        
+
         <div className="text-center">
           <h3 className="text-xl font-semibold text-gray-900 mb-2">Ticket Closed</h3>
           <p className="text-gray-600 mb-6">This ticket has been successfully resolved and closed.</p>
-          
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -45,7 +45,7 @@ const TicketClosedView = ({ onViewChat }) => {
 
 const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   const [isDownloading, setIsDownloading] = useState(false);
-  
+
   const getIcon = (type) => {
     return type === 'image' ? '🖼️' : '📄';
   };
@@ -53,13 +53,13 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   const handleDownload = async (e) => {
     e.stopPropagation();
     setIsDownloading(true);
-    
+
     try {
-      const baseApiUrl = import.meta.env.VITE_API_URL || 'http:import.meta.env.VITE_WS_URL/api';
+      const baseApiUrl = import.meta.env.VITE_API_URL;
       const baseUrl = baseApiUrl.replace('/api', ''); // Remove /api for file URLs
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
       let downloadUrl;
-      
+
       // Use dedicated download endpoint if attachment has an ID
       if (attachment.id) {
         downloadUrl = `${baseApiUrl}/attachments/download/${attachment.id}`;
@@ -68,18 +68,18 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
         const fileUrl = attachment.url.startsWith('/uploads/') ? attachment.url : `/uploads/${attachment.url}`;
         downloadUrl = `${baseUrl}${fileUrl}`;
       }
-            
+
       const response = await fetch(downloadUrl, {
         method: 'GET',
         headers: token ? {
           'Authorization': `Bearer ${token}`,
         } : {},
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to download file: ${response.status}`);
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -107,11 +107,10 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
-      className={`flex items-center gap-2 p-2 rounded-lg transition-colors mb-1 ${
-        isOwnMessage 
-          ? 'bg-blue-400' 
+      className={`flex items-center gap-2 p-2 rounded-lg transition-colors mb-1 ${isOwnMessage
+          ? 'bg-blue-400'
           : 'bg-gray-200'
-      }`}
+        }`}
     >
       <span className="text-sm">{getIcon(attachment.type)}</span>
       <div className="flex-1 min-w-0">
@@ -125,11 +124,10 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
       <div className="flex items-center gap-1">
         <button
           onClick={handlePreview}
-          className={`p-1 rounded transition-colors ${
-            isOwnMessage 
-              ? 'text-white hover:text-blue-100' 
+          className={`p-1 rounded transition-colors ${isOwnMessage
+              ? 'text-white hover:text-blue-100'
               : 'text-gray-600 hover:text-gray-800'
-          }`}
+            }`}
           title="Preview"
         >
           <Eye className="w-3 h-3" />
@@ -137,13 +135,12 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
         <button
           onClick={handleDownload}
           disabled={isDownloading}
-          className={`p-1 rounded transition-colors ${
-            isDownloading 
+          className={`p-1 rounded transition-colors ${isDownloading
               ? 'opacity-50 cursor-not-allowed'
-              : isOwnMessage 
-                ? 'text-white hover:text-blue-100' 
+              : isOwnMessage
+                ? 'text-white hover:text-blue-100'
                 : 'text-gray-600 hover:text-gray-800'
-          }`}
+            }`}
           title={isDownloading ? 'Downloading...' : 'Download'}
         >
           {isDownloading ? (
@@ -173,18 +170,17 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
         {avatar || name?.charAt(0) || 'A'}
       </div>
       <div className={`flex flex-col max-w-[75%] sm:max-w-[70%] ${isOwnMessage ? 'items-end' : ''}`}>
-        <div className={`px-3 sm:px-4 py-2 rounded-2xl ${
-          isOwnMessage 
-            ? 'bg-blue-500 text-white rounded-br-md' 
+        <div className={`px-3 sm:px-4 py-2 rounded-2xl ${isOwnMessage
+            ? 'bg-blue-500 text-white rounded-br-md'
             : 'bg-gray-100 text-gray-900 rounded-bl-md'
-        }`}>
+          }`}>
           {message && <p className="text-xs sm:text-sm">{message}</p>}
           {attachments && attachments.length > 0 && (
             <div className={`${message ? 'mt-2' : ''} space-y-1`}>
               {attachments.map((attachment, index) => (
-                <MessageAttachment 
-                  key={attachment.id || index} 
-                  attachment={attachment} 
+                <MessageAttachment
+                  key={attachment.id || index}
+                  attachment={attachment}
                   isOwnMessage={isOwnMessage}
                   onPreview={onPreviewAttachment}
                 />
@@ -277,7 +273,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             style={{ maxHeight: '120px' }}
           />
         </div>
-        
+
         <div className="flex items-center gap-1 sm:gap-2">
           <input
             type="file"
@@ -287,7 +283,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             className="hidden"
             accept="image/*,.pdf,.doc,.docx,.txt"
           />
-          
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -297,7 +293,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
           >
             <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -313,23 +309,23 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   );
 };
 
-export const ChatWindow = ({ 
-  messages = [], 
-  onSendMessage, 
-  isTyping = false, 
+export const ChatWindow = ({
+  messages = [],
+  onSendMessage,
+  isTyping = false,
   autoCloseTimer = null,
   disabled = false,
   loading = false,
   error = null,
   isConnected = true,
-  onRefresh = null ,
+  onRefresh = null,
   ticketStatus = null
 }) => {
   const messagesEndRef = useRef(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [showChatHistory, setShowChatHistory] = useState(false);
-  
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -392,8 +388,8 @@ export const ChatWindow = ({
               </motion.button>
             )}
             {/* Connection Status */}
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} 
-                 title={isConnected ? 'Connected' : 'Disconnected'} />
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+              title={isConnected ? 'Connected' : 'Disconnected'} />
             <span className="text-xs text-gray-600">
               {isConnected ? 'Live' : 'Offline'}
             </span>
@@ -410,8 +406,8 @@ export const ChatWindow = ({
             )}
           </div>
         </div>
-        
-        {autoCloseTimer && (
+
+       {/*  {autoCloseTimer && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -419,8 +415,8 @@ export const ChatWindow = ({
           >
             Auto-close in {Math.ceil(autoCloseTimer / 60)} minutes if no response
           </motion.div>
-        )}
-        
+        )} */}
+
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -463,7 +459,7 @@ export const ChatWindow = ({
             />
           ))
         )}
-        
+
         {/* Typing Indicator */}
         <AnimatePresence>
           {isTyping && (
@@ -486,7 +482,7 @@ export const ChatWindow = ({
             </motion.div>
           )}
         </AnimatePresence>
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -498,15 +494,15 @@ export const ChatWindow = ({
           </div>
         </div>
       ) : (
-        <ChatInput 
+        <ChatInput
           ticketStatus={ticketStatus}
-          onSendMessage={onSendMessage} 
+          onSendMessage={onSendMessage}
           disabled={disabled || !isConnected || ticketStatus === 'closed'}
         />
       )}
-      
+
       {/* Document Modal */}
-      <DocumentModal 
+      <DocumentModal
         isOpen={isDocumentModalOpen}
         onClose={closeDocumentModal}
         document={selectedDocument}
