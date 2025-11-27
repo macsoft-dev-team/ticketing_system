@@ -260,7 +260,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
       </AnimatePresence>
 
       {/* Input Area */}
-      <div className="flex items-end gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <div className="flex-1 relative">
           <textarea
             value={message}
@@ -269,7 +269,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             placeholder="Type your message..."
             disabled={disabled}
             className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base"
-            rows={1}
+            rows={2}
             style={{ maxHeight: '120px' }}
           />
         </div>
@@ -429,7 +429,7 @@ export const ChatWindow = ({
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+      <div className="flex-1 overflow-y-auto sm:max-h-full max-h-3/5 p-3 sm:p-4 space-y-3 sm:space-y-4">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center gap-2">
@@ -469,9 +469,9 @@ export const ChatWindow = ({
               exit={{ opacity: 0, y: 10 }}
               className="flex gap-3 mb-4"
             >
-              <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-sm">
-                T
-              </div>
+            {/*   <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-sm">
+                 T
+              </div> */}
               <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
@@ -488,7 +488,7 @@ export const ChatWindow = ({
 
       {/* Chat Input */}
       {ticketStatus === 'closed' && showChatHistory ? (
-        <div className="border-t border-gray-200 p-4 bg-gray-50">
+        <div className="border-t border-b border-gray-200 p-4 bg-gray-50">
           <div className="text-center text-sm text-gray-600">
             This ticket is closed. No new messages can be sent.
           </div>

@@ -327,11 +327,6 @@ export default function TicketDashboard() {
     try {
       await sendConversationMessage(message, attachments);
       setAutoCloseTimer(null);
-      addToast({
-        title: 'Message sent',
-        description: 'Your message has been sent successfully',
-        variant: 'success'
-      });
     } catch (error) {
       addToast({
         title: 'Failed to send message',

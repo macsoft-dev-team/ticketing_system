@@ -13,7 +13,8 @@ import {
     Video,
     Image as ImageIcon,
     Loader2,
-    ScanLine
+    ScanLine,
+    List
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import Input from '../../components/ui/input';
@@ -34,7 +35,7 @@ const ReceiveController = () => {
         console.warn('Toast not available:', toast);
     });
 
-    const [controllerNo, setControllerNo] = useState('');
+    const [searchKeyword, setSearchKeyword] = useState('');
     const [searchedTicket, setSearchedTicket] = useState(null);
     const [searching, setSearching] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -61,6 +62,9 @@ const ReceiveController = () => {
     // NEW: video devices and selected device
     const [videoDevices, setVideoDevices] = useState([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState(null);
+
+    // Batch state - list of items added to batch
+    const [batchItems, setBatchItems] = useState([]);
 
     const photoInputRef = useRef(null);
     const videoInputRef = useRef(null);
@@ -124,12 +128,12 @@ const ReceiveController = () => {
         }
     };
 
-    // Search ticket by controller number
+    // Search ticket by keyword (controller number, ticket code, or IMEI)
     const handleSearch = useCallback(async () => {
-        if (!controllerNo.trim()) {
+        if (!searchKeyword.trim()) {
             addToast({
                 title: 'Input Required',
-                description: 'Please enter a controller number',
+                description: 'Please enter a search keyword (Controller No, Ticket Code, or IMEI)',
                 variant: 'warning'
             });
             return;
@@ -138,7 +142,7 @@ const ReceiveController = () => {
         setSearching(true);
         try {
             const response = await axios.get(
-                `${API_URL}/tickets/search/controller/${encodeURIComponent(controllerNo.trim())}`,
+                `${API_URL}/tickets/search/${encodeURIComponent(searchKeyword.trim())}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                     withCredentials: true
@@ -156,23 +160,37 @@ const ReceiveController = () => {
             setSearchedTicket(null);
             addToast({
                 title: 'Not Found',
-                description: error.response?.data?.message || 'No ticket found with this controller number',
+                description: error.response?.data?.message || 'No ticket found with this keyword',
                 variant: 'error'
             });
         } finally {
             setSearching(false);
         }
-    }, [controllerNo, token, addToast]);
+    }, [searchKeyword, token, addToast]);
 
     // Handle photo upload
     const handlePhotoSelect = (e) => {
         const files = Array.from(e.target.files || []);
-        const newPhotos = files.map(file => ({
-            file,
-            preview: URL.createObjectURL(file),
-            label: '',
-            id: Math.random().toString(36)
-        }));
+        const newPhotos = files.map((file, index) => {
+            const photoId = Date.now() + Math.random() + index;
+            const originalName = file.name;
+            let fileName = originalName;
+            
+            // If ticket is selected, use proper naming format
+            if (searchedTicket && originalName.includes('.')) {
+                const extension = originalName.split('.').pop();
+                fileName = `photo_${searchedTicket.ticketCode}_${photoId}.${extension}`;
+            }
+            
+            const renamedFile = new File([file], fileName, { type: file.type });
+            
+            return {
+                id: photoId,
+                file: renamedFile,
+                label: '',
+                preview: URL.createObjectURL(file)
+            };
+        });
         setPhotos(prev => [...prev, ...newPhotos]);
     };
 
@@ -213,7 +231,7 @@ const ReceiveController = () => {
 
     // NEW: Capture current photo from camera
     const capturePhoto = () => {
-        if (!cameraVideoRef.current || !cameraStream) return;
+        if (!cameraVideoRef.current || !cameraStream || !searchedTicket) return;
 
         const video = cameraVideoRef.current;
         const canvas = document.createElement('canvas');
@@ -224,19 +242,24 @@ const ReceiveController = () => {
         ctx.drawImage(video, 0, 0);
 
         canvas.toBlob((blob) => {
-            const file = new File([blob], `${requiredPhotos[currentPhotoIndex]}-${Date.now()}.jpg`, { type: 'image/jpeg' });
+            const label = requiredPhotos[currentPhotoIndex];
+            const fileName = `${label.replace(/\s+/g, '_')}_${searchedTicket.ticketCode}.jpg`;
+            const file = new File([blob], fileName, { type: 'image/jpeg' });
             const newPhoto = {
                 file,
                 preview: URL.createObjectURL(blob),
-                label: requiredPhotos[currentPhotoIndex],
+                label: label,
                 id: Math.random().toString(36)
             };
 
-            setPhotos(prev => [...prev, newPhoto]);
+            setPhotos(prev => {
+                const filtered = prev.filter(p => p.label !== label);
+                return [...filtered, newPhoto];
+            });
 
             addToast({
                 title: 'Photo Captured',
-                description: `${requiredPhotos[currentPhotoIndex]} captured`,
+                description: `${label} captured`,
                 variant: 'success'
             });
 
@@ -421,11 +444,24 @@ const ReceiveController = () => {
         });
     };
 
-    // Update photo label
+    // Update photo label and rename file
     const updatePhotoLabel = (photoId, label) => {
-        setPhotos(prev => prev.map(p =>
-            p.id === photoId ? { ...p, label } : p
-        ));
+        setPhotos(prev => prev.map(photo => {
+            if (photo.id === photoId) {
+                let fileName = photo.file.name;
+                
+                // Rename file if ticket is available and label is set
+                if (searchedTicket && label) {
+                    const extension = photo.file.name.split('.').pop();
+                    fileName = `${label.replace(/\s+/g, '_')}_${searchedTicket.ticketCode}.${extension}`;
+                    const renamedFile = new File([photo.file], fileName, { type: photo.file.type });
+                    return { ...photo, label, file: renamedFile };
+                }
+                
+                return { ...photo, label };
+            }
+            return photo;
+        }));
     };
 
     // Start audio recording
@@ -486,6 +522,123 @@ const ReceiveController = () => {
             URL.revokeObjectURL(audioRecording.preview);
         }
         setAudioRecording(null);
+    };
+
+    // Batch management functions
+    const addToBatch = () => {
+        if (photos.length < requiredPhotos.length) {
+            addToast({
+                title: 'Photos Required',
+                description: `Please upload all ${requiredPhotos.length} required photos before adding to batch`,
+                variant: 'warning'
+            });
+            return;
+        }
+
+        const item = {
+            id: Math.random().toString(36),
+            ticketCode: searchedTicket?.ticketCode || '',
+            controllerNo: searchedTicket?.controllerNo || '',
+            createdAt: new Date(),
+            photos: photos.map(p => ({ ...p })),
+            videos: videos.map(v => ({ ...v })),
+            audio: audioRecording ? { ...audioRecording } : null,
+            isMarkedForReceive: true
+        };
+
+        setBatchItems(prev => [item, ...prev]);
+        addToast({
+            title: 'Added to Batch',
+            description: `Controller ${item.controllerNo || item.ticketCode || '-'} added to batch`,
+            variant: 'success'
+        });
+
+        // Reset current form but not the batch
+        resetForm();
+    };
+
+    const removeBatchItem = (id) => {
+        setBatchItems(prev => prev.filter(it => it.id !== id));
+    };
+
+    const clearBatch = () => {
+        setBatchItems([]);
+    };
+
+    // Batch submission: Mark all as received
+    const markAllAsReceived = async () => {
+        if (batchItems.length === 0) {
+            addToast({
+                title: 'Batch Empty',
+                description: 'No items in the batch to submit.',
+                variant: 'warning'
+            });
+            return;
+        }
+
+        // Build multipart form with files grouped per item
+        const formData = new FormData();
+        formData.append('batchCount', String(batchItems.length));
+
+        batchItems.forEach((item, idx) => {
+            formData.append(`items[${idx}][ticketCode]`, item.ticketCode || '');
+            formData.append(`items[${idx}][controllerNo]`, item.controllerNo || '');
+
+            // photos
+            item.photos.forEach((photo, pidx) => {
+                formData.append(`items[${idx}][photos]`, photo.file, photo.file.name);
+                // send label metadata for that photo
+                formData.append(`items[${idx}][photoLabels][${pidx}]`, photo.label || '');
+            });
+
+            // videos
+            item.videos.forEach((v, vidx) => {
+                formData.append(`items[${idx}][videos]`, v.file, v.file.name);
+            });
+
+            // audio
+            if (item.audio && item.audio.file) {
+                formData.append(`items[${idx}][audio]`, item.audio.file, item.audio.file.name);
+            }
+        });
+
+        try {
+            addToast({
+                title: 'Submitting Batch',
+                description: `Processing ${batchItems.length} item(s)`,
+                variant: 'info'
+            });
+            
+            const response = await axios.post(
+                `${API_URL}/milestones/receive-batch`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    withCredentials: true
+                }
+            );
+
+            addToast({
+                title: 'Success',
+                description: `Batch processed: ${response.data?.message || 'All items received at service center'}`,
+                variant: 'success'
+            });
+            
+            // Cleanup
+            clearBatch();
+            setSearchedTicket(null);
+            setSearchKeyword('');
+        } catch (error) {
+            console.error('Batch submission error:', error);
+            addToast({
+                title: 'Submission Failed',
+                description: error.response?.data?.message || 'Failed to process batch',
+                variant: 'error'
+            });
+        }
     };
 
     // Single unified barcode scanning function
@@ -636,7 +789,7 @@ const ReceiveController = () => {
                     const detectedValue = result.getText();
                     const barcodeFormat = result.getBarcodeFormat();
                     const upperValue = detectedValue.toUpperCase();
-                    setControllerNo(upperValue);
+                    setSearchKeyword(upperValue);
                     stopBarcodeScanning();
 
                     addToast({
@@ -849,7 +1002,7 @@ const ReceiveController = () => {
         setSubmitting(true);
         try {
             const formData = new FormData();
-            formData.append('controllerNo', controllerNo.trim());
+            formData.append('controllerNo', searchedTicket?.controllerNo || '');
 
             // Add photos
             photos.forEach((photo, index) => {
@@ -884,7 +1037,7 @@ const ReceiveController = () => {
 
             addToast({
                 title: 'Success!',
-                description: `Controller ${controllerNo} received successfully at service center`,
+                description: `Controller ${searchedTicket?.controllerNo || searchedTicket?.ticketCode} received successfully at service center`,
                 variant: 'success'
             });
 
@@ -904,7 +1057,7 @@ const ReceiveController = () => {
 
     // Reset form
     const resetForm = () => {
-        setControllerNo('');
+        setSearchKeyword('');
         setSearchedTicket(null);
 
         // Clean up object URLs
@@ -925,282 +1078,282 @@ const ReceiveController = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Left: Batch list */}
+                <div className="col-span-1">
+                    <Card className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-semibold text-lg flex items-center gap-2">
+                                <List className="w-5 h-5 text-blue-600" />
+                                Batch ({batchItems.length})
+                            </h3>
+                            <div className="flex items-center gap-2">
+                                <Button onClick={clearBatch} variant="outline" size="small" disabled={batchItems.length === 0}>
+                                    Clear
+                                </Button>
+                                <Button onClick={markAllAsReceived} variant={batchItems.length ? 'default' : 'ghost'} size="small" disabled={batchItems.length === 0}>
+                                    <CheckCircle className="w-4 h-4" />
+                                    Mark All as Received
+                                </Button>
+                            </div>
+                        </div>
 
-            <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-2"
-                >
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        <Package className="w-8 h-8 sm:w-10 sm:h-10 text-blue-600" />
-                        <h1 className="text-xl sm:text-2xl tracking-widest font-bold text-gray-900 uppercase">Receive Controller</h1>
-                    </div>
-                    <p className="text-sm sm:text-base text-gray-600 px-5">
-                        Scan or enter controller serial number to receive at service center
-                    </p>
-                </motion.div>
+                        {batchItems.length === 0 ? (
+                            <div className="text-sm text-gray-500">
+                                No items in batch yet. Add captured items from the right panel.
+                            </div>
+                        ) : (
+                            <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                                {batchItems.map(item => (
+                                    <div key={item.id} className="flex items-center gap-3 p-2 bg-white rounded shadow-sm">
+                                        <img 
+                                            src={item.photos[0]?.preview} 
+                                            alt="thumb" 
+                                            className="w-14 h-14 object-cover rounded" 
+                                        />
+                                        <div className="flex-1 text-sm">
+                                            <div className="font-medium truncate">
+                                                {item.ticketCode || item.controllerNo || '—'}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                {new Date(item.createdAt).toLocaleString()}
+                                            </div>
+                                            <div className="text-xs text-gray-600 mt-1">
+                                                {item.photos.length} photos • {item.videos.length} videos • {item.audio ? '1 audio' : '0 audio'}
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-1">
+                                            <Button size="small" variant="outline" onClick={() => removeBatchItem(item.id)}>
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </Card>
+                </div>
 
-                {/* Search Section */}
-                <Card className="p-4 sm:p-6">
-                    <div className="space-y-4">
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <div className="flex gap-2 flex-1">
-                                <div className="flex-1 relative">
+                {/* Right: Main form / uploader */}
+                <div className="col-span-2">
+                    <Card className="px-4 py-5 space-y-4">
+                        {/* Header */}
+                        <motion.div
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-2"
+                        >
+                            <div className="flex items-center gap-2">
+                                <Package className="w-8 h-8 text-blue-600" />
+                                <h1 className="text-xl sm:text-2xl font-medium tracking-wide uppercase">
+                                    Receive Controller — Add to Batch
+                                </h1>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                                Scan controller, upload required photos, then add to batch. Submit batch when ready.
+                            </p>
+                        </motion.div>
+
+                        {/* Search Section */}
+                        <div className="space-y-3">
+                            <div className="flex gap-2 items-center">
+                                <div className="flex-1">
                                     <Input
-                                        type="text"
-                                        placeholder="Enter or scan controller serial number..."
-                                        value={controllerNo}
-                                        onChange={(e) => setControllerNo(e.target.value)}
+                                        placeholder="Search by Controller No, Ticket Code, or IMEI..."
+                                        value={searchKeyword}
+                                        onChange={(e) => setSearchKeyword(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                        autoFocus
-                                        className="pr-12"
                                     />
                                 </div>
-                                <Button
-                                    type="button"
-                                    onClick={(e) => {
-                                         e.preventDefault();
 
+                                <Button
+                                    onClick={() => {
                                         if (isScanning) {
                                             stopBarcodeScanning();
                                             setIsScanning(false);
                                         } else {
-                                            // Ensure devices are listed and start scanning
                                             listVideoInputDevices().then(() => {
                                                 setIsScanning(true);
-                                                // Auto-start barcode scanner
                                                 setTimeout(() => startBarcodeScanning(), 300);
                                             });
                                         }
                                     }}
                                     variant={isScanning ? "destructive" : "outline"}
-                                    size="medium"
                                     className="gap-1 px-3"
-                                    title={isScanning ? "Stop Barcode Scanner" : "Start Barcode Scanner"}
+                                    size="medium"
                                 >
                                     <ScanLine className="w-4 h-4" />
                                     {isScanning ? 'Stop' : 'Scan'}
                                 </Button>
-                            </div>
-                            <Button
-                                onClick={handleSearch}
-                                disabled={searching || !controllerNo.trim()}
-                                className="gap-2 w-full sm:w-auto"
-                                size="medium"
-                            >
-                                {searching ? (
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <Search className="w-4 h-4" />
-                                )}
-                                Search
-                            </Button>
-                        </div>
 
-                        {/* Ticket Info */}
-                        <AnimatePresence>
-                            {searchedTicket && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="bg-blue-50 border border-blue-200 rounded-lg p-4"
+                                <Button
+                                    onClick={handleSearch}
+                                    disabled={searching || !searchKeyword.trim()}
+                                    className="gap-2"
                                 >
-                                    <div className="flex items-start gap-3">
-                                        <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold text-blue-900">
-                                                Ticket Found: {searchedTicket.ticketCode}
-                                            </h3>
-                                            <div className="mt-2 text-sm text-blue-800 space-y-1">
-                                                <p><strong>Customer:</strong> {searchedTicket.customerName}</p>
-                                                <p><strong>Controller No:</strong> {searchedTicket.controllerNo}</p>
-                                                <p><strong>Description:</strong> {searchedTicket.description}</p>
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <strong>Status:</strong>
-                                                    <Badge variant="info">{searchedTicket.status}</Badge>
+                                    {searching ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Search className="w-4 h-4" />
+                                    )}
+                                    Search
+                                </Button>
+                            </div>
+
+                            {/* If ticket found show details */}
+                            <AnimatePresence>
+                                {searchedTicket && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="bg-blue-50 border border-blue-200 rounded-lg p-3"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                                            <div>
+                                                <div className="font-semibold">
+                                                    Ticket Found: {searchedTicket.ticketCode}
+                                                </div>
+                                                <div className="text-sm text-blue-800 mt-1">
+                                                    <div><strong>Customer:</strong> {searchedTicket.customerName}</div>
+                                                    <div><strong>Controller:</strong> {searchedTicket.controllerNo}</div>
+                                                    <div className="mt-1">
+                                                        <Badge variant="info">{searchedTicket.status}</Badge>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        <AnimatePresence>
+                            {isScanning && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="mt-3"
+                                >
+                                    <div className="bg-white p-3 rounded shadow">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-medium">Barcode Scanner</h4>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <label className="text-xs">Camera:</label>
+                                                <select
+                                                    value={selectedDeviceId || ''}
+                                                    onChange={handleDeviceChange}
+                                                    className="text-sm border rounded px-2 py-1"
+                                                >
+                                                    {videoDevices.length === 0 && <option value="">Default Camera</option>}
+                                                    {videoDevices.map(dev => (
+                                                        <option key={dev.deviceId} value={dev.deviceId}>
+                                                            {dev.label || `Camera ${dev.deviceId}`}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <button
+                                                    onClick={() => { stopBarcodeScanning(); setIsScanning(false); }}
+                                                    className="ml-2 text-gray-500"
+                                                >
+                                                    <X className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="relative">
+                                            <video
+                                                ref={scannerVideoRef}
+                                                className="w-full aspect-video bg-black rounded"
+                                                playsInline
+                                                muted
+                                                autoPlay
+                                            />
+                                            {!scannerStream && (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <div className="text-white text-center">
+                                                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+                                                        Loading camera...
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
-                </Card>
 
-                {/* Barcode Scanner Modal */}
-                <AnimatePresence>
-                    {isScanning && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
-                        >
-                            <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.9, opacity: 0 }}
-                                className="bg-white rounded-lg p-4 max-w-md w-full mx-4"
-                            >
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-lg font-semibold text-gray-900">Barcode Scanner</h3>
-                                    <button
-                                        onClick={() => { stopBarcodeScanning(); setIsScanning(false); }}
-                                        className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
-                                    >
-                                        <X className="w-6 h-6" />
-                                    </button>
+                        {/* Mobile-Friendly Searched Ticket Info */}
+                        {searchedTicket && (
+                            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 shadow-sm mb-6">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-lg font-semibold text-green-800 flex items-center">
+                                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        Ticket Found
+                                    </h3>
+                                    <Badge variant={
+                                        searchedTicket.status === 'OPEN' ? 'warning' :
+                                        searchedTicket.status === 'IN_PROGRESS' ? 'info' :
+                                        searchedTicket.status === 'RESOLVED' ? 'success' :
+                                        'secondary'
+                                    }>
+                                        {searchedTicket.status}
+                                    </Badge>
                                 </div>
-
-                                <div className="relative">
-                                    <video
-                                        ref={scannerVideoRef}
-                                        className="w-full aspect-video bg-black rounded-lg"
-                                        playsInline
-                                        muted
-                                        autoPlay
-                                    />
-
-                                    {/* Scanning overlay with target area */}
-                                    <div className="absolute inset-0 pointer-events-none">
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                            <div className="w-64 h-40 sm:w-80 sm:h-48 border-4 border-green-500 border-dashed rounded-lg animate-pulse bg-green-500/10">
-                                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-white text-sm font-bold whitespace-nowrap bg-green-600 px-4 py-2 rounded-lg shadow-lg">
-                                                    📷 Hold barcode here (6-12 inches away)
-                                                </div>
-                                                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-white text-xs whitespace-nowrap bg-black/70 px-3 py-1 rounded">
-                                                    Ensure good lighting
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Corner guides */}
-                                        <div className="absolute top-4 left-4 w-8 h-8 border-l-4 border-t-4 border-green-400"></div>
-                                        <div className="absolute top-4 right-4 w-8 h-8 border-r-4 border-t-4 border-green-400"></div>
-                                        <div className="absolute bottom-4 left-4 w-8 h-8 border-l-4 border-b-4 border-green-400"></div>
-                                        <div className="absolute bottom-4 right-4 w-8 h-8 border-r-4 border-b-4 border-green-400"></div>
+                                
+                                {/* Mobile optimized info cards */}
+                                <div className="space-y-3">
+                                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                                        <div className="text-xs text-gray-500 mb-1">TICKET CODE</div>
+                                        <div className="font-semibold text-gray-900 text-lg">{searchedTicket.ticketCode}</div>
                                     </div>
-
-                                    {/* Loading indicator */}
-                                    {!scannerStream && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-gray-900 rounded-lg">
-                                            <div className="text-white text-center">
-                                                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                                                <p className="text-sm">Loading camera...</p>
-                                            </div>
+                                    
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className="bg-white rounded-lg p-3 shadow-sm">
+                                            <div className="text-xs text-gray-500 mb-1">CONTROLLER NO</div>
+                                            <div className="font-medium text-gray-900">{searchedTicket.controllerNo || 'N/A'}</div>
+                                        </div>
+                                        
+                                        <div className="bg-white rounded-lg p-3 shadow-sm">
+                                            <div className="text-xs text-gray-500 mb-1">IMEI</div>
+                                            <div className="font-medium text-gray-900">{searchedTicket.imei || 'N/A'}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="bg-white rounded-lg p-3 shadow-sm">
+                                        <div className="text-xs text-gray-500 mb-1">CLIENT</div>
+                                        <div className="font-medium text-gray-900">{searchedTicket.clientName || searchedTicket.customerName}</div>
+                                    </div>
+                                    
+                                    {searchedTicket.description && (
+                                        <div className="bg-white rounded-lg p-3 shadow-sm">
+                                            <div className="text-xs text-gray-500 mb-1">DESCRIPTION</div>
+                                            <div className="text-sm text-gray-700 leading-relaxed">{searchedTicket.description}</div>
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        )}
 
-                                <div className="mt-4 space-y-3">
-                                    {/* NEW: Camera selection dropdown */}
-                                    <div className="flex items-center gap-2">
-                                        <label className="text-sm text-gray-700">Camera:</label>
-                                        <select
-                                            value={selectedDeviceId || ''}
-                                            onChange={handleDeviceChange}
-                                            className="ml-2 text-sm border rounded px-2 py-1"
-                                        >
-                                            {/* If no devices yet, show placeholder */}
-                                            {videoDevices.length === 0 && <option value="">Default Camera</option>}
-                                            {videoDevices.map(dev => (
-                                                <option key={dev.deviceId} value={dev.deviceId}>
-                                                    {dev.label || `Camera ${dev.deviceId}`}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        {/* Manual refresh devices */}
-                                        <button
-                                            onClick={() => listVideoInputDevices()}
-                                            className="ml-auto text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200"
-                                            type="button"
-                                        >
-                                            Refresh
-                                        </button>
-                                    </div>
-
-                                    <div className="text-center">
-                                        <div className="inline-flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-full">
-                                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                            Scanning for barcodes...
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <Button
-                                            onClick={() => {
-                                                const manualValue = prompt('Please enter controller number manually:');
-                                                if (manualValue && manualValue.trim()) {
-                                                    setControllerNo(manualValue.trim().toUpperCase());
-                                                    stopBarcodeScanning();
-                                                    setIsScanning(false);
-                                                    addToast({
-                                                        title: 'Manual Entry',
-                                                        description: 'Controller number entered manually',
-                                                        variant: 'success'
-                                                    });
-                                                }
-                                            }}
-                                            variant="outline"
-                                            className="gap-1"
-                                            size="medium"
-                                        >
-                                            <ScanLine className="w-4 h-4" />
-                                            Manual
-                                        </Button>
-
-                                        <Button
-                                            onClick={() => { stopBarcodeScanning(); setIsScanning(false); }}
-                                            variant="outline"
-                                            size="medium"
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </div>
-
-                                    <p className="text-xs text-gray-600 text-center">
-                                        Position the barcode within the red frame for automatic detection,
-                                        <br />
-                                        or use "Manual" to enter the number directly.
-                                    </p>
-                                </div>
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Photo Upload Section */}
-                {searchedTicket && (
-                    <>
-                        <Card className="p-4 sm:p-6">
-                            <div className="space-y-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                    <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
-                                        <Camera className="w-5 h-5 text-blue-600" />
-                                        Upload Photos (Mandatory)
-                                    </h2>
-                                    <Badge variant={photos.length >= 4 ? 'success' : 'warning'} size="small">
-                                        {photos.length}/4 Required
-                                    </Badge>
-                                </div>
-
-                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                    <p className="text-sm text-yellow-800 font-medium mb-2">
-                                        Required Photos:
-                                    </p>
-                                    <ul className="text-sm text-yellow-700 space-y-1">
+                        {/* Photo / Video / Audio Uploader - only show when ticket found */}
+                        {searchedTicket && (
+                            <div className="space-y-3">
+                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                    <p className="text-sm text-yellow-800 font-medium mb-2">Required Photos:</p>
+                                    <div className="grid grid-cols-2 gap-1 text-xs text-yellow-700">
                                         {requiredPhotos.map((label, idx) => (
-                                            <li key={idx} className="flex items-center gap-2">
+                                            <div key={idx} className="flex items-center gap-2">
                                                 <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full" />
                                                 {label}
-                                            </li>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
 
                                 <input
@@ -1209,6 +1362,14 @@ const ReceiveController = () => {
                                     accept="image/*"
                                     multiple
                                     onChange={handlePhotoSelect}
+                                    className="hidden"
+                                />
+                                <input
+                                    ref={videoInputRef}
+                                    type="file"
+                                    accept="video/*"
+                                    multiple
+                                    onChange={handleVideoSelect}
                                     className="hidden"
                                 />
 
@@ -1221,170 +1382,127 @@ const ReceiveController = () => {
                                         <Camera className="w-4 h-4" />
                                         Capture Photos
                                     </Button>
-
                                     <Button
                                         onClick={() => photoInputRef.current?.click()}
                                         variant="outline"
                                         className="w-full gap-2"
                                     >
                                         <ImageIcon className="w-4 h-4" />
-                                        Upload Files
+                                        Upload Photos
                                     </Button>
                                 </div>
-
-                                {/* Photo Grid */}
-                                {photos.length > 0 && (
-                                    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                                        {photos.map((photo) => (
-                                            <div key={photo.id} className="relative group">
-                                                <img
-                                                    src={photo.preview}
-                                                    alt="Controller"
-                                                    className="w-full h-24 sm:h-32 object-cover rounded-lg border-2 border-gray-200"
-                                                />
-                                                <button
-                                                    onClick={() => removePhoto(photo.id)}
-                                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                                <select
-                                                    value={photo.label}
-                                                    onChange={(e) => updatePhotoLabel(photo.id, e.target.value)}
-                                                    className="mt-2 w-full text-xs border rounded px-2 py-1"
-                                                >
-                                                    <option value="">Select label...</option>
-                                                    {requiredPhotos.map(label => (
-                                                        <option key={label} value={label}>{label}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </Card>
-
-                        {/* Video Upload Section (Optional) */}
-                        <Card className="p-4 sm:p-6">
-                            <div className="space-y-4">
-                                <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
-                                    <Video className="w-5 h-5 text-blue-600" />
-                                    Upload Videos (Optional)
-                                </h2>
-
-                                <input
-                                    ref={videoInputRef}
-                                    type="file"
-                                    accept="video/*"
-                                    multiple
-                                    onChange={handleVideoSelect}
-                                    className="hidden"
-                                />
 
                                 <div className="grid grid-cols-2 gap-2">
                                     <Button
                                         onClick={startVideoRecording}
-                                        variant="default"
+                                        variant="outline"
                                         className="w-full gap-2"
                                     >
                                         <Video className="w-4 h-4" />
                                         Record Video
                                     </Button>
-
-                                    <Button
-                                        onClick={() => videoInputRef.current?.click()}
-                                        variant="outline"
-                                        className="w-full gap-2"
-                                    >
-                                        <Upload className="w-4 h-4" />
-                                        Upload Files
-                                    </Button>
-                                </div>
-
-                                {videos.length > 0 && (
-                                    <div className="space-y-2">
-                                        {videos.map((video) => (
-                                            <div key={video.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                                <Video className="w-8 h-8 text-gray-400" />
-                                                <span className="flex-1 text-sm truncate">{video.file.name}</span>
-                                                <button
-                                                    onClick={() => removeVideo(video.id)}
-                                                    className="text-red-500 hover:text-red-700"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </Card>
-
-                        {/* Audio Recording Section (Optional) */}
-                        <Card className="p-4 sm:p-6">
-                            <div className="space-y-4">
-                                <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
-                                    <Mic className="w-5 h-5 text-blue-600" />
-                                    Voice Note (Optional)
-                                </h2>
-
-                                {!audioRecording ? (
                                     <Button
                                         onClick={isRecording ? stopRecording : startRecording}
-                                        variant={isRecording ? 'danger' : 'outline'}
+                                        variant={isRecording ? 'destructive' : 'outline'}
                                         className="w-full gap-2"
                                     >
                                         <Mic className={`w-4 h-4 ${isRecording ? 'animate-pulse' : ''}`} />
-                                        {isRecording ? 'Stop Recording' : 'Start Recording'}
+                                        {isRecording ? 'Stop Recording' : 'Record Audio'}
                                     </Button>
-                                ) : (
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                        <Mic className="w-8 h-8 text-gray-400" />
-                                        <audio controls src={audioRecording.preview} className="flex-1" />
-                                        <button
-                                            onClick={removeAudio}
-                                            className="text-red-500 hover:text-red-700"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
+                                </div>
+
+                                {/* Media Preview Grid */}
+                                {(photos.length > 0 || videos.length > 0 || audioRecording) && (
+                                    <div className="space-y-3">
+                                        {photos.length > 0 && (
+                                            <div>
+                                                <h4 className="text-sm font-medium mb-2">Photos ({photos.length}/4)</h4>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    {photos.map((photo) => (
+                                                        <div key={photo.id} className="relative group">
+                                                            <img
+                                                                src={photo.preview}
+                                                                alt="Controller"
+                                                                className="w-full h-20 object-cover rounded border-2 border-gray-200"
+                                                            />
+                                                            <button
+                                                                onClick={() => removePhoto(photo.id)}
+                                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                            <select
+                                                                value={photo.label}
+                                                                onChange={(e) => updatePhotoLabel(photo.id, e.target.value)}
+                                                                className="mt-1 w-full text-xs border rounded px-1 py-0.5"
+                                                            >
+                                                                <option value="">Select label...</option>
+                                                                {requiredPhotos.map(label => (
+                                                                    <option key={label} value={label}>{label}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {videos.length > 0 && (
+                                            <div>
+                                                <h4 className="text-sm font-medium mb-2">Videos ({videos.length})</h4>
+                                                <div className="space-y-1">
+                                                    {videos.map((video) => (
+                                                        <div key={video.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-sm">
+                                                            <Video className="w-4 h-4 text-gray-400" />
+                                                            <span className="flex-1 truncate">{video.file.name}</span>
+                                                            <button
+                                                                onClick={() => removeVideo(video.id)}
+                                                                className="text-red-500 hover:text-red-700"
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {audioRecording && (
+                                            <div>
+                                                <h4 className="text-sm font-medium mb-2">Audio Recording</h4>
+                                                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                                    <Mic className="w-4 h-4 text-gray-400" />
+                                                    <audio controls src={audioRecording.preview} className="flex-1" />
+                                                    <button
+                                                        onClick={removeAudio}
+                                                        className="text-red-500 hover:text-red-700"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
-                            </div>
-                        </Card>
 
-                        {/* Submit Button */}
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <Button
-                                onClick={resetForm}
-                                variant="outline"
-                                className="flex-1 w-full"
-                                disabled={submitting}
-                                size="medium"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                onClick={handleSubmit}
-                                className="flex-1 w-full gap-2"
-                                disabled={submitting || photos.length < 4}
-                                size="medium"
-                            >
-                                {submitting ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        Submitting...
-                                    </>
-                                ) : (
-                                    <>
-                                        <CheckCircle className="w-4 h-4" />
-                                        Receive Controller
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </>
-                )}
+
+                                <div className="pt-3 flex gap-3">
+                                    <Button onClick={resetForm} variant="outline" className="flex-1">
+                                        Reset
+                                    </Button>
+                                    <Button
+                                        onClick={addToBatch}
+                                        className="flex-1"
+                                        disabled={photos.length < requiredPhotos.length}
+                                    >
+                                        <Package className="w-4 h-4" />
+                                        Add to Batch
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </Card>
+                </div>
             </div>
 
             {/* Camera Capture Modal */}

@@ -7,7 +7,8 @@ import { ToastProvider } from './components/ui/toast';
 import { SocketProvider } from './lib/contexts/SocketContext';
 import useAuth from './lib/hooks/useAuth';
 import { SessionManager } from './lib/utils/sessionManager';
- 
+import { SoundProvider } from './lib/hooks/SoundManager';
+
 function App() {
   const [router, setRouter] = React.useState(null);
   const [initializing, setInitializing] = React.useState(true);
@@ -19,24 +20,24 @@ function App() {
       try {
         // Initialize session activity tracking
         SessionManager.initializeActivityTracking();
-        
+
         const storedUser = SessionManager.getUser();
         const storedToken = SessionManager.getToken();
-        
+
         // Check if session is expired first
         if (SessionManager.isSessionExpired()) {
-           SessionManager.logout();
+          SessionManager.logout();
           setInitializing(false);
           return;
         }
-        
+
         // If we have stored credentials and they're not in Redux yet
         if (storedUser && storedToken && !user && !token) {
           try {
             // Set user and token in Redux
             setUser(storedUser);
             setToken(storedToken);
-            
+
             // Verify token is still valid with the server
             await checkAuth();
           } catch (error) {
@@ -89,9 +90,11 @@ function App() {
   return (
     <ToastProvider>
       <SocketProvider>
-        <div className="App">
-          <RouterProvider router={router} />
-        </div>
+        <SoundProvider defaultVolume={0.45}>
+          <div className="App">
+            <RouterProvider router={router} />
+          </div>
+        </SoundProvider>
       </SocketProvider>
     </ToastProvider>
   );

@@ -6,6 +6,19 @@ import {
   Network,
   UsersRound,
   CircleUserRound,
+  Package,
+  Boxes,
+  NotebookText,
+  FilePlus,
+  Ticket,
+  Truck,
+  Building2,
+  FolderKanban,
+  Wrench,
+  ClipboardList,
+  Building,
+  ScanLine,
+  PackageSearch
 } from 'lucide-react';
 
 import Dashboard from '../../pages/dashboard/dashboard';
@@ -24,45 +37,51 @@ import OrganisationPage from '../../pages/organisation/organisation';
 import ProfilePage from '../../pages/profile/Profile';
 import SettingsPage from '../../pages/settings';
 import Projects from '../../pages/projects/projects';
+import DeliveryPage from '../../pages/delivery/DeliveryPage';
 
 const BASE_ITEMS = {
   dashboard: {
     path: '/dashboard',
-    icon: Monitor,
-    label: 'dashboard',
+    icon: LayoutDashboard,
+    label: 'Dashboard',
     category: 'main',
     element: <Dashboard />,
   },
+
   tickets: {
     path: '/tickets',
-    icon: Monitor,
+    icon: Ticket,
     label: 'Tickets',
     category: 'main',
     element: <Tickets />,
   },
+
   ticketDetails: {
     path: '/tickets/:ticketId',
-    icon: Monitor,
-    label: 'ticket Details',
+    icon: NotebookText,
+    label: 'Ticket Details',
     hidden: true,
     category: 'main',
     element: <TicketDashboard />,
   },
+
   ticketNew: {
     path: '/tickets/new',
-    icon: Monitor,
+    icon: FilePlus,
     label: 'New Ticket',
     hidden: true,
     category: 'main',
     element: <TicketForm />,
   },
+
   receiveController: {
     path: '/receive-controller',
-    icon: Settings,
+    icon: ScanLine,
     label: 'Receive Controller',
     category: 'technical',
     element: <ReceiveController />,
   },
+
   users: {
     path: '/users',
     icon: UsersRound,
@@ -70,34 +89,39 @@ const BASE_ITEMS = {
     category: 'management',
     element: <UsersPage />,
   },
+
   serviceCenter: {
     path: '/service-center',
-    icon: Network,
+    icon: Building2,
     label: 'Service Center',
     category: 'technical',
     element: <ServiceCenters />,
   },
+
   spareRequest: {
     path: '/spare-request',
-    icon: Settings,
+    icon: Wrench,
     label: 'Spare Request',
     category: 'management',
     element: <SpareRequest />,
   },
+
   inventory: {
     path: '/inventory',
-    icon: FileText,
+    icon: Boxes,
     label: 'Inventory',
     category: 'main',
     element: <Inventory />,
   },
+
   products: {
     path: '/products',
-    icon: FileText,
+    icon: PackageSearch,
     label: 'Products',
     category: 'main',
     element: <Products />,
   },
+
   settings: {
     path: '/settings',
     icon: Settings,
@@ -105,28 +129,39 @@ const BASE_ITEMS = {
     category: 'management',
     element: <SettingsPage />,
   },
+
   organisation: {
     path: '/customers',
-    icon: UsersRound,
+    icon: Building,
     label: 'Customers',
     category: 'management',
     element: <OrganisationPage />,
   },
+
   profile: {
     path: '/profile',
     icon: CircleUserRound,
     label: 'Profile',
     category: 'management',
     element: <ProfilePage />,
-    hidden: true
+    hidden: true,
   },
-  project:{
+
+  project: {
     path: '/projects',
-    icon: UsersRound,
+    icon: FolderKanban,
     label: 'Projects',
     category: 'management',
     element: <Projects />,
-  }
+  },
+
+  deliver: {
+    path: '/deliver',
+    icon: Truck,
+    label: 'Deliver',
+    category: 'technical',
+    element: <DeliveryPage />,
+  },
 };
 
 const ROLE_ITEMS = {
@@ -145,6 +180,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.inventory,
     BASE_ITEMS.settings,
     BASE_ITEMS.profile,
+    BASE_ITEMS.deliver,
   ],
   MACSOFT_HEAD: [
     BASE_ITEMS.dashboard,

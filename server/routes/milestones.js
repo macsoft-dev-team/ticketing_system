@@ -56,6 +56,13 @@ router.post('/receive-controller',
   milestones.receiveControllerAtServiceCenter
 );
 
+// Receive controller batch route
+router.post('/receive-batch', 
+  authenticate, 
+  receiveControllerUpload.any(), // Accept any field names for batch processing
+  milestones.receiveControllerBatch
+);
+
 // Routes
 router.get('/:ticketId', authenticate, milestones.getTicketMilestones);
 router.post("/:ticketId", authenticate, milestones.createMilestone);

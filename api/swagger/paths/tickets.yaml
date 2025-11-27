@@ -1,8 +1,0 @@
- /tickets:
-  get:
-    summary: Get all tickets
-    tags:
-      - Tickets
-    responses:
-      200:
-        description: OK
