@@ -24,6 +24,7 @@ const inventory = require("./inventory");
 const inboundActivity = require("./inboundActivity");
 const projectWA = require("./projectsWA");
 const organisationWA = require("./organisationWA");
+const statesWA = require("./statesWA");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -48,6 +49,7 @@ router.use("/inbound-activities", authenticate, inboundActivity);
 router.use("/states", states);
 router.use("/projectsWA", projectWA);
 router.use("/organisationsWA", organisationWA);
+router.use("/statesWA", statesWA);
 //upload routes
 
 router.use("/uploads", authenticate, uploadRoutes);

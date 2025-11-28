@@ -76,6 +76,7 @@ model State {
   primaryUsers User[]    @relation("PrimaryState")
   users        User[]    @relation("UserStates")
   projects     Project[] @relation("StateProjects")
+  tickets      Ticket[]  @relation("ticketState")
 }
 
 model Organisation {
@@ -170,7 +171,7 @@ model Ticket {
   imei                  String?
   hp                    String?
   motorType             String?
-  state                 String
+  stateCode             String?
   district              String?
   village               String?
   block                 String?
@@ -194,6 +195,7 @@ model Ticket {
   createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
   serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
+  state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
   messages            Message[]
   notifications       Notification[]
   productTransactions ProductTransaction[]

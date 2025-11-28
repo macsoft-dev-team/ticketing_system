@@ -25,7 +25,7 @@ import {
     faultTypeOptions
 } from './ticketFormSchema';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { controllerAPI, projectAPI } from '../../../lib/services/api';
+import { controllerAPI, projectAPI, stateAPI, ticketAPI } from '../../../lib/services/api';
 import { useToast } from '../../../components/ui/toast';
 import { API_ENDPOINTS } from '../../../lib/constants/api';
 import useTickets from '../../../lib/hooks/useTickets';
@@ -38,6 +38,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const [controllerError, setControllerError] = useState('');
     const [projects, setProjects] = useState([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+    const [states, setStates] = useState([]);
+    const [isLoadingStates, setIsLoadingStates] = useState(true);
     const { addToast } = useToast();
     const { createTicket, loading: ticketLoading, error: ticketError } = useTickets();
     const navigate = useNavigate();
@@ -88,14 +90,38 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         fetchProjects();
     }, [addToast]);
 
+    // Fetch states when component mounts
+    useEffect(() => {
+        const fetchStates = async () => {
+            try {
+                setIsLoadingStates(true);
+                const statesData = await stateAPI.getStates();
+                setStates(statesData || []);
+            } catch (error) {
+                console.error('Error fetching states:', error);
+                addToast({
+                    title: "Warning",
+                    description: "Failed to load states. Please refresh the page.",
+                    variant: "warning"
+                });
+                setStates([]);
+            } finally {
+                setIsLoadingStates(false);
+            }
+        };
+
+        fetchStates();
+    }, [addToast]);
+
     // Auto-populate state information when project is selected
     useEffect(() => {
         const selectedProject = watch('project');
         if (selectedProject && projects.length > 0) {
             const project = projects.find(p => p.projectCode === selectedProject);
             if (project && project.state) {
-                // Auto-populate state from selected project
-                setValue('state', project.state.name.toLowerCase().replace(/\s+/g, '-'));
+                // Auto-populate state from selected project using state code
+                const stateData = states.find(s => s.name === project.state.name);
+                setValue('state', stateData ? stateData.code : project.state.name.toLowerCase().replace(/\s+/g, '-'));
                 
                 // Clear district if it was auto-filled from controller
                 if (!watchedValues.district || watchedValues.district === project.organisation?.address) {
@@ -156,7 +182,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 }
             }
         }
-    }, [watch('project'), projects, setValue, addToast, watchedValues.district]);
+    }, [watch('project'), projects, states, setValue, addToast, watchedValues.district]);
 
     // Fetch controller details from LMS
     const fetchControllerDetails = useCallback(async (controllerNumber) => {
@@ -168,6 +194,26 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         setControllerError('');
 
         try {
+            // First check if there's already an active ticket for this controller
+            console.log('🔍 Checking for active ticket for controller:', controllerNumber);
+            console.log('🔍 ticketAPI object:', ticketAPI);
+            
+            try {
+                console.log('🔍 Calling ticketAPI.checkActiveTicketForController...');
+                const result = await ticketAPI.checkActiveTicketForController(controllerNumber);
+                console.log('✅ No active ticket found, result:', result);
+                // If we reach here, no active ticket exists - continue with LMS fetch
+            } catch (checkError) {
+                console.log('❌ Active ticket check error:', checkError);
+                // If status is 400, it means active ticket exists
+                if (checkError.response?.status === 400 && checkError.response?.data?.error) {
+                    console.log('🚫 Active ticket exists:', checkError.response.data.error);
+                    throw new Error(checkError.response.data.error);
+                }
+                // For other errors (500, network issues), continue with LMS fetch
+                console.warn('Warning: Could not check for active tickets, continuing with LMS fetch:', checkError.message);
+            }
+
              const controllerData = await controllerAPI.getControllerFromLMS(controllerNumber);            
             // Set the fetched data to form fields
             // Handle the specific LMS API response structure
@@ -250,7 +296,11 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             console.error('Error fetching controller details:', error);
             
             let errorMessage = 'Failed to fetch controller details from LMS';
-            if (error.response?.status === 404) {
+            
+            // Check if this is an active ticket validation error (thrown directly as Error)
+            if (error.message && !error.response) {
+                errorMessage = error.message;
+            } else if (error.response?.status === 404) {
                 errorMessage = `Controller ${controllerNumber} not found in LMS system`;
             } else if (error.response?.status === 400) {
                 errorMessage = 'Invalid controller number format';
@@ -384,7 +434,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 imei: data.imei || '',
                 hp: data.hp || '',
                 motorType: data.motorType,
-                state: data.state,
+                project: data.project,
+                state: data.state, // This will now be the state code
                 district: data.district,
                 village: data.village || '',
                 block: data.block || '',
@@ -789,40 +840,31 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         </label>
                                         <select
                                             {...register('state')}
-                                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.state ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            disabled={isLoadingStates}
+                                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.state ? 'border-red-300 bg-red-50' : 'border-gray-300'} ${isLoadingStates ? 'bg-gray-50 cursor-not-allowed' : ''}
                                                 }`}
                                         >
-                                            <option value="">Select State</option>
-                                            <option value="andhra-pradesh">Andhra Pradesh</option>
-                                            <option value="arunachal-pradesh">Arunachal Pradesh</option>
-                                            <option value="assam">Assam</option>
-                                            <option value="bihar">Bihar</option>
-                                            <option value="chhattisgarh">Chhattisgarh</option>
-                                            <option value="goa">Goa</option>
-                                            <option value="gujarat">Gujarat</option>
-                                            <option value="haryana">Haryana</option>
-                                            <option value="himachal-pradesh">Himachal Pradesh</option>
-                                            <option value="jharkhand">Jharkhand</option>
-                                            <option value="karnataka">Karnataka</option>
-                                            <option value="kerala">Kerala</option>
-                                            <option value="madhya-pradesh">Madhya Pradesh</option>
-                                            <option value="maharashtra">Maharashtra</option>
-                                            <option value="manipur">Manipur</option>
-                                            <option value="meghalaya">Meghalaya</option>
-                                            <option value="mizoram">Mizoram</option>
-                                            <option value="nagaland">Nagaland</option>
-                                            <option value="odisha">Odisha</option>
-                                            <option value="punjab">Punjab</option>
-                                            <option value="rajasthan">Rajasthan</option>
-                                            <option value="sikkim">Sikkim</option>
-                                            <option value="tamil-nadu">Tamil Nadu</option>
-                                            <option value="telangana">Telangana</option>
-                                            <option value="tripura">Tripura</option>
-                                            <option value="uttar-pradesh">Uttar Pradesh</option>
-                                            <option value="uttarakhand">Uttarakhand</option>
-                                            <option value="west-bengal">West Bengal</option>
-                                            <option value="delhi">Delhi</option>
+                                            <option value="">
+                                                {isLoadingStates ? 'Loading states...' : 'Select State'}
+                                            </option>
+                                            {!isLoadingStates && states.map(state => (
+                                                <option key={state.code} value={state.code}>
+                                                    {state.name}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {isLoadingStates && (
+                                            <p className="text-xs text-blue-600 flex items-center gap-1">
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                                Loading states...
+                                            </p>
+                                        )}
+                                        {!isLoadingStates && states.length === 0 && (
+                                            <p className="text-xs text-amber-600 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                No states available. Please contact administrator.
+                                            </p>
+                                        )}
                                         {errors.state && (
                                             <motion.p
                                                 initial={{ opacity: 0, y: -10 }}
@@ -1079,9 +1121,14 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                                         </div>
                                                     </div>
                                                     <motion.button
+                                                        type="button"
                                                         whileHover={{ scale: 1.1 }}
                                                         whileTap={{ scale: 0.9 }}
-                                                        onClick={() => removeFile(file.id)}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            removeFile(file.id);
+                                                        }}
                                                         className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
                                                     >
                                                         <X className="w-3 h-3" />

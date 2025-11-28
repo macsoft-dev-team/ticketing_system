@@ -52,6 +52,17 @@ export const ticketAPI = {
     }
   },
 
+  // Check if controller has active tickets
+  checkActiveTicketForController: async (controllerNo) => {
+    try {
+      const response = await apiClient.get(`/tickets/check-controller/${controllerNo}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking active ticket for controller:', error);
+      throw error;
+    }
+  },
+
   // Get ticket details by ID
   getTicket: async (ticketId) => {
     const response = await apiClient.get(`/tickets/${ticketId}`);
@@ -295,6 +306,20 @@ export const projectAPI = {
       return response.data;
     } catch (error) {
       console.error('Error fetching projects:', error);
+      throw error;
+    }
+  }
+};
+
+// State API endpoints
+export const stateAPI = {
+  // Get all states (without authentication)
+  getStates: async () => {
+    try {
+      const response = await apiClient.get('/statesWA');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching states:', error);
       throw error;
     }
   }

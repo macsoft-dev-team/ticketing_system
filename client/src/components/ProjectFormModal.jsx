@@ -212,7 +212,7 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                                 <p className="text-red-500 text-xs mt-1">{errors.organisationId}</p>
                             )}
                         </div>
-                        {/* Organisation */}
+                        {/* State */}
                         <div className="space-y-2">
                             <Label htmlFor="stateId">
                                 State <span className="text-xs text-gray-500">(optional)</span>
@@ -223,15 +223,15 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                                 value={formData.stateId}
                                 onChange={handleChange}
                                 placeholder="Select state (optional)"
-                                options={states?.map(state => ({
+                                options={Array.isArray(states) && states.length > 0 ? states.map(state => ({
                                     value: state.id,
                                     label: state.name
-                                })) || []}
+                                })) : []}
                                 disabled={isSubmitting}
-                                className={errors.organisationId ? 'border-red-500' : ''}
+                                className={errors.stateId ? 'border-red-500' : ''}
                             />
-                            {errors.organisationId && (
-                                <p className="text-red-500 text-xs mt-1">{errors.organisationId}</p>
+                            {errors.stateId && (
+                                <p className="text-red-500 text-xs mt-1">{errors.stateId}</p>
                             )}
                         </div>
 

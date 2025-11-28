@@ -921,29 +921,16 @@ export default function TicketDashboard() {
                 )}
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Address</p>
-                  <p className="text-sm sm:text-base text-gray-900 flex items-start gap-2">
-                    <MapPin className="w-[14px] h-[14px] sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
-                    <span>{ticketData.customer?.address || 'N/A'}</span>
+                  <p className="text-sm sm:text-base text-gray-900">
+                    {[
+                      ticketData.customer?.village,
+                      ticketData.customer?.block,
+                      ticketData.customer?.district,
+                      ticketData.customer?.state
+                    ].filter(Boolean).join(', ') || 'N/A'}
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">State</p>
-                    <p className="text-sm sm:text-base text-gray-900">{ticketData.customer?.state || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">District</p>
-                    <p className="text-sm sm:text-base text-gray-900">{ticketData.customer?.district || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Block</p>
-                    <p className="text-sm sm:text-base text-gray-900">{ticketData.customer?.block || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Village</p>
-                    <p className="text-sm sm:text-base text-gray-900">{ticketData.customer?.village || 'N/A'}</p>
-                  </div>
-                </div>
+
               </div>
             </div>
           </div>

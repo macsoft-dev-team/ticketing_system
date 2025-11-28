@@ -200,6 +200,43 @@ const searchByControllerNumber = async (req, res) => {
   }
 };
 
+const checkActiveTicketForController = async (req, res) => {
+  try {
+    const { controllerNo } = req.params;
+    
+    if (!controllerNo) {
+      return res.status(400).json({ 
+        message: "Controller number is required",
+        error: "Controller number is required"
+      });
+    }
+
+    const result = await ticketService.checkActiveTicketForController(controllerNo);
+    
+    if (result.hasActiveTicket) {
+      return res.status(400).json({
+        message: "Active ticket exists",
+        error: `Active ticket already exists for controller ${controllerNo}. ` +
+               `Please make sure to close ticket ${result.activeTicket.ticketCode} (Status: ${result.activeTicket.status}) ` +
+               `before creating a new one. Created on ${new Date(result.activeTicket.createdAt).toLocaleDateString()}.`,
+        activeTicket: result.activeTicket
+      });
+    }
+
+    res.status(200).json({
+      message: "No active ticket found",
+      hasActiveTicket: false
+    });
+
+  } catch (error) {
+    console.error("Error checking active ticket:", error);
+    res.status(500).json({ 
+      message: "Internal server error",
+      error: "Failed to check for existing tickets"
+    });
+  }
+};
+
 module.exports = {
   getTickets,
   createTicket,
@@ -208,4 +245,5 @@ module.exports = {
   getTicketById,
   deleteTicket,
   searchByControllerNumber,
+  checkActiveTicketForController,
 };

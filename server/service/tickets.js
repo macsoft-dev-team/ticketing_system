@@ -9,6 +9,7 @@ const {
 } = require("../lib/notificationUtils");
 const { createMilestone } = require("./milestones");
 const { generateTicketCode } = require("../lib/ticketCodeGenerator");
+const { getStageConfig } = require("../lib/milestoneConfig");
 const fs = require("fs");
 const path = require("path");
 
@@ -82,7 +83,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
           { imei: { contains: s } },
           { hp: { contains: s } },
           { motorType: { contains: s } },
-          { state: { contains: s } },
+          { stateCode: { contains: s } },
           { district: { contains: s } },
           { village: { contains: s } },
           { block: { contains: s } },
@@ -351,6 +352,77 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
   }
 };
 
+/**
+ * Check if there's an active ticket for the given controller number
+ * A ticket is considered active if:
+ * 1. Status is not CLOSED
+ * 2. OR no final milestone is completed (DONE status for REQUEST_CLEARED_AT_FIELD, DELIVERED_TO_FIELD, FIELD_CLEARANCE_APPROVED)
+ */
+const checkActiveTicketForController = async (controllerNo) => {
+  try {
+    // Find tickets with the same controller number
+    const existingTickets = await prisma.ticket.findMany({
+      where: {
+        controllerNo: controllerNo,
+        deletedAt: null // Only check non-deleted tickets
+      },
+      include: {
+        ticketMilestones: {
+          where: {
+            stage: {
+              in: ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED']
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    if (existingTickets.length === 0) {
+      return { hasActiveTicket: false };
+    }
+
+    // Check each ticket to see if it's active
+    const activeTickets = existingTickets.filter(ticket => {
+      // If ticket status is CLOSED, check if it has completed final milestones
+      if (ticket.status === 'CLOSED') {
+        // Check if any final milestone is completed
+        const hasFinalMilestone = ticket.ticketMilestones.some(milestone => 
+          milestone.status === 'DONE' && 
+          ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED'].includes(milestone.stage)
+        );
+        return !hasFinalMilestone; // If no final milestone is done, ticket is still active
+      }
+      
+      // If status is not CLOSED (OPEN, IN_PROGRESS, RESOLVED), it's active
+      return true;
+    });
+
+    if (activeTickets.length > 0) {
+      const activeTicket = activeTickets[0]; // Most recent active ticket
+      return {
+        hasActiveTicket: true,
+        activeTicket: {
+          ticketCode: activeTicket.ticketCode,
+          status: activeTicket.status,
+          createdAt: activeTicket.createdAt,
+          id: activeTicket.id
+        }
+      };
+    }
+
+    return { hasActiveTicket: false };
+  } catch (error) {
+    console.error('Error checking active ticket for controller:', error);
+    throw new Error('Failed to check for existing tickets');
+  }
+};
+
 const createTicket = async (ticket, userId, io, attachments = []) => {
   const {
     description,
@@ -372,6 +444,18 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     ticketCodeSuffix, // Optional custom suffix
   } = ticket;
   try {
+    // Validate controller number - check for active tickets
+    if (controllerNo) {
+      const controllerCheck = await checkActiveTicketForController(controllerNo);
+      if (controllerCheck.hasActiveTicket) {
+        throw new Error(
+          `Active ticket already exists for controller ${controllerNo}. ` +
+          `Please close ticket ${controllerCheck.activeTicket.ticketCode} (Status: ${controllerCheck.activeTicket.status}) ` +
+          `before creating a new one. Created on ${new Date(controllerCheck.activeTicket.createdAt).toLocaleDateString()}.`
+        );
+      }
+    }
+
     // Generate unique ticket code
     const ticketCode = await generateTicketCode(
       ticketCodePrefix,
@@ -418,7 +502,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         imei: imei,
         hp: hp,
         motorType: motorType,
-        state: state,
+        stateCode: state,
         district: district,
         village: village,
         block: block,
@@ -655,7 +739,7 @@ const updateTicket = async (
         imei: imei,
         hp: hp,
         motorType: motorType,
-        state: state,
+        stateCode: state,
         district: district,
         village: village,
         block: block,
@@ -993,4 +1077,5 @@ module.exports = {
   updateStatus,
   deleteTicket,
   searchByControllerNumber,
+  checkActiveTicketForController,
 };

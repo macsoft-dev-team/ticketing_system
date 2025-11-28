@@ -8,6 +8,7 @@ const {
 } = require("../middleware/ticketFileUpload");
 
 // Ticket routes
+router.get("/check-controller/:controllerNo", authenticate, tickets.checkActiveTicketForController);
 router.get("/search/controller/:controllerNo", authenticate, tickets.searchByControllerNumber);
 router.get("/", authenticate, tickets.getTickets);
 router.get("/:id", authenticate, tickets.getTicketById);

@@ -64,9 +64,11 @@ export const fetchTickets = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Fetch tickets error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch tickets"
-      );
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to fetch tickets";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -79,9 +81,11 @@ export const fetchTicketById = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Fetch ticket by ID error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch ticket"
-      );
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to fetch ticket";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -132,9 +136,12 @@ export const createNewTicket = createAsyncThunk(
       }
     } catch (error) {
       console.error("Create ticket error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create ticket"
-      );
+      // Try to get the most specific error message available
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to create ticket";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -164,9 +171,11 @@ export const updateTicketById = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Update ticket error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update ticket"
-      );
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to update ticket";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -184,9 +193,11 @@ export const updateTicketStatusAPI = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error("Update ticket status error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update ticket status"
-      );
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to update ticket status";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -201,9 +212,11 @@ export const deleteTicketById = createAsyncThunk(
       return { ticketId, ...response.data };
     } catch (error) {
       console.error("Delete ticket error:", error);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to delete ticket"
-      );
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to delete ticket";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -288,11 +301,11 @@ export const updateMilestone = createAsyncThunk(
       }
     } catch (error) {
       console.error("Update milestone error:", error);
-      return rejectWithValue(
-        error.response?.data?.message ||
-          error.response?.data?.error ||
-          "Failed to update milestone"
-      );
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to update milestone";
+      return rejectWithValue(errorMessage);
     }
   }
 );
