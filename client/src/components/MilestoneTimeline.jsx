@@ -24,6 +24,7 @@ import axios from 'axios';
 import MilestoneActionButton from './MilestoneActionButton';
 import { SpareRequestForm } from './ui/spareRequestForm';
 import { API_URL } from '../lib/constants/api';
+import PhotoUploadModal from './PhotoUploadModal';
 
 // Role-based permissions - matches backend milestoneConfig.js
 const STAGE_ROLE_PERMISSIONS = {
@@ -798,6 +799,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     const [confirmDialogData, setConfirmDialogData] = useState(null);
     const [showSpareRequestModal, setShowSpareRequestModal] = useState(false);
     const [pendingSpareTransition, setPendingSpareTransition] = useState(null);
+    const [showPhotoModal, setShowPhotoModal] = useState(false);
     const { token, user } = useAuth();
     const { addToast } = useToast();
     // Update milestones when prop changes
@@ -1542,19 +1544,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                     </div>
                                 )}
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Notes (Optional)
-                                    </label>
-                                    <textarea
-                                        value={transitionNotes}
-                                        onChange={(e) => setTransitionNotes(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        rows={3}
-                                        placeholder="Add any notes about this transition..."
-                                    />
-                                </div>
-
                                 {/* Photo Upload Section */}
                                 {selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.photoRequired && (
                                     <div>
@@ -1562,111 +1551,63 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                             Photos Required (Min: {MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1})
                                         </label>
 
-                                        {/* Specific Photo Requirements for RECEIVED_AT_SERVICE_CENTER */}
-                                        {selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos ? (
-                                            <div className="space-y-3">
-                                                <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border">
-                                                    <strong>4 specific photos required:</strong>
-                                                    <div className="mt-1 grid grid-cols-2 gap-1 text-xs">
-                                                        {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.map((photoType, index) => (
-                                                            <div key={index} className="flex items-center gap-1">
-                                                                <span className={`w-4 h-4 rounded text-white text-xs flex items-center justify-center ${transitionPhotos.length > index ? 'bg-green-500' : 'bg-gray-400'
-                                                                    }`}>
-                                                                    {index + 1}
-                                                                </span>
-                                                                <span className={transitionPhotos.length > index ? 'text-green-600 font-medium' : 'text-gray-600'}>
-                                                                    {photoType}
-                                                                </span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex gap-2">
-                                                    <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer">
-                                                        <ImageIcon className="w-4 h-4" />
-                                                        <span className="text-sm">Choose from Gallery</span>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
-                                                            onChange={(e) => setTransitionPhotos(Array.from(e.target.files))}
-                                                            className="hidden"
-                                                        />
-                                                    </label>
-                                                    <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:text-orange-700 transition-colors cursor-pointer">
-                                                        <Camera className="w-4 h-4" />
-                                                        <span className="text-sm">Take Photo</span>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
-                                                            capture="environment"
-                                                            onChange={(e) => setTransitionPhotos(Array.from(e.target.files))}
-                                                            className="hidden"
-                                                        />
-                                                    </label>
-                                                </div>
-
-                                                {transitionPhotos.length > 0 && (
-                                                    <div className="space-y-2">
-                                                        <p className="text-xs text-center">
-                                                            <span className={`font-medium ${transitionPhotos.length >= 4 ? 'text-green-600' : 'text-orange-600'}`}>
-                                                                {transitionPhotos.length} of 4 photos selected
+                                        {/* Photo Requirements Info */}
+                                        {selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
+                                            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border mb-3">
+                                                <strong>4 specific photos required:</strong>
+                                                <div className="mt-1 grid grid-cols-2 gap-1 text-xs">
+                                                    {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.map((photoType, index) => (
+                                                        <div key={index} className="flex items-center gap-1">
+                                                            <span className={`w-4 h-4 rounded text-white text-xs flex items-center justify-center ${transitionPhotos.length > index ? 'bg-green-500' : 'bg-gray-400'
+                                                                }`}>
+                                                                {index + 1}
                                                             </span>
-                                                        </p>
-                                                        {transitionPhotos.length < 4 && (
-                                                            <p className="text-xs text-orange-600 text-center">
-                                                                Please upload {4 - transitionPhotos.length} more photo(s) to continue
-                                                            </p>
-                                                        )}
-                                                        {transitionPhotos.length >= 4 && (
-                                                            <p className="text-xs text-green-600 text-center font-medium">
-                                                                ✓ All required photos uploaded!
-                                                            </p>
-                                                        )}
-                                                    </div>
+                                                            <span className={transitionPhotos.length > index ? 'text-green-600 font-medium' : 'text-gray-600'}>
+                                                                {photoType}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Upload Button */}
+                                        <button
+                                            onClick={() => setShowPhotoModal(true)}
+                                            className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                                        >
+                                            <Camera className="w-5 h-5" />
+                                            <span className="font-medium">
+                                                {transitionPhotos.length > 0 
+                                                    ? `${transitionPhotos.length} photo(s) selected - Click to change`
+                                                    : 'Upload Photos'
+                                                }
+                                            </span>
+                                        </button>
+
+                                        {/* Photo Count Status */}
+                                        {transitionPhotos.length > 0 && (
+                                            <div className="mt-2 text-xs text-center">
+                                                {selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos === 4 ? (
+                                                    <span className={`font-medium ${transitionPhotos.length >= 4 ? 'text-green-600' : 'text-orange-600'}`}>
+                                                        {transitionPhotos.length >= 4 
+                                                            ? '✓ All required photos uploaded!' 
+                                                            : `${transitionPhotos.length} of 4 photos - ${4 - transitionPhotos.length} more needed`
+                                                        }
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-green-600 font-medium">
+                                                        ✓ {transitionPhotos.length} photo(s) ready to upload
+                                                    </span>
                                                 )}
                                             </div>
-                                        ) : (
-                                            /* Standard Photo Upload for other stages */
-                                            <div>
-                                                <div className="flex gap-2 mb-2">
-                                                    <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer">
-                                                        <ImageIcon className="w-4 h-4" />
-                                                        <span className="text-sm">Choose from Gallery</span>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
-                                                            onChange={(e) => setTransitionPhotos(Array.from(e.target.files))}
-                                                            className="hidden"
-                                                        />
-                                                    </label>
-                                                    <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:text-orange-700 transition-colors cursor-pointer">
-                                                        <Camera className="w-4 h-4" />
-                                                        <span className="text-sm">Take Photo</span>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
-                                                            capture="environment"
-                                                            onChange={(e) => setTransitionPhotos(Array.from(e.target.files))}
-                                                            className="hidden"
-                                                        />
-                                                    </label>
-                                                </div>
-                                                {transitionPhotos.length > 0 && (
-                                                    <p className="text-xs text-green-600 mt-1">
-                                                        {transitionPhotos.length} photo(s) selected
-                                                    </p>
-                                                )}
-                                                <span className='text-[12px]'>
-                                                    Required Photos:
-                                                    <span className='font-medium px-2'>
-                                                        {MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos?.join(', ') || 'No specific requirements'}
-                                                    </span>
-                                                </span>
+                                        )}
+
+                                        {/* Required Photos Info for other stages */}
+                                        {selectedTargetStage !== 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
+                                            <div className="mt-2 text-xs text-gray-600">
+                                                <span className="font-medium">Required Photos: </span>
+                                                {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}
                                             </div>
                                         )}
                                     </div>
@@ -1818,6 +1759,39 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Photo Upload Modal */}
+            <PhotoUploadModal
+                isOpen={showPhotoModal}
+                onClose={() => setShowPhotoModal(false)}
+                onUpload={(filesOrLabeled) => {
+                    // Handle labeled photos for RECEIVED_AT_SERVICE_CENTER or regular files for other stages
+                    if (selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && Array.isArray(filesOrLabeled) && filesOrLabeled[0]?.file) {
+                        // Extract files from labeled objects and store labels separately if needed
+                        const files = filesOrLabeled.map(item => item.file);
+                        const labels = filesOrLabeled.map(item => item.label);
+                        setTransitionPhotos(files);
+                        // You could store labels in a separate state if needed for validation
+                    } else {
+                        setTransitionPhotos(filesOrLabeled);
+                    }
+                    setShowPhotoModal(false);
+                }}
+                title={selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage] 
+                    ? `Upload Photos - ${MILESTONE_CONFIG[selectedTargetStage].label}`
+                    : 'Upload Photos'
+                }
+                description={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
+                    ? `Please upload 4 specific photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
+                    : selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
+                        ? `Required photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
+                        : 'Select photos to upload for this milestone'
+                }
+                minPhotos={selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1}
+                uploading={uploadingPhotos}
+                requireLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER'}
+                requiredLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' ? MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos : undefined}
+            />
         </div>
     );
 };

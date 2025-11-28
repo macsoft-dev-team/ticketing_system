@@ -13,10 +13,13 @@ const PhotoUploadModal = ({
   title = 'Upload Photos',
   description = 'Select photos to upload for this milestone',
   minPhotos = 1,
-  uploading = false
+  uploading = false,
+  requireLabels = false,
+  requiredLabels = []
 }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
+  const [photoLabels, setPhotoLabels] = useState([]);
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -27,6 +30,11 @@ const PhotoUploadModal = ({
     
     setSelectedFiles(prev => [...prev, ...files]);
     setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+    
+    // Initialize labels for new files
+    if (requireLabels) {
+      setPhotoLabels(prev => [...prev, ...files.map(() => '')]);
+    }
   };
 
   const handleRemovePhoto = (index) => {
@@ -35,6 +43,11 @@ const PhotoUploadModal = ({
     // Revoke the object URL to free memory
     URL.revokeObjectURL(previewUrls[index]);
     setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+    
+    // Remove corresponding label
+    if (requireLabels) {
+      setPhotoLabels(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const handleUpload = async () => {
@@ -43,7 +56,34 @@ const PhotoUploadModal = ({
       return;
     }
 
-    await onUpload(selectedFiles);
+    // Validate labels if required
+    if (requireLabels) {
+      const missingLabels = photoLabels.some((label, index) => !label && index < selectedFiles.length);
+      if (missingLabels) {
+        alert('Please assign labels to all photos');
+        return;
+      }
+
+      // Check for duplicate labels if specific labels are required
+      if (requiredLabels.length > 0) {
+        const usedLabels = photoLabels.filter(label => label);
+        const duplicates = usedLabels.filter((label, index) => usedLabels.indexOf(label) !== index);
+        if (duplicates.length > 0) {
+          alert('Each photo must have a unique label');
+          return;
+        }
+      }
+    }
+
+    // Create files with labels if required
+    const filesWithLabels = requireLabels 
+      ? selectedFiles.map((file, index) => ({
+          file,
+          label: photoLabels[index] || ''
+        }))
+      : selectedFiles;
+
+    await onUpload(filesWithLabels);
     handleClose();
   };
 
@@ -52,6 +92,7 @@ const PhotoUploadModal = ({
     previewUrls.forEach(url => URL.revokeObjectURL(url));
     setSelectedFiles([]);
     setPreviewUrls([]);
+    setPhotoLabels([]);
     onClose();
   };
 
@@ -140,6 +181,11 @@ const PhotoUploadModal = ({
               
               <p className="text-xs text-center text-gray-500">
                 Minimum {minPhotos} photo{minPhotos > 1 ? 's' : ''} required
+                {requireLabels && requiredLabels.length > 0 && (
+                  <span className="block mt-1 text-blue-600 font-medium">
+                    Each photo must be labeled with its specific type
+                  </span>
+                )}
               </p>
             </div>
 
@@ -156,31 +202,80 @@ const PhotoUploadModal = ({
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {previewUrls.map((url, index) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="relative group aspect-square"
+                      className="relative group"
                     >
-                      <img
-                        src={url}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
-                      />
-                      <button
-                        onClick={() => handleRemovePhoto(index)}
-                        disabled={uploading}
-                        className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 disabled:opacity-50"
-                      >
-                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </button>
-                      <div className="absolute bottom-2 left-2 px-2 py-1 bg-black bg-opacity-60 text-white text-xs rounded">
-                        {selectedFiles[index].name.length > 15
-                          ? selectedFiles[index].name.substring(0, 12) + '...'
-                          : selectedFiles[index].name}
+                      <div className="flex gap-3 p-3 border border-gray-200 rounded-lg">
+                        <div className="relative w-20 h-20 flex-shrink-0">
+                          <img
+                            src={url}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-full object-cover rounded border"
+                          />
+                          <button
+                            onClick={() => handleRemovePhoto(index)}
+                            disabled={uploading}
+                            className="absolute -top-2 -right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 disabled:opacity-50"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs text-gray-600 mb-2">
+                            {selectedFiles[index].name.length > 25
+                              ? selectedFiles[index].name.substring(0, 22) + '...'
+                              : selectedFiles[index].name}
+                          </div>
+                          {requireLabels && (
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                                Photo Type:
+                              </label>
+                              {requiredLabels.length > 0 ? (
+                                <select
+                                  value={photoLabels[index] || ''}
+                                  onChange={(e) => {
+                                    const newLabels = [...photoLabels];
+                                    newLabels[index] = e.target.value;
+                                    setPhotoLabels(newLabels);
+                                  }}
+                                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                  disabled={uploading}
+                                >
+                                  <option value="">Select type...</option>
+                                  {requiredLabels.map((label) => (
+                                    <option 
+                                      key={label} 
+                                      value={label}
+                                      disabled={photoLabels.includes(label) && photoLabels[index] !== label}
+                                    >
+                                      {label}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={photoLabels[index] || ''}
+                                  onChange={(e) => {
+                                    const newLabels = [...photoLabels];
+                                    newLabels[index] = e.target.value;
+                                    setPhotoLabels(newLabels);
+                                  }}
+                                  placeholder="Enter photo description"
+                                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                  disabled={uploading}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   ))}
@@ -201,9 +296,22 @@ const PhotoUploadModal = ({
           <div className="flex items-center justify-between gap-3 p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
             <div className="text-xs sm:text-sm text-gray-600">
               {selectedFiles.length > 0 && (
-                <span>
-                  {selectedFiles.length} photo{selectedFiles.length > 1 ? 's' : ''} selected
-                </span>
+                <div className="space-y-1">
+                  <span>
+                    {selectedFiles.length} photo{selectedFiles.length > 1 ? 's' : ''} selected
+                  </span>
+                  {requireLabels && requiredLabels.length > 0 && (
+                    <div>
+                      <span className={`text-xs ${
+                        photoLabels.filter(label => label).length === selectedFiles.length 
+                          ? 'text-green-600' 
+                          : 'text-amber-600'
+                      }`}>
+                        {photoLabels.filter(label => label).length} of {selectedFiles.length} labeled
+                      </span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             <div className="flex gap-2 sm:gap-3">
@@ -216,7 +324,12 @@ const PhotoUploadModal = ({
               </button>
               <button
                 onClick={handleUpload}
-                disabled={uploading || selectedFiles.length < minPhotos}
+                disabled={
+                  uploading || 
+                  selectedFiles.length < minPhotos ||
+                  (requireLabels && photoLabels.some((label, index) => !label && index < selectedFiles.length)) ||
+                  (requireLabels && requiredLabels.length > 0 && selectedFiles.length !== requiredLabels.length)
+                }
                 className="px-3 sm:px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {uploading ? (
