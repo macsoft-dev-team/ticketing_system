@@ -88,8 +88,7 @@ export default function Header() {
                     </motion.h1>
 
                     {/* Filter Tabs - Hidden on small screens */}
-                    {tickets.length > 0 && (
-                        <motion.div
+                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2 }}
@@ -136,8 +135,7 @@ export default function Header() {
                                 </motion.button>
                             ))}
                         </motion.div>
-                    )}
-                </div>
+                 </div>
 
                 {/* Right Section */}
                 <div className="flex items-center space-x-2 sm:space-x-3">

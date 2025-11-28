@@ -63,6 +63,13 @@ router.post('/receive-batch',
   milestones.receiveControllerBatch
 );
 
+// Delivery batch route
+router.post('/delivery-batch', 
+  authenticate, 
+  receiveControllerUpload.any(), // Accept any field names for batch processing
+  milestones.deliveryControllerBatch
+);
+
 // Routes
 router.get('/:ticketId', authenticate, milestones.getTicketMilestones);
 router.post("/:ticketId", authenticate, milestones.createMilestone);

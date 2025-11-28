@@ -459,6 +459,29 @@ const batch = await batchService.receiveControllerBatch(batchId);
   }
 };
 
+const deliveryControllerBatch = async (req, res) => {
+  try {
+    const { batchCount, batchId } = req.body;
+
+    console.log('🚀 Processing delivery batch:', { batchCount, batchId });
+     
+    const batch = await batchService.deliveryControllerBatch(batchId);
+ 
+    res.status(200).json({
+      message: `Batch of ${batchCount} controllers marked as delivered successfully`,
+      milestone: batch
+    });
+
+  } catch (error) {
+    console.error("❌ Error processing delivery batch:", error);
+    res.status(500).json({
+      message: "Failed to process delivery batch",
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
+
 module.exports = {
   getTicketMilestones,
   getCurrentMilestone,
@@ -471,4 +494,5 @@ module.exports = {
   createMilestone,
   receiveControllerAtServiceCenter,
   receiveControllerBatch,
+  deliveryControllerBatch,
 };

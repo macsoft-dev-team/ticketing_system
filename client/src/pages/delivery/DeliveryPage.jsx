@@ -61,6 +61,15 @@ const DeliveryPage = () => {
     const [showCompletedBatches, setShowCompletedBatches] = useState(false);
     const [loadingCompletedBatches, setLoadingCompletedBatches] = useState(false);
 
+    // Camera and barcode scanner state
+    const [videoDevices, setVideoDevices] = useState([]);
+    const [selectedDeviceId, setSelectedDeviceId] = useState(null);
+    
+    // Media capture states (not used in delivery but needed for UI consistency)
+    const [photos, setPhotos] = useState([]);
+    const [videos, setVideos] = useState([]);
+    const [audioRecording, setAudioRecording] = useState(null);
+
      // Refs for barcode scanning
     const scannerVideoRef = useRef(null);
     const codeReaderRef = useRef(null);
@@ -71,6 +80,45 @@ const DeliveryPage = () => {
             codeReaderRef.current = new BrowserMultiFormatReader();
         }
     }, []);
+
+    // Video device management
+    const listVideoInputDevices = async () => {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoInputDevices = devices.filter(device => device.kind === 'videoinput');
+            setVideoDevices(videoInputDevices);
+            
+            // Set default device if none selected
+            if (!selectedDeviceId && videoInputDevices.length > 0) {
+                // Prefer back camera on mobile
+                const backCamera = videoInputDevices.find(device => 
+                    device.label.toLowerCase().includes('back') || 
+                    device.label.toLowerCase().includes('rear') ||
+                    device.label.toLowerCase().includes('environment')
+                );
+                setSelectedDeviceId(backCamera?.deviceId || videoInputDevices[0].deviceId);
+            }
+        } catch (error) {
+            console.error('Error listing video devices:', error);
+        }
+    };
+
+    const pickVideoDeviceId = (devices) => {
+        if (devices.length === 0) return null;
+        
+        // Try to find back camera on mobile
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            const backCamera = devices.find(device => 
+                device.label.toLowerCase().includes('back') || 
+                device.label.toLowerCase().includes('rear') ||
+                device.label.toLowerCase().includes('environment')
+            );
+            if (backCamera) return backCamera.deviceId;
+        }
+        
+        return devices[0].deviceId;
+    };
 
     // Search tickets by keyword (controller number, ticket code, or IMEI)
     const handleSearch = useCallback(async () => {
@@ -261,13 +309,20 @@ const DeliveryPage = () => {
         await addTicketToBatchHandler();
     };
  
-    const clearBatch = () => {
-        // This would require a separate endpoint to close/complete batch
-        addToast({
-            title: 'Clear Batch',
-            description: 'Clear batch functionality needs to be implemented',
-            variant: 'warning'
-        });
+    const clearBatch = async () => {
+        try {
+            // Create a new active batch after the current one is completed
+            await getOrCreateActiveBatch('DELIVERY_CONTROLLER');
+            // Reload completed batches
+            await loadCompletedBatches();
+        } catch (error) {
+            console.error('Error refreshing batch:', error);
+            addToast({
+                title: 'Warning',
+                description: 'Batch completed but failed to refresh. Please reload the page.',
+                variant: 'warning'
+            });
+        }
     };
 
   
@@ -351,7 +406,7 @@ const DeliveryPage = () => {
             });
 
             // Cleanup
-            clearBatch();
+            await clearBatch();
             setSearchedTicket(null);
             setSearchKeyword('');
         } catch (error) {

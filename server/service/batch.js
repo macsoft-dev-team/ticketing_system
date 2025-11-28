@@ -326,6 +326,23 @@ const receiveControllerBatch = async (batchId) => {
   }
 };
 
+const deliveryControllerBatch = async (batchId) => {
+  try {
+    // Update batch status to COMPLETED
+    const updatedBatch = await prisma.batch.update({
+      where: { id: parseInt(batchId) },
+      data: {
+        batchStatus: "COMPLETED",
+        updatedAt: new Date(),
+      },
+    });
+    return updatedBatch;
+  } catch (error) {
+    console.error("❌ Error completing delivery batch:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   getBatchByUser,
   getActiveBatchByUser,
@@ -336,4 +353,5 @@ module.exports = {
   getOrCreateActiveBatch,
   getBatchImages,
   receiveControllerBatch,
+  deliveryControllerBatch,
 };
