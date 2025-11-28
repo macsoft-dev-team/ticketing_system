@@ -8,10 +8,22 @@ const generateBatchCode = () => {
   return `BATCH-${timestamp}-${random}`;
 };
 
-const getBatchByUser = async (userId) => {
+const getBatchByUser = async (userId, batchType) => {
   try {
+    const where = {
+      batchStatus: "PENDING",
+    };
+    if (batchType === "DELIVERY_CONTROLLER") {
+      where.batchType = "DELIVERY_CONTROLLER";
+    } else {
+      where.batchType = "RECEIVE_CONTROLLER";
+    }
+
+    if (userId) {
+      where.createdBy = userId;
+    }
     const batches = await prisma.batch.findMany({
-      where: { createdBy: userId },
+      where,
       include: {
         batchItems: {
           include: {
@@ -53,7 +65,7 @@ const getActiveBatchByUser = async (userId, batchType) => {
       where.createdBy = userId;
     }
     const activeBatch = await prisma.batch.findFirst({
-      where:  where,
+      where: where,
       include: {
         batchItems: {
           include: {

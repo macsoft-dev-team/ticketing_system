@@ -98,11 +98,6 @@ export const useBatch = () => {
         batchType
       });
       setCurrentBatch(response.data);
-      addToast({
-        title: 'Batch Ready',
-        description: `Batch ${response.data.batchCode} is ready`,
-        variant: 'success'
-      });
       return response.data;
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Failed to get or create batch';
