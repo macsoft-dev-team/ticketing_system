@@ -537,7 +537,7 @@ exports.TransactionType = exports.$Enums.TransactionType = {
 
 exports.batchType = exports.$Enums.batchType = {
   RECEIVE_CONTROLLER: 'RECEIVE_CONTROLLER',
-  DELIVER_CONTROLLER: 'DELIVER_CONTROLLER'
+  DELIVERY_CONTROLLER: 'DELIVERY_CONTROLLER'
 };
 
 exports.batchStatus = exports.$Enums.batchStatus = {

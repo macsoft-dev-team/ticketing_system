@@ -38,11 +38,14 @@ export const useBatch = () => {
   }, [addToast]);
 
   // Get active batch for the current user
-  const fetchActiveBatch = useCallback(async () => {
+  const fetchActiveBatch = useCallback(async (batchType = null) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/batch/active`);
+      const url = batchType 
+        ? `${API_URL}/batch/active?batchType=${batchType}` 
+        : `${API_URL}/batch/active`;
+      const response = await axios.get(url);
       setCurrentBatch(response.data);
       return response.data;
     } catch (err) {
@@ -63,11 +66,14 @@ export const useBatch = () => {
   }, [addToast]);
 
   // Get completed batches for the current user
-  const fetchCompletedBatches = useCallback(async () => {
+  const fetchCompletedBatches = useCallback(async (batchType = null) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/batch/completed`);
+      const url = batchType 
+        ? `${API_URL}/batch/completed?batchType=${batchType}` 
+        : `${API_URL}/batch/completed`;
+      const response = await axios.get(url);
       return response.data;
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Failed to fetch completed batches';

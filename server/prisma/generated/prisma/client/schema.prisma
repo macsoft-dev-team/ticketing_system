@@ -427,7 +427,7 @@ model batchItem {
 
 enum batchType {
   RECEIVE_CONTROLLER
-  DELIVER_CONTROLLER
+  DELIVERY_CONTROLLER
 }
 
 enum batchStatus {

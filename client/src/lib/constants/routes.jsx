@@ -192,6 +192,8 @@ const ROLE_ITEMS = {
     BASE_ITEMS.products,
     BASE_ITEMS.serviceCenter, 
     BASE_ITEMS.profile,
+    BASE_ITEMS.deliver,
+
   ],
   MACSOFT_SUPPORT: [
     BASE_ITEMS.dashboard,
@@ -203,6 +205,8 @@ const ROLE_ITEMS = {
     BASE_ITEMS.products,
     BASE_ITEMS.serviceCenter,
     BASE_ITEMS.profile,
+    BASE_ITEMS.deliver,
+
   ],
   CUSTOMER_SERVICE_HEAD: [
     BASE_ITEMS.tickets,
@@ -212,6 +216,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
+    
   ],
   SERVICE_CENTER_TECHNICIAN: [ 
     BASE_ITEMS.tickets,
@@ -220,6 +225,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
+    BASE_ITEMS.deliver,
   ],
   CUSTOMER_FIELD_ENGINEER: [
     BASE_ITEMS.tickets,

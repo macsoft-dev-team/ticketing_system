@@ -193,7 +193,7 @@ export type Category = (typeof Category)[keyof typeof Category]
 
 export const batchType: {
   RECEIVE_CONTROLLER: 'RECEIVE_CONTROLLER',
-  DELIVER_CONTROLLER: 'DELIVER_CONTROLLER'
+  DELIVERY_CONTROLLER: 'DELIVERY_CONTROLLER'
 };
 
 export type batchType = (typeof batchType)[keyof typeof batchType]

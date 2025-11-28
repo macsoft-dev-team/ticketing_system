@@ -38,14 +38,22 @@ const getBatchByUser = async (userId) => {
   }
 };
 
-const getActiveBatchByUser = async (userId) => {
+const getActiveBatchByUser = async (userId, batchType) => {
   try {
+    const where = {
+      batchStatus: "PENDING",
+    };
+    if (batchType === "DELIVERY_CONTROLLER") {
+      where.batchType = "DELIVERY_CONTROLLER";
+    } else {
+      where.batchType = "RECEIVE_CONTROLLER";
+    }
+
+    if (userId) {
+      where.createdBy = userId;
+    }
     const activeBatch = await prisma.batch.findFirst({
-      where: {
-        createdBy: userId,
-        batchType: "RECEIVE_CONTROLLER",
-        batchStatus: "PENDING", // Only get pending (active) batches
-      },
+      where:  where,
       include: {
         batchItems: {
           include: {
@@ -76,14 +84,23 @@ const getActiveBatchByUser = async (userId) => {
   }
 };
 
-const getCompletedBatchesByUser = async (userId) => {
+const getCompletedBatchesByUser = async (userId, batchType) => {
   try {
+    const where = {
+      batchStatus: "COMPLETED",
+    };
+    if (batchType === "DELIVERY_CONTROLLER") {
+      where.batchType = "DELIVERY_CONTROLLER";
+    } else {
+      where.batchType = "RECEIVE_CONTROLLER";
+    }
+
+    if (userId) {
+      where.createdBy = userId;
+    }
+
     const completedBatches = await prisma.batch.findMany({
-      where: {
-        createdBy: userId,
-        batchType: "RECEIVE_CONTROLLER",
-        batchStatus: "COMPLETED",
-      },
+      where,
       include: {
         batchItems: {
           include: {
@@ -209,7 +226,7 @@ const getOrCreateActiveBatch = async (
 ) => {
   try {
     // First try to get existing active batch
-    let activeBatch = await getActiveBatchByUser(userId);
+    let activeBatch = await getActiveBatchByUser(userId, batchType);
 
     // If no active batch, create one
     if (!activeBatch) {
@@ -282,7 +299,7 @@ const getBatchImages = async (batchId) => {
 
 const receiveControllerBatch = async (batchId) => {
   try {
-    // Update batch status to COMPLETED 
+    // Update batch status to COMPLETED
     const updatedBatch = await prisma.batch.update({
       where: { id: parseInt(batchId) },
       data: {
