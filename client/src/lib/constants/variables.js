@@ -7,6 +7,8 @@ export const initialState = {
     tickets: [],
     currentTicket: null,
     deviceDetails: null,
+    searchResults: [],
+    searching: false,
     loading: false,
     statusCount: {},
     error: null,

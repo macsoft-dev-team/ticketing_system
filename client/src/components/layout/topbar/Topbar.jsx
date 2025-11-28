@@ -13,8 +13,8 @@ const Topbar = () => {
         {/* Notifications */}
         <NotificationBell />
         
-        {/* User Menu
-        <UserMenu /> */}
+      {/*   User Menu */}
+        <UserMenu />
       </div>
     </header>
   );

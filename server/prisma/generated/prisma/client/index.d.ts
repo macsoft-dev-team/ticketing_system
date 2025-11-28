@@ -103,6 +103,16 @@ export type NotificationRecipient = $Result.DefaultSelection<Prisma.$Notificatio
  * 
  */
 export type TicketSequence = $Result.DefaultSelection<Prisma.$TicketSequencePayload>
+/**
+ * Model batch
+ * 
+ */
+export type batch = $Result.DefaultSelection<Prisma.$batchPayload>
+/**
+ * Model batchItem
+ * 
+ */
+export type batchItem = $Result.DefaultSelection<Prisma.$batchItemPayload>
 
 /**
  * Enums
@@ -180,6 +190,23 @@ export const Category: {
 
 export type Category = (typeof Category)[keyof typeof Category]
 
+
+export const batchType: {
+  RECEIVE_CONTROLLER: 'RECEIVE_CONTROLLER',
+  DELIVER_CONTROLLER: 'DELIVER_CONTROLLER'
+};
+
+export type batchType = (typeof batchType)[keyof typeof batchType]
+
+
+export const batchStatus: {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type batchStatus = (typeof batchStatus)[keyof typeof batchStatus]
+
 }
 
 export type MilestoneStatus = $Enums.MilestoneStatus
@@ -205,6 +232,14 @@ export const Role: typeof $Enums.Role
 export type Category = $Enums.Category
 
 export const Category: typeof $Enums.Category
+
+export type batchType = $Enums.batchType
+
+export const batchType: typeof $Enums.batchType
+
+export type batchStatus = $Enums.batchStatus
+
+export const batchStatus: typeof $Enums.batchStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -503,6 +538,26 @@ export class PrismaClient<
     * ```
     */
   get ticketSequence(): Prisma.TicketSequenceDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.batch`: Exposes CRUD operations for the **batch** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Batches
+    * const batches = await prisma.batch.findMany()
+    * ```
+    */
+  get batch(): Prisma.batchDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.batchItem`: Exposes CRUD operations for the **batchItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BatchItems
+    * const batchItems = await prisma.batchItem.findMany()
+    * ```
+    */
+  get batchItem(): Prisma.batchItemDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -960,7 +1015,9 @@ export namespace Prisma {
     MessageSeen: 'MessageSeen',
     Notification: 'Notification',
     NotificationRecipient: 'NotificationRecipient',
-    TicketSequence: 'TicketSequence'
+    TicketSequence: 'TicketSequence',
+    batch: 'batch',
+    batchItem: 'batchItem'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -979,7 +1036,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "state" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence"
+      modelProps: "state" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2171,6 +2228,138 @@ export namespace Prisma {
           }
         }
       }
+      batch: {
+        payload: Prisma.$batchPayload<ExtArgs>
+        fields: Prisma.batchFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.batchFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.batchFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>
+          }
+          findFirst: {
+            args: Prisma.batchFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.batchFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>
+          }
+          findMany: {
+            args: Prisma.batchFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>[]
+          }
+          create: {
+            args: Prisma.batchCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>
+          }
+          createMany: {
+            args: Prisma.batchCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.batchDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>
+          }
+          update: {
+            args: Prisma.batchUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>
+          }
+          deleteMany: {
+            args: Prisma.batchDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.batchUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.batchUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchPayload>
+          }
+          aggregate: {
+            args: Prisma.BatchAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBatch>
+          }
+          groupBy: {
+            args: Prisma.batchGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BatchGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.batchCountArgs<ExtArgs>
+            result: $Utils.Optional<BatchCountAggregateOutputType> | number
+          }
+        }
+      }
+      batchItem: {
+        payload: Prisma.$batchItemPayload<ExtArgs>
+        fields: Prisma.batchItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.batchItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.batchItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>
+          }
+          findFirst: {
+            args: Prisma.batchItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.batchItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>
+          }
+          findMany: {
+            args: Prisma.batchItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>[]
+          }
+          create: {
+            args: Prisma.batchItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>
+          }
+          createMany: {
+            args: Prisma.batchItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.batchItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>
+          }
+          update: {
+            args: Prisma.batchItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.batchItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.batchItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.batchItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$batchItemPayload>
+          }
+          aggregate: {
+            args: Prisma.BatchItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBatchItem>
+          }
+          groupBy: {
+            args: Prisma.batchItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BatchItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.batchItemCountArgs<ExtArgs>
+            result: $Utils.Optional<BatchItemCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2285,6 +2474,8 @@ export namespace Prisma {
     notification?: NotificationOmit
     notificationRecipient?: NotificationRecipientOmit
     ticketSequence?: TicketSequenceOmit
+    batch?: batchOmit
+    batchItem?: batchItemOmit
   }
 
   /* Types for Logging */
@@ -2367,11 +2558,15 @@ export namespace Prisma {
   export type StateCountOutputType = {
     primaryUsers: number
     users: number
+    projects: number
+    tickets: number
   }
 
   export type StateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     primaryUsers?: boolean | StateCountOutputTypeCountPrimaryUsersArgs
     users?: boolean | StateCountOutputTypeCountUsersArgs
+    projects?: boolean | StateCountOutputTypeCountProjectsArgs
+    tickets?: boolean | StateCountOutputTypeCountTicketsArgs
   }
 
   // Custom InputTypes
@@ -2397,6 +2592,20 @@ export namespace Prisma {
    */
   export type StateCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
+  }
+
+  /**
+   * StateCountOutputType without action
+   */
+  export type StateCountOutputTypeCountProjectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectWhereInput
+  }
+
+  /**
+   * StateCountOutputType without action
+   */
+  export type StateCountOutputTypeCountTicketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
   }
 
 
@@ -2536,6 +2745,8 @@ export namespace Prisma {
     productTransactions: number
     TicketMilestone: number
     states: number
+    createdBatches: number
+    updatedBatches: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2550,6 +2761,8 @@ export namespace Prisma {
     productTransactions?: boolean | UserCountOutputTypeCountProductTransactionsArgs
     TicketMilestone?: boolean | UserCountOutputTypeCountTicketMilestoneArgs
     states?: boolean | UserCountOutputTypeCountStatesArgs
+    createdBatches?: boolean | UserCountOutputTypeCountCreatedBatchesArgs
+    updatedBatches?: boolean | UserCountOutputTypeCountUpdatedBatchesArgs
   }
 
   // Custom InputTypes
@@ -2640,6 +2853,20 @@ export namespace Prisma {
     where?: StateWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCreatedBatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: batchWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUpdatedBatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: batchWhereInput
+  }
+
 
   /**
    * Count Type TicketCountOutputType
@@ -2651,6 +2878,7 @@ export namespace Prisma {
     productTransactions: number
     attachments: number
     ticketMilestones: number
+    batchItems: number
   }
 
   export type TicketCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2659,6 +2887,7 @@ export namespace Prisma {
     productTransactions?: boolean | TicketCountOutputTypeCountProductTransactionsArgs
     attachments?: boolean | TicketCountOutputTypeCountAttachmentsArgs
     ticketMilestones?: boolean | TicketCountOutputTypeCountTicketMilestonesArgs
+    batchItems?: boolean | TicketCountOutputTypeCountBatchItemsArgs
   }
 
   // Custom InputTypes
@@ -2705,6 +2934,13 @@ export namespace Prisma {
    */
   export type TicketCountOutputTypeCountTicketMilestonesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TicketMilestoneWhereInput
+  }
+
+  /**
+   * TicketCountOutputType without action
+   */
+  export type TicketCountOutputTypeCountBatchItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: batchItemWhereInput
   }
 
 
@@ -2887,6 +3123,37 @@ export namespace Prisma {
    */
   export type NotificationCountOutputTypeCountRecipientsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotificationRecipientWhereInput
+  }
+
+
+  /**
+   * Count Type BatchCountOutputType
+   */
+
+  export type BatchCountOutputType = {
+    batchItems: number
+  }
+
+  export type BatchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batchItems?: boolean | BatchCountOutputTypeCountBatchItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * BatchCountOutputType without action
+   */
+  export type BatchCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BatchCountOutputType
+     */
+    select?: BatchCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * BatchCountOutputType without action
+   */
+  export type BatchCountOutputTypeCountBatchItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: batchItemWhereInput
   }
 
 
@@ -3078,6 +3345,8 @@ export namespace Prisma {
     stateCode?: boolean
     primaryUsers?: boolean | State$primaryUsersArgs<ExtArgs>
     users?: boolean | State$usersArgs<ExtArgs>
+    projects?: boolean | State$projectsArgs<ExtArgs>
+    tickets?: boolean | State$ticketsArgs<ExtArgs>
     _count?: boolean | StateCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["state"]>
 
@@ -3093,6 +3362,8 @@ export namespace Prisma {
   export type StateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     primaryUsers?: boolean | State$primaryUsersArgs<ExtArgs>
     users?: boolean | State$usersArgs<ExtArgs>
+    projects?: boolean | State$projectsArgs<ExtArgs>
+    tickets?: boolean | State$ticketsArgs<ExtArgs>
     _count?: boolean | StateCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3101,6 +3372,8 @@ export namespace Prisma {
     objects: {
       primaryUsers: Prisma.$UserPayload<ExtArgs>[]
       users: Prisma.$UserPayload<ExtArgs>[]
+      projects: Prisma.$ProjectPayload<ExtArgs>[]
+      tickets: Prisma.$TicketPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -3448,6 +3721,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     primaryUsers<T extends State$primaryUsersArgs<ExtArgs> = {}>(args?: Subset<T, State$primaryUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     users<T extends State$usersArgs<ExtArgs> = {}>(args?: Subset<T, State$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    projects<T extends State$projectsArgs<ExtArgs> = {}>(args?: Subset<T, State$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tickets<T extends State$ticketsArgs<ExtArgs> = {}>(args?: Subset<T, State$ticketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3868,6 +4143,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
+  }
+
+  /**
+   * State.projects
+   */
+  export type State$projectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Project
+     */
+    omit?: ProjectOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+    orderBy?: ProjectOrderByWithRelationInput | ProjectOrderByWithRelationInput[]
+    cursor?: ProjectWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProjectScalarFieldEnum | ProjectScalarFieldEnum[]
+  }
+
+  /**
+   * State.tickets
+   */
+  export type State$ticketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
   }
 
   /**
@@ -4975,11 +5298,13 @@ export namespace Prisma {
 
   export type ProjectAvgAggregateOutputType = {
     id: number | null
+    stateId: number | null
     organisationId: number | null
   }
 
   export type ProjectSumAggregateOutputType = {
     id: number | null
+    stateId: number | null
     organisationId: number | null
   }
 
@@ -4989,6 +5314,7 @@ export namespace Prisma {
     projectCode: string | null
     email: string | null
     address: string | null
+    stateId: number | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5002,6 +5328,7 @@ export namespace Prisma {
     projectCode: string | null
     email: string | null
     address: string | null
+    stateId: number | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5015,6 +5342,7 @@ export namespace Prisma {
     projectCode: number
     email: number
     address: number
+    stateId: number
     isActive: number
     createdAt: number
     updatedAt: number
@@ -5026,11 +5354,13 @@ export namespace Prisma {
 
   export type ProjectAvgAggregateInputType = {
     id?: true
+    stateId?: true
     organisationId?: true
   }
 
   export type ProjectSumAggregateInputType = {
     id?: true
+    stateId?: true
     organisationId?: true
   }
 
@@ -5040,6 +5370,7 @@ export namespace Prisma {
     projectCode?: true
     email?: true
     address?: true
+    stateId?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -5053,6 +5384,7 @@ export namespace Prisma {
     projectCode?: true
     email?: true
     address?: true
+    stateId?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -5066,6 +5398,7 @@ export namespace Prisma {
     projectCode?: true
     email?: true
     address?: true
+    stateId?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -5166,6 +5499,7 @@ export namespace Prisma {
     projectCode: string
     email: string
     address: string | null
+    stateId: number | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date | null
@@ -5198,12 +5532,14 @@ export namespace Prisma {
     projectCode?: boolean
     email?: boolean
     address?: boolean
+    stateId?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
     organisationId?: boolean
     ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
+    state?: boolean | Project$stateArgs<ExtArgs>
     organisation?: boolean | Project$organisationArgs<ExtArgs>
     users?: boolean | Project$usersArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
@@ -5217,6 +5553,7 @@ export namespace Prisma {
     projectCode?: boolean
     email?: boolean
     address?: boolean
+    stateId?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5224,9 +5561,10 @@ export namespace Prisma {
     organisationId?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "projectCode" | "email" | "address" | "isActive" | "createdAt" | "updatedAt" | "deletedAt" | "organisationId", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "projectCode" | "email" | "address" | "stateId" | "isActive" | "createdAt" | "updatedAt" | "deletedAt" | "organisationId", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
+    state?: boolean | Project$stateArgs<ExtArgs>
     organisation?: boolean | Project$organisationArgs<ExtArgs>
     users?: boolean | Project$usersArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
@@ -5236,6 +5574,7 @@ export namespace Prisma {
     name: "Project"
     objects: {
       ServiceCenter: Prisma.$ServiceCenterPayload<ExtArgs>[]
+      state: Prisma.$StatePayload<ExtArgs> | null
       organisation: Prisma.$OrganisationPayload<ExtArgs> | null
       users: Prisma.$UserPayload<ExtArgs>[]
     }
@@ -5245,6 +5584,7 @@ export namespace Prisma {
       projectCode: string
       email: string
       address: string | null
+      stateId: number | null
       isActive: boolean
       createdAt: Date
       updatedAt: Date | null
@@ -5591,6 +5931,7 @@ export namespace Prisma {
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     ServiceCenter<T extends Project$ServiceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Project$ServiceCenterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    state<T extends Project$stateArgs<ExtArgs> = {}>(args?: Subset<T, Project$stateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     organisation<T extends Project$organisationArgs<ExtArgs> = {}>(args?: Subset<T, Project$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     users<T extends Project$usersArgs<ExtArgs> = {}>(args?: Subset<T, Project$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -5627,6 +5968,7 @@ export namespace Prisma {
     readonly projectCode: FieldRef<"Project", 'String'>
     readonly email: FieldRef<"Project", 'String'>
     readonly address: FieldRef<"Project", 'String'>
+    readonly stateId: FieldRef<"Project", 'Int'>
     readonly isActive: FieldRef<"Project", 'Boolean'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
@@ -5996,6 +6338,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ServiceCenterScalarFieldEnum | ServiceCenterScalarFieldEnum[]
+  }
+
+  /**
+   * Project.state
+   */
+  export type Project$stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the State
+     */
+    select?: StateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the State
+     */
+    omit?: StateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StateInclude<ExtArgs> | null
+    where?: StateWhereInput
   }
 
   /**
@@ -7455,6 +7816,8 @@ export namespace Prisma {
     states?: boolean | User$statesArgs<ExtArgs>
     project?: boolean | User$projectArgs<ExtArgs>
     organisation?: boolean | User$organisationArgs<ExtArgs>
+    createdBatches?: boolean | User$createdBatchesArgs<ExtArgs>
+    updatedBatches?: boolean | User$updatedBatchesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -7494,6 +7857,8 @@ export namespace Prisma {
     states?: boolean | User$statesArgs<ExtArgs>
     project?: boolean | User$projectArgs<ExtArgs>
     organisation?: boolean | User$organisationArgs<ExtArgs>
+    createdBatches?: boolean | User$createdBatchesArgs<ExtArgs>
+    updatedBatches?: boolean | User$updatedBatchesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7515,6 +7880,8 @@ export namespace Prisma {
       states: Prisma.$StatePayload<ExtArgs>[]
       project: Prisma.$ProjectPayload<ExtArgs> | null
       organisation: Prisma.$OrganisationPayload<ExtArgs> | null
+      createdBatches: Prisma.$batchPayload<ExtArgs>[]
+      updatedBatches: Prisma.$batchPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -7886,6 +8253,8 @@ export namespace Prisma {
     states<T extends User$statesArgs<ExtArgs> = {}>(args?: Subset<T, User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     project<T extends User$projectArgs<ExtArgs> = {}>(args?: Subset<T, User$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     organisation<T extends User$organisationArgs<ExtArgs> = {}>(args?: Subset<T, User$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    createdBatches<T extends User$createdBatchesArgs<ExtArgs> = {}>(args?: Subset<T, User$createdBatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    updatedBatches<T extends User$updatedBatchesArgs<ExtArgs> = {}>(args?: Subset<T, User$updatedBatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8612,6 +8981,54 @@ export namespace Prisma {
   }
 
   /**
+   * User.createdBatches
+   */
+  export type User$createdBatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    where?: batchWhereInput
+    orderBy?: batchOrderByWithRelationInput | batchOrderByWithRelationInput[]
+    cursor?: batchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BatchScalarFieldEnum | BatchScalarFieldEnum[]
+  }
+
+  /**
+   * User.updatedBatches
+   */
+  export type User$updatedBatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    where?: batchWhereInput
+    orderBy?: batchOrderByWithRelationInput | batchOrderByWithRelationInput[]
+    cursor?: batchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BatchScalarFieldEnum | BatchScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8663,7 +9080,7 @@ export namespace Prisma {
     imei: string | null
     hp: string | null
     motorType: string | null
-    state: string | null
+    stateCode: string | null
     district: string | null
     village: string | null
     block: string | null
@@ -8691,7 +9108,7 @@ export namespace Prisma {
     imei: string | null
     hp: string | null
     motorType: string | null
-    state: string | null
+    stateCode: string | null
     district: string | null
     village: string | null
     block: string | null
@@ -8719,7 +9136,7 @@ export namespace Prisma {
     imei: number
     hp: number
     motorType: number
-    state: number
+    stateCode: number
     district: number
     village: number
     block: number
@@ -8761,7 +9178,7 @@ export namespace Prisma {
     imei?: true
     hp?: true
     motorType?: true
-    state?: true
+    stateCode?: true
     district?: true
     village?: true
     block?: true
@@ -8789,7 +9206,7 @@ export namespace Prisma {
     imei?: true
     hp?: true
     motorType?: true
-    state?: true
+    stateCode?: true
     district?: true
     village?: true
     block?: true
@@ -8817,7 +9234,7 @@ export namespace Prisma {
     imei?: true
     hp?: true
     motorType?: true
-    state?: true
+    stateCode?: true
     district?: true
     village?: true
     block?: true
@@ -8932,7 +9349,7 @@ export namespace Prisma {
     imei: string | null
     hp: string | null
     motorType: string | null
-    state: string
+    stateCode: string | null
     district: string | null
     village: string | null
     block: string | null
@@ -8979,7 +9396,7 @@ export namespace Prisma {
     imei?: boolean
     hp?: boolean
     motorType?: boolean
-    state?: boolean
+    stateCode?: boolean
     district?: boolean
     village?: boolean
     block?: boolean
@@ -8999,11 +9416,13 @@ export namespace Prisma {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
+    state?: boolean | Ticket$stateArgs<ExtArgs>
     messages?: boolean | Ticket$messagesArgs<ExtArgs>
     notifications?: boolean | Ticket$notificationsArgs<ExtArgs>
     productTransactions?: boolean | Ticket$productTransactionsArgs<ExtArgs>
     attachments?: boolean | Ticket$attachmentsArgs<ExtArgs>
     ticketMilestones?: boolean | Ticket$ticketMilestonesArgs<ExtArgs>
+    batchItems?: boolean | Ticket$batchItemsArgs<ExtArgs>
     _count?: boolean | TicketCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["ticket"]>
 
@@ -9018,7 +9437,7 @@ export namespace Prisma {
     imei?: boolean
     hp?: boolean
     motorType?: boolean
-    state?: boolean
+    stateCode?: boolean
     district?: boolean
     village?: boolean
     block?: boolean
@@ -9037,16 +9456,18 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "imei" | "hp" | "motorType" | "state" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "imei" | "hp" | "motorType" | "stateCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
+    state?: boolean | Ticket$stateArgs<ExtArgs>
     messages?: boolean | Ticket$messagesArgs<ExtArgs>
     notifications?: boolean | Ticket$notificationsArgs<ExtArgs>
     productTransactions?: boolean | Ticket$productTransactionsArgs<ExtArgs>
     attachments?: boolean | Ticket$attachmentsArgs<ExtArgs>
     ticketMilestones?: boolean | Ticket$ticketMilestonesArgs<ExtArgs>
+    batchItems?: boolean | Ticket$batchItemsArgs<ExtArgs>
     _count?: boolean | TicketCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -9056,11 +9477,13 @@ export namespace Prisma {
       createdByUser: Prisma.$UserPayload<ExtArgs>
       updatedByUser: Prisma.$UserPayload<ExtArgs> | null
       serviceCenter: Prisma.$ServiceCenterPayload<ExtArgs> | null
+      state: Prisma.$StatePayload<ExtArgs> | null
       messages: Prisma.$MessagePayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       productTransactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
       attachments: Prisma.$AttachmentsPayload<ExtArgs>[]
       ticketMilestones: Prisma.$TicketMilestonePayload<ExtArgs>[]
+      batchItems: Prisma.$batchItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -9071,7 +9494,7 @@ export namespace Prisma {
       imei: string | null
       hp: string | null
       motorType: string | null
-      state: string
+      stateCode: string | null
       district: string | null
       village: string | null
       block: string | null
@@ -9431,11 +9854,13 @@ export namespace Prisma {
     createdByUser<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     updatedByUser<T extends Ticket$updatedByUserArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$updatedByUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     serviceCenter<T extends Ticket$serviceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$serviceCenterArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    state<T extends Ticket$stateArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$stateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     messages<T extends Ticket$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends Ticket$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     productTransactions<T extends Ticket$productTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$productTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     attachments<T extends Ticket$attachmentsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttachmentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     ticketMilestones<T extends Ticket$ticketMilestonesArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$ticketMilestonesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketMilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    batchItems<T extends Ticket$batchItemsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$batchItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9473,7 +9898,7 @@ export namespace Prisma {
     readonly imei: FieldRef<"Ticket", 'String'>
     readonly hp: FieldRef<"Ticket", 'String'>
     readonly motorType: FieldRef<"Ticket", 'String'>
-    readonly state: FieldRef<"Ticket", 'String'>
+    readonly stateCode: FieldRef<"Ticket", 'String'>
     readonly district: FieldRef<"Ticket", 'String'>
     readonly village: FieldRef<"Ticket", 'String'>
     readonly block: FieldRef<"Ticket", 'String'>
@@ -9871,6 +10296,25 @@ export namespace Prisma {
   }
 
   /**
+   * Ticket.state
+   */
+  export type Ticket$stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the State
+     */
+    select?: StateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the State
+     */
+    omit?: StateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StateInclude<ExtArgs> | null
+    where?: StateWhereInput
+  }
+
+  /**
    * Ticket.messages
    */
   export type Ticket$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9988,6 +10432,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TicketMilestoneScalarFieldEnum | TicketMilestoneScalarFieldEnum[]
+  }
+
+  /**
+   * Ticket.batchItems
+   */
+  export type Ticket$batchItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    where?: batchItemWhereInput
+    orderBy?: batchItemOrderByWithRelationInput | batchItemOrderByWithRelationInput[]
+    cursor?: batchItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BatchItemScalarFieldEnum | BatchItemScalarFieldEnum[]
   }
 
   /**
@@ -22437,6 +22905,2038 @@ export namespace Prisma {
 
 
   /**
+   * Model batch
+   */
+
+  export type AggregateBatch = {
+    _count: BatchCountAggregateOutputType | null
+    _avg: BatchAvgAggregateOutputType | null
+    _sum: BatchSumAggregateOutputType | null
+    _min: BatchMinAggregateOutputType | null
+    _max: BatchMaxAggregateOutputType | null
+  }
+
+  export type BatchAvgAggregateOutputType = {
+    id: number | null
+    createdBy: number | null
+    updatedBy: number | null
+  }
+
+  export type BatchSumAggregateOutputType = {
+    id: number | null
+    createdBy: number | null
+    updatedBy: number | null
+  }
+
+  export type BatchMinAggregateOutputType = {
+    id: number | null
+    batchCode: string | null
+    batchType: $Enums.batchType | null
+    batchStatus: $Enums.batchStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    createdBy: number | null
+    updatedBy: number | null
+  }
+
+  export type BatchMaxAggregateOutputType = {
+    id: number | null
+    batchCode: string | null
+    batchType: $Enums.batchType | null
+    batchStatus: $Enums.batchStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    createdBy: number | null
+    updatedBy: number | null
+  }
+
+  export type BatchCountAggregateOutputType = {
+    id: number
+    batchCode: number
+    batchType: number
+    batchStatus: number
+    createdAt: number
+    updatedAt: number
+    createdBy: number
+    updatedBy: number
+    _all: number
+  }
+
+
+  export type BatchAvgAggregateInputType = {
+    id?: true
+    createdBy?: true
+    updatedBy?: true
+  }
+
+  export type BatchSumAggregateInputType = {
+    id?: true
+    createdBy?: true
+    updatedBy?: true
+  }
+
+  export type BatchMinAggregateInputType = {
+    id?: true
+    batchCode?: true
+    batchType?: true
+    batchStatus?: true
+    createdAt?: true
+    updatedAt?: true
+    createdBy?: true
+    updatedBy?: true
+  }
+
+  export type BatchMaxAggregateInputType = {
+    id?: true
+    batchCode?: true
+    batchType?: true
+    batchStatus?: true
+    createdAt?: true
+    updatedAt?: true
+    createdBy?: true
+    updatedBy?: true
+  }
+
+  export type BatchCountAggregateInputType = {
+    id?: true
+    batchCode?: true
+    batchType?: true
+    batchStatus?: true
+    createdAt?: true
+    updatedAt?: true
+    createdBy?: true
+    updatedBy?: true
+    _all?: true
+  }
+
+  export type BatchAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which batch to aggregate.
+     */
+    where?: batchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batches to fetch.
+     */
+    orderBy?: batchOrderByWithRelationInput | batchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: batchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned batches
+    **/
+    _count?: true | BatchCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BatchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BatchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BatchMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BatchMaxAggregateInputType
+  }
+
+  export type GetBatchAggregateType<T extends BatchAggregateArgs> = {
+        [P in keyof T & keyof AggregateBatch]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBatch[P]>
+      : GetScalarType<T[P], AggregateBatch[P]>
+  }
+
+
+
+
+  export type batchGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: batchWhereInput
+    orderBy?: batchOrderByWithAggregationInput | batchOrderByWithAggregationInput[]
+    by: BatchScalarFieldEnum[] | BatchScalarFieldEnum
+    having?: batchScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BatchCountAggregateInputType | true
+    _avg?: BatchAvgAggregateInputType
+    _sum?: BatchSumAggregateInputType
+    _min?: BatchMinAggregateInputType
+    _max?: BatchMaxAggregateInputType
+  }
+
+  export type BatchGroupByOutputType = {
+    id: number
+    batchCode: string
+    batchType: $Enums.batchType | null
+    batchStatus: $Enums.batchStatus
+    createdAt: Date
+    updatedAt: Date
+    createdBy: number
+    updatedBy: number | null
+    _count: BatchCountAggregateOutputType | null
+    _avg: BatchAvgAggregateOutputType | null
+    _sum: BatchSumAggregateOutputType | null
+    _min: BatchMinAggregateOutputType | null
+    _max: BatchMaxAggregateOutputType | null
+  }
+
+  type GetBatchGroupByPayload<T extends batchGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BatchGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BatchGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BatchGroupByOutputType[P]>
+            : GetScalarType<T[P], BatchGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type batchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchCode?: boolean
+    batchType?: boolean
+    batchStatus?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+    updatedBy?: boolean
+    batchItems?: boolean | batch$batchItemsArgs<ExtArgs>
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    updater?: boolean | batch$updaterArgs<ExtArgs>
+    _count?: boolean | BatchCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["batch"]>
+
+
+
+  export type batchSelectScalar = {
+    id?: boolean
+    batchCode?: boolean
+    batchType?: boolean
+    batchStatus?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    createdBy?: boolean
+    updatedBy?: boolean
+  }
+
+  export type batchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchCode" | "batchType" | "batchStatus" | "createdAt" | "updatedAt" | "createdBy" | "updatedBy", ExtArgs["result"]["batch"]>
+  export type batchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batchItems?: boolean | batch$batchItemsArgs<ExtArgs>
+    creator?: boolean | UserDefaultArgs<ExtArgs>
+    updater?: boolean | batch$updaterArgs<ExtArgs>
+    _count?: boolean | BatchCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $batchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "batch"
+    objects: {
+      batchItems: Prisma.$batchItemPayload<ExtArgs>[]
+      creator: Prisma.$UserPayload<ExtArgs>
+      updater: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      batchCode: string
+      batchType: $Enums.batchType | null
+      batchStatus: $Enums.batchStatus
+      createdAt: Date
+      updatedAt: Date
+      createdBy: number
+      updatedBy: number | null
+    }, ExtArgs["result"]["batch"]>
+    composites: {}
+  }
+
+  type batchGetPayload<S extends boolean | null | undefined | batchDefaultArgs> = $Result.GetResult<Prisma.$batchPayload, S>
+
+  type batchCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<batchFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BatchCountAggregateInputType | true
+    }
+
+  export interface batchDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['batch'], meta: { name: 'batch' } }
+    /**
+     * Find zero or one Batch that matches the filter.
+     * @param {batchFindUniqueArgs} args - Arguments to find a Batch
+     * @example
+     * // Get one Batch
+     * const batch = await prisma.batch.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends batchFindUniqueArgs>(args: SelectSubset<T, batchFindUniqueArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Batch that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {batchFindUniqueOrThrowArgs} args - Arguments to find a Batch
+     * @example
+     * // Get one Batch
+     * const batch = await prisma.batch.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends batchFindUniqueOrThrowArgs>(args: SelectSubset<T, batchFindUniqueOrThrowArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Batch that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchFindFirstArgs} args - Arguments to find a Batch
+     * @example
+     * // Get one Batch
+     * const batch = await prisma.batch.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends batchFindFirstArgs>(args?: SelectSubset<T, batchFindFirstArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Batch that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchFindFirstOrThrowArgs} args - Arguments to find a Batch
+     * @example
+     * // Get one Batch
+     * const batch = await prisma.batch.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends batchFindFirstOrThrowArgs>(args?: SelectSubset<T, batchFindFirstOrThrowArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Batches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Batches
+     * const batches = await prisma.batch.findMany()
+     * 
+     * // Get first 10 Batches
+     * const batches = await prisma.batch.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const batchWithIdOnly = await prisma.batch.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends batchFindManyArgs>(args?: SelectSubset<T, batchFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Batch.
+     * @param {batchCreateArgs} args - Arguments to create a Batch.
+     * @example
+     * // Create one Batch
+     * const Batch = await prisma.batch.create({
+     *   data: {
+     *     // ... data to create a Batch
+     *   }
+     * })
+     * 
+     */
+    create<T extends batchCreateArgs>(args: SelectSubset<T, batchCreateArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Batches.
+     * @param {batchCreateManyArgs} args - Arguments to create many Batches.
+     * @example
+     * // Create many Batches
+     * const batch = await prisma.batch.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends batchCreateManyArgs>(args?: SelectSubset<T, batchCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Batch.
+     * @param {batchDeleteArgs} args - Arguments to delete one Batch.
+     * @example
+     * // Delete one Batch
+     * const Batch = await prisma.batch.delete({
+     *   where: {
+     *     // ... filter to delete one Batch
+     *   }
+     * })
+     * 
+     */
+    delete<T extends batchDeleteArgs>(args: SelectSubset<T, batchDeleteArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Batch.
+     * @param {batchUpdateArgs} args - Arguments to update one Batch.
+     * @example
+     * // Update one Batch
+     * const batch = await prisma.batch.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends batchUpdateArgs>(args: SelectSubset<T, batchUpdateArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Batches.
+     * @param {batchDeleteManyArgs} args - Arguments to filter Batches to delete.
+     * @example
+     * // Delete a few Batches
+     * const { count } = await prisma.batch.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends batchDeleteManyArgs>(args?: SelectSubset<T, batchDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Batches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Batches
+     * const batch = await prisma.batch.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends batchUpdateManyArgs>(args: SelectSubset<T, batchUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Batch.
+     * @param {batchUpsertArgs} args - Arguments to update or create a Batch.
+     * @example
+     * // Update or create a Batch
+     * const batch = await prisma.batch.upsert({
+     *   create: {
+     *     // ... data to create a Batch
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Batch we want to update
+     *   }
+     * })
+     */
+    upsert<T extends batchUpsertArgs>(args: SelectSubset<T, batchUpsertArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Batches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchCountArgs} args - Arguments to filter Batches to count.
+     * @example
+     * // Count the number of Batches
+     * const count = await prisma.batch.count({
+     *   where: {
+     *     // ... the filter for the Batches we want to count
+     *   }
+     * })
+    **/
+    count<T extends batchCountArgs>(
+      args?: Subset<T, batchCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BatchCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Batch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BatchAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BatchAggregateArgs>(args: Subset<T, BatchAggregateArgs>): Prisma.PrismaPromise<GetBatchAggregateType<T>>
+
+    /**
+     * Group by Batch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends batchGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: batchGroupByArgs['orderBy'] }
+        : { orderBy?: batchGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, batchGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBatchGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the batch model
+   */
+  readonly fields: batchFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for batch.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__batchClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    batchItems<T extends batch$batchItemsArgs<ExtArgs> = {}>(args?: Subset<T, batch$batchItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    creator<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    updater<T extends batch$updaterArgs<ExtArgs> = {}>(args?: Subset<T, batch$updaterArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the batch model
+   */
+  interface batchFieldRefs {
+    readonly id: FieldRef<"batch", 'Int'>
+    readonly batchCode: FieldRef<"batch", 'String'>
+    readonly batchType: FieldRef<"batch", 'batchType'>
+    readonly batchStatus: FieldRef<"batch", 'batchStatus'>
+    readonly createdAt: FieldRef<"batch", 'DateTime'>
+    readonly updatedAt: FieldRef<"batch", 'DateTime'>
+    readonly createdBy: FieldRef<"batch", 'Int'>
+    readonly updatedBy: FieldRef<"batch", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * batch findUnique
+   */
+  export type batchFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * Filter, which batch to fetch.
+     */
+    where: batchWhereUniqueInput
+  }
+
+  /**
+   * batch findUniqueOrThrow
+   */
+  export type batchFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * Filter, which batch to fetch.
+     */
+    where: batchWhereUniqueInput
+  }
+
+  /**
+   * batch findFirst
+   */
+  export type batchFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * Filter, which batch to fetch.
+     */
+    where?: batchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batches to fetch.
+     */
+    orderBy?: batchOrderByWithRelationInput | batchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for batches.
+     */
+    cursor?: batchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of batches.
+     */
+    distinct?: BatchScalarFieldEnum | BatchScalarFieldEnum[]
+  }
+
+  /**
+   * batch findFirstOrThrow
+   */
+  export type batchFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * Filter, which batch to fetch.
+     */
+    where?: batchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batches to fetch.
+     */
+    orderBy?: batchOrderByWithRelationInput | batchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for batches.
+     */
+    cursor?: batchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of batches.
+     */
+    distinct?: BatchScalarFieldEnum | BatchScalarFieldEnum[]
+  }
+
+  /**
+   * batch findMany
+   */
+  export type batchFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * Filter, which batches to fetch.
+     */
+    where?: batchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batches to fetch.
+     */
+    orderBy?: batchOrderByWithRelationInput | batchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing batches.
+     */
+    cursor?: batchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batches.
+     */
+    skip?: number
+    distinct?: BatchScalarFieldEnum | BatchScalarFieldEnum[]
+  }
+
+  /**
+   * batch create
+   */
+  export type batchCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * The data needed to create a batch.
+     */
+    data: XOR<batchCreateInput, batchUncheckedCreateInput>
+  }
+
+  /**
+   * batch createMany
+   */
+  export type batchCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many batches.
+     */
+    data: batchCreateManyInput | batchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * batch update
+   */
+  export type batchUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * The data needed to update a batch.
+     */
+    data: XOR<batchUpdateInput, batchUncheckedUpdateInput>
+    /**
+     * Choose, which batch to update.
+     */
+    where: batchWhereUniqueInput
+  }
+
+  /**
+   * batch updateMany
+   */
+  export type batchUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update batches.
+     */
+    data: XOR<batchUpdateManyMutationInput, batchUncheckedUpdateManyInput>
+    /**
+     * Filter which batches to update
+     */
+    where?: batchWhereInput
+    /**
+     * Limit how many batches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * batch upsert
+   */
+  export type batchUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * The filter to search for the batch to update in case it exists.
+     */
+    where: batchWhereUniqueInput
+    /**
+     * In case the batch found by the `where` argument doesn't exist, create a new batch with this data.
+     */
+    create: XOR<batchCreateInput, batchUncheckedCreateInput>
+    /**
+     * In case the batch was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<batchUpdateInput, batchUncheckedUpdateInput>
+  }
+
+  /**
+   * batch delete
+   */
+  export type batchDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+    /**
+     * Filter which batch to delete.
+     */
+    where: batchWhereUniqueInput
+  }
+
+  /**
+   * batch deleteMany
+   */
+  export type batchDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which batches to delete
+     */
+    where?: batchWhereInput
+    /**
+     * Limit how many batches to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * batch.batchItems
+   */
+  export type batch$batchItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    where?: batchItemWhereInput
+    orderBy?: batchItemOrderByWithRelationInput | batchItemOrderByWithRelationInput[]
+    cursor?: batchItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BatchItemScalarFieldEnum | BatchItemScalarFieldEnum[]
+  }
+
+  /**
+   * batch.updater
+   */
+  export type batch$updaterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * batch without action
+   */
+  export type batchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batch
+     */
+    select?: batchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batch
+     */
+    omit?: batchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model batchItem
+   */
+
+  export type AggregateBatchItem = {
+    _count: BatchItemCountAggregateOutputType | null
+    _avg: BatchItemAvgAggregateOutputType | null
+    _sum: BatchItemSumAggregateOutputType | null
+    _min: BatchItemMinAggregateOutputType | null
+    _max: BatchItemMaxAggregateOutputType | null
+  }
+
+  export type BatchItemAvgAggregateOutputType = {
+    id: number | null
+    batchId: number | null
+    ticketId: number | null
+  }
+
+  export type BatchItemSumAggregateOutputType = {
+    id: number | null
+    batchId: number | null
+    ticketId: number | null
+  }
+
+  export type BatchItemMinAggregateOutputType = {
+    id: number | null
+    batchId: number | null
+    ticketId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BatchItemMaxAggregateOutputType = {
+    id: number | null
+    batchId: number | null
+    ticketId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BatchItemCountAggregateOutputType = {
+    id: number
+    batchId: number
+    ticketId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BatchItemAvgAggregateInputType = {
+    id?: true
+    batchId?: true
+    ticketId?: true
+  }
+
+  export type BatchItemSumAggregateInputType = {
+    id?: true
+    batchId?: true
+    ticketId?: true
+  }
+
+  export type BatchItemMinAggregateInputType = {
+    id?: true
+    batchId?: true
+    ticketId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BatchItemMaxAggregateInputType = {
+    id?: true
+    batchId?: true
+    ticketId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BatchItemCountAggregateInputType = {
+    id?: true
+    batchId?: true
+    ticketId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BatchItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which batchItem to aggregate.
+     */
+    where?: batchItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batchItems to fetch.
+     */
+    orderBy?: batchItemOrderByWithRelationInput | batchItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: batchItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batchItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batchItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned batchItems
+    **/
+    _count?: true | BatchItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BatchItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BatchItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BatchItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BatchItemMaxAggregateInputType
+  }
+
+  export type GetBatchItemAggregateType<T extends BatchItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateBatchItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBatchItem[P]>
+      : GetScalarType<T[P], AggregateBatchItem[P]>
+  }
+
+
+
+
+  export type batchItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: batchItemWhereInput
+    orderBy?: batchItemOrderByWithAggregationInput | batchItemOrderByWithAggregationInput[]
+    by: BatchItemScalarFieldEnum[] | BatchItemScalarFieldEnum
+    having?: batchItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BatchItemCountAggregateInputType | true
+    _avg?: BatchItemAvgAggregateInputType
+    _sum?: BatchItemSumAggregateInputType
+    _min?: BatchItemMinAggregateInputType
+    _max?: BatchItemMaxAggregateInputType
+  }
+
+  export type BatchItemGroupByOutputType = {
+    id: number
+    batchId: number
+    ticketId: number
+    createdAt: Date
+    updatedAt: Date
+    _count: BatchItemCountAggregateOutputType | null
+    _avg: BatchItemAvgAggregateOutputType | null
+    _sum: BatchItemSumAggregateOutputType | null
+    _min: BatchItemMinAggregateOutputType | null
+    _max: BatchItemMaxAggregateOutputType | null
+  }
+
+  type GetBatchItemGroupByPayload<T extends batchItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BatchItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BatchItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BatchItemGroupByOutputType[P]>
+            : GetScalarType<T[P], BatchItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type batchItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchId?: boolean
+    ticketId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | batchDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["batchItem"]>
+
+
+
+  export type batchItemSelectScalar = {
+    id?: boolean
+    batchId?: boolean
+    ticketId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type batchItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchId" | "ticketId" | "createdAt" | "updatedAt", ExtArgs["result"]["batchItem"]>
+  export type batchItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | batchDefaultArgs<ExtArgs>
+    ticket?: boolean | TicketDefaultArgs<ExtArgs>
+  }
+
+  export type $batchItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "batchItem"
+    objects: {
+      batch: Prisma.$batchPayload<ExtArgs>
+      ticket: Prisma.$TicketPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      batchId: number
+      ticketId: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["batchItem"]>
+    composites: {}
+  }
+
+  type batchItemGetPayload<S extends boolean | null | undefined | batchItemDefaultArgs> = $Result.GetResult<Prisma.$batchItemPayload, S>
+
+  type batchItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<batchItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BatchItemCountAggregateInputType | true
+    }
+
+  export interface batchItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['batchItem'], meta: { name: 'batchItem' } }
+    /**
+     * Find zero or one BatchItem that matches the filter.
+     * @param {batchItemFindUniqueArgs} args - Arguments to find a BatchItem
+     * @example
+     * // Get one BatchItem
+     * const batchItem = await prisma.batchItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends batchItemFindUniqueArgs>(args: SelectSubset<T, batchItemFindUniqueArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BatchItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {batchItemFindUniqueOrThrowArgs} args - Arguments to find a BatchItem
+     * @example
+     * // Get one BatchItem
+     * const batchItem = await prisma.batchItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends batchItemFindUniqueOrThrowArgs>(args: SelectSubset<T, batchItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BatchItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchItemFindFirstArgs} args - Arguments to find a BatchItem
+     * @example
+     * // Get one BatchItem
+     * const batchItem = await prisma.batchItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends batchItemFindFirstArgs>(args?: SelectSubset<T, batchItemFindFirstArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BatchItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchItemFindFirstOrThrowArgs} args - Arguments to find a BatchItem
+     * @example
+     * // Get one BatchItem
+     * const batchItem = await prisma.batchItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends batchItemFindFirstOrThrowArgs>(args?: SelectSubset<T, batchItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BatchItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BatchItems
+     * const batchItems = await prisma.batchItem.findMany()
+     * 
+     * // Get first 10 BatchItems
+     * const batchItems = await prisma.batchItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const batchItemWithIdOnly = await prisma.batchItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends batchItemFindManyArgs>(args?: SelectSubset<T, batchItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BatchItem.
+     * @param {batchItemCreateArgs} args - Arguments to create a BatchItem.
+     * @example
+     * // Create one BatchItem
+     * const BatchItem = await prisma.batchItem.create({
+     *   data: {
+     *     // ... data to create a BatchItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends batchItemCreateArgs>(args: SelectSubset<T, batchItemCreateArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BatchItems.
+     * @param {batchItemCreateManyArgs} args - Arguments to create many BatchItems.
+     * @example
+     * // Create many BatchItems
+     * const batchItem = await prisma.batchItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends batchItemCreateManyArgs>(args?: SelectSubset<T, batchItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a BatchItem.
+     * @param {batchItemDeleteArgs} args - Arguments to delete one BatchItem.
+     * @example
+     * // Delete one BatchItem
+     * const BatchItem = await prisma.batchItem.delete({
+     *   where: {
+     *     // ... filter to delete one BatchItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends batchItemDeleteArgs>(args: SelectSubset<T, batchItemDeleteArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BatchItem.
+     * @param {batchItemUpdateArgs} args - Arguments to update one BatchItem.
+     * @example
+     * // Update one BatchItem
+     * const batchItem = await prisma.batchItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends batchItemUpdateArgs>(args: SelectSubset<T, batchItemUpdateArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BatchItems.
+     * @param {batchItemDeleteManyArgs} args - Arguments to filter BatchItems to delete.
+     * @example
+     * // Delete a few BatchItems
+     * const { count } = await prisma.batchItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends batchItemDeleteManyArgs>(args?: SelectSubset<T, batchItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BatchItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BatchItems
+     * const batchItem = await prisma.batchItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends batchItemUpdateManyArgs>(args: SelectSubset<T, batchItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one BatchItem.
+     * @param {batchItemUpsertArgs} args - Arguments to update or create a BatchItem.
+     * @example
+     * // Update or create a BatchItem
+     * const batchItem = await prisma.batchItem.upsert({
+     *   create: {
+     *     // ... data to create a BatchItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BatchItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends batchItemUpsertArgs>(args: SelectSubset<T, batchItemUpsertArgs<ExtArgs>>): Prisma__batchItemClient<$Result.GetResult<Prisma.$batchItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BatchItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchItemCountArgs} args - Arguments to filter BatchItems to count.
+     * @example
+     * // Count the number of BatchItems
+     * const count = await prisma.batchItem.count({
+     *   where: {
+     *     // ... the filter for the BatchItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends batchItemCountArgs>(
+      args?: Subset<T, batchItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BatchItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BatchItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BatchItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BatchItemAggregateArgs>(args: Subset<T, BatchItemAggregateArgs>): Prisma.PrismaPromise<GetBatchItemAggregateType<T>>
+
+    /**
+     * Group by BatchItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {batchItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends batchItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: batchItemGroupByArgs['orderBy'] }
+        : { orderBy?: batchItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, batchItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBatchItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the batchItem model
+   */
+  readonly fields: batchItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for batchItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__batchItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    batch<T extends batchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, batchDefaultArgs<ExtArgs>>): Prisma__batchClient<$Result.GetResult<Prisma.$batchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    ticket<T extends TicketDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TicketDefaultArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the batchItem model
+   */
+  interface batchItemFieldRefs {
+    readonly id: FieldRef<"batchItem", 'Int'>
+    readonly batchId: FieldRef<"batchItem", 'Int'>
+    readonly ticketId: FieldRef<"batchItem", 'Int'>
+    readonly createdAt: FieldRef<"batchItem", 'DateTime'>
+    readonly updatedAt: FieldRef<"batchItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * batchItem findUnique
+   */
+  export type batchItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * Filter, which batchItem to fetch.
+     */
+    where: batchItemWhereUniqueInput
+  }
+
+  /**
+   * batchItem findUniqueOrThrow
+   */
+  export type batchItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * Filter, which batchItem to fetch.
+     */
+    where: batchItemWhereUniqueInput
+  }
+
+  /**
+   * batchItem findFirst
+   */
+  export type batchItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * Filter, which batchItem to fetch.
+     */
+    where?: batchItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batchItems to fetch.
+     */
+    orderBy?: batchItemOrderByWithRelationInput | batchItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for batchItems.
+     */
+    cursor?: batchItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batchItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batchItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of batchItems.
+     */
+    distinct?: BatchItemScalarFieldEnum | BatchItemScalarFieldEnum[]
+  }
+
+  /**
+   * batchItem findFirstOrThrow
+   */
+  export type batchItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * Filter, which batchItem to fetch.
+     */
+    where?: batchItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batchItems to fetch.
+     */
+    orderBy?: batchItemOrderByWithRelationInput | batchItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for batchItems.
+     */
+    cursor?: batchItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batchItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batchItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of batchItems.
+     */
+    distinct?: BatchItemScalarFieldEnum | BatchItemScalarFieldEnum[]
+  }
+
+  /**
+   * batchItem findMany
+   */
+  export type batchItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * Filter, which batchItems to fetch.
+     */
+    where?: batchItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of batchItems to fetch.
+     */
+    orderBy?: batchItemOrderByWithRelationInput | batchItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing batchItems.
+     */
+    cursor?: batchItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` batchItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` batchItems.
+     */
+    skip?: number
+    distinct?: BatchItemScalarFieldEnum | BatchItemScalarFieldEnum[]
+  }
+
+  /**
+   * batchItem create
+   */
+  export type batchItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a batchItem.
+     */
+    data: XOR<batchItemCreateInput, batchItemUncheckedCreateInput>
+  }
+
+  /**
+   * batchItem createMany
+   */
+  export type batchItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many batchItems.
+     */
+    data: batchItemCreateManyInput | batchItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * batchItem update
+   */
+  export type batchItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a batchItem.
+     */
+    data: XOR<batchItemUpdateInput, batchItemUncheckedUpdateInput>
+    /**
+     * Choose, which batchItem to update.
+     */
+    where: batchItemWhereUniqueInput
+  }
+
+  /**
+   * batchItem updateMany
+   */
+  export type batchItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update batchItems.
+     */
+    data: XOR<batchItemUpdateManyMutationInput, batchItemUncheckedUpdateManyInput>
+    /**
+     * Filter which batchItems to update
+     */
+    where?: batchItemWhereInput
+    /**
+     * Limit how many batchItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * batchItem upsert
+   */
+  export type batchItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the batchItem to update in case it exists.
+     */
+    where: batchItemWhereUniqueInput
+    /**
+     * In case the batchItem found by the `where` argument doesn't exist, create a new batchItem with this data.
+     */
+    create: XOR<batchItemCreateInput, batchItemUncheckedCreateInput>
+    /**
+     * In case the batchItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<batchItemUpdateInput, batchItemUncheckedUpdateInput>
+  }
+
+  /**
+   * batchItem delete
+   */
+  export type batchItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+    /**
+     * Filter which batchItem to delete.
+     */
+    where: batchItemWhereUniqueInput
+  }
+
+  /**
+   * batchItem deleteMany
+   */
+  export type batchItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which batchItems to delete
+     */
+    where?: batchItemWhereInput
+    /**
+     * Limit how many batchItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * batchItem without action
+   */
+  export type batchItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the batchItem
+     */
+    select?: batchItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the batchItem
+     */
+    omit?: batchItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: batchItemInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -22481,6 +24981,7 @@ export namespace Prisma {
     projectCode: 'projectCode',
     email: 'email',
     address: 'address',
+    stateId: 'stateId',
     isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -22537,7 +25038,7 @@ export namespace Prisma {
     imei: 'imei',
     hp: 'hp',
     motorType: 'motorType',
-    state: 'state',
+    stateCode: 'stateCode',
     district: 'district',
     village: 'village',
     block: 'block',
@@ -22722,6 +25223,31 @@ export namespace Prisma {
   export type TicketSequenceScalarFieldEnum = (typeof TicketSequenceScalarFieldEnum)[keyof typeof TicketSequenceScalarFieldEnum]
 
 
+  export const BatchScalarFieldEnum: {
+    id: 'id',
+    batchCode: 'batchCode',
+    batchType: 'batchType',
+    batchStatus: 'batchStatus',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    createdBy: 'createdBy',
+    updatedBy: 'updatedBy'
+  };
+
+  export type BatchScalarFieldEnum = (typeof BatchScalarFieldEnum)[keyof typeof BatchScalarFieldEnum]
+
+
+  export const BatchItemScalarFieldEnum: {
+    id: 'id',
+    batchId: 'batchId',
+    ticketId: 'ticketId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BatchItemScalarFieldEnum = (typeof BatchItemScalarFieldEnum)[keyof typeof BatchItemScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -22799,7 +25325,7 @@ export namespace Prisma {
     imei: 'imei',
     hp: 'hp',
     motorType: 'motorType',
-    state: 'state',
+    stateCode: 'stateCode',
     district: 'district',
     village: 'village',
     block: 'block',
@@ -22895,6 +25421,13 @@ export namespace Prisma {
   export type TicketSequenceOrderByRelevanceFieldEnum = (typeof TicketSequenceOrderByRelevanceFieldEnum)[keyof typeof TicketSequenceOrderByRelevanceFieldEnum]
 
 
+  export const batchOrderByRelevanceFieldEnum: {
+    batchCode: 'batchCode'
+  };
+
+  export type batchOrderByRelevanceFieldEnum = (typeof batchOrderByRelevanceFieldEnum)[keyof typeof batchOrderByRelevanceFieldEnum]
+
+
   /**
    * Field references
    */
@@ -22971,6 +25504,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'batchType'
+   */
+  export type EnumbatchTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'batchType'>
+    
+
+
+  /**
+   * Reference to a field of type 'batchStatus'
+   */
+  export type EnumbatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'batchStatus'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -22989,6 +25536,8 @@ export namespace Prisma {
     stateCode?: StringNullableFilter<"State"> | string | null
     primaryUsers?: UserListRelationFilter
     users?: UserListRelationFilter
+    projects?: ProjectListRelationFilter
+    tickets?: TicketListRelationFilter
   }
 
   export type StateOrderByWithRelationInput = {
@@ -22997,6 +25546,8 @@ export namespace Prisma {
     stateCode?: SortOrderInput | SortOrder
     primaryUsers?: UserOrderByRelationAggregateInput
     users?: UserOrderByRelationAggregateInput
+    projects?: ProjectOrderByRelationAggregateInput
+    tickets?: TicketOrderByRelationAggregateInput
     _relevance?: StateOrderByRelevanceInput
   }
 
@@ -23009,6 +25560,8 @@ export namespace Prisma {
     name?: StringFilter<"State"> | string
     primaryUsers?: UserListRelationFilter
     users?: UserListRelationFilter
+    projects?: ProjectListRelationFilter
+    tickets?: TicketListRelationFilter
   }, "id" | "stateCode">
 
   export type StateOrderByWithAggregationInput = {
@@ -23126,12 +25679,14 @@ export namespace Prisma {
     projectCode?: StringFilter<"Project"> | string
     email?: StringFilter<"Project"> | string
     address?: StringNullableFilter<"Project"> | string | null
+    stateId?: IntNullableFilter<"Project"> | number | null
     isActive?: BoolFilter<"Project"> | boolean
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
     ServiceCenter?: ServiceCenterListRelationFilter
+    state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
     users?: UserListRelationFilter
   }
@@ -23142,12 +25697,14 @@ export namespace Prisma {
     projectCode?: SortOrder
     email?: SortOrder
     address?: SortOrderInput | SortOrder
+    stateId?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     organisationId?: SortOrderInput | SortOrder
     ServiceCenter?: ServiceCenterOrderByRelationAggregateInput
+    state?: StateOrderByWithRelationInput
     organisation?: OrganisationOrderByWithRelationInput
     users?: UserOrderByRelationAggregateInput
     _relevance?: ProjectOrderByRelevanceInput
@@ -23162,12 +25719,14 @@ export namespace Prisma {
     NOT?: ProjectWhereInput | ProjectWhereInput[]
     name?: StringFilter<"Project"> | string
     address?: StringNullableFilter<"Project"> | string | null
+    stateId?: IntNullableFilter<"Project"> | number | null
     isActive?: BoolFilter<"Project"> | boolean
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
     ServiceCenter?: ServiceCenterListRelationFilter
+    state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
     users?: UserListRelationFilter
   }, "id" | "projectCode" | "email">
@@ -23178,6 +25737,7 @@ export namespace Prisma {
     projectCode?: SortOrder
     email?: SortOrder
     address?: SortOrderInput | SortOrder
+    stateId?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrderInput | SortOrder
@@ -23199,6 +25759,7 @@ export namespace Prisma {
     projectCode?: StringWithAggregatesFilter<"Project"> | string
     email?: StringWithAggregatesFilter<"Project"> | string
     address?: StringNullableWithAggregatesFilter<"Project"> | string | null
+    stateId?: IntNullableWithAggregatesFilter<"Project"> | number | null
     isActive?: BoolWithAggregatesFilter<"Project"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
@@ -23333,6 +25894,8 @@ export namespace Prisma {
     states?: StateListRelationFilter
     project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
+    createdBatches?: BatchListRelationFilter
+    updatedBatches?: BatchListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -23365,6 +25928,8 @@ export namespace Prisma {
     states?: StateOrderByRelationAggregateInput
     project?: ProjectOrderByWithRelationInput
     organisation?: OrganisationOrderByWithRelationInput
+    createdBatches?: batchOrderByRelationAggregateInput
+    updatedBatches?: batchOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -23401,6 +25966,8 @@ export namespace Prisma {
     states?: StateListRelationFilter
     project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
+    createdBatches?: BatchListRelationFilter
+    updatedBatches?: BatchListRelationFilter
   }, "id" | "phone">
 
   export type UserOrderByWithAggregationInput = {
@@ -23457,7 +26024,7 @@ export namespace Prisma {
     imei?: StringNullableFilter<"Ticket"> | string | null
     hp?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
-    state?: StringFilter<"Ticket"> | string
+    stateCode?: StringNullableFilter<"Ticket"> | string | null
     district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
@@ -23477,11 +26044,13 @@ export namespace Prisma {
     createdByUser?: XOR<UserScalarRelationFilter, UserWhereInput>
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
+    state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
     productTransactions?: ProductTransactionListRelationFilter
     attachments?: AttachmentsListRelationFilter
     ticketMilestones?: TicketMilestoneListRelationFilter
+    batchItems?: BatchItemListRelationFilter
   }
 
   export type TicketOrderByWithRelationInput = {
@@ -23493,7 +26062,7 @@ export namespace Prisma {
     imei?: SortOrderInput | SortOrder
     hp?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
-    state?: SortOrder
+    stateCode?: SortOrderInput | SortOrder
     district?: SortOrderInput | SortOrder
     village?: SortOrderInput | SortOrder
     block?: SortOrderInput | SortOrder
@@ -23513,11 +26082,13 @@ export namespace Prisma {
     createdByUser?: UserOrderByWithRelationInput
     updatedByUser?: UserOrderByWithRelationInput
     serviceCenter?: ServiceCenterOrderByWithRelationInput
+    state?: StateOrderByWithRelationInput
     messages?: MessageOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
     productTransactions?: ProductTransactionOrderByRelationAggregateInput
     attachments?: AttachmentsOrderByRelationAggregateInput
     ticketMilestones?: TicketMilestoneOrderByRelationAggregateInput
+    batchItems?: batchItemOrderByRelationAggregateInput
     _relevance?: TicketOrderByRelevanceInput
   }
 
@@ -23533,7 +26104,7 @@ export namespace Prisma {
     imei?: StringNullableFilter<"Ticket"> | string | null
     hp?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
-    state?: StringFilter<"Ticket"> | string
+    stateCode?: StringNullableFilter<"Ticket"> | string | null
     district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
@@ -23553,11 +26124,13 @@ export namespace Prisma {
     createdByUser?: XOR<UserScalarRelationFilter, UserWhereInput>
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
+    state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
     productTransactions?: ProductTransactionListRelationFilter
     attachments?: AttachmentsListRelationFilter
     ticketMilestones?: TicketMilestoneListRelationFilter
+    batchItems?: BatchItemListRelationFilter
   }, "id" | "ticketCode">
 
   export type TicketOrderByWithAggregationInput = {
@@ -23569,7 +26142,7 @@ export namespace Prisma {
     imei?: SortOrderInput | SortOrder
     hp?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
-    state?: SortOrder
+    stateCode?: SortOrderInput | SortOrder
     district?: SortOrderInput | SortOrder
     village?: SortOrderInput | SortOrder
     block?: SortOrderInput | SortOrder
@@ -23605,7 +26178,7 @@ export namespace Prisma {
     imei?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     hp?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     motorType?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
-    state?: StringWithAggregatesFilter<"Ticket"> | string
+    stateCode?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     district?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     village?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     block?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
@@ -24533,11 +27106,152 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"TicketSequence"> | Date | string
   }
 
+  export type batchWhereInput = {
+    AND?: batchWhereInput | batchWhereInput[]
+    OR?: batchWhereInput[]
+    NOT?: batchWhereInput | batchWhereInput[]
+    id?: IntFilter<"batch"> | number
+    batchCode?: StringFilter<"batch"> | string
+    batchType?: EnumbatchTypeNullableFilter<"batch"> | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFilter<"batch"> | $Enums.batchStatus
+    createdAt?: DateTimeFilter<"batch"> | Date | string
+    updatedAt?: DateTimeFilter<"batch"> | Date | string
+    createdBy?: IntFilter<"batch"> | number
+    updatedBy?: IntNullableFilter<"batch"> | number | null
+    batchItems?: BatchItemListRelationFilter
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    updater?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type batchOrderByWithRelationInput = {
+    id?: SortOrder
+    batchCode?: SortOrder
+    batchType?: SortOrderInput | SortOrder
+    batchStatus?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    batchItems?: batchItemOrderByRelationAggregateInput
+    creator?: UserOrderByWithRelationInput
+    updater?: UserOrderByWithRelationInput
+    _relevance?: batchOrderByRelevanceInput
+  }
+
+  export type batchWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    batchCode?: string
+    AND?: batchWhereInput | batchWhereInput[]
+    OR?: batchWhereInput[]
+    NOT?: batchWhereInput | batchWhereInput[]
+    batchType?: EnumbatchTypeNullableFilter<"batch"> | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFilter<"batch"> | $Enums.batchStatus
+    createdAt?: DateTimeFilter<"batch"> | Date | string
+    updatedAt?: DateTimeFilter<"batch"> | Date | string
+    createdBy?: IntFilter<"batch"> | number
+    updatedBy?: IntNullableFilter<"batch"> | number | null
+    batchItems?: BatchItemListRelationFilter
+    creator?: XOR<UserScalarRelationFilter, UserWhereInput>
+    updater?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "batchCode">
+
+  export type batchOrderByWithAggregationInput = {
+    id?: SortOrder
+    batchCode?: SortOrder
+    batchType?: SortOrderInput | SortOrder
+    batchStatus?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrderInput | SortOrder
+    _count?: batchCountOrderByAggregateInput
+    _avg?: batchAvgOrderByAggregateInput
+    _max?: batchMaxOrderByAggregateInput
+    _min?: batchMinOrderByAggregateInput
+    _sum?: batchSumOrderByAggregateInput
+  }
+
+  export type batchScalarWhereWithAggregatesInput = {
+    AND?: batchScalarWhereWithAggregatesInput | batchScalarWhereWithAggregatesInput[]
+    OR?: batchScalarWhereWithAggregatesInput[]
+    NOT?: batchScalarWhereWithAggregatesInput | batchScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"batch"> | number
+    batchCode?: StringWithAggregatesFilter<"batch"> | string
+    batchType?: EnumbatchTypeNullableWithAggregatesFilter<"batch"> | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusWithAggregatesFilter<"batch"> | $Enums.batchStatus
+    createdAt?: DateTimeWithAggregatesFilter<"batch"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"batch"> | Date | string
+    createdBy?: IntWithAggregatesFilter<"batch"> | number
+    updatedBy?: IntNullableWithAggregatesFilter<"batch"> | number | null
+  }
+
+  export type batchItemWhereInput = {
+    AND?: batchItemWhereInput | batchItemWhereInput[]
+    OR?: batchItemWhereInput[]
+    NOT?: batchItemWhereInput | batchItemWhereInput[]
+    id?: IntFilter<"batchItem"> | number
+    batchId?: IntFilter<"batchItem"> | number
+    ticketId?: IntFilter<"batchItem"> | number
+    createdAt?: DateTimeFilter<"batchItem"> | Date | string
+    updatedAt?: DateTimeFilter<"batchItem"> | Date | string
+    batch?: XOR<BatchScalarRelationFilter, batchWhereInput>
+    ticket?: XOR<TicketScalarRelationFilter, TicketWhereInput>
+  }
+
+  export type batchItemOrderByWithRelationInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    batch?: batchOrderByWithRelationInput
+    ticket?: TicketOrderByWithRelationInput
+  }
+
+  export type batchItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: batchItemWhereInput | batchItemWhereInput[]
+    OR?: batchItemWhereInput[]
+    NOT?: batchItemWhereInput | batchItemWhereInput[]
+    batchId?: IntFilter<"batchItem"> | number
+    ticketId?: IntFilter<"batchItem"> | number
+    createdAt?: DateTimeFilter<"batchItem"> | Date | string
+    updatedAt?: DateTimeFilter<"batchItem"> | Date | string
+    batch?: XOR<BatchScalarRelationFilter, batchWhereInput>
+    ticket?: XOR<TicketScalarRelationFilter, TicketWhereInput>
+  }, "id">
+
+  export type batchItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: batchItemCountOrderByAggregateInput
+    _avg?: batchItemAvgOrderByAggregateInput
+    _max?: batchItemMaxOrderByAggregateInput
+    _min?: batchItemMinOrderByAggregateInput
+    _sum?: batchItemSumOrderByAggregateInput
+  }
+
+  export type batchItemScalarWhereWithAggregatesInput = {
+    AND?: batchItemScalarWhereWithAggregatesInput | batchItemScalarWhereWithAggregatesInput[]
+    OR?: batchItemScalarWhereWithAggregatesInput[]
+    NOT?: batchItemScalarWhereWithAggregatesInput | batchItemScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"batchItem"> | number
+    batchId?: IntWithAggregatesFilter<"batchItem"> | number
+    ticketId?: IntWithAggregatesFilter<"batchItem"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"batchItem"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"batchItem"> | Date | string
+  }
+
   export type StateCreateInput = {
     name: string
     stateCode?: string | null
     primaryUsers?: UserCreateNestedManyWithoutStateInput
     users?: UserCreateNestedManyWithoutStatesInput
+    projects?: ProjectCreateNestedManyWithoutStateInput
+    tickets?: TicketCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateInput = {
@@ -24546,6 +27260,8 @@ export namespace Prisma {
     stateCode?: string | null
     primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
     users?: UserUncheckedCreateNestedManyWithoutStatesInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
+    tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateUpdateInput = {
@@ -24553,6 +27269,8 @@ export namespace Prisma {
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     primaryUsers?: UserUpdateManyWithoutStateNestedInput
     users?: UserUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUpdateManyWithoutStateNestedInput
+    tickets?: TicketUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateInput = {
@@ -24561,6 +27279,8 @@ export namespace Prisma {
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
     users?: UserUncheckedUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
+    tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type StateCreateManyInput = {
@@ -24686,6 +27406,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
+    state?: StateCreateNestedOneWithoutProjectsInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
     users?: UserCreateNestedManyWithoutProjectInput
   }
@@ -24696,6 +27417,7 @@ export namespace Prisma {
     projectCode: string
     email: string
     address?: string | null
+    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -24715,6 +27437,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
+    state?: StateUpdateOneWithoutProjectsNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
     users?: UserUpdateManyWithoutProjectNestedInput
   }
@@ -24725,6 +27448,7 @@ export namespace Prisma {
     projectCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24740,6 +27464,7 @@ export namespace Prisma {
     projectCode: string
     email: string
     address?: string | null
+    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -24764,6 +27489,7 @@ export namespace Prisma {
     projectCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -24898,6 +27624,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -24926,6 +27654,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUpdateInput = {
@@ -24953,6 +27683,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -24981,6 +27713,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -25037,7 +27771,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -25054,11 +27787,13 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateInput = {
@@ -25070,7 +27805,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -25092,6 +27827,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUpdateInput = {
@@ -25102,7 +27838,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25119,11 +27854,13 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateInput = {
@@ -25135,7 +27872,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25157,6 +27894,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketCreateManyInput = {
@@ -25168,7 +27906,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -25195,7 +27933,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25220,7 +27957,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26106,6 +28843,133 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type batchCreateInput = {
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batchItems?: batchItemCreateNestedManyWithoutBatchInput
+    creator: UserCreateNestedOneWithoutCreatedBatchesInput
+    updater?: UserCreateNestedOneWithoutUpdatedBatchesInput
+  }
+
+  export type batchUncheckedCreateInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: number
+    updatedBy?: number | null
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type batchUpdateInput = {
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batchItems?: batchItemUpdateManyWithoutBatchNestedInput
+    creator?: UserUpdateOneRequiredWithoutCreatedBatchesNestedInput
+    updater?: UserUpdateOneWithoutUpdatedBatchesNestedInput
+  }
+
+  export type batchUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    batchItems?: batchItemUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type batchCreateManyInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: number
+    updatedBy?: number | null
+  }
+
+  export type batchUpdateManyMutationInput = {
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type batchUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type batchItemCreateInput = {
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: batchCreateNestedOneWithoutBatchItemsInput
+    ticket: TicketCreateNestedOneWithoutBatchItemsInput
+  }
+
+  export type batchItemUncheckedCreateInput = {
+    id?: number
+    batchId: number
+    ticketId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type batchItemUpdateInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: batchUpdateOneRequiredWithoutBatchItemsNestedInput
+    ticket?: TicketUpdateOneRequiredWithoutBatchItemsNestedInput
+  }
+
+  export type batchItemUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchId?: IntFieldUpdateOperationsInput | number
+    ticketId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type batchItemCreateManyInput = {
+    id?: number
+    batchId: number
+    ticketId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type batchItemUpdateManyMutationInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type batchItemUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchId?: IntFieldUpdateOperationsInput | number
+    ticketId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -26153,12 +29017,32 @@ export namespace Prisma {
     none?: UserWhereInput
   }
 
+  export type ProjectListRelationFilter = {
+    every?: ProjectWhereInput
+    some?: ProjectWhereInput
+    none?: ProjectWhereInput
+  }
+
+  export type TicketListRelationFilter = {
+    every?: TicketWhereInput
+    some?: TicketWhereInput
+    none?: TicketWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProjectOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TicketOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -26273,16 +29157,6 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
-  export type ProjectListRelationFilter = {
-    every?: ProjectWhereInput
-    some?: ProjectWhereInput
-    none?: ProjectWhereInput
-  }
-
-  export type ProjectOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type OrganisationOrderByRelevanceInput = {
     fields: OrganisationOrderByRelevanceFieldEnum | OrganisationOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -26389,6 +29263,11 @@ export namespace Prisma {
     none?: ServiceCenterWhereInput
   }
 
+  export type StateNullableScalarRelationFilter = {
+    is?: StateWhereInput | null
+    isNot?: StateWhereInput | null
+  }
+
   export type OrganisationNullableScalarRelationFilter = {
     is?: OrganisationWhereInput | null
     isNot?: OrganisationWhereInput | null
@@ -26410,6 +29289,7 @@ export namespace Prisma {
     projectCode?: SortOrder
     email?: SortOrder
     address?: SortOrder
+    stateId?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26419,6 +29299,7 @@ export namespace Prisma {
 
   export type ProjectAvgOrderByAggregateInput = {
     id?: SortOrder
+    stateId?: SortOrder
     organisationId?: SortOrder
   }
 
@@ -26428,6 +29309,7 @@ export namespace Prisma {
     projectCode?: SortOrder
     email?: SortOrder
     address?: SortOrder
+    stateId?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26441,6 +29323,7 @@ export namespace Prisma {
     projectCode?: SortOrder
     email?: SortOrder
     address?: SortOrder
+    stateId?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26450,6 +29333,7 @@ export namespace Prisma {
 
   export type ProjectSumOrderByAggregateInput = {
     id?: SortOrder
+    stateId?: SortOrder
     organisationId?: SortOrder
   }
 
@@ -26472,16 +29356,6 @@ export namespace Prisma {
   export type ProjectNullableScalarRelationFilter = {
     is?: ProjectWhereInput | null
     isNot?: ProjectWhereInput | null
-  }
-
-  export type TicketListRelationFilter = {
-    every?: TicketWhereInput
-    some?: TicketWhereInput
-    none?: TicketWhereInput
-  }
-
-  export type TicketOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type ServiceCenterOrderByRelevanceInput = {
@@ -26594,15 +29468,16 @@ export namespace Prisma {
     none?: TicketMilestoneWhereInput
   }
 
-  export type StateNullableScalarRelationFilter = {
-    is?: StateWhereInput | null
-    isNot?: StateWhereInput | null
-  }
-
   export type StateListRelationFilter = {
     every?: StateWhereInput
     some?: StateWhereInput
     none?: StateWhereInput
+  }
+
+  export type BatchListRelationFilter = {
+    every?: batchWhereInput
+    some?: batchWhereInput
+    none?: batchWhereInput
   }
 
   export type MessageOrderByRelationAggregateInput = {
@@ -26634,6 +29509,10 @@ export namespace Prisma {
   }
 
   export type StateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type batchOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -26737,7 +29616,17 @@ export namespace Prisma {
     none?: AttachmentsWhereInput
   }
 
+  export type BatchItemListRelationFilter = {
+    every?: batchItemWhereInput
+    some?: batchItemWhereInput
+    none?: batchItemWhereInput
+  }
+
   export type AttachmentsOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type batchItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -26756,7 +29645,7 @@ export namespace Prisma {
     imei?: SortOrder
     hp?: SortOrder
     motorType?: SortOrder
-    state?: SortOrder
+    stateCode?: SortOrder
     district?: SortOrder
     village?: SortOrder
     block?: SortOrder
@@ -26790,7 +29679,7 @@ export namespace Prisma {
     imei?: SortOrder
     hp?: SortOrder
     motorType?: SortOrder
-    state?: SortOrder
+    stateCode?: SortOrder
     district?: SortOrder
     village?: SortOrder
     block?: SortOrder
@@ -26818,7 +29707,7 @@ export namespace Prisma {
     imei?: SortOrder
     hp?: SortOrder
     motorType?: SortOrder
-    state?: SortOrder
+    stateCode?: SortOrder
     district?: SortOrder
     village?: SortOrder
     block?: SortOrder
@@ -27590,6 +30479,132 @@ export namespace Prisma {
     lastNumber?: SortOrder
   }
 
+  export type EnumbatchTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchType | EnumbatchTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.batchType[] | null
+    notIn?: $Enums.batchType[] | null
+    not?: NestedEnumbatchTypeNullableFilter<$PrismaModel> | $Enums.batchType | null
+  }
+
+  export type EnumbatchStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchStatus | EnumbatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.batchStatus[]
+    notIn?: $Enums.batchStatus[]
+    not?: NestedEnumbatchStatusFilter<$PrismaModel> | $Enums.batchStatus
+  }
+
+  export type batchOrderByRelevanceInput = {
+    fields: batchOrderByRelevanceFieldEnum | batchOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type batchCountOrderByAggregateInput = {
+    id?: SortOrder
+    batchCode?: SortOrder
+    batchType?: SortOrder
+    batchStatus?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrder
+  }
+
+  export type batchAvgOrderByAggregateInput = {
+    id?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrder
+  }
+
+  export type batchMaxOrderByAggregateInput = {
+    id?: SortOrder
+    batchCode?: SortOrder
+    batchType?: SortOrder
+    batchStatus?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrder
+  }
+
+  export type batchMinOrderByAggregateInput = {
+    id?: SortOrder
+    batchCode?: SortOrder
+    batchType?: SortOrder
+    batchStatus?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrder
+  }
+
+  export type batchSumOrderByAggregateInput = {
+    id?: SortOrder
+    createdBy?: SortOrder
+    updatedBy?: SortOrder
+  }
+
+  export type EnumbatchTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchType | EnumbatchTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.batchType[] | null
+    notIn?: $Enums.batchType[] | null
+    not?: NestedEnumbatchTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.batchType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumbatchTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumbatchTypeNullableFilter<$PrismaModel>
+  }
+
+  export type EnumbatchStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchStatus | EnumbatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.batchStatus[]
+    notIn?: $Enums.batchStatus[]
+    not?: NestedEnumbatchStatusWithAggregatesFilter<$PrismaModel> | $Enums.batchStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumbatchStatusFilter<$PrismaModel>
+    _max?: NestedEnumbatchStatusFilter<$PrismaModel>
+  }
+
+  export type BatchScalarRelationFilter = {
+    is?: batchWhereInput
+    isNot?: batchWhereInput
+  }
+
+  export type batchItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type batchItemAvgOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+  }
+
+  export type batchItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type batchItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type batchItemSumOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    ticketId?: SortOrder
+  }
+
   export type UserCreateNestedManyWithoutStateInput = {
     create?: XOR<UserCreateWithoutStateInput, UserUncheckedCreateWithoutStateInput> | UserCreateWithoutStateInput[] | UserUncheckedCreateWithoutStateInput[]
     connectOrCreate?: UserCreateOrConnectWithoutStateInput | UserCreateOrConnectWithoutStateInput[]
@@ -27603,6 +30618,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
+  export type ProjectCreateNestedManyWithoutStateInput = {
+    create?: XOR<ProjectCreateWithoutStateInput, ProjectUncheckedCreateWithoutStateInput> | ProjectCreateWithoutStateInput[] | ProjectUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutStateInput | ProjectCreateOrConnectWithoutStateInput[]
+    createMany?: ProjectCreateManyStateInputEnvelope
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type TicketCreateNestedManyWithoutStateInput = {
+    create?: XOR<TicketCreateWithoutStateInput, TicketUncheckedCreateWithoutStateInput> | TicketCreateWithoutStateInput[] | TicketUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutStateInput | TicketCreateOrConnectWithoutStateInput[]
+    createMany?: TicketCreateManyStateInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutStateInput = {
     create?: XOR<UserCreateWithoutStateInput, UserUncheckedCreateWithoutStateInput> | UserCreateWithoutStateInput[] | UserUncheckedCreateWithoutStateInput[]
     connectOrCreate?: UserCreateOrConnectWithoutStateInput | UserCreateOrConnectWithoutStateInput[]
@@ -27614,6 +30643,20 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput> | UserCreateWithoutStatesInput[] | UserUncheckedCreateWithoutStatesInput[]
     connectOrCreate?: UserCreateOrConnectWithoutStatesInput | UserCreateOrConnectWithoutStatesInput[]
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type ProjectUncheckedCreateNestedManyWithoutStateInput = {
+    create?: XOR<ProjectCreateWithoutStateInput, ProjectUncheckedCreateWithoutStateInput> | ProjectCreateWithoutStateInput[] | ProjectUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutStateInput | ProjectCreateOrConnectWithoutStateInput[]
+    createMany?: ProjectCreateManyStateInputEnvelope
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+  }
+
+  export type TicketUncheckedCreateNestedManyWithoutStateInput = {
+    create?: XOR<TicketCreateWithoutStateInput, TicketUncheckedCreateWithoutStateInput> | TicketCreateWithoutStateInput[] | TicketUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutStateInput | TicketCreateOrConnectWithoutStateInput[]
+    createMany?: TicketCreateManyStateInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -27651,6 +30694,34 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
+  export type ProjectUpdateManyWithoutStateNestedInput = {
+    create?: XOR<ProjectCreateWithoutStateInput, ProjectUncheckedCreateWithoutStateInput> | ProjectCreateWithoutStateInput[] | ProjectUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutStateInput | ProjectCreateOrConnectWithoutStateInput[]
+    upsert?: ProjectUpsertWithWhereUniqueWithoutStateInput | ProjectUpsertWithWhereUniqueWithoutStateInput[]
+    createMany?: ProjectCreateManyStateInputEnvelope
+    set?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    disconnect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    delete?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    update?: ProjectUpdateWithWhereUniqueWithoutStateInput | ProjectUpdateWithWhereUniqueWithoutStateInput[]
+    updateMany?: ProjectUpdateManyWithWhereWithoutStateInput | ProjectUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type TicketUpdateManyWithoutStateNestedInput = {
+    create?: XOR<TicketCreateWithoutStateInput, TicketUncheckedCreateWithoutStateInput> | TicketCreateWithoutStateInput[] | TicketUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutStateInput | TicketCreateOrConnectWithoutStateInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutStateInput | TicketUpsertWithWhereUniqueWithoutStateInput[]
+    createMany?: TicketCreateManyStateInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutStateInput | TicketUpdateWithWhereUniqueWithoutStateInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutStateInput | TicketUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -27684,6 +30755,34 @@ export namespace Prisma {
     update?: UserUpdateWithWhereUniqueWithoutStatesInput | UserUpdateWithWhereUniqueWithoutStatesInput[]
     updateMany?: UserUpdateManyWithWhereWithoutStatesInput | UserUpdateManyWithWhereWithoutStatesInput[]
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type ProjectUncheckedUpdateManyWithoutStateNestedInput = {
+    create?: XOR<ProjectCreateWithoutStateInput, ProjectUncheckedCreateWithoutStateInput> | ProjectCreateWithoutStateInput[] | ProjectUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: ProjectCreateOrConnectWithoutStateInput | ProjectCreateOrConnectWithoutStateInput[]
+    upsert?: ProjectUpsertWithWhereUniqueWithoutStateInput | ProjectUpsertWithWhereUniqueWithoutStateInput[]
+    createMany?: ProjectCreateManyStateInputEnvelope
+    set?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    disconnect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    delete?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    connect?: ProjectWhereUniqueInput | ProjectWhereUniqueInput[]
+    update?: ProjectUpdateWithWhereUniqueWithoutStateInput | ProjectUpdateWithWhereUniqueWithoutStateInput[]
+    updateMany?: ProjectUpdateManyWithWhereWithoutStateInput | ProjectUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+  }
+
+  export type TicketUncheckedUpdateManyWithoutStateNestedInput = {
+    create?: XOR<TicketCreateWithoutStateInput, TicketUncheckedCreateWithoutStateInput> | TicketCreateWithoutStateInput[] | TicketUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutStateInput | TicketCreateOrConnectWithoutStateInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutStateInput | TicketUpsertWithWhereUniqueWithoutStateInput[]
+    createMany?: TicketCreateManyStateInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutStateInput | TicketUpdateWithWhereUniqueWithoutStateInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutStateInput | TicketUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
   }
 
   export type ProjectCreateNestedManyWithoutOrganisationInput = {
@@ -27789,6 +30888,12 @@ export namespace Prisma {
     connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
   }
 
+  export type StateCreateNestedOneWithoutProjectsInput = {
+    create?: XOR<StateCreateWithoutProjectsInput, StateUncheckedCreateWithoutProjectsInput>
+    connectOrCreate?: StateCreateOrConnectWithoutProjectsInput
+    connect?: StateWhereUniqueInput
+  }
+
   export type OrganisationCreateNestedOneWithoutProjectInput = {
     create?: XOR<OrganisationCreateWithoutProjectInput, OrganisationUncheckedCreateWithoutProjectInput>
     connectOrCreate?: OrganisationCreateOrConnectWithoutProjectInput
@@ -27828,6 +30933,16 @@ export namespace Prisma {
     update?: ServiceCenterUpdateWithWhereUniqueWithoutProjectInput | ServiceCenterUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: ServiceCenterUpdateManyWithWhereWithoutProjectInput | ServiceCenterUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
+  }
+
+  export type StateUpdateOneWithoutProjectsNestedInput = {
+    create?: XOR<StateCreateWithoutProjectsInput, StateUncheckedCreateWithoutProjectsInput>
+    connectOrCreate?: StateCreateOrConnectWithoutProjectsInput
+    upsert?: StateUpsertWithoutProjectsInput
+    disconnect?: StateWhereInput | boolean
+    delete?: StateWhereInput | boolean
+    connect?: StateWhereUniqueInput
+    update?: XOR<XOR<StateUpdateToOneWithWhereWithoutProjectsInput, StateUpdateWithoutProjectsInput>, StateUncheckedUpdateWithoutProjectsInput>
   }
 
   export type OrganisationUpdateOneWithoutProjectNestedInput = {
@@ -28090,6 +31205,20 @@ export namespace Prisma {
     connect?: OrganisationWhereUniqueInput
   }
 
+  export type batchCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<batchCreateWithoutCreatorInput, batchUncheckedCreateWithoutCreatorInput> | batchCreateWithoutCreatorInput[] | batchUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutCreatorInput | batchCreateOrConnectWithoutCreatorInput[]
+    createMany?: batchCreateManyCreatorInputEnvelope
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+  }
+
+  export type batchCreateNestedManyWithoutUpdaterInput = {
+    create?: XOR<batchCreateWithoutUpdaterInput, batchUncheckedCreateWithoutUpdaterInput> | batchCreateWithoutUpdaterInput[] | batchUncheckedCreateWithoutUpdaterInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutUpdaterInput | batchCreateOrConnectWithoutUpdaterInput[]
+    createMany?: batchCreateManyUpdaterInputEnvelope
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+  }
+
   export type TicketUncheckedCreateNestedManyWithoutCreatedByUserInput = {
     create?: XOR<TicketCreateWithoutCreatedByUserInput, TicketUncheckedCreateWithoutCreatedByUserInput> | TicketCreateWithoutCreatedByUserInput[] | TicketUncheckedCreateWithoutCreatedByUserInput[]
     connectOrCreate?: TicketCreateOrConnectWithoutCreatedByUserInput | TicketCreateOrConnectWithoutCreatedByUserInput[]
@@ -28164,6 +31293,20 @@ export namespace Prisma {
     create?: XOR<StateCreateWithoutUsersInput, StateUncheckedCreateWithoutUsersInput> | StateCreateWithoutUsersInput[] | StateUncheckedCreateWithoutUsersInput[]
     connectOrCreate?: StateCreateOrConnectWithoutUsersInput | StateCreateOrConnectWithoutUsersInput[]
     connect?: StateWhereUniqueInput | StateWhereUniqueInput[]
+  }
+
+  export type batchUncheckedCreateNestedManyWithoutCreatorInput = {
+    create?: XOR<batchCreateWithoutCreatorInput, batchUncheckedCreateWithoutCreatorInput> | batchCreateWithoutCreatorInput[] | batchUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutCreatorInput | batchCreateOrConnectWithoutCreatorInput[]
+    createMany?: batchCreateManyCreatorInputEnvelope
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+  }
+
+  export type batchUncheckedCreateNestedManyWithoutUpdaterInput = {
+    create?: XOR<batchCreateWithoutUpdaterInput, batchUncheckedCreateWithoutUpdaterInput> | batchCreateWithoutUpdaterInput[] | batchUncheckedCreateWithoutUpdaterInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutUpdaterInput | batchCreateOrConnectWithoutUpdaterInput[]
+    createMany?: batchCreateManyUpdaterInputEnvelope
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
   }
 
   export type NullableEnumRoleFieldUpdateOperationsInput = {
@@ -28363,6 +31506,34 @@ export namespace Prisma {
     update?: XOR<XOR<OrganisationUpdateToOneWithWhereWithoutUsersInput, OrganisationUpdateWithoutUsersInput>, OrganisationUncheckedUpdateWithoutUsersInput>
   }
 
+  export type batchUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<batchCreateWithoutCreatorInput, batchUncheckedCreateWithoutCreatorInput> | batchCreateWithoutCreatorInput[] | batchUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutCreatorInput | batchCreateOrConnectWithoutCreatorInput[]
+    upsert?: batchUpsertWithWhereUniqueWithoutCreatorInput | batchUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: batchCreateManyCreatorInputEnvelope
+    set?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    disconnect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    delete?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    update?: batchUpdateWithWhereUniqueWithoutCreatorInput | batchUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: batchUpdateManyWithWhereWithoutCreatorInput | batchUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: batchScalarWhereInput | batchScalarWhereInput[]
+  }
+
+  export type batchUpdateManyWithoutUpdaterNestedInput = {
+    create?: XOR<batchCreateWithoutUpdaterInput, batchUncheckedCreateWithoutUpdaterInput> | batchCreateWithoutUpdaterInput[] | batchUncheckedCreateWithoutUpdaterInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutUpdaterInput | batchCreateOrConnectWithoutUpdaterInput[]
+    upsert?: batchUpsertWithWhereUniqueWithoutUpdaterInput | batchUpsertWithWhereUniqueWithoutUpdaterInput[]
+    createMany?: batchCreateManyUpdaterInputEnvelope
+    set?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    disconnect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    delete?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    update?: batchUpdateWithWhereUniqueWithoutUpdaterInput | batchUpdateWithWhereUniqueWithoutUpdaterInput[]
+    updateMany?: batchUpdateManyWithWhereWithoutUpdaterInput | batchUpdateManyWithWhereWithoutUpdaterInput[]
+    deleteMany?: batchScalarWhereInput | batchScalarWhereInput[]
+  }
+
   export type TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput = {
     create?: XOR<TicketCreateWithoutCreatedByUserInput, TicketUncheckedCreateWithoutCreatedByUserInput> | TicketCreateWithoutCreatedByUserInput[] | TicketUncheckedCreateWithoutCreatedByUserInput[]
     connectOrCreate?: TicketCreateOrConnectWithoutCreatedByUserInput | TicketCreateOrConnectWithoutCreatedByUserInput[]
@@ -28516,6 +31687,34 @@ export namespace Prisma {
     deleteMany?: StateScalarWhereInput | StateScalarWhereInput[]
   }
 
+  export type batchUncheckedUpdateManyWithoutCreatorNestedInput = {
+    create?: XOR<batchCreateWithoutCreatorInput, batchUncheckedCreateWithoutCreatorInput> | batchCreateWithoutCreatorInput[] | batchUncheckedCreateWithoutCreatorInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutCreatorInput | batchCreateOrConnectWithoutCreatorInput[]
+    upsert?: batchUpsertWithWhereUniqueWithoutCreatorInput | batchUpsertWithWhereUniqueWithoutCreatorInput[]
+    createMany?: batchCreateManyCreatorInputEnvelope
+    set?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    disconnect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    delete?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    update?: batchUpdateWithWhereUniqueWithoutCreatorInput | batchUpdateWithWhereUniqueWithoutCreatorInput[]
+    updateMany?: batchUpdateManyWithWhereWithoutCreatorInput | batchUpdateManyWithWhereWithoutCreatorInput[]
+    deleteMany?: batchScalarWhereInput | batchScalarWhereInput[]
+  }
+
+  export type batchUncheckedUpdateManyWithoutUpdaterNestedInput = {
+    create?: XOR<batchCreateWithoutUpdaterInput, batchUncheckedCreateWithoutUpdaterInput> | batchCreateWithoutUpdaterInput[] | batchUncheckedCreateWithoutUpdaterInput[]
+    connectOrCreate?: batchCreateOrConnectWithoutUpdaterInput | batchCreateOrConnectWithoutUpdaterInput[]
+    upsert?: batchUpsertWithWhereUniqueWithoutUpdaterInput | batchUpsertWithWhereUniqueWithoutUpdaterInput[]
+    createMany?: batchCreateManyUpdaterInputEnvelope
+    set?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    disconnect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    delete?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    connect?: batchWhereUniqueInput | batchWhereUniqueInput[]
+    update?: batchUpdateWithWhereUniqueWithoutUpdaterInput | batchUpdateWithWhereUniqueWithoutUpdaterInput[]
+    updateMany?: batchUpdateManyWithWhereWithoutUpdaterInput | batchUpdateManyWithWhereWithoutUpdaterInput[]
+    deleteMany?: batchScalarWhereInput | batchScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutCreatedTicketsInput = {
     create?: XOR<UserCreateWithoutCreatedTicketsInput, UserUncheckedCreateWithoutCreatedTicketsInput>
     connectOrCreate?: UserCreateOrConnectWithoutCreatedTicketsInput
@@ -28532,6 +31731,12 @@ export namespace Prisma {
     create?: XOR<ServiceCenterCreateWithoutAssignedTicketsInput, ServiceCenterUncheckedCreateWithoutAssignedTicketsInput>
     connectOrCreate?: ServiceCenterCreateOrConnectWithoutAssignedTicketsInput
     connect?: ServiceCenterWhereUniqueInput
+  }
+
+  export type StateCreateNestedOneWithoutTicketsInput = {
+    create?: XOR<StateCreateWithoutTicketsInput, StateUncheckedCreateWithoutTicketsInput>
+    connectOrCreate?: StateCreateOrConnectWithoutTicketsInput
+    connect?: StateWhereUniqueInput
   }
 
   export type MessageCreateNestedManyWithoutTicketInput = {
@@ -28569,6 +31774,13 @@ export namespace Prisma {
     connect?: TicketMilestoneWhereUniqueInput | TicketMilestoneWhereUniqueInput[]
   }
 
+  export type batchItemCreateNestedManyWithoutTicketInput = {
+    create?: XOR<batchItemCreateWithoutTicketInput, batchItemUncheckedCreateWithoutTicketInput> | batchItemCreateWithoutTicketInput[] | batchItemUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutTicketInput | batchItemCreateOrConnectWithoutTicketInput[]
+    createMany?: batchItemCreateManyTicketInputEnvelope
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+  }
+
   export type MessageUncheckedCreateNestedManyWithoutTicketInput = {
     create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
     connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
@@ -28604,6 +31816,13 @@ export namespace Prisma {
     connect?: TicketMilestoneWhereUniqueInput | TicketMilestoneWhereUniqueInput[]
   }
 
+  export type batchItemUncheckedCreateNestedManyWithoutTicketInput = {
+    create?: XOR<batchItemCreateWithoutTicketInput, batchItemUncheckedCreateWithoutTicketInput> | batchItemCreateWithoutTicketInput[] | batchItemUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutTicketInput | batchItemCreateOrConnectWithoutTicketInput[]
+    createMany?: batchItemCreateManyTicketInputEnvelope
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+  }
+
   export type EnumTicketStatusFieldUpdateOperationsInput = {
     set?: $Enums.TicketStatus
   }
@@ -28634,6 +31853,16 @@ export namespace Prisma {
     delete?: ServiceCenterWhereInput | boolean
     connect?: ServiceCenterWhereUniqueInput
     update?: XOR<XOR<ServiceCenterUpdateToOneWithWhereWithoutAssignedTicketsInput, ServiceCenterUpdateWithoutAssignedTicketsInput>, ServiceCenterUncheckedUpdateWithoutAssignedTicketsInput>
+  }
+
+  export type StateUpdateOneWithoutTicketsNestedInput = {
+    create?: XOR<StateCreateWithoutTicketsInput, StateUncheckedCreateWithoutTicketsInput>
+    connectOrCreate?: StateCreateOrConnectWithoutTicketsInput
+    upsert?: StateUpsertWithoutTicketsInput
+    disconnect?: StateWhereInput | boolean
+    delete?: StateWhereInput | boolean
+    connect?: StateWhereUniqueInput
+    update?: XOR<XOR<StateUpdateToOneWithWhereWithoutTicketsInput, StateUpdateWithoutTicketsInput>, StateUncheckedUpdateWithoutTicketsInput>
   }
 
   export type MessageUpdateManyWithoutTicketNestedInput = {
@@ -28706,6 +31935,20 @@ export namespace Prisma {
     deleteMany?: TicketMilestoneScalarWhereInput | TicketMilestoneScalarWhereInput[]
   }
 
+  export type batchItemUpdateManyWithoutTicketNestedInput = {
+    create?: XOR<batchItemCreateWithoutTicketInput, batchItemUncheckedCreateWithoutTicketInput> | batchItemCreateWithoutTicketInput[] | batchItemUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutTicketInput | batchItemCreateOrConnectWithoutTicketInput[]
+    upsert?: batchItemUpsertWithWhereUniqueWithoutTicketInput | batchItemUpsertWithWhereUniqueWithoutTicketInput[]
+    createMany?: batchItemCreateManyTicketInputEnvelope
+    set?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    disconnect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    delete?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    update?: batchItemUpdateWithWhereUniqueWithoutTicketInput | batchItemUpdateWithWhereUniqueWithoutTicketInput[]
+    updateMany?: batchItemUpdateManyWithWhereWithoutTicketInput | batchItemUpdateManyWithWhereWithoutTicketInput[]
+    deleteMany?: batchItemScalarWhereInput | batchItemScalarWhereInput[]
+  }
+
   export type MessageUncheckedUpdateManyWithoutTicketNestedInput = {
     create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
     connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
@@ -28774,6 +32017,20 @@ export namespace Prisma {
     update?: TicketMilestoneUpdateWithWhereUniqueWithoutTicketInput | TicketMilestoneUpdateWithWhereUniqueWithoutTicketInput[]
     updateMany?: TicketMilestoneUpdateManyWithWhereWithoutTicketInput | TicketMilestoneUpdateManyWithWhereWithoutTicketInput[]
     deleteMany?: TicketMilestoneScalarWhereInput | TicketMilestoneScalarWhereInput[]
+  }
+
+  export type batchItemUncheckedUpdateManyWithoutTicketNestedInput = {
+    create?: XOR<batchItemCreateWithoutTicketInput, batchItemUncheckedCreateWithoutTicketInput> | batchItemCreateWithoutTicketInput[] | batchItemUncheckedCreateWithoutTicketInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutTicketInput | batchItemCreateOrConnectWithoutTicketInput[]
+    upsert?: batchItemUpsertWithWhereUniqueWithoutTicketInput | batchItemUpsertWithWhereUniqueWithoutTicketInput[]
+    createMany?: batchItemCreateManyTicketInputEnvelope
+    set?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    disconnect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    delete?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    update?: batchItemUpdateWithWhereUniqueWithoutTicketInput | batchItemUpdateWithWhereUniqueWithoutTicketInput[]
+    updateMany?: batchItemUpdateManyWithWhereWithoutTicketInput | batchItemUpdateManyWithWhereWithoutTicketInput[]
+    deleteMany?: batchItemScalarWhereInput | batchItemScalarWhereInput[]
   }
 
   export type TicketCreateNestedOneWithoutTicketMilestonesInput = {
@@ -29484,6 +32741,114 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationRecipientsInput, UserUpdateWithoutNotificationRecipientsInput>, UserUncheckedUpdateWithoutNotificationRecipientsInput>
   }
 
+  export type batchItemCreateNestedManyWithoutBatchInput = {
+    create?: XOR<batchItemCreateWithoutBatchInput, batchItemUncheckedCreateWithoutBatchInput> | batchItemCreateWithoutBatchInput[] | batchItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutBatchInput | batchItemCreateOrConnectWithoutBatchInput[]
+    createMany?: batchItemCreateManyBatchInputEnvelope
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+  }
+
+  export type UserCreateNestedOneWithoutCreatedBatchesInput = {
+    create?: XOR<UserCreateWithoutCreatedBatchesInput, UserUncheckedCreateWithoutCreatedBatchesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCreatedBatchesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutUpdatedBatchesInput = {
+    create?: XOR<UserCreateWithoutUpdatedBatchesInput, UserUncheckedCreateWithoutUpdatedBatchesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUpdatedBatchesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type batchItemUncheckedCreateNestedManyWithoutBatchInput = {
+    create?: XOR<batchItemCreateWithoutBatchInput, batchItemUncheckedCreateWithoutBatchInput> | batchItemCreateWithoutBatchInput[] | batchItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutBatchInput | batchItemCreateOrConnectWithoutBatchInput[]
+    createMany?: batchItemCreateManyBatchInputEnvelope
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+  }
+
+  export type NullableEnumbatchTypeFieldUpdateOperationsInput = {
+    set?: $Enums.batchType | null
+  }
+
+  export type EnumbatchStatusFieldUpdateOperationsInput = {
+    set?: $Enums.batchStatus
+  }
+
+  export type batchItemUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<batchItemCreateWithoutBatchInput, batchItemUncheckedCreateWithoutBatchInput> | batchItemCreateWithoutBatchInput[] | batchItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutBatchInput | batchItemCreateOrConnectWithoutBatchInput[]
+    upsert?: batchItemUpsertWithWhereUniqueWithoutBatchInput | batchItemUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: batchItemCreateManyBatchInputEnvelope
+    set?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    disconnect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    delete?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    update?: batchItemUpdateWithWhereUniqueWithoutBatchInput | batchItemUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: batchItemUpdateManyWithWhereWithoutBatchInput | batchItemUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: batchItemScalarWhereInput | batchItemScalarWhereInput[]
+  }
+
+  export type UserUpdateOneRequiredWithoutCreatedBatchesNestedInput = {
+    create?: XOR<UserCreateWithoutCreatedBatchesInput, UserUncheckedCreateWithoutCreatedBatchesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCreatedBatchesInput
+    upsert?: UserUpsertWithoutCreatedBatchesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCreatedBatchesInput, UserUpdateWithoutCreatedBatchesInput>, UserUncheckedUpdateWithoutCreatedBatchesInput>
+  }
+
+  export type UserUpdateOneWithoutUpdatedBatchesNestedInput = {
+    create?: XOR<UserCreateWithoutUpdatedBatchesInput, UserUncheckedCreateWithoutUpdatedBatchesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUpdatedBatchesInput
+    upsert?: UserUpsertWithoutUpdatedBatchesInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUpdatedBatchesInput, UserUpdateWithoutUpdatedBatchesInput>, UserUncheckedUpdateWithoutUpdatedBatchesInput>
+  }
+
+  export type batchItemUncheckedUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<batchItemCreateWithoutBatchInput, batchItemUncheckedCreateWithoutBatchInput> | batchItemCreateWithoutBatchInput[] | batchItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: batchItemCreateOrConnectWithoutBatchInput | batchItemCreateOrConnectWithoutBatchInput[]
+    upsert?: batchItemUpsertWithWhereUniqueWithoutBatchInput | batchItemUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: batchItemCreateManyBatchInputEnvelope
+    set?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    disconnect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    delete?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    connect?: batchItemWhereUniqueInput | batchItemWhereUniqueInput[]
+    update?: batchItemUpdateWithWhereUniqueWithoutBatchInput | batchItemUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: batchItemUpdateManyWithWhereWithoutBatchInput | batchItemUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: batchItemScalarWhereInput | batchItemScalarWhereInput[]
+  }
+
+  export type batchCreateNestedOneWithoutBatchItemsInput = {
+    create?: XOR<batchCreateWithoutBatchItemsInput, batchUncheckedCreateWithoutBatchItemsInput>
+    connectOrCreate?: batchCreateOrConnectWithoutBatchItemsInput
+    connect?: batchWhereUniqueInput
+  }
+
+  export type TicketCreateNestedOneWithoutBatchItemsInput = {
+    create?: XOR<TicketCreateWithoutBatchItemsInput, TicketUncheckedCreateWithoutBatchItemsInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutBatchItemsInput
+    connect?: TicketWhereUniqueInput
+  }
+
+  export type batchUpdateOneRequiredWithoutBatchItemsNestedInput = {
+    create?: XOR<batchCreateWithoutBatchItemsInput, batchUncheckedCreateWithoutBatchItemsInput>
+    connectOrCreate?: batchCreateOrConnectWithoutBatchItemsInput
+    upsert?: batchUpsertWithoutBatchItemsInput
+    connect?: batchWhereUniqueInput
+    update?: XOR<XOR<batchUpdateToOneWithWhereWithoutBatchItemsInput, batchUpdateWithoutBatchItemsInput>, batchUncheckedUpdateWithoutBatchItemsInput>
+  }
+
+  export type TicketUpdateOneRequiredWithoutBatchItemsNestedInput = {
+    create?: XOR<TicketCreateWithoutBatchItemsInput, TicketUncheckedCreateWithoutBatchItemsInput>
+    connectOrCreate?: TicketCreateOrConnectWithoutBatchItemsInput
+    upsert?: TicketUpsertWithoutBatchItemsInput
+    connect?: TicketWhereUniqueInput
+    update?: XOR<XOR<TicketUpdateToOneWithWhereWithoutBatchItemsInput, TicketUpdateWithoutBatchItemsInput>, TicketUncheckedUpdateWithoutBatchItemsInput>
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -29791,6 +33156,40 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumbatchTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchType | EnumbatchTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.batchType[] | null
+    notIn?: $Enums.batchType[] | null
+    not?: NestedEnumbatchTypeNullableFilter<$PrismaModel> | $Enums.batchType | null
+  }
+
+  export type NestedEnumbatchStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchStatus | EnumbatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.batchStatus[]
+    notIn?: $Enums.batchStatus[]
+    not?: NestedEnumbatchStatusFilter<$PrismaModel> | $Enums.batchStatus
+  }
+
+  export type NestedEnumbatchTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchType | EnumbatchTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.batchType[] | null
+    notIn?: $Enums.batchType[] | null
+    not?: NestedEnumbatchTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.batchType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumbatchTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumbatchTypeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumbatchStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.batchStatus | EnumbatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.batchStatus[]
+    notIn?: $Enums.batchStatus[]
+    not?: NestedEnumbatchStatusWithAggregatesFilter<$PrismaModel> | $Enums.batchStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumbatchStatusFilter<$PrismaModel>
+    _max?: NestedEnumbatchStatusFilter<$PrismaModel>
+  }
+
   export type UserCreateWithoutStateInput = {
     name: string
     phone: string
@@ -29815,6 +33214,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutStateInput = {
@@ -29842,6 +33243,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutStateInput = {
@@ -29878,6 +33281,8 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutStatesInput = {
@@ -29905,11 +33310,127 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutStatesInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutStatesInput, UserUncheckedCreateWithoutStatesInput>
+  }
+
+  export type ProjectCreateWithoutStateInput = {
+    name: string
+    projectCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
+    organisation?: OrganisationCreateNestedOneWithoutProjectInput
+    users?: UserCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutStateInput = {
+    id?: number
+    name: string
+    projectCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    organisationId?: number | null
+    ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
+    users?: UserUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutStateInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutStateInput, ProjectUncheckedCreateWithoutStateInput>
+  }
+
+  export type ProjectCreateManyStateInputEnvelope = {
+    data: ProjectCreateManyStateInput | ProjectCreateManyStateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TicketCreateWithoutStateInput = {
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    imei?: string | null
+    hp?: string | null
+    motorType?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
+    updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
+    notifications?: NotificationCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutStateInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    imei?: string | null
+    hp?: string | null
+    motorType?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutStateInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutStateInput, TicketUncheckedCreateWithoutStateInput>
+  }
+
+  export type TicketCreateManyStateInputEnvelope = {
+    data: TicketCreateManyStateInput | TicketCreateManyStateInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithWhereUniqueWithoutStateInput = {
@@ -29964,6 +33485,86 @@ export namespace Prisma {
     data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutStatesInput>
   }
 
+  export type ProjectUpsertWithWhereUniqueWithoutStateInput = {
+    where: ProjectWhereUniqueInput
+    update: XOR<ProjectUpdateWithoutStateInput, ProjectUncheckedUpdateWithoutStateInput>
+    create: XOR<ProjectCreateWithoutStateInput, ProjectUncheckedCreateWithoutStateInput>
+  }
+
+  export type ProjectUpdateWithWhereUniqueWithoutStateInput = {
+    where: ProjectWhereUniqueInput
+    data: XOR<ProjectUpdateWithoutStateInput, ProjectUncheckedUpdateWithoutStateInput>
+  }
+
+  export type ProjectUpdateManyWithWhereWithoutStateInput = {
+    where: ProjectScalarWhereInput
+    data: XOR<ProjectUpdateManyMutationInput, ProjectUncheckedUpdateManyWithoutStateInput>
+  }
+
+  export type ProjectScalarWhereInput = {
+    AND?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+    OR?: ProjectScalarWhereInput[]
+    NOT?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
+    id?: IntFilter<"Project"> | number
+    name?: StringFilter<"Project"> | string
+    projectCode?: StringFilter<"Project"> | string
+    email?: StringFilter<"Project"> | string
+    address?: StringNullableFilter<"Project"> | string | null
+    stateId?: IntNullableFilter<"Project"> | number | null
+    isActive?: BoolFilter<"Project"> | boolean
+    createdAt?: DateTimeFilter<"Project"> | Date | string
+    updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    organisationId?: IntNullableFilter<"Project"> | number | null
+  }
+
+  export type TicketUpsertWithWhereUniqueWithoutStateInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutStateInput, TicketUncheckedUpdateWithoutStateInput>
+    create: XOR<TicketCreateWithoutStateInput, TicketUncheckedCreateWithoutStateInput>
+  }
+
+  export type TicketUpdateWithWhereUniqueWithoutStateInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutStateInput, TicketUncheckedUpdateWithoutStateInput>
+  }
+
+  export type TicketUpdateManyWithWhereWithoutStateInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutStateInput>
+  }
+
+  export type TicketScalarWhereInput = {
+    AND?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    OR?: TicketScalarWhereInput[]
+    NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
+    id?: IntFilter<"Ticket"> | number
+    ticketCode?: StringFilter<"Ticket"> | string
+    description?: StringFilter<"Ticket"> | string
+    customerName?: StringFilter<"Ticket"> | string
+    controllerNo?: StringFilter<"Ticket"> | string
+    imei?: StringNullableFilter<"Ticket"> | string | null
+    hp?: StringNullableFilter<"Ticket"> | string | null
+    motorType?: StringNullableFilter<"Ticket"> | string | null
+    stateCode?: StringNullableFilter<"Ticket"> | string | null
+    district?: StringNullableFilter<"Ticket"> | string | null
+    village?: StringNullableFilter<"Ticket"> | string | null
+    block?: StringNullableFilter<"Ticket"> | string | null
+    complaintType?: StringFilter<"Ticket"> | string
+    faultCode?: StringFilter<"Ticket"> | string
+    faultType?: StringFilter<"Ticket"> | string
+    status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
+    priority?: StringNullableFilter<"Ticket"> | string | null
+    assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
+    createdBy?: IntFilter<"Ticket"> | number
+    updatedBy?: IntNullableFilter<"Ticket"> | number | null
+    code?: StringNullableFilter<"Ticket"> | string | null
+    projectName?: StringNullableFilter<"Ticket"> | string | null
+    createdAt?: DateTimeFilter<"Ticket"> | Date | string
+    updatedAt?: DateTimeFilter<"Ticket"> | Date | string
+    deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+  }
+
   export type ProjectCreateWithoutOrganisationInput = {
     name: string
     projectCode: string
@@ -29974,6 +33575,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
+    state?: StateCreateNestedOneWithoutProjectsInput
     users?: UserCreateNestedManyWithoutProjectInput
   }
 
@@ -29983,6 +33585,7 @@ export namespace Prisma {
     projectCode: string
     email: string
     address?: string | null
+    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -30025,6 +33628,8 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutOrganisationInput = {
@@ -30052,6 +33657,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutOrganisationInput = {
@@ -30078,22 +33685,6 @@ export namespace Prisma {
   export type ProjectUpdateManyWithWhereWithoutOrganisationInput = {
     where: ProjectScalarWhereInput
     data: XOR<ProjectUpdateManyMutationInput, ProjectUncheckedUpdateManyWithoutOrganisationInput>
-  }
-
-  export type ProjectScalarWhereInput = {
-    AND?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
-    OR?: ProjectScalarWhereInput[]
-    NOT?: ProjectScalarWhereInput | ProjectScalarWhereInput[]
-    id?: IntFilter<"Project"> | number
-    name?: StringFilter<"Project"> | string
-    projectCode?: StringFilter<"Project"> | string
-    email?: StringFilter<"Project"> | string
-    address?: StringNullableFilter<"Project"> | string | null
-    isActive?: BoolFilter<"Project"> | boolean
-    createdAt?: DateTimeFilter<"Project"> | Date | string
-    updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
-    deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
-    organisationId?: IntNullableFilter<"Project"> | number | null
   }
 
   export type UserUpsertWithWhereUniqueWithoutOrganisationInput = {
@@ -30149,6 +33740,28 @@ export namespace Prisma {
   export type ServiceCenterCreateManyProjectInputEnvelope = {
     data: ServiceCenterCreateManyProjectInput | ServiceCenterCreateManyProjectInput[]
     skipDuplicates?: boolean
+  }
+
+  export type StateCreateWithoutProjectsInput = {
+    name: string
+    stateCode?: string | null
+    primaryUsers?: UserCreateNestedManyWithoutStateInput
+    users?: UserCreateNestedManyWithoutStatesInput
+    tickets?: TicketCreateNestedManyWithoutStateInput
+  }
+
+  export type StateUncheckedCreateWithoutProjectsInput = {
+    id?: number
+    name: string
+    stateCode?: string | null
+    primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
+    users?: UserUncheckedCreateNestedManyWithoutStatesInput
+    tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
+  }
+
+  export type StateCreateOrConnectWithoutProjectsInput = {
+    where: StateWhereUniqueInput
+    create: XOR<StateCreateWithoutProjectsInput, StateUncheckedCreateWithoutProjectsInput>
   }
 
   export type OrganisationCreateWithoutProjectInput = {
@@ -30207,6 +33820,8 @@ export namespace Prisma {
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutProjectInput = {
@@ -30234,6 +33849,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutProjectInput = {
@@ -30277,6 +33894,34 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"ServiceCenter"> | Date | string
     updatedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
+  }
+
+  export type StateUpsertWithoutProjectsInput = {
+    update: XOR<StateUpdateWithoutProjectsInput, StateUncheckedUpdateWithoutProjectsInput>
+    create: XOR<StateCreateWithoutProjectsInput, StateUncheckedCreateWithoutProjectsInput>
+    where?: StateWhereInput
+  }
+
+  export type StateUpdateToOneWithWhereWithoutProjectsInput = {
+    where?: StateWhereInput
+    data: XOR<StateUpdateWithoutProjectsInput, StateUncheckedUpdateWithoutProjectsInput>
+  }
+
+  export type StateUpdateWithoutProjectsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUpdateManyWithoutStateNestedInput
+    users?: UserUpdateManyWithoutStatesNestedInput
+    tickets?: TicketUpdateManyWithoutStateNestedInput
+  }
+
+  export type StateUncheckedUpdateWithoutProjectsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
+    users?: UserUncheckedUpdateManyWithoutStatesNestedInput
+    tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type OrganisationUpsertWithoutProjectInput = {
@@ -30357,6 +34002,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutServiceCenterInput = {
@@ -30384,6 +34031,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutServiceCenterInput = {
@@ -30405,6 +34054,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
+    state?: StateCreateNestedOneWithoutProjectsInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
     users?: UserCreateNestedManyWithoutProjectInput
   }
@@ -30415,6 +34065,7 @@ export namespace Prisma {
     projectCode: string
     email: string
     address?: string | null
+    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -30436,7 +34087,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30452,11 +34102,13 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutServiceCenterInput = {
@@ -30468,7 +34120,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30489,6 +34141,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutServiceCenterInput = {
@@ -30537,6 +34190,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    state?: StateUpdateOneWithoutProjectsNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
     users?: UserUpdateManyWithoutProjectNestedInput
   }
@@ -30547,6 +34201,7 @@ export namespace Prisma {
     projectCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30569,37 +34224,6 @@ export namespace Prisma {
   export type TicketUpdateManyWithWhereWithoutServiceCenterInput = {
     where: TicketScalarWhereInput
     data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutServiceCenterInput>
-  }
-
-  export type TicketScalarWhereInput = {
-    AND?: TicketScalarWhereInput | TicketScalarWhereInput[]
-    OR?: TicketScalarWhereInput[]
-    NOT?: TicketScalarWhereInput | TicketScalarWhereInput[]
-    id?: IntFilter<"Ticket"> | number
-    ticketCode?: StringFilter<"Ticket"> | string
-    description?: StringFilter<"Ticket"> | string
-    customerName?: StringFilter<"Ticket"> | string
-    controllerNo?: StringFilter<"Ticket"> | string
-    imei?: StringNullableFilter<"Ticket"> | string | null
-    hp?: StringNullableFilter<"Ticket"> | string | null
-    motorType?: StringNullableFilter<"Ticket"> | string | null
-    state?: StringFilter<"Ticket"> | string
-    district?: StringNullableFilter<"Ticket"> | string | null
-    village?: StringNullableFilter<"Ticket"> | string | null
-    block?: StringNullableFilter<"Ticket"> | string | null
-    complaintType?: StringFilter<"Ticket"> | string
-    faultCode?: StringFilter<"Ticket"> | string
-    faultType?: StringFilter<"Ticket"> | string
-    status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
-    priority?: StringNullableFilter<"Ticket"> | string | null
-    assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
-    createdBy?: IntFilter<"Ticket"> | number
-    updatedBy?: IntNullableFilter<"Ticket"> | number | null
-    code?: StringNullableFilter<"Ticket"> | string | null
-    projectName?: StringNullableFilter<"Ticket"> | string | null
-    createdAt?: DateTimeFilter<"Ticket"> | Date | string
-    updatedAt?: DateTimeFilter<"Ticket"> | Date | string
-    deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
   }
 
   export type ServiceCenterCreateWithoutUsersInput = {
@@ -30644,7 +34268,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30660,11 +34283,13 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutCreatedByUserInput = {
@@ -30676,7 +34301,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30697,6 +34322,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutCreatedByUserInput = {
@@ -30717,7 +34343,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30733,11 +34358,13 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutUpdatedByUserInput = {
@@ -30749,7 +34376,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30770,6 +34397,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutUpdatedByUserInput = {
@@ -31026,6 +34654,8 @@ export namespace Prisma {
     name: string
     stateCode?: string | null
     users?: UserCreateNestedManyWithoutStatesInput
+    projects?: ProjectCreateNestedManyWithoutStateInput
+    tickets?: TicketCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutPrimaryUsersInput = {
@@ -31033,6 +34663,8 @@ export namespace Prisma {
     name: string
     stateCode?: string | null
     users?: UserUncheckedCreateNestedManyWithoutStatesInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
+    tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutPrimaryUsersInput = {
@@ -31044,6 +34676,8 @@ export namespace Prisma {
     name: string
     stateCode?: string | null
     primaryUsers?: UserCreateNestedManyWithoutStateInput
+    projects?: ProjectCreateNestedManyWithoutStateInput
+    tickets?: TicketCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutUsersInput = {
@@ -31051,6 +34685,8 @@ export namespace Prisma {
     name: string
     stateCode?: string | null
     primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
+    tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutUsersInput = {
@@ -31068,6 +34704,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
+    state?: StateCreateNestedOneWithoutProjectsInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
   }
 
@@ -31077,6 +34714,7 @@ export namespace Prisma {
     projectCode: string
     email: string
     address?: string | null
+    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -31120,6 +34758,68 @@ export namespace Prisma {
   export type OrganisationCreateOrConnectWithoutUsersInput = {
     where: OrganisationWhereUniqueInput
     create: XOR<OrganisationCreateWithoutUsersInput, OrganisationUncheckedCreateWithoutUsersInput>
+  }
+
+  export type batchCreateWithoutCreatorInput = {
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batchItems?: batchItemCreateNestedManyWithoutBatchInput
+    updater?: UserCreateNestedOneWithoutUpdatedBatchesInput
+  }
+
+  export type batchUncheckedCreateWithoutCreatorInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    updatedBy?: number | null
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type batchCreateOrConnectWithoutCreatorInput = {
+    where: batchWhereUniqueInput
+    create: XOR<batchCreateWithoutCreatorInput, batchUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type batchCreateManyCreatorInputEnvelope = {
+    data: batchCreateManyCreatorInput | batchCreateManyCreatorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type batchCreateWithoutUpdaterInput = {
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batchItems?: batchItemCreateNestedManyWithoutBatchInput
+    creator: UserCreateNestedOneWithoutCreatedBatchesInput
+  }
+
+  export type batchUncheckedCreateWithoutUpdaterInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: number
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type batchCreateOrConnectWithoutUpdaterInput = {
+    where: batchWhereUniqueInput
+    create: XOR<batchCreateWithoutUpdaterInput, batchUncheckedCreateWithoutUpdaterInput>
+  }
+
+  export type batchCreateManyUpdaterInputEnvelope = {
+    data: batchCreateManyUpdaterInput | batchCreateManyUpdaterInput[]
+    skipDuplicates?: boolean
   }
 
   export type ServiceCenterUpsertWithoutUsersInput = {
@@ -31433,6 +35133,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUpdateManyWithoutStateNestedInput
+    tickets?: TicketUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateWithoutPrimaryUsersInput = {
@@ -31440,6 +35142,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     users?: UserUncheckedUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
+    tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type StateUpsertWithWhereUniqueWithoutUsersInput = {
@@ -31488,6 +35192,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
+    state?: StateUpdateOneWithoutProjectsNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
   }
 
@@ -31497,6 +35202,7 @@ export namespace Prisma {
     projectCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -31543,6 +35249,52 @@ export namespace Prisma {
     project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
+  export type batchUpsertWithWhereUniqueWithoutCreatorInput = {
+    where: batchWhereUniqueInput
+    update: XOR<batchUpdateWithoutCreatorInput, batchUncheckedUpdateWithoutCreatorInput>
+    create: XOR<batchCreateWithoutCreatorInput, batchUncheckedCreateWithoutCreatorInput>
+  }
+
+  export type batchUpdateWithWhereUniqueWithoutCreatorInput = {
+    where: batchWhereUniqueInput
+    data: XOR<batchUpdateWithoutCreatorInput, batchUncheckedUpdateWithoutCreatorInput>
+  }
+
+  export type batchUpdateManyWithWhereWithoutCreatorInput = {
+    where: batchScalarWhereInput
+    data: XOR<batchUpdateManyMutationInput, batchUncheckedUpdateManyWithoutCreatorInput>
+  }
+
+  export type batchScalarWhereInput = {
+    AND?: batchScalarWhereInput | batchScalarWhereInput[]
+    OR?: batchScalarWhereInput[]
+    NOT?: batchScalarWhereInput | batchScalarWhereInput[]
+    id?: IntFilter<"batch"> | number
+    batchCode?: StringFilter<"batch"> | string
+    batchType?: EnumbatchTypeNullableFilter<"batch"> | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFilter<"batch"> | $Enums.batchStatus
+    createdAt?: DateTimeFilter<"batch"> | Date | string
+    updatedAt?: DateTimeFilter<"batch"> | Date | string
+    createdBy?: IntFilter<"batch"> | number
+    updatedBy?: IntNullableFilter<"batch"> | number | null
+  }
+
+  export type batchUpsertWithWhereUniqueWithoutUpdaterInput = {
+    where: batchWhereUniqueInput
+    update: XOR<batchUpdateWithoutUpdaterInput, batchUncheckedUpdateWithoutUpdaterInput>
+    create: XOR<batchCreateWithoutUpdaterInput, batchUncheckedCreateWithoutUpdaterInput>
+  }
+
+  export type batchUpdateWithWhereUniqueWithoutUpdaterInput = {
+    where: batchWhereUniqueInput
+    data: XOR<batchUpdateWithoutUpdaterInput, batchUncheckedUpdateWithoutUpdaterInput>
+  }
+
+  export type batchUpdateManyWithWhereWithoutUpdaterInput = {
+    where: batchScalarWhereInput
+    data: XOR<batchUpdateManyMutationInput, batchUncheckedUpdateManyWithoutUpdaterInput>
+  }
+
   export type UserCreateWithoutCreatedTicketsInput = {
     name: string
     phone: string
@@ -31567,6 +35319,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutCreatedTicketsInput = {
@@ -31594,6 +35348,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutCreatedTicketsInput = {
@@ -31625,6 +35381,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutUpdatedTicketsInput = {
@@ -31652,6 +35410,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutUpdatedTicketsInput = {
@@ -31691,6 +35451,28 @@ export namespace Prisma {
   export type ServiceCenterCreateOrConnectWithoutAssignedTicketsInput = {
     where: ServiceCenterWhereUniqueInput
     create: XOR<ServiceCenterCreateWithoutAssignedTicketsInput, ServiceCenterUncheckedCreateWithoutAssignedTicketsInput>
+  }
+
+  export type StateCreateWithoutTicketsInput = {
+    name: string
+    stateCode?: string | null
+    primaryUsers?: UserCreateNestedManyWithoutStateInput
+    users?: UserCreateNestedManyWithoutStatesInput
+    projects?: ProjectCreateNestedManyWithoutStateInput
+  }
+
+  export type StateUncheckedCreateWithoutTicketsInput = {
+    id?: number
+    name: string
+    stateCode?: string | null
+    primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
+    users?: UserUncheckedCreateNestedManyWithoutStatesInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
+  }
+
+  export type StateCreateOrConnectWithoutTicketsInput = {
+    where: StateWhereUniqueInput
+    create: XOR<StateCreateWithoutTicketsInput, StateUncheckedCreateWithoutTicketsInput>
   }
 
   export type MessageCreateWithoutTicketInput = {
@@ -31862,6 +35644,29 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type batchItemCreateWithoutTicketInput = {
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: batchCreateNestedOneWithoutBatchItemsInput
+  }
+
+  export type batchItemUncheckedCreateWithoutTicketInput = {
+    id?: number
+    batchId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type batchItemCreateOrConnectWithoutTicketInput = {
+    where: batchItemWhereUniqueInput
+    create: XOR<batchItemCreateWithoutTicketInput, batchItemUncheckedCreateWithoutTicketInput>
+  }
+
+  export type batchItemCreateManyTicketInputEnvelope = {
+    data: batchItemCreateManyTicketInput | batchItemCreateManyTicketInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutCreatedTicketsInput = {
     update: XOR<UserUpdateWithoutCreatedTicketsInput, UserUncheckedUpdateWithoutCreatedTicketsInput>
     create: XOR<UserCreateWithoutCreatedTicketsInput, UserUncheckedCreateWithoutCreatedTicketsInput>
@@ -31897,6 +35702,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedTicketsInput = {
@@ -31924,6 +35731,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUpsertWithoutUpdatedTicketsInput = {
@@ -31961,6 +35770,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUpdatedTicketsInput = {
@@ -31988,6 +35799,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type ServiceCenterUpsertWithoutAssignedTicketsInput = {
@@ -32028,6 +35841,34 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+  }
+
+  export type StateUpsertWithoutTicketsInput = {
+    update: XOR<StateUpdateWithoutTicketsInput, StateUncheckedUpdateWithoutTicketsInput>
+    create: XOR<StateCreateWithoutTicketsInput, StateUncheckedCreateWithoutTicketsInput>
+    where?: StateWhereInput
+  }
+
+  export type StateUpdateToOneWithWhereWithoutTicketsInput = {
+    where?: StateWhereInput
+    data: XOR<StateUpdateWithoutTicketsInput, StateUncheckedUpdateWithoutTicketsInput>
+  }
+
+  export type StateUpdateWithoutTicketsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUpdateManyWithoutStateNestedInput
+    users?: UserUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUpdateManyWithoutStateNestedInput
+  }
+
+  export type StateUncheckedUpdateWithoutTicketsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
+    users?: UserUncheckedUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type MessageUpsertWithWhereUniqueWithoutTicketInput = {
@@ -32125,6 +35966,33 @@ export namespace Prisma {
     data: XOR<TicketMilestoneUpdateManyMutationInput, TicketMilestoneUncheckedUpdateManyWithoutTicketInput>
   }
 
+  export type batchItemUpsertWithWhereUniqueWithoutTicketInput = {
+    where: batchItemWhereUniqueInput
+    update: XOR<batchItemUpdateWithoutTicketInput, batchItemUncheckedUpdateWithoutTicketInput>
+    create: XOR<batchItemCreateWithoutTicketInput, batchItemUncheckedCreateWithoutTicketInput>
+  }
+
+  export type batchItemUpdateWithWhereUniqueWithoutTicketInput = {
+    where: batchItemWhereUniqueInput
+    data: XOR<batchItemUpdateWithoutTicketInput, batchItemUncheckedUpdateWithoutTicketInput>
+  }
+
+  export type batchItemUpdateManyWithWhereWithoutTicketInput = {
+    where: batchItemScalarWhereInput
+    data: XOR<batchItemUpdateManyMutationInput, batchItemUncheckedUpdateManyWithoutTicketInput>
+  }
+
+  export type batchItemScalarWhereInput = {
+    AND?: batchItemScalarWhereInput | batchItemScalarWhereInput[]
+    OR?: batchItemScalarWhereInput[]
+    NOT?: batchItemScalarWhereInput | batchItemScalarWhereInput[]
+    id?: IntFilter<"batchItem"> | number
+    batchId?: IntFilter<"batchItem"> | number
+    ticketId?: IntFilter<"batchItem"> | number
+    createdAt?: DateTimeFilter<"batchItem"> | Date | string
+    updatedAt?: DateTimeFilter<"batchItem"> | Date | string
+  }
+
   export type TicketCreateWithoutTicketMilestonesInput = {
     ticketCode: string
     description: string
@@ -32133,7 +36001,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -32150,10 +36017,12 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutTicketMilestonesInput = {
@@ -32165,7 +36034,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -32186,6 +36055,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutTicketMilestonesInput = {
@@ -32217,6 +36087,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutTicketMilestoneInput = {
@@ -32244,6 +36116,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutTicketMilestoneInput = {
@@ -32301,7 +36175,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32318,10 +36191,12 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutTicketMilestonesInput = {
@@ -32333,7 +36208,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32354,6 +36229,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type UserUpsertWithoutTicketMilestoneInput = {
@@ -32391,6 +36267,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTicketMilestoneInput = {
@@ -32418,6 +36296,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type AttachmentsUpsertWithWhereUniqueWithoutMilestoneInput = {
@@ -32510,7 +36390,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -32527,10 +36406,12 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutAttachmentsInput = {
@@ -32542,7 +36423,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -32563,6 +36444,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutAttachmentsInput = {
@@ -32667,7 +36549,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32684,10 +36565,12 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutAttachmentsInput = {
@@ -32699,7 +36582,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32720,6 +36603,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type UserCreateWithoutSpareRequestsCreatedInput = {
@@ -32746,6 +36630,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsCreatedInput = {
@@ -32773,6 +36659,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutSpareRequestsCreatedInput = {
@@ -32804,6 +36692,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutSpareRequestsUpdatedInput = {
@@ -32831,6 +36721,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutSpareRequestsUpdatedInput = {
@@ -32900,6 +36792,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsCreatedInput = {
@@ -32927,6 +36821,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUpsertWithoutSpareRequestsUpdatedInput = {
@@ -32964,6 +36860,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSpareRequestsUpdatedInput = {
@@ -32991,6 +36889,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type spareRequestItemUpsertWithWhereUniqueWithoutSpareRequestInput = {
@@ -33320,7 +37220,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -33337,10 +37236,12 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutProductTransactionsInput = {
@@ -33352,7 +37253,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -33373,6 +37274,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutProductTransactionsInput = {
@@ -33404,6 +37306,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutProductTransactionsInput = {
@@ -33431,6 +37335,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutProductTransactionsInput = {
@@ -33493,7 +37399,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33510,10 +37415,12 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutProductTransactionsInput = {
@@ -33525,7 +37432,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33546,6 +37453,7 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type UserUpsertWithoutProductTransactionsInput = {
@@ -33583,6 +37491,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductTransactionsInput = {
@@ -33610,6 +37520,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type ProductCreateWithoutInventoryInput = {
@@ -33702,6 +37614,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutMessagesInput = {
@@ -33729,6 +37643,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutMessagesInput = {
@@ -33744,7 +37660,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -33761,10 +37676,12 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutMessagesInput = {
@@ -33776,7 +37693,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -33797,6 +37714,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutMessagesInput = {
@@ -33922,6 +37840,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessagesInput = {
@@ -33949,6 +37869,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type TicketUpsertWithoutMessagesInput = {
@@ -33970,7 +37892,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33987,10 +37908,12 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutMessagesInput = {
@@ -34002,7 +37925,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34023,6 +37946,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type NotificationUpsertWithWhereUniqueWithoutMessageInput = {
@@ -34121,6 +38045,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutMessageSeensInput = {
@@ -34148,6 +38074,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutMessageSeensInput = {
@@ -34220,6 +38148,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMessageSeensInput = {
@@ -34247,6 +38177,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type MessageCreateWithoutNotificationInput = {
@@ -34297,6 +38229,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutSentNotificationsInput = {
@@ -34324,6 +38258,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutSentNotificationsInput = {
@@ -34339,7 +38275,6 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
     district?: string | null
     village?: string | null
     block?: string | null
@@ -34356,10 +38291,12 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
   }
 
   export type TicketUncheckedCreateWithoutNotificationsInput = {
@@ -34371,7 +38308,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -34392,6 +38329,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
     ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
   }
 
   export type TicketCreateOrConnectWithoutNotificationsInput = {
@@ -34487,6 +38425,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentNotificationsInput = {
@@ -34514,6 +38454,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type TicketUpsertWithoutNotificationsInput = {
@@ -34535,7 +38477,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34552,10 +38493,12 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutNotificationsInput = {
@@ -34567,7 +38510,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -34588,6 +38531,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type NotificationRecipientUpsertWithWhereUniqueWithoutNotificationInput = {
@@ -34656,6 +38600,8 @@ export namespace Prisma {
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
     organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserUncheckedCreateWithoutNotificationRecipientsInput = {
@@ -34683,6 +38629,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
   }
 
   export type UserCreateOrConnectWithoutNotificationRecipientsInput = {
@@ -34757,6 +38705,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationRecipientsInput = {
@@ -34784,6 +38734,511 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
+  }
+
+  export type batchItemCreateWithoutBatchInput = {
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    ticket: TicketCreateNestedOneWithoutBatchItemsInput
+  }
+
+  export type batchItemUncheckedCreateWithoutBatchInput = {
+    id?: number
+    ticketId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type batchItemCreateOrConnectWithoutBatchInput = {
+    where: batchItemWhereUniqueInput
+    create: XOR<batchItemCreateWithoutBatchInput, batchItemUncheckedCreateWithoutBatchInput>
+  }
+
+  export type batchItemCreateManyBatchInputEnvelope = {
+    data: batchItemCreateManyBatchInput | batchItemCreateManyBatchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserCreateWithoutCreatedBatchesInput = {
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutUsersInput
+    createdTickets?: TicketCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
+  }
+
+  export type UserUncheckedCreateWithoutCreatedBatchesInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    projectCode?: string | null
+    orgCode?: string | null
+    createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
+  }
+
+  export type UserCreateOrConnectWithoutCreatedBatchesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCreatedBatchesInput, UserUncheckedCreateWithoutCreatedBatchesInput>
+  }
+
+  export type UserCreateWithoutUpdatedBatchesInput = {
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutUsersInput
+    createdTickets?: TicketCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+  }
+
+  export type UserUncheckedCreateWithoutUpdatedBatchesInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    projectCode?: string | null
+    orgCode?: string | null
+    createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+  }
+
+  export type UserCreateOrConnectWithoutUpdatedBatchesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUpdatedBatchesInput, UserUncheckedCreateWithoutUpdatedBatchesInput>
+  }
+
+  export type batchItemUpsertWithWhereUniqueWithoutBatchInput = {
+    where: batchItemWhereUniqueInput
+    update: XOR<batchItemUpdateWithoutBatchInput, batchItemUncheckedUpdateWithoutBatchInput>
+    create: XOR<batchItemCreateWithoutBatchInput, batchItemUncheckedCreateWithoutBatchInput>
+  }
+
+  export type batchItemUpdateWithWhereUniqueWithoutBatchInput = {
+    where: batchItemWhereUniqueInput
+    data: XOR<batchItemUpdateWithoutBatchInput, batchItemUncheckedUpdateWithoutBatchInput>
+  }
+
+  export type batchItemUpdateManyWithWhereWithoutBatchInput = {
+    where: batchItemScalarWhereInput
+    data: XOR<batchItemUpdateManyMutationInput, batchItemUncheckedUpdateManyWithoutBatchInput>
+  }
+
+  export type UserUpsertWithoutCreatedBatchesInput = {
+    update: XOR<UserUpdateWithoutCreatedBatchesInput, UserUncheckedUpdateWithoutCreatedBatchesInput>
+    create: XOR<UserCreateWithoutCreatedBatchesInput, UserUncheckedCreateWithoutCreatedBatchesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCreatedBatchesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCreatedBatchesInput, UserUncheckedUpdateWithoutCreatedBatchesInput>
+  }
+
+  export type UserUpdateWithoutCreatedBatchesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    serviceCenter?: ServiceCenterUpdateOneWithoutUsersNestedInput
+    createdTickets?: TicketUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCreatedBatchesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
+  }
+
+  export type UserUpsertWithoutUpdatedBatchesInput = {
+    update: XOR<UserUpdateWithoutUpdatedBatchesInput, UserUncheckedUpdateWithoutUpdatedBatchesInput>
+    create: XOR<UserCreateWithoutUpdatedBatchesInput, UserUncheckedCreateWithoutUpdatedBatchesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUpdatedBatchesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUpdatedBatchesInput, UserUncheckedUpdateWithoutUpdatedBatchesInput>
+  }
+
+  export type UserUpdateWithoutUpdatedBatchesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    serviceCenter?: ServiceCenterUpdateOneWithoutUsersNestedInput
+    createdTickets?: TicketUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutUpdatedBatchesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+  }
+
+  export type batchCreateWithoutBatchItemsInput = {
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    creator: UserCreateNestedOneWithoutCreatedBatchesInput
+    updater?: UserCreateNestedOneWithoutUpdatedBatchesInput
+  }
+
+  export type batchUncheckedCreateWithoutBatchItemsInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: number
+    updatedBy?: number | null
+  }
+
+  export type batchCreateOrConnectWithoutBatchItemsInput = {
+    where: batchWhereUniqueInput
+    create: XOR<batchCreateWithoutBatchItemsInput, batchUncheckedCreateWithoutBatchItemsInput>
+  }
+
+  export type TicketCreateWithoutBatchItemsInput = {
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    imei?: string | null
+    hp?: string | null
+    motorType?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
+    updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
+    notifications?: NotificationCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutBatchItemsInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    imei?: string | null
+    hp?: string | null
+    motorType?: string | null
+    stateCode?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutBatchItemsInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutBatchItemsInput, TicketUncheckedCreateWithoutBatchItemsInput>
+  }
+
+  export type batchUpsertWithoutBatchItemsInput = {
+    update: XOR<batchUpdateWithoutBatchItemsInput, batchUncheckedUpdateWithoutBatchItemsInput>
+    create: XOR<batchCreateWithoutBatchItemsInput, batchUncheckedCreateWithoutBatchItemsInput>
+    where?: batchWhereInput
+  }
+
+  export type batchUpdateToOneWithWhereWithoutBatchItemsInput = {
+    where?: batchWhereInput
+    data: XOR<batchUpdateWithoutBatchItemsInput, batchUncheckedUpdateWithoutBatchItemsInput>
+  }
+
+  export type batchUpdateWithoutBatchItemsInput = {
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    creator?: UserUpdateOneRequiredWithoutCreatedBatchesNestedInput
+    updater?: UserUpdateOneWithoutUpdatedBatchesNestedInput
+  }
+
+  export type batchUncheckedUpdateWithoutBatchItemsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type TicketUpsertWithoutBatchItemsInput = {
+    update: XOR<TicketUpdateWithoutBatchItemsInput, TicketUncheckedUpdateWithoutBatchItemsInput>
+    create: XOR<TicketCreateWithoutBatchItemsInput, TicketUncheckedCreateWithoutBatchItemsInput>
+    where?: TicketWhereInput
+  }
+
+  export type TicketUpdateToOneWithWhereWithoutBatchItemsInput = {
+    where?: TicketWhereInput
+    data: XOR<TicketUpdateWithoutBatchItemsInput, TicketUncheckedUpdateWithoutBatchItemsInput>
+  }
+
+  export type TicketUpdateWithoutBatchItemsInput = {
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
+    updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutBatchItemsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type UserCreateManyStateInput = {
@@ -34800,6 +39255,46 @@ export namespace Prisma {
     isActive?: boolean
     projectCode?: string | null
     orgCode?: string | null
+  }
+
+  export type ProjectCreateManyStateInput = {
+    id?: number
+    name: string
+    projectCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    organisationId?: number | null
+  }
+
+  export type TicketCreateManyStateInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    imei?: string | null
+    hp?: string | null
+    motorType?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
   }
 
   export type UserUpdateWithoutStateInput = {
@@ -34826,6 +39321,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStateInput = {
@@ -34853,6 +39350,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutStateInput = {
@@ -34895,6 +39394,8 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStatesInput = {
@@ -34922,6 +39423,8 @@ export namespace Prisma {
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutStatesInput = {
@@ -34941,12 +39444,147 @@ export namespace Prisma {
     orgCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type ProjectUpdateWithoutStateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    projectCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
+    organisation?: OrganisationUpdateOneWithoutProjectNestedInput
+    users?: UserUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutStateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    projectCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    organisationId?: NullableIntFieldUpdateOperationsInput | number | null
+    ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
+    users?: UserUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateManyWithoutStateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    projectCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    organisationId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type TicketUpdateWithoutStateInput = {
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
+    updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutStateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateManyWithoutStateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type ProjectCreateManyOrganisationInput = {
     id?: number
     name: string
     projectCode: string
     email: string
     address?: string | null
+    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -34979,6 +39617,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
+    state?: StateUpdateOneWithoutProjectsNestedInput
     users?: UserUpdateManyWithoutProjectNestedInput
   }
 
@@ -34988,6 +39627,7 @@ export namespace Prisma {
     projectCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35002,6 +39642,7 @@ export namespace Prisma {
     projectCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35032,6 +39673,8 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganisationInput = {
@@ -35059,6 +39702,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutOrganisationInput = {
@@ -35172,6 +39817,8 @@ export namespace Prisma {
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProjectInput = {
@@ -35199,6 +39846,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutProjectInput = {
@@ -35242,7 +39891,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -35284,6 +39933,8 @@ export namespace Prisma {
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
     organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateWithoutServiceCenterInput = {
@@ -35311,6 +39962,8 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
   export type UserUncheckedUpdateManyWithoutServiceCenterInput = {
@@ -35337,7 +39990,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35353,11 +40005,13 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutServiceCenterInput = {
@@ -35369,7 +40023,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35390,6 +40044,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateManyWithoutServiceCenterInput = {
@@ -35401,7 +40056,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35428,7 +40083,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -35455,7 +40110,7 @@ export namespace Prisma {
     imei?: string | null
     hp?: string | null
     motorType?: string | null
-    state: string
+    stateCode?: string | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -35550,6 +40205,26 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type batchCreateManyCreatorInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    updatedBy?: number | null
+  }
+
+  export type batchCreateManyUpdaterInput = {
+    id?: number
+    batchCode: string
+    batchType?: $Enums.batchType | null
+    batchStatus?: $Enums.batchStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: number
+  }
+
   export type TicketUpdateWithoutCreatedByUserInput = {
     ticketCode?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -35558,7 +40233,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35574,11 +40248,13 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutCreatedByUserInput = {
@@ -35590,7 +40266,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35611,6 +40287,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateManyWithoutCreatedByUserInput = {
@@ -35622,7 +40299,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35648,7 +40325,6 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35664,11 +40340,13 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateWithoutUpdatedByUserInput = {
@@ -35680,7 +40358,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35701,6 +40379,7 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
   }
 
   export type TicketUncheckedUpdateManyWithoutUpdatedByUserInput = {
@@ -35712,7 +40391,7 @@ export namespace Prisma {
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35971,6 +40650,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     primaryUsers?: UserUpdateManyWithoutStateNestedInput
+    projects?: ProjectUpdateManyWithoutStateNestedInput
+    tickets?: TicketUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateWithoutUsersInput = {
@@ -35978,12 +40659,76 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
+    tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateManyWithoutUsersInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type batchUpdateWithoutCreatorInput = {
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batchItems?: batchItemUpdateManyWithoutBatchNestedInput
+    updater?: UserUpdateOneWithoutUpdatedBatchesNestedInput
+  }
+
+  export type batchUncheckedUpdateWithoutCreatorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    batchItems?: batchItemUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type batchUncheckedUpdateManyWithoutCreatorInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type batchUpdateWithoutUpdaterInput = {
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batchItems?: batchItemUpdateManyWithoutBatchNestedInput
+    creator?: UserUpdateOneRequiredWithoutCreatedBatchesNestedInput
+  }
+
+  export type batchUncheckedUpdateWithoutUpdaterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: IntFieldUpdateOperationsInput | number
+    batchItems?: batchItemUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type batchUncheckedUpdateManyWithoutUpdaterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchCode?: StringFieldUpdateOperationsInput | string
+    batchType?: NullableEnumbatchTypeFieldUpdateOperationsInput | $Enums.batchType | null
+    batchStatus?: EnumbatchStatusFieldUpdateOperationsInput | $Enums.batchStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: IntFieldUpdateOperationsInput | number
   }
 
   export type MessageCreateManyTicketInput = {
@@ -36039,6 +40784,13 @@ export namespace Prisma {
     photoRequired?: boolean
     changedBy?: number | null
     notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type batchItemCreateManyTicketInput = {
+    id?: number
+    batchId: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -36215,6 +40967,26 @@ export namespace Prisma {
     photoRequired?: BoolFieldUpdateOperationsInput | boolean
     changedBy?: NullableIntFieldUpdateOperationsInput | number | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type batchItemUpdateWithoutTicketInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: batchUpdateOneRequiredWithoutBatchItemsNestedInput
+  }
+
+  export type batchItemUncheckedUpdateWithoutTicketInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type batchItemUncheckedUpdateManyWithoutTicketInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    batchId?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -36507,6 +41279,33 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
     seen?: BoolFieldUpdateOperationsInput | boolean
     seenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type batchItemCreateManyBatchInput = {
+    id?: number
+    ticketId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type batchItemUpdateWithoutBatchInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    ticket?: TicketUpdateOneRequiredWithoutBatchItemsNestedInput
+  }
+
+  export type batchItemUncheckedUpdateWithoutBatchInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type batchItemUncheckedUpdateManyWithoutBatchInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

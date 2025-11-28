@@ -9,6 +9,7 @@ import {
   clearError,
   updateMilestone as updateMilestoneAction,
   setCurrentPage,
+  searchTickets,
 } from "../features/tickets";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,6 +21,8 @@ function useTickets() {
     totalPages,
     currentTicket,
     deviceDetails,
+    searchResults,
+    searching,
     loading,
     error,
     filters,
@@ -68,12 +71,18 @@ function useTickets() {
     dispatch(setCurrentPage(pageNumber));
   }
 
+  const searchTicketsAPI = (keyword) => {
+    return dispatch(searchTickets(keyword));
+  };
+
   return {
     tickets,
     currentPage,
     totalPages,
     ticket: currentTicket,
     deviceDetails,
+    searchResults,
+    searching,
     loading,
     error,
     filters,
@@ -91,6 +100,7 @@ function useTickets() {
     clearError: clearErrors,
     updateMilestone,
     setCurrentPage: setCurrentPageNumber,
+    searchTickets: searchTicketsAPI,
   };
 }
 export default useTickets;

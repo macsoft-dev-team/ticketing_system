@@ -20,8 +20,7 @@ import {
 import {
     ticketFormSchema,
     defaultValues,
-    priorityOptions,
-    categoryOptions,
+    priorityOptions, 
     faultTypeOptions
 } from './ticketFormSchema';
 import { NavLink, useNavigate } from 'react-router-dom';

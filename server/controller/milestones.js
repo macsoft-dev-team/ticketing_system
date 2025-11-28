@@ -1,4 +1,5 @@
 const milestoneService = require("../service/milestones");
+const batchService = require("../service/batch");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -439,153 +440,13 @@ const receiveControllerAtServiceCenter = async (req, res) => {
 
 const receiveControllerBatch = async (req, res) => {
   try {
-    const { batchCount } = req.body;
-    const { id: userId, role: userRole } = req.user;
-    const io = req.io;
-    const files = req.files;
-
-    if (!batchCount || parseInt(batchCount) === 0) {
-      return res.status(400).json({ 
-        message: "Invalid batch count",
-        received: batchCount
-      });
-    }
-
-    const itemCount = parseInt(batchCount);
-    const results = [];
-    const errors = [];
-
-    // Process each batch item
-    for (let i = 0; i < itemCount; i++) {
-      try {
-        // Extract item data
-        const itemControllerNo = req.body[`items[${i}][controllerNo]`];
-        const itemTicketCode = req.body[`items[${i}][ticketCode]`];
-
-        if (!itemControllerNo) {
-          errors.push({
-            index: i,
-            error: "Controller number is required",
-            controllerNo: itemControllerNo
-          });
-          continue;
-        }
-
-        // Process item files
-        let itemAttachments = [];
-        
-        // Handle photos for this item
-        if (files && files[`items[${i}][photos]`]) {
-          const itemPhotos = Array.isArray(files[`items[${i}][photos]`]) 
-            ? files[`items[${i}][photos]`] 
-            : [files[`items[${i}][photos]`]];
-            
-          itemPhotos.forEach((file, photoIndex) => {
-            // Get the corresponding label for this photo
-            const labelKey = `items[${i}][photoLabels][${photoIndex}]`;
-            const label = req.body[labelKey] || null;
-            
-            itemAttachments.push({
-              filename: file.filename,
-              originalName: file.originalname,
-              mimetype: file.mimetype,
-              size: file.size,
-              path: file.path,
-              type: 'photo',
-              label: label
-            });
-          });
-        }
-
-        // Handle videos for this item
-        if (files && files[`items[${i}][videos]`]) {
-          const itemVideos = Array.isArray(files[`items[${i}][videos]`]) 
-            ? files[`items[${i}][videos]`] 
-            : [files[`items[${i}][videos]`]];
-            
-          itemVideos.forEach((file) => {
-            itemAttachments.push({
-              filename: file.filename,
-              originalName: file.originalname,
-              mimetype: file.mimetype,
-              size: file.size,
-              path: file.path,
-              type: 'video'
-            });
-          });
-        }
-
-        // Handle audio for this item
-        if (files && files[`items[${i}][audio]`]) {
-          const audioFile = Array.isArray(files[`items[${i}][audio]`])
-            ? files[`items[${i}][audio]`][0]
-            : files[`items[${i}][audio]`];
-            
-          itemAttachments.push({
-            filename: audioFile.filename,
-            originalName: audioFile.originalname,
-            mimetype: audioFile.mimetype,
-            size: audioFile.size,
-            path: audioFile.path,
-            type: 'audio'
-          });
-        }
-
-        // Validate photo count for this item
-        const photoCount = itemAttachments.filter(att => att.type === 'photo').length;
-        if (photoCount < 4) {
-          errors.push({
-            index: i,
-            error: `At least 4 photos are required for controller ${itemControllerNo}`,
-            controllerNo: itemControllerNo,
-            photoCount
-          });
-          continue;
-        }
-
-        // Process this item
-        const result = await milestoneService.receiveControllerAtServiceCenter(
-          itemControllerNo,
-          userId,
-          userRole,
-          itemAttachments,
-          io
-        );
-
-        results.push({
-          index: i,
-          controllerNo: itemControllerNo,
-          ticketCode: result.ticket?.ticketCode || itemTicketCode,
-          success: true,
-          milestone: result.milestone
-        });
-
-      } catch (itemError) {
-        console.error(`Error processing batch item ${i}:`, itemError);
-        errors.push({
-          index: i,
-          error: itemError.message,
-          controllerNo: req.body[`items[${i}][controllerNo]`] || 'unknown'
-        });
-      }
-    }
-
-    // Return batch results
-    const successCount = results.length;
-    const errorCount = errors.length;
-
+    const { batchCount, batchId } = req.body;
+     
+const batch = await batchService.receiveControllerBatch(batchId);
+ 
     res.status(200).json({
-      message: `Batch processed: ${successCount} successful, ${errorCount} errors`,
-      batchCount: itemCount,
-      successCount,
-      errorCount,
-      results,
-      errors,
-      summary: {
-        total: itemCount,
-        processed: successCount,
-        failed: errorCount
-      }
+      message: `Batch of ${batchCount} controllers received successfully`,
+      milestone: batch
     });
 
   } catch (error) {

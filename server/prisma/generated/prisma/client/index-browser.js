@@ -145,6 +145,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   projectCode: 'projectCode',
   email: 'email',
   address: 'address',
+  stateId: 'stateId',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -192,7 +193,7 @@ exports.Prisma.TicketScalarFieldEnum = {
   imei: 'imei',
   hp: 'hp',
   motorType: 'motorType',
-  state: 'state',
+  stateCode: 'stateCode',
   district: 'district',
   village: 'village',
   block: 'block',
@@ -338,6 +339,25 @@ exports.Prisma.TicketSequenceScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BatchScalarFieldEnum = {
+  id: 'id',
+  batchCode: 'batchCode',
+  batchType: 'batchType',
+  batchStatus: 'batchStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy',
+  updatedBy: 'updatedBy'
+};
+
+exports.Prisma.BatchItemScalarFieldEnum = {
+  id: 'id',
+  batchId: 'batchId',
+  ticketId: 'ticketId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -394,7 +414,7 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   imei: 'imei',
   hp: 'hp',
   motorType: 'motorType',
-  state: 'state',
+  stateCode: 'stateCode',
   district: 'district',
   village: 'village',
   block: 'block',
@@ -456,6 +476,10 @@ exports.Prisma.NotificationOrderByRelevanceFieldEnum = {
 exports.Prisma.TicketSequenceOrderByRelevanceFieldEnum = {
   prefix: 'prefix'
 };
+
+exports.Prisma.batchOrderByRelevanceFieldEnum = {
+  batchCode: 'batchCode'
+};
 exports.Role = exports.$Enums.Role = {
   MACSOFT_ADMIN: 'MACSOFT_ADMIN',
   MACSOFT_HEAD: 'MACSOFT_HEAD',
@@ -511,6 +535,17 @@ exports.TransactionType = exports.$Enums.TransactionType = {
   DELIVERY: 'DELIVERY'
 };
 
+exports.batchType = exports.$Enums.batchType = {
+  RECEIVE_CONTROLLER: 'RECEIVE_CONTROLLER',
+  DELIVER_CONTROLLER: 'DELIVER_CONTROLLER'
+};
+
+exports.batchStatus = exports.$Enums.batchStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
 exports.Prisma.ModelName = {
   State: 'State',
   Organisation: 'Organisation',
@@ -529,7 +564,9 @@ exports.Prisma.ModelName = {
   MessageSeen: 'MessageSeen',
   Notification: 'Notification',
   NotificationRecipient: 'NotificationRecipient',
-  TicketSequence: 'TicketSequence'
+  TicketSequence: 'TicketSequence',
+  batch: 'batch',
+  batchItem: 'batchItem'
 };
 
 /**

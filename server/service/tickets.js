@@ -98,6 +98,16 @@ const getTickets = async (skip, take, filter, userId, role) => {
       where.status = filter.status;
     }
 
+    // milestone stage filter - filter tickets by their milestone stage and status
+    if (filter && filter.milestoneStage) {
+      where.ticketMilestones = {
+        some: {
+          stage: filter.milestoneStage,
+          status: 'IN_PROGRESS' // Filter by milestones that are in progress
+        }
+      };
+    }
+
     // Fetch the calling user (we need centerCode + primary State + assigned states)
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -1069,6 +1079,92 @@ const searchByControllerNumber = async (controllerNo, userId, userRole) => {
   }
 };
 
+const searchTickets = async (keyword, userId, userRole) => {
+  try {
+    // Build where clause based on role
+    let where = {
+      OR: [
+        { ticketCode: { contains: keyword } },
+        { controllerNo: { contains: keyword } },
+        { imei: { contains: keyword } },
+        { customerName: { contains: keyword } },
+        { hp: { contains: keyword } },
+        { motorType: { contains: keyword } },
+        { stateCode: { contains: keyword } },
+        { district: { contains: keyword } },
+        { village: { contains: keyword } },
+        { block: { contains: keyword } }
+      ]
+    };
+
+    // Add role-based filtering
+    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
+      where.createdBy = userId;
+    } else if (userRole === "CUSTOMER_SERVICE_HEAD" || userRole === "SERVICE_CENTER_TECHNICIAN") {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { serviceCenterCode: true },
+      });
+
+      if (user?.serviceCenterCode) {
+        where.assignedServiceCenter = user.serviceCenterCode;
+      }
+    }
+
+    // For receive controller, we want tickets that are ready to be received
+    where.ticketMilestones = {
+      some: {
+        stage: {
+          in: ["SENT_TO_SERVICE_CENTER"],
+        },
+        status: {
+          in: ["IN_PROGRESS"],
+        },
+      },
+    };
+
+    const tickets = await prisma.ticket.findMany({
+      where,
+      include: {
+        createdByUser: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
+        },
+        serviceCenter: {
+          select: {
+            id: true,
+            name: true,
+            centerCode: true,
+            address: true,
+          },
+        },
+        ticketMilestones: {
+          include: {
+            changer: {
+              select: {
+                id: true,
+                name: true,
+                role: true,
+              },
+            },
+          },
+          orderBy: { order: "asc" },
+        },
+        attachments: true,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50 // Limit results for performance
+    });
+
+    return tickets;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getTickets,
   getTicketById,
@@ -1077,5 +1173,6 @@ module.exports = {
   updateStatus,
   deleteTicket,
   searchByControllerNumber,
+  searchTickets,
   checkActiveTicketForController,
 };

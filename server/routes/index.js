@@ -25,11 +25,13 @@ const inboundActivity = require("./inboundActivity");
 const projectWA = require("./projectsWA");
 const organisationWA = require("./organisationWA");
 const statesWA = require("./statesWA");
+const batch = require("./batch");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
 router.use("/users", authenticate, user);
 router.use("/tickets", authenticate, ticket);
+router.use("/batch", authenticate, batch);
 router.use("/organisations", authenticate, organisation);
 router.use("/service-centers", authenticate, serviceCenter);
 router.use("/service-center-assignment", authenticate, serviceCenterAssignment);

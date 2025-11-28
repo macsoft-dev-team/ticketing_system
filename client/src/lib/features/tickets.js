@@ -90,6 +90,25 @@ export const fetchTicketById = createAsyncThunk(
   }
 );
 
+export const searchTickets = createAsyncThunk(
+  "tickets/searchTickets",
+  async (keyword, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${API_ENDPOINTS.ticket}/search`, {
+        params: { keyword }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Search tickets error:", error);
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          error.message || 
+                          "Failed to search tickets";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const createNewTicket = createAsyncThunk(
   "tickets/createNewTicket",
   async (ticketData, { rejectWithValue }) => {
@@ -494,6 +513,22 @@ const ticketSlice = createSlice({
       .addCase(deleteTicketById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to delete ticket";
+      })
+      .addCase(searchTickets.pending, (state) => {
+        state.searching = true;
+        state.error = null;
+      })
+      .addCase(searchTickets.fulfilled, (state, action) => {
+        state.searching = false;
+        state.searchResults = Array.isArray(action.payload.tickets)
+          ? action.payload.tickets
+          : [];
+        state.error = null;
+      })
+      .addCase(searchTickets.rejected, (state, action) => {
+        state.searching = false;
+        state.searchResults = [];
+        state.error = action.payload || "Failed to search tickets";
       });
   },
 });

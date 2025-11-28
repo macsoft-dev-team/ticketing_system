@@ -200,6 +200,38 @@ const searchByControllerNumber = async (req, res) => {
   }
 };
 
+const searchTickets = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    if (!keyword || !keyword.trim()) {
+      return res.status(400).json({
+        message: "Search keyword is required",
+        error: "Please provide a search keyword"
+      });
+    }
+
+    const tickets = await ticketService.searchTickets(
+      keyword.trim(),
+      userId,
+      userRole
+    );
+
+    res.status(200).json({
+      tickets,
+      message: `Found ${tickets.length} tickets matching "${keyword}"`
+    });
+  } catch (error) {
+    console.error("Error searching tickets:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message
+    });
+  }
+};
+
 const checkActiveTicketForController = async (req, res) => {
   try {
     const { controllerNo } = req.params;
@@ -245,5 +277,6 @@ module.exports = {
   getTicketById,
   deleteTicket,
   searchByControllerNumber,
+  searchTickets,
   checkActiveTicketForController,
 };

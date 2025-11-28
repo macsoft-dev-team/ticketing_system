@@ -76,6 +76,7 @@ model State {
   primaryUsers User[]    @relation("PrimaryState")
   users        User[]    @relation("UserStates")
   projects     Project[] @relation("StateProjects")
+  tickets      Ticket[]  @relation("ticketState")
 }
 
 model Organisation {
@@ -159,6 +160,8 @@ model User {
   project                Project?                @relation(fields: [projectCode], references: [projectCode])
   orgCode                String?
   organisation           Organisation?           @relation(fields: [orgCode], references: [orgCode])
+  createdBatches         batch[]                 @relation("BatchCreator")
+  updatedBatches         batch[]                 @relation("BatchUpdater")
 }
 
 model Ticket {
@@ -170,7 +173,7 @@ model Ticket {
   imei                  String?
   hp                    String?
   motorType             String?
-  state                 String
+  stateCode             String?
   district              String?
   village               String?
   block                 String?
@@ -185,7 +188,6 @@ model Ticket {
   // addon
   code                  String?
   projectName           String?
-  isReceving            Boolean      @default(false)
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
   deletedAt             DateTime?    @map("deleted_at")
@@ -194,11 +196,13 @@ model Ticket {
   createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
   serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
+  state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
   messages            Message[]
   notifications       Notification[]
   productTransactions ProductTransaction[]
   attachments         Attachments[]
   ticketMilestones    TicketMilestone[]
+  batchItems          batchItem[]
 }
 
 model TicketMilestone {
@@ -391,4 +395,43 @@ model TicketSequence {
   prefix     String   @default("TKT")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model batch {
+  id          Int         @id @default(autoincrement())
+  batchCode   String      @unique
+  batchType   batchType?
+  batchStatus batchStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  createdBy   Int
+  updatedBy   Int?
+
+  // Relations
+  batchItems batchItem[]
+  creator    User        @relation("BatchCreator", fields: [createdBy], references: [id])
+  updater    User?       @relation("BatchUpdater", fields: [updatedBy], references: [id])
+}
+
+model batchItem {
+  id        Int      @id @default(autoincrement())
+  batchId   Int
+  ticketId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  batch  batch  @relation(fields: [batchId], references: [id])
+  ticket Ticket @relation(fields: [ticketId], references: [id])
+}
+
+enum batchType {
+  RECEIVE_CONTROLLER
+  DELIVER_CONTROLLER
+}
+
+enum batchStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }

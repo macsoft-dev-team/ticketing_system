@@ -14,7 +14,10 @@ import {
     Image as ImageIcon,
     Loader2,
     ScanLine,
-    List
+    List,
+    Eye,
+    Download,
+    RefreshCw
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import Input from '../../components/ui/input';
@@ -22,12 +25,25 @@ import { Card } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { useToast } from '../../components/ui/toast';
 import { useAuth } from '../../lib/hooks/useAuth';
+import useTickets from '../../lib/hooks/useTickets';
+import useBatch from '../../lib/hooks/useBatch';
+import { useDebounce } from '../../lib/hooks/ticketHooks';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ReceiveController = () => {
     const { token } = useAuth();
+    const { fetchTickets, tickets, searching, searchResults, updateMilestone } = useTickets();
+    const { 
+        currentBatch, 
+        getOrCreateActiveBatch, 
+        addTicketToBatch, 
+        removeTicketFromBatch, 
+        isTicketInBatch,
+        fetchCompletedBatches,
+        loading: loadingBatch 
+    } = useBatch();
     const toastContext = useToast();
 
     // Safe toast function with fallback
@@ -37,7 +53,11 @@ const ReceiveController = () => {
 
     const [searchKeyword, setSearchKeyword] = useState('');
     const [searchedTicket, setSearchedTicket] = useState(null);
-    const [searching, setSearching] = useState(false);
+    const [ticketsList, setTicketsList] = useState([]);
+    const [showTicketsList, setShowTicketsList] = useState(false);
+    
+    // Debounce the search keyword with 500ms delay (longer for API calls)
+    const debouncedSearchKeyword = useDebounce(searchKeyword, 500);
     const [submitting, setSubmitting] = useState(false);
     const [photos, setPhotos] = useState([]);
     const [videos, setVideos] = useState([]);
@@ -45,6 +65,17 @@ const ReceiveController = () => {
     const [isRecording, setIsRecording] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [scannerStream, setScannerStream] = useState(null);
+    
+    // Batch item photos - stores photos for each ticket in the batch
+    const [batchItemPhotos, setBatchItemPhotos] = useState({}); // { ticketId: [photo1, photo2, ...] }
+    const [selectedTicketForUpload, setSelectedTicketForUpload] = useState(null);
+    
+    // Completed batches state
+    const [completedBatches, setCompletedBatches] = useState([]);
+    const [showCompletedBatches, setShowCompletedBatches] = useState(false);
+    const [loadingCompletedBatches, setLoadingCompletedBatches] = useState(false);
+    
+    // Batch state comes from useBatch hook
 
     // NEW: Camera capture state
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -63,8 +94,14 @@ const ReceiveController = () => {
     const [videoDevices, setVideoDevices] = useState([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState(null);
 
-    // Batch state - list of items added to batch
-    const [batchItems, setBatchItems] = useState([]);
+    // Image viewing state
+    const [viewingImages, setViewingImages] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [currentBatchImages, setCurrentBatchImages] = useState([]);
+    const [selectedTicketForImages, setSelectedTicketForImages] = useState(null);
+    const [ticketImages, setTicketImages] = useState({});
+
+    // Batch state comes from useBatch hook
 
     const photoInputRef = useRef(null);
     const videoInputRef = useRef(null);
@@ -128,9 +165,10 @@ const ReceiveController = () => {
         }
     };
 
-    // Search ticket by keyword (controller number, ticket code, or IMEI)
+    // Search tickets by keyword (controller number, ticket code, or IMEI)
     const handleSearch = useCallback(async () => {
-        if (!searchKeyword.trim()) {
+        const keyword = debouncedSearchKeyword.trim();
+        if (!keyword) {
             addToast({
                 title: 'Input Required',
                 description: 'Please enter a search keyword (Controller No, Ticket Code, or IMEI)',
@@ -139,39 +177,193 @@ const ReceiveController = () => {
             return;
         }
 
-        setSearching(true);
-        try {
-            const response = await axios.get(
-                `${API_URL}/tickets/search?keyword=${encodeURIComponent(searchKeyword.trim())}`,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                    withCredentials: true
-                }
-            );
-
-            // The search returns an array, so get the first result
-            if (response.data.tickets && response.data.tickets.length > 0) {
-                setSearchedTicket(response.data.tickets[0]);
-            } else {
-                throw new Error('No tickets found');
+        // Use fetchTickets with search filter for tickets ready to receive
+        fetchTickets({
+            skip: 0,
+            take: 50,
+            filter: {
+                search: keyword,
+                milestoneStage: 'SENT_TO_SERVICE_CENTER' // Filter by milestone stage
             }
+        });
+        setShowTicketsList(true);
+    }, [debouncedSearchKeyword]); // Remove unstable function dependencies
+
+    // Update ticket list when tickets from hook change
+    React.useEffect(() => {
+        if (tickets && showTicketsList) {
+            setTicketsList(tickets);
+            // Only show toast notifications when there are actual results to show
+            // Remove addToast from dependencies to prevent infinite loops
+            if (tickets.length > 0) {
+                addToast({
+                    title: 'Tickets Found',
+                    description: `Found ${tickets.length} tickets`,
+                    variant: 'success'
+                });
+            }
+        }
+    }, [tickets, showTicketsList]); // Remove addToast and searchKeyword
+
+    // Select a ticket from the search results
+    const handleSelectTicket = useCallback((ticket) => {
+        setSearchedTicket(ticket);
+        setShowTicketsList(false);
+        // Clear photos when selecting a new ticket
+        setPhotos([]);
+        setVideos([]);
+        setAudioRecording(null);
+        addToast({
+            title: 'Ticket Selected',
+            description: `Selected ticket ${ticket.ticketCode}`,
+            variant: 'success'
+        });
+    }, [addToast]);
+
+    // Add selected ticket to batch after photos are taken
+    const addTicketToBatchHandler = useCallback(async () => {
+        if (!searchedTicket || !currentBatch) {
             addToast({
-                title: 'Ticket Found',
-                description: `Ticket ${response.data.tickets[0].ticketCode} found`,
-                variant: 'success'
+                title: 'Error',
+                description: 'No ticket selected or batch not available',
+                variant: 'error'
             });
-        } catch (error) {
-            console.error('Search error:', error);
-            setSearchedTicket(null);
+            return;
+        }
+
+        // Check if ticket is already in batch
+        if (isTicketInBatch(searchedTicket.id)) {
             addToast({
-                title: 'Not Found',
-                description: error.response?.data?.message || 'No ticket found with this keyword',
+                title: 'Already Added',
+                description: `Ticket ${searchedTicket.ticketCode} is already in the batch`,
+                variant: 'warning'
+            });
+            return;
+        }
+
+        // Check if photos are available
+        if (photos.length === 0) {
+            addToast({
+                title: 'Photos Required',
+                description: 'Please capture or upload photos before adding ticket to batch',
+                variant: 'error'
+            });
+            return;
+        }
+
+        try {
+            // First, create the milestone with attachments
+            const milestoneResult = await updateMilestone({
+                ticketId: searchedTicket.id,
+                milestoneData: {
+                    targetStage: 'RECEIVED_AT_SERVICE_CENTER',
+                    action: 'transition',
+                    attachments: photos.map(photo => photo.file) // Extract File objects
+                }
+            });
+
+            // Check if milestone creation was successful
+            if (milestoneResult.meta.requestStatus === 'fulfilled') {
+                // Now add ticket to batch
+                await addTicketToBatch(currentBatch.id, searchedTicket.id);
+                
+                addToast({
+                    title: 'Success',
+                    description: `Ticket ${searchedTicket.ticketCode} received at service center and added to batch`,
+                    variant: 'success'
+                });
+                
+                // Reset form after adding to batch
+                setSearchedTicket(null);
+                setPhotos([]);
+                setVideos([]);
+                setAudioRecording(null);
+                setSearchKeyword('');
+            } else {
+                throw new Error(milestoneResult.payload || 'Failed to create milestone');
+            }
+        } catch (error) {
+            console.error('Error adding ticket to batch:', error);
+            addToast({
+                title: 'Error',
+                description: error.message || 'Failed to process ticket',
+                variant: 'error'
+            });
+        }
+    }, [searchedTicket, currentBatch, isTicketInBatch, addTicketToBatch, addToast, photos, updateMilestone]);
+
+    // Remove ticket from batch
+    const removeTicketFromBatchHandler = useCallback(async (ticketId) => {
+        if (!currentBatch) {
+            addToast({
+                title: 'Error',
+                description: 'No active batch found',
+                variant: 'error'
+            });
+            return;
+        }
+
+        try {
+            await removeTicketFromBatch(currentBatch.id, ticketId);
+        } catch (error) {
+            console.error('Error removing ticket from batch:', error);
+        }
+    }, [currentBatch, removeTicketFromBatch, addToast]);
+
+    // Function to load completed batches
+    const loadCompletedBatches = useCallback(async () => {
+        setLoadingCompletedBatches(true);
+        try {
+            const batches = await fetchCompletedBatches();
+            setCompletedBatches(batches);
+        } catch (error) {
+            console.error('Error loading completed batches:', error);
+            addToast({
+                title: 'Error',
+                description: 'Failed to load completed batches',
                 variant: 'error'
             });
         } finally {
-            setSearching(false);
+            setLoadingCompletedBatches(false);
         }
-    }, [searchKeyword, token, addToast]);
+    }, [fetchCompletedBatches, addToast]);
+
+    // Initialize batch on component mount
+    React.useEffect(() => {
+        const init = async () => {
+            try {
+                await getOrCreateActiveBatch('RECEIVE_CONTROLLER');
+                // Load completed batches
+                await loadCompletedBatches();
+            } catch (error) {
+                console.error('Error initializing batch:', error);
+            }
+        };
+        init();
+    }, [getOrCreateActiveBatch, loadCompletedBatches]); // Updated dependencies
+
+    // Auto-search when debounced keyword changes (if it has value)
+    React.useEffect(() => {
+        if (debouncedSearchKeyword && debouncedSearchKeyword.trim().length >= 2) {
+            const keyword = debouncedSearchKeyword.trim();
+            // Call fetchTickets without .then() since it doesn't return a Promise
+            fetchTickets({
+                skip: 0,
+                take: 50,
+                filter: {
+                    search: keyword,
+                    milestoneStage: 'SENT_TO_SERVICE_CENTER' // Filter by milestone stage
+                }
+            });
+            setShowTicketsList(true);
+        } else if (debouncedSearchKeyword.trim().length === 0) {
+            // Clear results when search is empty
+            setShowTicketsList(false);
+            setTicketsList([]);
+        }
+    }, [debouncedSearchKeyword]); // Remove fetchTickets from dependencies
+
+    // Functions exist later in the component
 
     // Handle photo upload
     const handlePhotoSelect = (e) => {
@@ -530,7 +722,7 @@ const ReceiveController = () => {
     };
 
     // Batch management functions
-    const addToBatch = () => {
+    const addToBatch = async () => {
         if (!searchedTicket) {
             addToast({
                 title: 'No Ticket Selected',
@@ -581,9 +773,8 @@ const ReceiveController = () => {
             return;
         }
 
-        // Check if already in batch
-        const alreadyInBatch = batchItems.some(item => item.ticketCode === searchedTicket.ticketCode);
-        if (alreadyInBatch) {
+        // Check if already in batch using the hook
+        if (isTicketInBatch(searchedTicket.id)) {
             addToast({
                 title: 'Already in Batch',
                 description: 'This ticket is already in the batch',
@@ -592,39 +783,160 @@ const ReceiveController = () => {
             return;
         }
 
-        const item = {
-            id: Math.random().toString(36),
-            ticketCode: searchedTicket?.ticketCode || '',
-            controllerNo: searchedTicket?.controllerNo || '',
-            customerName: searchedTicket?.customerName || '',
-            createdAt: new Date(),
-            photos: photos.map(p => ({ ...p })),
-            videos: videos.map(v => ({ ...v })),
-            audio: audioRecording ? { ...audioRecording } : null,
-            isMarkedForReceive: true
-        };
+        // photo labels must be unique
+        const labelSet = new Set();
+        for (const photo of photos) {
+            if (labelSet.has(photo.label)) {
+                addToast({
+                    title: 'Duplicate Labels',
+                    description: `Duplicate photo label found: ${photo.label}. Please ensure all photo labels are unique.`,
+                    variant: 'error'
+                });
+                return;
+            }
+            labelSet.add(photo.label);
+        }
 
-        setBatchItems(prev => [item, ...prev]);
-        addToast({
-            title: 'Added to Batch',
-            description: `Controller ${item.controllerNo || item.ticketCode || '-'} added to batch`,
-            variant: 'success'
-        });
-
-        // Reset form after successful addition
-        resetForm();
+        // Use the batch hook to add the ticket
+        try {
+            await addTicketToBatchHandler();
+            // Reset form after successful addition
+            resetForm();
+        } catch (error) {
+            console.error('Error adding ticket to batch:', error);
+        }
     };
 
-    const removeBatchItem = (id) => {
-        setBatchItems(prev => prev.filter(it => it.id !== id));
+    const removeBatchItem = (ticketId) => {
+        if (currentBatch) {
+            removeTicketFromBatchHandler(ticketId);
+        }
     };
 
     const clearBatch = () => {
-        setBatchItems([]);
+        // This would require a separate endpoint to close/complete batch
+        addToast({
+            title: 'Clear Batch',
+            description: 'Clear batch functionality needs to be implemented',
+            variant: 'warning'
+        });
+    };
+
+    // View ticket images (milestone attachments) - use data already available in batch
+    const viewTicketImages = useCallback(async (ticketId) => {
+        if (!ticketId) return;
+        
+        try {
+            let images = [];
+            
+            // Find the ticket in the current batch
+            const batchItem = currentBatch?.batchItems?.find(item => item.ticket?.id === ticketId);
+            
+            if (batchItem?.ticket) {
+                // First, try to find RECEIVED_AT_SERVICE_CENTER milestone attachments
+                const receivedMilestone = batchItem.ticket.ticketMilestones?.find(m => m.stage === 'RECEIVED_AT_SERVICE_CENTER');
+                if (receivedMilestone?.attachments?.length > 0) {
+                    images = receivedMilestone.attachments.filter(att => 
+                        att.fileType?.startsWith('image/') || 
+                        att.fileName?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
+                    );
+                    console.log('Found RECEIVED_AT_SERVICE_CENTER milestone images:', images.length);
+                }
+                
+                // If no images in RECEIVED_AT_SERVICE_CENTER, check other milestone attachments
+                if (images.length === 0) {
+                    const milestonesWithAttachments = batchItem.ticket.ticketMilestones?.filter(m => 
+                        m.attachments && m.attachments.length > 0
+                    );
+                    
+                    if (milestonesWithAttachments?.length > 0) {
+                        // Get all images from all milestones
+                        images = milestonesWithAttachments.flatMap(m => 
+                            m.attachments.filter(att => 
+                                att.fileType?.startsWith('image/') || 
+                                att.fileName?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
+                            )
+                        );
+                        console.log('Found milestone images from other stages:', images.length);
+                    }
+                }
+                
+                // If still no images, check general ticket attachments
+                if (images.length === 0 && batchItem.ticket.attachments) {
+                    images = batchItem.ticket.attachments.filter(att => 
+                        att.fileType?.startsWith('image/') || 
+                        att.fileName?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
+                    );
+                    console.log('Found general ticket images:', images.length);
+                }
+            }
+            
+            // If still no images, check if there are locally uploaded photos for this ticket
+            if (images.length === 0 && batchItemPhotos[ticketId]) {
+                images = batchItemPhotos[ticketId].map(photo => ({
+                    id: photo.id,
+                    fileName: photo.file.name,
+                    fileType: photo.file.type,
+                    fileUrl: photo.preview,
+                    label: photo.label,
+                    isLocal: true // Flag to indicate this is a local preview
+                }));
+                console.log('Found local photos:', images.length);
+            }
+            
+            if (images && images.length > 0) {
+                setCurrentBatchImages(images);
+                setCurrentImageIndex(0);
+                setSelectedTicketForImages(ticketId);
+                setViewingImages(true);
+                
+                console.log('Displaying images:', images.map(img => ({
+                    fileName: img.fileName,
+                    fileUrl: img.fileUrl,
+                    isLocal: img.isLocal
+                })));
+            } else {
+                console.log('No images found for ticket:', ticketId);
+                addToast({
+                    title: 'No Images',
+                    description: 'No images found for this ticket. Upload photos during receiving process.',
+                    variant: 'info'
+                });
+            }
+        } catch (error) {
+            console.error('Error viewing ticket images:', error);
+            addToast({
+                title: 'Error',
+                description: 'Failed to display ticket images',
+                variant: 'error'
+            });
+        }
+    }, [currentBatch, batchItemPhotos, addToast]);
+
+    // Close image viewer
+    const closeImageViewer = () => {
+        setViewingImages(false);
+        setCurrentBatchImages([]);
+        setCurrentImageIndex(0);
+        setSelectedTicketForImages(null);
+    };
+
+    // Navigate images
+    const nextImage = () => {
+        setCurrentImageIndex((prev) => 
+            prev < currentBatchImages.length - 1 ? prev + 1 : 0
+        );
+    };
+
+    const prevImage = () => {
+        setCurrentImageIndex((prev) => 
+            prev > 0 ? prev - 1 : currentBatchImages.length - 1
+        );
     };
 
     // Batch submission: Mark all as received
     const markAllAsReceived = async () => {
+        const batchItems = currentBatch?.batchItems || [];
         if (batchItems.length === 0) {
             addToast({
                 title: 'Batch Empty',
@@ -635,7 +947,7 @@ const ReceiveController = () => {
         }
 
         // Validate all items have controllerNo
-        const itemsWithoutControllerNo = batchItems.filter(item => !item.controllerNo);
+        const itemsWithoutControllerNo = batchItems.filter(item => !item.ticket.controllerNo);
         if (itemsWithoutControllerNo.length > 0) {
             addToast({
                 title: 'Invalid Items',
@@ -645,74 +957,44 @@ const ReceiveController = () => {
             return;
         }
 
-        // Validate all items have required photos with labels
-        for (let i = 0; i < batchItems.length; i++) {
-            const item = batchItems[i];
-            if (item.photos.length < 4) {
-                addToast({
-                    title: 'Missing Photos',
-                    description: `Item ${i + 1} (${item.controllerNo}) needs at least 4 photos`,
-                    variant: 'error'
-                });
-                return;
-            }
-            
-            const photosWithoutLabels = item.photos.filter(p => !p.label);
-            if (photosWithoutLabels.length > 0) {
-                addToast({
-                    title: 'Missing Labels',
-                    description: `Item ${i + 1} (${item.controllerNo}) has ${photosWithoutLabels.length} photo(s) without labels`,
-                    variant: 'error'
-                });
-                return;
-            }
-        }
+        // Since milestones are now created when tickets are added to batch,
+        // we skip detailed photo validation here as photos are already attached to milestones
+        // The batch processing endpoint will handle any remaining validation
 
-        // Build multipart form with files grouped per item
+        // Build form data with batch information
+        // Photos are already attached to milestones when tickets were added to batch
         const formData = new FormData();
         formData.append('batchCount', String(batchItems.length));
+        formData.append('batchId', String(currentBatch.id));
 
         console.log('🚀 Building batch FormData:', {
             itemCount: batchItems.length,
             items: batchItems.map((item, idx) => ({
                 index: idx,
-                controllerNo: item.controllerNo,
-                ticketCode: item.ticketCode,
-                photoCount: item.photos.length,
-                videoCount: item.videos.length,
-                hasAudio: !!item.audio
+                controllerNo: item.ticket.controllerNo,
+                ticketCode: item.ticket.ticketCode,
+                note: 'Photos already attached to milestone'
             }))
         });
 
         batchItems.forEach((item, idx) => {
             // Append item metadata with correct FormData key format
-            formData.append(`items[${idx}][ticketCode]`, item.ticketCode || '');
-            formData.append(`items[${idx}][controllerNo]`, item.controllerNo);
+            formData.append(`items[${idx}][ticketCode]`, item.ticket.ticketCode || '');
+            formData.append(`items[${idx}][controllerNo]`, item.ticket.controllerNo);
 
             console.log(`📦 Item ${idx}:`, {
-                ticketCode: item.ticketCode,
-                controllerNo: item.controllerNo,
-                photos: item.photos.length
+                ticketCode: item.ticket.ticketCode,
+                controllerNo: item.ticket.controllerNo,
+                note: 'Milestone and photos already created'
             });
 
-            // Append photos with their labels
-            item.photos.forEach((photo, pidx) => {
-                formData.append(`items[${idx}][photos]`, photo.file, photo.file.name);
-                formData.append(`items[${idx}][photoLabels][${pidx}]`, photo.label || '');
-                console.log(`  📸 Photo ${pidx}: ${photo.label} - ${photo.file.name}`);
+            // If there are additional photos in batchItemPhotos (uploaded later), include them
+            const additionalPhotos = batchItemPhotos[item.ticket.id] || [];
+            additionalPhotos.forEach((photo, pidx) => {
+                formData.append(`items[${idx}][additionalPhotos]`, photo.file, photo.file.name);
+                formData.append(`items[${idx}][additionalPhotoLabels][${pidx}]`, photo.label || '');
+                console.log(`  📸 Additional Photo ${pidx}: ${photo.label} - ${photo.file.name}`);
             });
-
-            // Append videos
-            item.videos.forEach((v, vidx) => {
-                formData.append(`items[${idx}][videos]`, v.file, v.file.name);
-                console.log(`  🎥 Video ${vidx}: ${v.file.name}`);
-            });
-
-            // Append audio
-            if (item.audio && item.audio.file) {
-                formData.append(`items[${idx}][audio]`, item.audio.file, item.audio.file.name);
-                console.log(`  🎤 Audio: ${item.audio.file.name}`);
-            }
         });
 
         try {
@@ -746,6 +1028,7 @@ const ReceiveController = () => {
             
             // Cleanup
             clearBatch();
+            setBatchItemPhotos({}); // Clear any additional photos
             setSearchedTicket(null);
             setSearchKeyword('');
         } catch (error) {
@@ -1201,9 +1484,8 @@ const ReceiveController = () => {
     return (
         <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left: Batch list */}
-               
-                <div className="col-span-1 lg:min-w-3/5 ">
+                {/* Main content - spans 2 columns */}
+                <div className="lg:col-span-2">
                     <Card className="px-4 py-5 space-y-4">
                         {/* Header */}
                         <motion.div
@@ -1214,11 +1496,11 @@ const ReceiveController = () => {
                             <div className="flex items-center gap-2">
                                 <Package className="w-8 h-8 text-blue-600" />
                                 <h1 className="font-medium tracking-wide uppercase">
-                                    Receive Controller — Add to Batch
+                                    Receive Controller
                                 </h1>
                             </div>
                             <p className="text-sm text-gray-600">
-                                Scan controller, upload required photos, then add to batch. Submit batch when ready.
+                                Scan controller, upload required photos, then add to batch.
                             </p>
                         </motion.div>
 
@@ -1227,7 +1509,7 @@ const ReceiveController = () => {
                             <div className="flex gap-2 items-center">
                                 <div className="flex-1">
                                     <Input
-                                        placeholder="Search by Controller No, Ticket Code, or IMEI..."
+                                        placeholder="Type 2+ characters to search (Controller No, Ticket Code, IMEI...)"
                                         value={searchKeyword}
                                         onChange={(e) => setSearchKeyword(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -1264,9 +1546,81 @@ const ReceiveController = () => {
                                     ) : (
                                         <Search className="w-4 h-4" />
                                     )}
-                                    Search
+                                    {searching ? 'Searching...' : 'Search'}
                                 </Button>
                             </div>
+
+                            {/* Ticket Search Results List */}
+                            <AnimatePresence>
+                                {showTicketsList && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="bg-white border border-gray-200 rounded-lg shadow-sm max-h-64 overflow-y-auto"
+                                    >
+                                        <div className="p-3 border-b border-gray-200 flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <List className="w-4 h-4 text-gray-600" />
+                                                <span className="font-medium text-sm">
+                                                    Search Results ({ticketsList.length})
+                                                </span>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setShowTicketsList(false)}
+                                                className="p-1 h-6 w-6"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                        
+                                        {searching ? (
+                                            <div className="p-4 text-center text-gray-500 text-sm flex items-center justify-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                Searching tickets...
+                                            </div>
+                                        ) : ticketsList.length === 0 ? (
+                                            <div className="p-4 text-center text-gray-500 text-sm">
+                                                No tickets found matching your search
+                                            </div>
+                                        ) : (
+                                            <div className="divide-y divide-gray-100">
+                                                {ticketsList.map((ticket) => (
+                                                    <div
+                                                        key={ticket.id}
+                                                        className="p-3 hover:bg-gray-50 cursor-pointer transition-colors"
+                                                        onClick={() => handleSelectTicket(ticket)}
+                                                    >
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="font-medium text-sm truncate">
+                                                                    {ticket.ticketCode}
+                                                                </div>
+                                                                <div className="text-xs text-gray-600 mt-1">
+                                                                    <div><strong>Customer:</strong> {ticket.customerName}</div>
+                                                                    <div><strong>Controller:</strong> {ticket.controllerNo}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col items-end gap-1 ml-3">
+                                                                <Badge variant="outline" className="text-xs">
+                                                                    {ticket.status}
+                                                                </Badge>
+                                                                {isTicketInBatch(ticket.id) && (
+                                                                    <Badge variant="secondary" className="text-xs">
+                                                                        In Batch
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
                             {/* If ticket found show details */}
                             <AnimatePresence>
@@ -1619,58 +1973,209 @@ const ReceiveController = () => {
                     </Card>
                 </div>
 
-                {/* Right: Main form / uploader */}
-                <div className="col-span-2">
-                    <Card className="p-4 space-y-3">
+                {/* Right side: Batch Card */}
+                <div className="lg:col-span-1">
+                    <Card className="p-4 space-y-4 h-fit sticky top-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="font-semibold text-lg flex items-center gap-2">
-                                <List className="w-5 h-5 text-blue-600" />
-                                Batch ({batchItems.length})
-                            </h3>
-                            <div className="flex items-center gap-2">
-                                <Button onClick={clearBatch} variant="outline" size="small" disabled={batchItems.length === 0}>
-                                    Clear
-                                </Button>
-                                <Button onClick={markAllAsReceived} variant={batchItems.length ? 'default' : 'ghost'} size="small" disabled={batchItems.length === 0}>
-                                    <CheckCircle className="w-4 h-4" />
-                                    Mark All as Received
-                                </Button>
+                            <div>
+                                <h3 className="font-semibold text-lg flex items-center gap-2">
+                                    <List className="w-5 h-5 text-blue-600" />
+                                    Current Batch
+                                </h3>
+                                {currentBatch && (
+                                    <p className="text-sm text-gray-600 mt-1">
+                                        {currentBatch.batchCode}
+                                    </p>
+                                )}
                             </div>
+                            {loadingBatch && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
                         </div>
 
-                        {batchItems.length === 0 ? (
-                            <div className="text-sm text-gray-500">
-                                No items in batch yet. Add captured items from the right panel.
+                        {currentBatch ? (
+                            <div className="space-y-3">
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                    <div className="text-sm text-blue-800 font-medium">
+                                        {currentBatch.batchItems?.length || 0} tickets in batch
+                                    </div>
+                                </div>
+
+
+                                {/* Batch Items List */}
+                                {currentBatch.batchItems?.length > 0 ? (
+                                    <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+                                        <div className="text-sm font-medium text-gray-700">
+                                            Tickets:
+                                        </div>
+                                        {currentBatch.batchItems.map(item => (
+                                            <div key={item.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="font-medium text-sm truncate">
+                                                        {item.ticket?.ticketCode}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600 truncate">
+                                                        Controller: {item.ticket?.controllerNo}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 truncate">
+                                                        Customer: {item.ticket?.customerName}
+                                                    </div>
+                                                </div>
+                                                                                        <div className="flex items-center gap-1">                                                  
+                                                    {batchItemPhotos[item.ticket?.id]?.length > 0 && (
+                                                        <div className="text-xs bg-green-100 text-green-700 px-1 rounded">
+                                                            {batchItemPhotos[item.ticket?.id].length}
+                                                        </div>
+                                                    )}
+                                                    <Button
+                                                        variant="default"
+                                                        size="xs"
+                                                        onClick={() => viewTicketImages(item.ticket?.id)}
+                                                        className="p-1 h-6 w-6 text-white"
+                                                        title="View Images"
+                                                    >
+                                                        <Eye className="w-3 h-3" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="danger"
+                                                        size="xs"
+                                                        onClick={() => removeTicketFromBatchHandler(item.ticket?.id)}
+                                                         title="Remove from batch"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-gray-500 text-sm py-4">
+                                        No tickets in batch yet
+                                    </div>
+                                )}
+                                
+                                <div className="space-y-2">
+                                    <div className="flex gap-2">
+                                       {/*  <Button 
+                                            onClick={clearBatch} 
+                                            variant="outline" 
+                                            size="small" 
+                                            disabled={!currentBatch?.batchItems?.length}
+                                            className="flex-1"
+                                        >
+                                            Clear
+                                        </Button> */}
+                                        {currentBatch?.batchItems?.length > 0 && (
+                                        <Button 
+                                            onClick={markAllAsReceived} 
+                                            variant={currentBatch?.batchItems?.length ? 'default' : 'ghost'} 
+                                            size="small" 
+                                            disabled={!currentBatch?.batchItems?.length}
+                                            className="flex-1"
+                                        >
+                                            <CheckCircle className="w-4 h-4" />
+                                            Mark as Completed
+                                        </Button>
+                                        )}
+                                    </div>
+ 
+                                </div>
                             </div>
                         ) : (
-                            <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-                                {batchItems.map(item => (
-                                    <div key={item.id} className="flex items-center gap-3 p-2 bg-white rounded shadow-sm">
-                                        <img
-                                            src={item.photos[0]?.preview}
-                                            alt="thumb"
-                                            className="w-14 h-14 object-cover rounded"
-                                        />
-                                        <div className="flex-1 text-sm">
-                                            <div className="font-medium truncate">
-                                                {item.ticketCode || item.controllerNo || '—'}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                                {new Date(item.createdAt).toLocaleString()}
-                                            </div>
-                                            <div className="text-xs text-gray-600 mt-1">
-                                                {item.photos.length} photos • {item.videos.length} videos • {item.audio ? '1 audio' : '0 audio'}
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <Button size="small" variant="outline" onClick={() => removeBatchItem(item.id)}>
-                                                <X className="w-4 h-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="text-center text-gray-500 py-4">
+                                <div className="text-sm">Loading batch...</div>
                             </div>
                         )}
+                    </Card>
+
+                    {/* Completed Batches Section */}
+                    <Card className="bg-white border-l-4 border-l-green-500 my-4">
+                        <div className="p-4">
+                            <div className="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 className="font-semibold text-sm flex items-center gap-2">
+                                        <CheckCircle className="w-5 h-5 text-green-600" />
+                                        Completed Batches
+                                    </h3>
+                                    <p className="text-xs text-gray-600 mt-1">
+                                        View previously completed batches
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        onClick={() => setShowCompletedBatches(!showCompletedBatches)}
+                                        variant="outline"
+                                        size="xs"
+                                    >
+                                        {showCompletedBatches ? 'Hide' : 'Show'}
+                                    </Button>
+                                    <Button
+                                        onClick={loadCompletedBatches}
+                                        variant="outline"
+                                        size="xs"
+                                        disabled={loadingCompletedBatches}
+                                    >
+                                        {loadingCompletedBatches ? (
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                        ) : (
+                                            <RefreshCw className="w-3 h-3" />
+                                        )}
+                                        Refresh
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {showCompletedBatches && (
+                                <div className="space-y-3">
+                                    {completedBatches.length > 0 ? (
+                                        <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+                                            {completedBatches.map(batch => (
+                                                <div key={batch.id} className="border border-gray-200 rounded-lg p-3">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div>
+                                                            <div className="font-medium text-sm text-gray-900">
+                                                                {batch.batchCode}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500">
+                                                                Completed: {new Date(batch.updatedAt).toLocaleDateString()} {new Date(batch.updatedAt).toLocaleTimeString()}
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-sm font-medium text-green-600">
+                                                                COMPLETED
+                                                            </div>
+                                                            <div className="text-xs text-gray-500">
+                                                                {batch.batchItems?.length || 0} tickets
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {batch.batchItems && batch.batchItems.length > 0 && (
+                                                        <div className="mt-2 pt-2 border-t border-gray-100">
+                                                            <div className="text-xs text-gray-600 mb-1">Tickets:</div>
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {batch.batchItems.slice(0, 3).map(item => (
+                                                                    <span key={item.id} className="inline-block px-2 py-1 bg-gray-100 text-xs rounded">
+                                                                        {item.ticket.ticketCode}
+                                                                    </span>
+                                                                ))}
+                                                                {batch.batchItems.length > 3 && (
+                                                                    <span className="inline-block px-2 py-1 bg-gray-100 text-xs rounded">
+                                                                        +{batch.batchItems.length - 3} more
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center text-gray-500 py-4">
+                                            <div className="text-sm">No completed batches found</div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </Card>
                 </div>
             </div>
@@ -1895,6 +2400,118 @@ const ReceiveController = () => {
                                 </div>
                             </div>
                         </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Image Viewer Modal */}
+            <AnimatePresence>
+                {viewingImages && currentBatchImages.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/25"
+                        onClick={closeImageViewer}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="relative max-w-4xl max-h-[calc(100vh-4rem)] bg-white rounded-lg overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between p-4 bg-gray-50 border-b">
+                                <div>
+                                    <h3 className="font-semibold text-lg">
+                                        Ticket Images
+                                        {currentBatchImages[currentImageIndex]?.isLocal 
+                                            ? ' - Local Photos' 
+                                            : ' - Milestone Attachments'
+                                        }
+                                    </h3>
+                                    <p className="text-sm text-gray-600">
+                                        {currentImageIndex + 1} of {currentBatchImages.length}
+                                    </p>
+                                </div>
+                                <Button
+                                    onClick={closeImageViewer}
+                                    variant="ghost"
+                                    size="small"
+                                    className="p-2"
+                                >
+                                    <X className="w-5 h-5" />
+                                </Button>
+                            </div>
+
+                            {/* Image Display */}
+                            <div className="relative min-h-40">
+                                <img
+                                    src={currentBatchImages[currentImageIndex]?.isLocal 
+                                        ? currentBatchImages[currentImageIndex]?.fileUrl 
+                                        : `${import.meta.env.VITE_API_URL}${currentBatchImages[currentImageIndex]?.fileUrl}`
+                                    }
+                                    alt={currentBatchImages[currentImageIndex]?.fileName || 'Ticket image'}
+                                    className="max-w-full max-h-[70vh] object-contain mx-auto"
+                                />
+                                
+                                {/* Navigation Buttons */}
+                                {currentBatchImages.length > 1 && (
+                                    <>
+                                        <Button
+                                            onClick={prevImage}
+                                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white"
+                                            size="small"
+                                        >
+                                            ‹
+                                        </Button>
+                                        <Button
+                                            onClick={nextImage}
+                                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white"
+                                            size="small"
+                                        >
+                                            ›
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Image Info */}
+                            <div className="p-4 bg-gray-50 border-t">
+                                <div className="flex justify-between items-start">
+                                    <div className="text-sm flex gap-2 px-2">
+                                        <p><strong>Filename:</strong> {currentBatchImages[currentImageIndex]?.fileName}</p>
+                                        <p><strong>Type:</strong> {currentBatchImages[currentImageIndex]?.fileType}</p>
+                                        <p><strong>Size:</strong> {currentBatchImages[currentImageIndex]?.fileSize ? 
+                                            `${Math.round(currentBatchImages[currentImageIndex].fileSize / 1024)} KB` : 'Unknown'}</p>
+                                        {currentBatchImages[currentImageIndex]?.createdAt && (
+                                            <p><strong>Uploaded:</strong> {new Date(currentBatchImages[currentImageIndex].createdAt).toLocaleDateString()}</p>
+                                        )}
+                                    </div>
+                                    <Button
+                                        onClick={() => {
+                                            const attachment = currentBatchImages[currentImageIndex];
+                                            const link = document.createElement('a');
+                                            link.href = attachment.isLocal 
+                                                ? attachment.fileUrl 
+                                                : `${import.meta.env.VITE_API_URL}${attachment.fileUrl}`;
+                                            link.download = attachment.fileName;
+                                            link.target = '_blank';
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }}
+                                        variant="outline"
+                                        size="small"
+                                        className="flex items-center gap-2"
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        Download
+                                    </Button>
+                                </div>
+                            </div>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
