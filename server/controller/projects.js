@@ -4,15 +4,19 @@ const getAllProjects = async (req, res) => {
   try {
     const { skip, take, filter } = req.query;
     const _transformedFilter = filter ? JSON.parse(filter) : undefined;
-        
+
     const { projects, count, statusCount } =
       await projectService.getAllProjects(skip, take, _transformedFilter);
 
     const _transformedProjects = projects.map((project) => ({
       ...project,
       status: project.isActive ? "ACTIVE" : "INACTIVE",
-      organisationName: project.organisation ?  project.organisation.name : 'N/A',
-      organizationCode: project.organisation ? project.organisation.orgCode : 'N/A',
+      organisationName: project.organisation
+        ? project.organisation.name
+        : "N/A",
+      organizationCode: project.organisation
+        ? project.organisation.orgCode
+        : "N/A",
       createdAt: moment(project.createdAt).format("YYYY-MM-DD HH:mm:ss"),
     }));
 
@@ -51,6 +55,7 @@ const getProjectById = async (req, res) => {
 const createProject = async (req, res) => {
   const projectData = req.body;
   try {
+    projectData.stateId = parseInt(projectData.stateId) || null;
     const newProject = await projectService.createProject(projectData);
     res.status(201).json(newProject);
   } catch (error) {
@@ -63,6 +68,7 @@ const updateProject = async (req, res) => {
   const { id } = req.params;
   const projectData = req.body;
   try {
+    projectData.stateId = parseInt(projectData.stateId) || null;
     const updatedProject = await projectService.updateProject(
       parseInt(id),
       projectData

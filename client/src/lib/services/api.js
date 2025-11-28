@@ -286,6 +286,20 @@ export const handleApiError = (error) => {
   }
 };
 
+// Project API endpoints
+export const projectAPI = {
+  // Get all projects (without authentication)
+  getProjects: async () => {
+    try {
+      const response = await apiClient.get('/projectsWA');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      throw error;
+    }
+  }
+};
+
 // Mock data service (for development/testing)
 export const mockAPI = {
   getTicket: (ticketId) => {

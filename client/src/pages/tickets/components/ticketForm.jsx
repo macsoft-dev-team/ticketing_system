@@ -25,7 +25,7 @@ import {
     faultTypeOptions
 } from './ticketFormSchema';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { controllerAPI } from '../../../lib/services/api';
+import { controllerAPI, projectAPI } from '../../../lib/services/api';
 import { useToast } from '../../../components/ui/toast';
 import { API_ENDPOINTS } from '../../../lib/constants/api';
 import useTickets from '../../../lib/hooks/useTickets';
@@ -36,6 +36,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFetchingController, setIsFetchingController] = useState(false);
     const [controllerError, setControllerError] = useState('');
+    const [projects, setProjects] = useState([]);
+    const [isLoadingProjects, setIsLoadingProjects] = useState(true);
     const { addToast } = useToast();
     const { createTicket, loading: ticketLoading, error: ticketError } = useTickets();
     const navigate = useNavigate();
@@ -62,6 +64,99 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
     const watchedValues = watch();
     const controllerNo = watch('controllerNo');
+
+    // Fetch projects when component mounts
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setIsLoadingProjects(true);
+                const projectsData = await projectAPI.getProjects();
+                setProjects(projectsData || []);
+            } catch (error) {
+                console.error('Error fetching projects:', error);
+                addToast({
+                    title: "Warning",
+                    description: "Failed to load projects. Please refresh the page.",
+                    variant: "warning"
+                });
+                setProjects([]);
+            } finally {
+                setIsLoadingProjects(false);
+            }
+        };
+
+        fetchProjects();
+    }, [addToast]);
+
+    // Auto-populate state information when project is selected
+    useEffect(() => {
+        const selectedProject = watch('project');
+        if (selectedProject && projects.length > 0) {
+            const project = projects.find(p => p.projectCode === selectedProject);
+            if (project && project.state) {
+                // Auto-populate state from selected project
+                setValue('state', project.state.name.toLowerCase().replace(/\s+/g, '-'));
+                
+                // Clear district if it was auto-filled from controller
+                if (!watchedValues.district || watchedValues.district === project.organisation?.address) {
+                    setValue('district', project.address || '');
+                }
+                
+                // Show success message
+                addToast({
+                    title: "Auto-filled",
+                    description: `State "${project.state.name}" auto-populated from selected project.`,
+                    variant: "success"
+                });
+            } else if (project && project.organisation?.address) {
+                // Fallback: try to extract state from project organization address
+                const address = project.organisation.address.toUpperCase();
+                const cityStateMapping = {
+                    // Tamil Nadu
+                    'COIMBATORE': 'tamil-nadu',
+                    'CHENNAI': 'tamil-nadu',
+                    'MADURAI': 'tamil-nadu',
+                    'SALEM': 'tamil-nadu',
+                    'TRICHY': 'tamil-nadu',
+                    'TIRUPUR': 'tamil-nadu',
+                    'ERODE': 'tamil-nadu',
+                    'VELLORE': 'tamil-nadu',
+                    'TANJORE': 'tamil-nadu',
+                    // Karnataka
+                    'BANGALORE': 'karnataka',
+                    'BENGALURU': 'karnataka',
+                    'MYSORE': 'karnataka',
+                    'HUBLI': 'karnataka',
+                    'MANGALORE': 'karnataka',
+                    // Maharashtra
+                    'MUMBAI': 'maharashtra',
+                    'PUNE': 'maharashtra',
+                    'NASHIK': 'maharashtra',
+                    'AURANGABAD': 'maharashtra',
+                    // Gujarat
+                    'AHMEDABAD': 'gujarat',
+                    'SURAT': 'gujarat',
+                    'VADODARA': 'gujarat',
+                    'RAJKOT': 'gujarat',
+                    // Add more as needed
+                };
+                
+                for (const [city, state] of Object.entries(cityStateMapping)) {
+                    if (address.includes(city)) {
+                        setValue('state', state);
+                        setValue('district', project.address || '');
+                        
+                        addToast({
+                            title: "Auto-filled",
+                            description: `State info extracted from project address.`,
+                            variant: "info"
+                        });
+                        break;
+                    }
+                }
+            }
+        }
+    }, [watch('project'), projects, setValue, addToast, watchedValues.district]);
 
     // Fetch controller details from LMS
     const fetchControllerDetails = useCallback(async (controllerNumber) => {
@@ -142,8 +237,14 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 }
             }
             
+            // Extract project code from lot.project.code
+            const projectCode = data.lot?.project?.code || '';
+            if (projectCode && !watchedValues.project) {
+                setValue('project', projectCode);
+            }
+            
             // Clear any previous errors for these fields
-            clearErrors(['imei', 'hp', 'motorType', 'customerName', 'district', 'state']);
+            clearErrors(['imei', 'hp', 'motorType', 'customerName', 'district', 'state', 'project']);
             
         } catch (error) {
             console.error('Error fetching controller details:', error);
@@ -167,12 +268,13 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             setValue('imei', '');
             setValue('hp', '');
             setValue('motorType', '');
+            setValue('project', '');
             // Don't clear customer name, district, or state as user might have entered them manually
             // Only clear them if they were auto-filled from the current controller lookup
         } finally {
             setIsFetchingController(false);
         }
-    }, [setValue, clearErrors]);
+    }, [setValue, clearErrors, watchedValues.project, watchedValues.customerName, watchedValues.district]);
 
     // Manual fetch function for the button
     const handleFetchControllerDetails = () => {
@@ -596,20 +698,39 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                 </motion.div>
 
                                 {/* Project */}
-                                <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
+                                <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2 sm:col-span-2">
                                     <label className="block text-xs sm:text-sm font-medium text-gray-700">
                                         Project *
                                     </label>
                                     <select
                                         {...register('project')}
-                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.project ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                        disabled={isLoadingProjects}
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.project ? 'border-red-300 bg-red-50' : 'border-gray-300'} ${isLoadingProjects ? 'bg-gray-50 cursor-not-allowed' : ''}
                                             }`}
                                     >
-                                        <option value="">Select Project</option>
-                                        <option value="project1">Project 1</option>
-                                        <option value="project2">Project 2</option>
-                                        <option value="project3">Project 3</option>
+                                        <option value="">
+                                            {isLoadingProjects ? 'Loading projects...' : 'Select Project'}
+                                        </option>
+                                        {!isLoadingProjects && projects.map(project => (
+                                            <option key={project.projectCode} value={project.projectCode}>
+                                                {project.name} ({project.projectCode})
+                                                {project.state && ` - ${project.state.name}`}
+                                                {project.organisation && ` - ${project.organisation.name}`}
+                                            </option>
+                                        ))}
                                     </select>
+                                    {isLoadingProjects && (
+                                        <p className="text-xs text-blue-600 flex items-center gap-1">
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                            Loading projects...
+                                        </p>
+                                    )}
+                                    {!isLoadingProjects && projects.length === 0 && (
+                                        <p className="text-xs text-amber-600 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            No projects available. Please contact administrator.
+                                        </p>
+                                    )}
                                     {errors.project && (
                                         <motion.p
                                             initial={{ opacity: 0, y: -10 }}
@@ -660,8 +781,11 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                 <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
                                     {/* State */}
                                     <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
-                                        <label className="block text-xs sm:text-sm font-medium text-gray-700">
+                                        <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
                                             State *
+                                            {watchedValues.state && watchedValues.project && (
+                                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled from project</span>
+                                            )}
                                         </label>
                                         <select
                                             {...register('state')}
@@ -707,6 +831,32 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             >
                                                 <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 {errors.state.message}
+                                            </motion.p>
+                                        )}
+                                    </motion.div>
+
+                                    {/* District */}
+                                    <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
+                                        <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
+                                            District *
+                                            {watchedValues.district && watchedValues.project && (
+                                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled</span>
+                                            )}
+                                        </label>
+                                        <input
+                                            {...register('district')}
+                                            className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.district ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                                }`}
+                                            placeholder="District"
+                                        />
+                                        {errors.district && (
+                                            <motion.p
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
+                                            >
+                                                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                {errors.district.message}
                                             </motion.p>
                                         )}
                                     </motion.div>

@@ -5,6 +5,7 @@ import Input from './ui/input';
 import { Label } from './ui/label';
 import Select from './ui/select';
 import useOrganisation from '../lib/hooks/useOrganisation';
+import axios from 'axios';
 
 const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode = 'create' }) => {
     const [formData, setFormData] = useState({
@@ -13,9 +14,10 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
         email: '',
         address: '',
         organisationId: '',
+        stateId: '',
         isActive: true,
     });
-
+    const [states,setStates] = useState([]);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     
@@ -29,6 +31,7 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                 email: initialData.email || '',
                 address: initialData.address || '',
                 organisationId: initialData.organisationId || '',
+                stateId: initialData.stateId || '',
                 isActive: initialData.isActive !== undefined ? initialData.isActive : true,
             });
         } else {
@@ -38,16 +41,27 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                 email: '',
                 address: '',
                 organisationId: '',
+                stateId: '',
                 isActive: true,
             });
         }
         setErrors({});
     }, [initialData, open]);
 
+    const getStates = async () => {
+        try {
+            const response = await axios.get('/states');
+            setStates(response.data);
+        } catch (error) {
+            console.error('Error fetching states:', error);
+        }
+    };
+
     // Fetch organisations when modal opens
     useEffect(() => {
         if (open) {
             getOrganisations({ skip: 0, take: 100, filter: null });
+            getStates();
         }
     }, [open, getOrganisations]);
 
@@ -198,9 +212,31 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
                                 <p className="text-red-500 text-xs mt-1">{errors.organisationId}</p>
                             )}
                         </div>
+                        {/* Organisation */}
+                        <div className="space-y-2">
+                            <Label htmlFor="stateId">
+                                State <span className="text-xs text-gray-500">(optional)</span>
+                            </Label>
+                            <Select
+                                id="stateId"
+                                name="stateId"
+                                value={formData.stateId}
+                                onChange={handleChange}
+                                placeholder="Select state (optional)"
+                                options={states?.map(state => ({
+                                    value: state.id,
+                                    label: state.name
+                                })) || []}
+                                disabled={isSubmitting}
+                                className={errors.organisationId ? 'border-red-500' : ''}
+                            />
+                            {errors.organisationId && (
+                                <p className="text-red-500 text-xs mt-1">{errors.organisationId}</p>
+                            )}
+                        </div>
 
                         {/* Address */}
-                        <div className="space-y-2 md:col-span-2">
+                        <div className="space-y-2">
                             <Label htmlFor="address">
                                 Address <span className="text-xs text-gray-500">(optional)</span>
                             </Label>

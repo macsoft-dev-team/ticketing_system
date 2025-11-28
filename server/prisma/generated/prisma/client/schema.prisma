@@ -70,11 +70,12 @@ enum Category {
 }
 
 model State {
-  id           Int     @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   name         String
-  stateCode    String? @unique
-  primaryUsers User[]  @relation("PrimaryState")
-  users        User[]  @relation("UserStates")
+  stateCode    String?   @unique
+  primaryUsers User[]    @relation("PrimaryState")
+  users        User[]    @relation("UserStates")
+  projects     Project[] @relation("StateProjects")
 }
 
 model Organisation {
@@ -98,11 +99,13 @@ model Project {
   projectCode    String          @unique
   email          String          @unique
   address        String?
+  stateId        Int?
   isActive       Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime?       @updatedAt
   deletedAt      DateTime?       @map("deleted_at")
   ServiceCenter  ServiceCenter[]
+  state          State?          @relation("StateProjects", fields: [stateId], references: [id])
   organisation   Organisation?   @relation(fields: [organisationId], references: [id])
   organisationId Int?
   users          User[]
@@ -182,10 +185,10 @@ model Ticket {
   // addon
   code                  String?
   projectName           String?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime? @map("deleted_at")
+  isReceving            Boolean      @default(false)
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  deletedAt             DateTime?    @map("deleted_at")
 
   // Relations
   createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
