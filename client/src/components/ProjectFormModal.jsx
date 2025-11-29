@@ -6,6 +6,7 @@ import { Label } from './ui/label';
 import Select from './ui/select';
 import useOrganisation from '../lib/hooks/useOrganisation';
 import axios from 'axios';
+import { API_URL } from '../lib/constants/api';
 
 const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode = 'create' }) => {
     const [formData, setFormData] = useState({
@@ -50,7 +51,7 @@ const ProjectFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mo
 
     const getStates = async () => {
         try {
-            const response = await axios.get('/states');
+            const response = await axios.get(`${API_URL}/statesWA`);
             setStates(response.data);
         } catch (error) {
             console.error('Error fetching states:', error);

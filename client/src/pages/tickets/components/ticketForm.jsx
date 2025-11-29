@@ -20,7 +20,7 @@ import {
 import {
     ticketFormSchema,
     defaultValues,
-    priorityOptions, 
+    priorityOptions,
     faultTypeOptions
 } from './ticketFormSchema';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -60,7 +60,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
     // Debug: Log form state
     useEffect(() => {
- 
+
     }, [errors, isValid, isDirty, isSubmitting, ticketLoading, ticketError, getValues]);
 
     const watchedValues = watch();
@@ -121,18 +121,11 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 // Auto-populate state from selected project using state code
                 const stateData = states.find(s => s.name === project.state.name);
                 setValue('state', stateData ? stateData.code : project.state.name.toLowerCase().replace(/\s+/g, '-'));
-                
+
                 // Clear district if it was auto-filled from controller
                 if (!watchedValues.district || watchedValues.district === project.organisation?.address) {
                     setValue('district', project.address || '');
                 }
-                
-                // Show success message
-                addToast({
-                    title: "Auto-filled",
-                    description: `State "${project.state.name}" auto-populated from selected project.`,
-                    variant: "success"
-                });
             } else if (project && project.organisation?.address) {
                 // Fallback: try to extract state from project organization address
                 const address = project.organisation.address.toUpperCase();
@@ -165,17 +158,11 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                     'RAJKOT': 'gujarat',
                     // Add more as needed
                 };
-                
+
                 for (const [city, state] of Object.entries(cityStateMapping)) {
                     if (address.includes(city)) {
                         setValue('state', state);
                         setValue('district', project.address || '');
-                        
-                        addToast({
-                            title: "Auto-filled",
-                            description: `State info extracted from project address.`,
-                            variant: "info"
-                        });
                         break;
                     }
                 }
@@ -196,7 +183,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             // First check if there's already an active ticket for this controller
             console.log('🔍 Checking for active ticket for controller:', controllerNumber);
             console.log('🔍 ticketAPI object:', ticketAPI);
-            
+
             try {
                 console.log('🔍 Calling ticketAPI.checkActiveTicketForController...');
                 const result = await ticketAPI.checkActiveTicketForController(controllerNumber);
@@ -213,35 +200,35 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 console.warn('Warning: Could not check for active tickets, continuing with LMS fetch:', checkError.message);
             }
 
-             const controllerData = await controllerAPI.getControllerFromLMS(controllerNumber);            
+            const controllerData = await controllerAPI.getControllerFromLMS(controllerNumber);
             // Set the fetched data to form fields
             // Handle the specific LMS API response structure
             const data = controllerData.data || controllerData;
- 
+
             // Extract IMEI from imeinumber field
             setValue('imei', data.imeinumber || '');
-            
+
             // Extract HP from lot.product.powerrating
             const powerRating = data.lot?.product?.powerrating || '';
             setValue('hp', powerRating);
-            
+
             // Extract motor type from lot.product.motortype
             const motorType = data.lot?.product?.motortype || '';
             setValue('motorType', motorType);
-            
+
             // Extract customer information if available
             const customerInfo = data.lot?.product?.customer || {};
             const customerName = customerInfo.name || '';
             if (customerName && !watchedValues.customerName) {
                 setValue('customerName', customerName);
             }
-            
+
             // Extract location information from customer address if available
             const customerAddress = customerInfo.address || '';
             if (customerAddress && !watchedValues.district) {
                 // Try to extract location info from address
                 setValue('district', customerAddress);
-                
+
                 // Map cities to states
                 const cityStateMapping = {
                     // Tamil Nadu
@@ -272,7 +259,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                     'RAJKOT': 'Gujarat',
                     // Add more as needed
                 };
-                
+
                 const addressUpper = customerAddress.toUpperCase();
                 for (const [city, state] of Object.entries(cityStateMapping)) {
                     if (addressUpper.includes(city)) {
@@ -281,21 +268,21 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                     }
                 }
             }
-            
+
             // Extract project code from lot.project.code
             const projectCode = data.lot?.project?.code || '';
             if (projectCode && !watchedValues.project) {
                 setValue('project', projectCode);
             }
-            
+
             // Clear any previous errors for these fields
             clearErrors(['imei', 'hp', 'motorType', 'customerName', 'district', 'state', 'project']);
-            
+
         } catch (error) {
             console.error('Error fetching controller details:', error);
-            
+
             let errorMessage = 'Failed to fetch controller details from LMS';
-            
+
             // Check if this is an active ticket validation error (thrown directly as Error)
             if (error.message && !error.response) {
                 errorMessage = error.message;
@@ -310,9 +297,9 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             } else if (error.response?.data?.message) {
                 errorMessage = error.response.data.message;
             }
-            
+
             setControllerError(errorMessage);
-            
+
             // Clear the auto-filled fields if error occurs
             setValue('imei', '');
             setValue('hp', '');
@@ -446,43 +433,43 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             };
 
             // Use the Redux action to create the ticket (includes authentication)
-       
+
             const resultAction = await createTicket(ticketData);
-            
-             
+
+
             // Check if the action was fulfilled by checking the meta.requestStatus
             if (resultAction.meta.requestStatus === 'fulfilled') {
                 const result = resultAction.payload;
-                 
+
                 // Call the onSubmit prop if provided (for parent component handling)
                 if (onSubmit) {
                     await onSubmit(result);
                 }
-                
+
                 // Show success message
                 addToast({
                     title: "Success!",
                     description: `Ticket ${result.ticketCode || result.ticketNumber} created successfully.`,
                     variant: "success"
                 });
-                
+
                 // Reset form after successful submission
                 reset(defaultValues);
                 setUploadedFiles([]);
-                
+
                 // Navigate to tickets page after a brief delay to show the toast
                 setTimeout(() => {
                     navigate('/tickets');
-                }, 1000);
+                }, 500);
             } else {
                 // Handle rejection
                 const errorMessage = resultAction.payload || resultAction.error?.message || 'Failed to create ticket. Please try again.';
                 throw new Error(errorMessage);
             }
-            
+
         } catch (error) {
             console.error('Form submission error:', error);
-            
+
             // Show user-friendly error message
             let errorMessage = 'Failed to create ticket. Please try again.';
             if (error.message) {
@@ -490,7 +477,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             } else if (typeof error === 'string') {
                 errorMessage = error;
             }
-            
+
             addToast({
                 title: "Error",
                 description: errorMessage,
@@ -584,11 +571,10 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             disabled={!controllerNo || controllerNo.length < 3 || isFetchingController}
                                             whileHover={{ scale: !isFetchingController ? 1.02 : 1 }}
                                             whileTap={{ scale: !isFetchingController ? 0.98 : 1 }}
-                                            className={`flex-shrink-0 px-2 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 rounded-md xs:rounded-lg text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 whitespace-nowrap min-w-[70px] xs:min-w-[90px] sm:min-w-[110px] ${
-                                                controllerNo && controllerNo.length >= 3 && !isFetchingController
+                                            className={`flex-shrink-0 px-2 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 rounded-md xs:rounded-lg text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 whitespace-nowrap min-w-[70px] xs:min-w-[90px] sm:min-w-[110px] ${controllerNo && controllerNo.length >= 3 && !isFetchingController
                                                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
                                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                            }`}
+                                                }`}
                                         >
                                             {isFetchingController ? (
                                                 <div className="flex items-center justify-center gap-0.5 xs:gap-1 sm:gap-2">
@@ -635,7 +621,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                                 <CheckCircle className="w-4 h-4" />
                                                 Controller details fetched and auto-filled successfully
                                             </p>
-                                            
+
                                         </motion.div>
                                     )}
                                 </motion.div>
@@ -718,7 +704,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     )}
                                 </motion.div>
 
-                               
+
                                 {/* Priority */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="block text-xs sm:text-sm font-medium text-gray-700">
@@ -1056,8 +1042,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                 onDrop={onDrop}
                                 whileHover={{ scale: 1.01 }}
                                 className={`relative border-2 border-dashed rounded-xl p-4 sm:p-6 lg:p-8 text-center transition-all duration-300 ${isDragActive
-                                        ? 'border-blue-400 bg-blue-50'
-                                        : 'border-gray-300 hover:border-gray-400'
+                                    ? 'border-blue-400 bg-blue-50'
+                                    : 'border-gray-300 hover:border-gray-400'
                                     }`}
                             >
                                 <input
@@ -1151,7 +1137,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                             )}
                         </div>
                     </motion.div>
-                </div>              
+                </div>
                 {/* Action Buttons */}
                 <motion.div
                     variants={itemVariants}
@@ -1189,8 +1175,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                         whileTap="tap"
                         disabled={!isValid || isSubmitting || ticketLoading}
                         className={`flex ms-auto items-center justify-center gap-2 text-nowrap px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 lg:py-3 rounded-lg text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 min-w-[120px] sm:min-w-[140px] ${isValid && !isSubmitting && !ticketLoading
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             }`}
                         title={!isValid ? 'Please fill all required fields correctly' : 'Submit ticket'}
                     >
