@@ -56,6 +56,7 @@ const createProject = async (req, res) => {
   const projectData = req.body;
   try {
     projectData.stateId = parseInt(projectData.stateId) || null;
+    projectData.organisationId = parseInt(projectData.organisationId) || null;
     const newProject = await projectService.createProject(projectData);
     res.status(201).json(newProject);
   } catch (error) {
@@ -69,6 +70,7 @@ const updateProject = async (req, res) => {
   const projectData = req.body;
   try {
     projectData.stateId = parseInt(projectData.stateId) || null;
+    projectData.organisationId = parseInt(projectData.organisationId) || null;
     const updatedProject = await projectService.updateProject(
       parseInt(id),
       projectData
