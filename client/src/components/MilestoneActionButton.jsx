@@ -40,7 +40,7 @@ const STAGE_ROLE_PERMISSIONS = {
 
   // dispatch / field delivery / final clearance
   READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
-  DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN'],
+  DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'],
   FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
@@ -162,17 +162,8 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'SUBMITTED_TO_SERVICE_CENTER',
           requiresPhotos: true,
-        }] : []),
-        // For Service Center Technicians - directly receive (legacy, but needs submission first)
-        ...(canUserTransitionToStage(userRole, 'RECEIVED_AT_SERVICE_CENTER') && !canUserTransitionToStage(userRole, 'SUBMITTED_TO_SERVICE_CENTER') ? [{
-          title: 'Receive at Service Center',
-          shortTitle: 'Receive',
-          icon: CheckCircle,
-          color: 'blue',
-          action: 'transition',
-          targetStage: 'RECEIVED_AT_SERVICE_CENTER',
-          requiresPhotos: true,
         }] : [])
+        // Service Center Technicians cannot receive until field engineer acknowledges submission
       ],
       SUBMITTED_TO_SERVICE_CENTER: needsPhotos ? [
         {
