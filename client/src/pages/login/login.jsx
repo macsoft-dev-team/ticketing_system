@@ -239,13 +239,16 @@ export default function Login() {
                                 />
                                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
                             </label>
-                            <motion.a
-                                href="#"
+                            <Link
+                                to="/forgot-password"
                                 className="text-sm text-blue-600 hover:text-blue-500"
-                                whileHover={{ scale: 1.05 }}
                             >
-                                Forgot password?
-                            </motion.a>
+                                <motion.span
+                                    whileHover={{ scale: 1.05 }}
+                                >
+                                    Forgot password?
+                                </motion.span>
+                            </Link>
                         </motion.div>
 
                         {/* Submit Button */}

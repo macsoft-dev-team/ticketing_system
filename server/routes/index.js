@@ -4,6 +4,7 @@ const authenticate = require("../middleware/authenticate");
 const router = express.Router();
 const { login } = require("../middleware/login");
 const { register } = require("../middleware/register");
+const { forgotPassword, verifyResetCode, resetPassword } = require("../middleware/forgotPassword");
 const user = require("./user");
 const ticket = require("./ticket");
 const notification = require("./notification");
@@ -29,6 +30,9 @@ const batch = require("./batch");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
+router.post("/auth/forgot-password", forgotPassword);
+router.post("/auth/verify-reset-code", verifyResetCode);
+router.post("/auth/reset-password", resetPassword);
 router.use("/users", authenticate, user);
 router.use("/tickets", authenticate, ticket);
 router.use("/batch", authenticate, batch);

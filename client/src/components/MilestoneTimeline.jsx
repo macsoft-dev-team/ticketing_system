@@ -599,7 +599,7 @@ const MilestoneCard = ({
                             {/* Changed by */}
                             {milestone.changer && (
                                 <p className="text-xs text-gray-500">
-                                    Updated by: {milestone.changer.name} ({milestone.changer.role})
+                                    Marked by: {milestone.changer.name} ({milestone.changer.role})
                                 </p>
                             )}
 

@@ -391,4 +391,47 @@ export const mockAPI = {
   }
 };
 
+// Auth API endpoints
+export const authAPI = {
+  // Send forgot password request
+  sendForgotPasswordCode: async (phoneNumber) => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.forgotPassword, { phone: phoneNumber });
+      return response.data;
+    } catch (error) {
+      console.error('Error sending forgot password code:', error);
+      throw error;
+    }
+  },
+
+  // Verify reset code
+  verifyResetCode: async (phoneNumber, code) => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.verifyResetCode, { 
+        phone: phoneNumber, 
+        code 
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error verifying reset code:', error);
+      throw error;
+    }
+  },
+
+  // Reset password with new password
+  resetPassword: async (phoneNumber, code, newPassword) => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.resetPassword, { 
+        phone: phoneNumber, 
+        code, 
+        newPassword 
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      throw error;
+    }
+  }
+};
+
 export default apiClient;
