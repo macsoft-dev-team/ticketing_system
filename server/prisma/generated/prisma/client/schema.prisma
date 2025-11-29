@@ -25,7 +25,8 @@ enum ServiceStage {
   TICKET_RAISED // Initial ticket raised
   SERVICE_CENTER_ASSIGNED // Service center assigned by MACSOFT_SUPPORT
   REQUEST_CLEARED_AT_FIELD // Fault cleared on-site by field engineer
-  SENT_TO_SERVICE_CENTER // Controller sent/request raised to service centre
+  SENT_TO_SERVICE_CENTER // Controller submission request raised submit to service centre
+  SUBMITTED_TO_SERVICE_CENTER // Controller submitted to service centre (photo required)
   RECEIVED_AT_SERVICE_CENTER // Controller physically received at centre (photo required)
   DIAGNOSIS_IN_PROGRESS // Diagnosis started to decide repair or replacement
   SPARE_REQUESTED // Spare parts requested (photo required)
@@ -98,7 +99,7 @@ model Project {
   id             Int             @id @default(autoincrement())
   name           String
   projectCode    String          @unique
-  email          String          @unique
+  email          String?         @unique
   address        String?
   stateId        Int?
   isActive       Boolean         @default(false)

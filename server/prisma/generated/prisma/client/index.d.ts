@@ -133,6 +133,7 @@ export const ServiceStage: {
   SERVICE_CENTER_ASSIGNED: 'SERVICE_CENTER_ASSIGNED',
   REQUEST_CLEARED_AT_FIELD: 'REQUEST_CLEARED_AT_FIELD',
   SENT_TO_SERVICE_CENTER: 'SENT_TO_SERVICE_CENTER',
+  SUBMITTED_TO_SERVICE_CENTER: 'SUBMITTED_TO_SERVICE_CENTER',
   RECEIVED_AT_SERVICE_CENTER: 'RECEIVED_AT_SERVICE_CENTER',
   DIAGNOSIS_IN_PROGRESS: 'DIAGNOSIS_IN_PROGRESS',
   SPARE_REQUESTED: 'SPARE_REQUESTED',
@@ -5497,7 +5498,7 @@ export namespace Prisma {
     id: number
     name: string
     projectCode: string
-    email: string
+    email: string | null
     address: string | null
     stateId: number | null
     isActive: boolean
@@ -5582,7 +5583,7 @@ export namespace Prisma {
       id: number
       name: string
       projectCode: string
-      email: string
+      email: string | null
       address: string | null
       stateId: number | null
       isActive: boolean
@@ -25677,7 +25678,7 @@ export namespace Prisma {
     id?: IntFilter<"Project"> | number
     name?: StringFilter<"Project"> | string
     projectCode?: StringFilter<"Project"> | string
-    email?: StringFilter<"Project"> | string
+    email?: StringNullableFilter<"Project"> | string | null
     address?: StringNullableFilter<"Project"> | string | null
     stateId?: IntNullableFilter<"Project"> | number | null
     isActive?: BoolFilter<"Project"> | boolean
@@ -25695,7 +25696,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     projectCode?: SortOrder
-    email?: SortOrder
+    email?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
     stateId?: SortOrderInput | SortOrder
     isActive?: SortOrder
@@ -25735,7 +25736,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     projectCode?: SortOrder
-    email?: SortOrder
+    email?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
     stateId?: SortOrderInput | SortOrder
     isActive?: SortOrder
@@ -25757,7 +25758,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Project"> | number
     name?: StringWithAggregatesFilter<"Project"> | string
     projectCode?: StringWithAggregatesFilter<"Project"> | string
-    email?: StringWithAggregatesFilter<"Project"> | string
+    email?: StringNullableWithAggregatesFilter<"Project"> | string | null
     address?: StringNullableWithAggregatesFilter<"Project"> | string | null
     stateId?: IntNullableWithAggregatesFilter<"Project"> | number | null
     isActive?: BoolWithAggregatesFilter<"Project"> | boolean
@@ -27399,7 +27400,7 @@ export namespace Prisma {
   export type ProjectCreateInput = {
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -27415,7 +27416,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     stateId?: number | null
     isActive?: boolean
@@ -27430,7 +27431,7 @@ export namespace Prisma {
   export type ProjectUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27446,7 +27447,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -27462,7 +27463,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     stateId?: number | null
     isActive?: boolean
@@ -27475,7 +27476,7 @@ export namespace Prisma {
   export type ProjectUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27487,7 +27488,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -33322,7 +33323,7 @@ export namespace Prisma {
   export type ProjectCreateWithoutStateInput = {
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -33337,7 +33338,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -33508,7 +33509,7 @@ export namespace Prisma {
     id?: IntFilter<"Project"> | number
     name?: StringFilter<"Project"> | string
     projectCode?: StringFilter<"Project"> | string
-    email?: StringFilter<"Project"> | string
+    email?: StringNullableFilter<"Project"> | string | null
     address?: StringNullableFilter<"Project"> | string | null
     stateId?: IntNullableFilter<"Project"> | number | null
     isActive?: BoolFilter<"Project"> | boolean
@@ -33568,7 +33569,7 @@ export namespace Prisma {
   export type ProjectCreateWithoutOrganisationInput = {
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -33583,7 +33584,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     stateId?: number | null
     isActive?: boolean
@@ -34048,7 +34049,7 @@ export namespace Prisma {
   export type ProjectCreateWithoutServiceCenterInput = {
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -34063,7 +34064,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     stateId?: number | null
     isActive?: boolean
@@ -34184,7 +34185,7 @@ export namespace Prisma {
   export type ProjectUpdateWithoutServiceCenterInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34199,7 +34200,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -34697,7 +34698,7 @@ export namespace Prisma {
   export type ProjectCreateWithoutUsersInput = {
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -34712,7 +34713,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     stateId?: number | null
     isActive?: boolean
@@ -35185,7 +35186,7 @@ export namespace Prisma {
   export type ProjectUpdateWithoutUsersInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35200,7 +35201,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -39261,7 +39262,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
@@ -39447,7 +39448,7 @@ export namespace Prisma {
   export type ProjectUpdateWithoutStateInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39462,7 +39463,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39477,7 +39478,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39582,7 +39583,7 @@ export namespace Prisma {
     id?: number
     name: string
     projectCode: string
-    email: string
+    email?: string | null
     address?: string | null
     stateId?: number | null
     isActive?: boolean
@@ -39610,7 +39611,7 @@ export namespace Prisma {
   export type ProjectUpdateWithoutOrganisationInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39625,7 +39626,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -39640,7 +39641,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
