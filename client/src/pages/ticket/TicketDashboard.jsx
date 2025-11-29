@@ -8,8 +8,7 @@ import ServiceCenterAssignmentModal from '../../components/ServiceCenterAssignme
 import {
   ArrowLeft,
   Calendar,
-  User,
-  MapPin,
+  User, 
   Phone,
   FileText,
   Download,

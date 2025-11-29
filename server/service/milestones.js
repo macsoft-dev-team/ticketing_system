@@ -318,7 +318,7 @@ const transitionMilestone = async (
       }
       
       // For service center related stages, notify technicians
-      if (['RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED'].includes(targetStage)) {
+      if (['RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED', 'READY_FOR_DISPATCH'].includes(targetStage)) {
         targetRoles.push('SERVICE_CENTER_TECHNICIAN');
       }
       

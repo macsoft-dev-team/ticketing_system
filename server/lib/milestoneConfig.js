@@ -192,7 +192,7 @@ const milestoneStageConfig = [
     order: 11,
     label: "Ready for Dispatch",
     description: "Controller ready for dispatch",
-    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_SUPPORT", "MACSOFT_ADMIN"],
+    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_SUPPORT", "SERVICE_CENTER_TECHNICIAN", "MACSOFT_ADMIN"],
     photoRequired: true,
     minPhotos: 1,
     notes: "Photo of packaged controller required",
