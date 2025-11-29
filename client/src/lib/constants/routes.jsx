@@ -178,7 +178,6 @@ const ROLE_ITEMS = {
   MACSOFT_ADMIN: [
     BASE_ITEMS.dashboard,
     BASE_ITEMS.tickets,
-    BASE_ITEMS.spareRequest,
     BASE_ITEMS.spareRequestApproval,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
@@ -199,10 +198,9 @@ const ROLE_ITEMS = {
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.receiveController,
-    BASE_ITEMS.spareRequest,
     BASE_ITEMS.spareRequestApproval,
     BASE_ITEMS.products,
-    BASE_ITEMS.serviceCenter, 
+    BASE_ITEMS.serviceCenter,
     BASE_ITEMS.profile,
     BASE_ITEMS.deliver,
 
@@ -213,7 +211,6 @@ const ROLE_ITEMS = {
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.receiveController,
-    BASE_ITEMS.spareRequest,
     BASE_ITEMS.products,
     BASE_ITEMS.serviceCenter,
     BASE_ITEMS.profile,
@@ -226,16 +223,14 @@ const ROLE_ITEMS = {
     BASE_ITEMS.inventory,
     BASE_ITEMS.receiveController,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
-    
+
   ],
-  SERVICE_CENTER_TECHNICIAN: [ 
+  SERVICE_CENTER_TECHNICIAN: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.receiveController,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.spareRequest,
     BASE_ITEMS.profile,
     BASE_ITEMS.deliver,
   ],
