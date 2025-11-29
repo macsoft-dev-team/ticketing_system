@@ -74,7 +74,7 @@ const UserMenu = () => {
         </div>
       </button>
       
-     {/*  {showUserMenu && (
+      {showUserMenu && (
         <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-600 z-50">
           <div className="p-4 border-b border-gray-200 dark:border-gray-600">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -85,7 +85,7 @@ const UserMenu = () => {
             </p>
           </div>
           <div className="py-2">
-            <button
+           {/*  <button
               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
               onClick={() => {
                 setShowAccountDialog(true);
@@ -94,7 +94,7 @@ const UserMenu = () => {
             >
               <UserCheck className="w-4 h-4 mr-3" />
               Account Settings
-            </button>
+            </button> */}
             <Link to="/settings">
               <button
                 className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -118,7 +118,7 @@ const UserMenu = () => {
             </button>
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 };
