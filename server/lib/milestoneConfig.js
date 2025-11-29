@@ -8,6 +8,7 @@ const ServiceStages = {
   SERVICE_CENTER_ASSIGNED: "SERVICE_CENTER_ASSIGNED",
   REQUEST_CLEARED_AT_FIELD: "REQUEST_CLEARED_AT_FIELD",
   SENT_TO_SERVICE_CENTER: "SENT_TO_SERVICE_CENTER",
+  SUBMITTED_TO_SERVICE_CENTER: "SUBMITTED_TO_SERVICE_CENTER",
   RECEIVED_AT_SERVICE_CENTER: "RECEIVED_AT_SERVICE_CENTER",
   DIAGNOSIS_IN_PROGRESS: "DIAGNOSIS_IN_PROGRESS",
   SPARE_REQUESTED: "SPARE_REQUESTED",
@@ -59,7 +60,7 @@ const milestoneStageConfig = [
     label: "Request Cleared at Field",
     description: "Fault cleared on-site by field engineer",
     allowedRoles: ["CUSTOMER_FIELD_ENGINEER", "MACSOFT_ADMIN"],
-    photoRequired: true,  
+    photoRequired: true,
     minPhotos: 1,
     isFinal: true,
     notes: "Field clearance completed - photo required to confirm resolution",
@@ -67,7 +68,7 @@ const milestoneStageConfig = [
   {
     stage: ServiceStages.SENT_TO_SERVICE_CENTER,
     order: 3,
-    label: "Sent to Service Center",
+    label: "Submit to Service Center",
     description: "Controller submission to service centre initiated",
     allowedRoles: [
       "MACSOFT_SUPPORT",
@@ -79,11 +80,32 @@ const milestoneStageConfig = [
     notes: "Controller dispatched to service center",
   },
   {
-    stage: ServiceStages.RECEIVED_AT_SERVICE_CENTER,
+    stage: ServiceStages.SUBMITTED_TO_SERVICE_CENTER,
     order: 4,
+    label: "Submitted to Service Center",
+    description: "Controller submitted to service center (photo required)",
+    allowedRoles: [
+      "CUSTOMER_FIELD_ENGINEER",
+      "CUSTOMER_SERVICE_HEAD",
+      "MACSOFT_ADMIN",
+    ],
+    photoRequired: true,
+    minPhotos: 4,
+    requiredPhotos: [
+      "Controller Front",
+      "Controller Bottom",
+      "Full View Open",
+      "MCB Close Up",
+    ],
+    notes:
+      "4 specific photos required: Controller Front, Controller Bottom, Full View Open, MCB Close Up. Field engineer must submit controller first.",
+  },
+  {
+    stage: ServiceStages.RECEIVED_AT_SERVICE_CENTER,
+    order: 5,
     label: "Received at Service Center",
     description:
-      "Controller physically received at service center (4 specific photos required)",
+      "Controller physically received at service center (requires prior submission acknowledgment, 4 specific photos required)",
     allowedRoles: [
       "MACSOFT_HEAD",
       "MACSOFT_SUPPORT",
@@ -99,11 +121,11 @@ const milestoneStageConfig = [
       "MCB Close Up",
     ],
     notes:
-      "4 specific photos required: Controller Front, Controller Bottom, Full View Open, MCB Close Up",
+      "4 specific photos required: Controller Front, Controller Bottom, Full View Open, MCB Close Up. Field engineer must submit controller first.",
   },
   {
     stage: ServiceStages.DIAGNOSIS_IN_PROGRESS,
-    order: 5,
+    order: 6,
     label: "Diagnosis in Progress",
     description: "Diagnosis started to decide repair or replacement",
     allowedRoles: [
@@ -117,7 +139,7 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.REPAIR_IN_PROGRESS,
-    order: 6,
+    order: 7,
     label: "Repair in Progress",
     description: "Controller repair initiated",
     allowedRoles: [
@@ -132,7 +154,7 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.REPLACEMENT_IN_PROGRESS,
-    order: 7, // First replacement stage
+    order: 8, // First replacement stage
     label: "Replacement in Progress",
     description: "Replacement initiated (alternate to repair)",
     allowedRoles: [
@@ -147,7 +169,7 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.SPARE_REQUESTED,
-    order: 8,
+    order: 9,
     label: "Spare Requested",
     description: "Spare parts requested",
     allowedRoles: [
@@ -165,7 +187,7 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.SPARE_APPROVED,
-    order: 9,
+    order: 10,
     label: "Spare Approved",
     description: "Spare request approved by head",
     allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN"],
@@ -175,7 +197,7 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.REPAIRED,
-    order: 10,
+    order: 11,
     label: "Repaired",
     description: "Controller repaired and tested",
     allowedRoles: [
@@ -189,17 +211,22 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.READY_FOR_DISPATCH,
-    order: 11,
+    order: 12,
     label: "Ready for Dispatch",
     description: "Controller ready for dispatch",
-    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_SUPPORT", "SERVICE_CENTER_TECHNICIAN", "MACSOFT_ADMIN"],
+    allowedRoles: [
+      "MACSOFT_HEAD",
+      "MACSOFT_SUPPORT",
+      "SERVICE_CENTER_TECHNICIAN",
+      "MACSOFT_ADMIN",
+    ],
     photoRequired: true,
     minPhotos: 1,
     notes: "Photo of packaged controller required",
   },
   {
     stage: ServiceStages.DELIVERED_TO_FIELD,
-    order: 12,
+    order: 13,
     label: "Delivered to Field",
     description:
       "Controller delivered/dispatched back to field - Final completion",
@@ -215,7 +242,7 @@ const milestoneStageConfig = [
   },
   {
     stage: ServiceStages.FIELD_CLEARANCE_APPROVED,
-    order: 13,
+    order: 14,
     label: "Field Clearance Approved",
     description: "Field clearance approved by Head",
     allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN"],
@@ -249,7 +276,8 @@ function getNextAvailableStages(currentStage, userRole) {
       "REQUEST_CLEARED_AT_FIELD",
       "SENT_TO_SERVICE_CENTER",
     ],
-    SENT_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
+    SENT_TO_SERVICE_CENTER: ["SUBMITTED_TO_SERVICE_CENTER"],
+    SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
     RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS"],
     DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS"],
     SPARE_REQUESTED: ["SPARE_APPROVED"],
@@ -328,7 +356,8 @@ function validateMilestoneTransition(
         "REQUEST_CLEARED_AT_FIELD",
         "SENT_TO_SERVICE_CENTER",
       ],
-      SENT_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
+      SENT_TO_SERVICE_CENTER: ["SUBMITTED_TO_SERVICE_CENTER"],
+      SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
       RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS"],
       DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS"],
       SPARE_REQUESTED: ["SPARE_APPROVED"],

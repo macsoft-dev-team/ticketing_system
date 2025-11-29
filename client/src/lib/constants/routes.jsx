@@ -132,14 +132,6 @@ const BASE_ITEMS = {
     element: <Products />,
   },
 
-  settings: {
-    path: '/settings',
-    icon: Settings,
-    label: 'Settings',
-    category: 'management',
-    element: <SettingsPage />,
-  },
-
   organisation: {
     path: '/customers',
     icon: Building,
@@ -172,6 +164,15 @@ const BASE_ITEMS = {
     category: 'technical',
     element: <DeliveryPage />,
   },
+
+  settings: {
+    path: '/settings',
+    icon: Settings,
+    label: 'Settings',
+    category: 'management',
+    element: <SettingsPage />,
+  },
+
 };
 
 const ROLE_ITEMS = {

@@ -166,6 +166,14 @@ const transitionMilestone = async (
       throw new Error(validation.error);
     }
 
+    // Additional validation for RECEIVED_AT_SERVICE_CENTER
+    if (targetStage === 'RECEIVED_AT_SERVICE_CENTER') {
+      // Check if current milestone is SUBMITTED_TO_SERVICE_CENTER (which is the required prerequisite)
+      if (!currentMilestone || currentMilestone.stage !== 'SUBMITTED_TO_SERVICE_CENTER') {
+        throw new Error('Controller must be submitted to service center by field engineer before it can be received');
+      }
+    }
+
     // Get ticket for file URL generation
     const ticket = await prisma.ticket.findUnique({
       where: { id: ticketId },
@@ -318,7 +326,7 @@ const transitionMilestone = async (
       }
       
       // For service center related stages, notify technicians
-      if (['RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED', 'READY_FOR_DISPATCH'].includes(targetStage)) {
+      if (['SUBMITTED_TO_SERVICE_CENTER', 'RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED', 'READY_FOR_DISPATCH'].includes(targetStage)) {
         targetRoles.push('SERVICE_CENTER_TECHNICIAN');
       }
       
@@ -706,6 +714,15 @@ const receiveControllerAtServiceCenter = async (
     // Check if user has permission to receive at service center
     if (!canRoleTransitionToStage(userRole, 'RECEIVED_AT_SERVICE_CENTER')) {
       throw new Error(`Your role (${userRole}) does not have permission to receive controllers`);
+    }
+
+    // Validate that controller has been submitted to service center first
+    const currentMilestone = ticket.ticketMilestones.find(
+      milestone => milestone.status === 'IN_PROGRESS' || milestone.status === 'BLOCKED'
+    );
+    
+    if (!currentMilestone || currentMilestone.stage !== 'SUBMITTED_TO_SERVICE_CENTER') {
+      throw new Error('Controller must be submitted to service center by field engineer before it can be received');
     }
 
     // Check if user is from the assigned service center

@@ -35,6 +35,7 @@ const STAGE_ROLE_PERMISSIONS = {
     // assigning / submitting to service centre (image shows Macsoft roles + support/head)
     SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
     SENT_TO_SERVICE_CENTER: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
+    SUBMITTED_TO_SERVICE_CENTER: ['CUSTOMER_FIELD_ENGINEER', 'CUSTOMER_SERVICE_HEAD', 'MACSOFT_ADMIN'],
 
     // service centre arrival / work
     RECEIVED_AT_SERVICE_CENTER: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
@@ -371,75 +372,83 @@ const MILESTONE_CONFIG = {
         isFinal: true,
     },
     SENT_TO_SERVICE_CENTER: {
-        label: 'Sent to Service Center',
-        description: 'Controller sent/request raised to service centre',
+        label: 'Submit to Service Center',
+        description: 'Controller submission request raised submit to service centre',
         photoRequired: false,
         order: 3,
     },
-    RECEIVED_AT_SERVICE_CENTER: {
-        label: 'Received at Service Center',
-        description: 'Controller physically received at centre (4 specific photos required)',
+    SUBMITTED_TO_SERVICE_CENTER: {
+        label: 'Submitted to Service Center',
+        description: 'Controller submitted to service center (4 specific photos required)',
         photoRequired: true,
         minPhotos: 4,
         requiredPhotos: ['Controller Front', 'Controller Bottom', 'Full View Open', 'MCB Close Up'],
         order: 4,
     },
+    RECEIVED_AT_SERVICE_CENTER: {
+        label: 'Received at Service Center',
+        description: 'Controller physically received at centre (requires prior submission acknowledgment, 4 specific photos required)',
+        photoRequired: true,
+        minPhotos: 4,
+        requiredPhotos: ['Controller Front', 'Controller Bottom', 'Full View Open', 'MCB Close Up'],
+        order: 5,
+    },
     DIAGNOSIS_IN_PROGRESS: {
         label: 'Diagnosis in Progress',
         description: 'Diagnosis started to decide repair or replacement',
         photoRequired: false,
-        order: 5,
+        order: 6,
     },
     REPAIR_IN_PROGRESS: {
         label: 'Repair in Progress',
         description: 'Controller repair initiated (no spares needed)',
         photoRequired: false,
-        order: 6,
+        order: 7,
     },
     REPLACEMENT_IN_PROGRESS: {
         label: 'Replacement in Progress',
         description: 'Replacement initiated (may require spare parts)',
         photoRequired: false,
-        order: 7,
+        order: 8,
     },
     SPARE_REQUESTED: {
         label: 'Spare Requested',
         description: 'Spare parts requested for replacement (photo required)',
         photoRequired: true,
         minPhotos: 1,
-        order: 8,
+        order: 9,
     },
     SPARE_APPROVED: {
         label: 'Spare Approved',
         description: 'Spare request approved - replacement can continue',
         photoRequired: false,
-        order: 9,
+        order: 10,
     },
     REPAIRED: {
         label: 'Repaired',
         description: 'Controller repaired or replaced successfully',
         photoRequired: false,
-        order: 10,
+        order: 11,
     },
     READY_FOR_DISPATCH: {
         label: 'Ready for Dispatch',
         description: 'Controller ready for dispatch (photo required)',
         photoRequired: true,
         minPhotos: 1,
-        order: 11,
+        order: 12,
     },
     DELIVERED_TO_FIELD: {
         label: 'Delivered',
         description: 'Controller delivered/dispatched',
         photoRequired: false,
-        order: 12,
+        order: 13,
         isFinal: true,
     },
     FIELD_CLEARANCE_APPROVED: {
         label: 'Field Clearance Approved',
         description: 'Field clearance approved by Head (legacy)',
         photoRequired: false,
-        order: 13,
+        order: 14,
         isFinal: true,
     },
 };
@@ -820,7 +829,8 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
         // Stages that require photos
         const photoRequiredStages = [
-            'RECEIVED_AT_SERVICE_CENTRE',
+            'SUBMITTED_TO_SERVICE_CENTER',
+            'RECEIVED_AT_SERVICE_CENTER',
             'SPARE_REQUESTED',
             'READY_FOR_DISPATCH'
         ];
@@ -1552,7 +1562,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                         </label>
 
                                         {/* Photo Requirements Info */}
-                                        {selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
+                                        {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
                                             <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border mb-3">
                                                 <strong>4 specific photos required:</strong>
                                                 <div className="mt-1 grid grid-cols-2 gap-1 text-xs">
@@ -1588,7 +1598,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                         {/* Photo Count Status */}
                                         {transitionPhotos.length > 0 && (
                                             <div className="mt-2 text-xs text-center">
-                                                {selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos === 4 ? (
+                                                {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos === 4 ? (
                                                     <span className={`font-medium ${transitionPhotos.length >= 4 ? 'text-green-600' : 'text-orange-600'}`}>
                                                         {transitionPhotos.length >= 4 
                                                             ? '✓ All required photos uploaded!' 
@@ -1623,11 +1633,11 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                     <button
                                         onClick={handleTransition}
                                         disabled={
-                                            selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' &&
+                                            (selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') &&
                                             MILESTONE_CONFIG[selectedTargetStage]?.photoRequired &&
                                             transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
                                         }
-                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' &&
+                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') &&
                                             MILESTONE_CONFIG[selectedTargetStage]?.photoRequired &&
                                             transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
                                             ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
@@ -1766,7 +1776,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 onClose={() => setShowPhotoModal(false)}
                 onUpload={(filesOrLabeled) => {
                     // Handle labeled photos for RECEIVED_AT_SERVICE_CENTER or regular files for other stages
-                    if (selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && Array.isArray(filesOrLabeled) && filesOrLabeled[0]?.file) {
+                    if ((selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && Array.isArray(filesOrLabeled) && filesOrLabeled[0]?.file) {
                         // Extract files from labeled objects and store labels separately if needed
                         const files = filesOrLabeled.map(item => item.file);
                         const labels = filesOrLabeled.map(item => item.label);
@@ -1781,7 +1791,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                     ? `Upload Photos - ${MILESTONE_CONFIG[selectedTargetStage].label}`
                     : 'Upload Photos'
                 }
-                description={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
+                description={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
                     ? `Please upload 4 specific photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
                     : selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
                         ? `Required photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
@@ -1789,8 +1799,8 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 }
                 minPhotos={selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1}
                 uploading={uploadingPhotos}
-                requireLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER'}
-                requiredLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' ? MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos : undefined}
+                requireLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER'}
+                requiredLabels={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') ? MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos : undefined}
             />
         </div>
     );

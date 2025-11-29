@@ -595,6 +595,10 @@ export default function TicketDashboard() {
         title: 'Upload Field Clearance Photos',
         description: 'Add photos confirming the issue has been resolved at field',
       },
+      SUBMITTED_TO_SERVICE_CENTER: {
+        title: 'Upload Submission Photos',
+        description: 'Add 4 specific photos confirming controller submission: Controller Front, Controller Bottom, Full View Open, MCB Close Up',
+      },
       RECEIVED_AT_SERVICE_CENTER: {
         title: 'Upload Receipt Photos',
         description: 'Add photos of the controller received at service center',
@@ -704,9 +708,9 @@ export default function TicketDashboard() {
           <div className="flex items-center gap-3">
             <StatusBadge status={ticketData.status} />
             {/* Service Center Assignment Button for MACSOFT_SUPPORT, MACSOFT_HEAD, and MACSOFT_ADMIN */}
-            {/* Hide button after ticket has been sent to service center */}
+            {/* Hide button after ticket has been submitted to service center */}
             {(user?.role === 'MACSOFT_SUPPORT' || user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') &&
-              !ticket?.ticketMilestones?.some(milestone => milestone.stage === 'SENT_TO_SERVICE_CENTER') && (
+              !ticket?.ticketMilestones?.some(milestone => milestone.stage === 'SUBMITTED_TO_SERVICE_CENTER') && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

@@ -23,6 +23,7 @@ const STAGE_ROLE_PERMISSIONS = {
   // assigning / submitting to service centre (image shows Macsoft roles + support/head)
   SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
   SENT_TO_SERVICE_CENTER: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
+  SUBMITTED_TO_SERVICE_CENTER: ['CUSTOMER_FIELD_ENGINEER', 'CUSTOMER_SERVICE_HEAD', 'MACSOFT_ADMIN'],
 
   // service centre arrival / work
   RECEIVED_AT_SERVICE_CENTER: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
@@ -75,7 +76,7 @@ const MilestoneActionButton = ({
     const { stage, attachments = [] } = currentMilestone;
     const photoCount = attachments.length;
 
-    // Check if service center is already assigned or if ticket has been sent to service center
+    // Check if service center is already assigned or if ticket has been Submit to Service Center
     const isServiceCenterAssigned = allMilestones.some(
       milestone => milestone.stage === 'SERVICE_CENTER_ASSIGNED' || milestone.stage === 'SENT_TO_SERVICE_CENTER'
     );
@@ -83,6 +84,7 @@ const MilestoneActionButton = ({
     // Stages that require photos
     const photoRequiredStages = [
       'REQUEST_CLEARED_AT_FIELD',
+      'SUBMITTED_TO_SERVICE_CENTER',
       'RECEIVED_AT_SERVICE_CENTER',
       'SPARE_REQUESTED',
       'READY_FOR_DISPATCH'
@@ -90,7 +92,9 @@ const MilestoneActionButton = ({
 
     // Check if photos are needed based on stage requirements
     const needsPhotos = photoRequiredStages.includes(stage) && (
-      stage === 'RECEIVED_AT_SERVICE_CENTER' ? photoCount < 4 : photoCount === 0
+      stage === 'RECEIVED_AT_SERVICE_CENTER' ? photoCount < 4 : 
+      stage === 'SUBMITTED_TO_SERVICE_CENTER' ? photoCount < 4 : 
+      photoCount === 0
     );
 
     
@@ -149,7 +153,18 @@ const MilestoneActionButton = ({
         }
       ],
       SENT_TO_SERVICE_CENTER: [
-        {
+        // For Customer Field Engineers - acknowledge submission
+        ...(canUserTransitionToStage(userRole, 'SUBMITTED_TO_SERVICE_CENTER') ? [{
+          title: 'Acknowledge Submission',
+          shortTitle: 'Acknowledge',
+          icon: CheckCircle,
+          color: 'green',
+          action: 'transition',
+          targetStage: 'SUBMITTED_TO_SERVICE_CENTER',
+          requiresPhotos: true,
+        }] : []),
+        // For Service Center Technicians - directly receive (legacy, but needs submission first)
+        ...(canUserTransitionToStage(userRole, 'RECEIVED_AT_SERVICE_CENTER') && !canUserTransitionToStage(userRole, 'SUBMITTED_TO_SERVICE_CENTER') ? [{
           title: 'Receive at Service Center',
           shortTitle: 'Receive',
           icon: CheckCircle,
@@ -157,7 +172,28 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'RECEIVED_AT_SERVICE_CENTER',
           requiresPhotos: true,
+        }] : [])
+      ],
+      SUBMITTED_TO_SERVICE_CENTER: needsPhotos ? [
+        {
+          title: 'Add Submission Photos',
+          shortTitle: 'Add Photos',
+          icon: Camera,
+          color: 'orange',
+          action: 'upload_photos',
+          requiresPhotos: true,
         }
+      ] : [
+        // For Service Center Technicians - receive after submission acknowledged
+        ...(canUserTransitionToStage(userRole, 'RECEIVED_AT_SERVICE_CENTER') ? [{
+          title: 'Receive at Service Center',
+          shortTitle: 'Receive',
+          icon: CheckCircle,
+          color: 'blue',
+          action: 'transition',
+          targetStage: 'RECEIVED_AT_SERVICE_CENTER',
+          requiresPhotos: true,
+        }] : [])
       ],
       RECEIVED_AT_SERVICE_CENTER: needsPhotos ? [
         {

@@ -20,14 +20,33 @@ async function main() {
         const data = fs.readFileSync(dataPath, "utf8");
         const json = JSON.parse(data);
         const model = prisma[file];
+        
         for (const item of json) {
           const { id, ...rest } = item; // Extract id and the rest of the fields
+          
+          // Handle different models with different unique constraints
+          let whereClause = { id };
+          
+          // For Project model, use projectCode for upsert to avoid constraint violations
+          if (file === 'project' && item.projectCode) {
+            whereClause = { projectCode: item.projectCode };
+          }
+          // For ServiceCenter model, use centerCode for upsert
+          else if (file === 'serviceCenter' && item.centerCode) {
+            whereClause = { centerCode: item.centerCode };
+          }
+          // For Organisation model, use orgCode for upsert
+          else if (file === 'organisation' && item.orgCode) {
+            whereClause = { orgCode: item.orgCode };
+          }
+          
           await model.upsert({
-            where: { id },
+            where: whereClause,
             update: { ...rest },
             create: { id, ...rest },
           });
         }
+        console.log(`✓ Successfully seeded ${file}`);
       } catch (error) {
         console.error(`Error processing file ${file}.json:`, error);
       }
