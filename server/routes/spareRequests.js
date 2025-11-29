@@ -22,4 +22,16 @@ router.put('/items/:itemId/status', authenticate, spareRequestController.updateS
 // Bulk approve spare requests for a ticket
 router.put('/ticket/:ticketCode/bulk-approve', authenticate, spareRequestController.bulkApproveSpareRequestsByTicket);
 
+// Get pending spare requests for approval (admin view)
+router.get('/pending-approval', authenticate, spareRequestController.getPendingSpareRequestsForApproval);
+
+// Approve individual spare request item
+router.post('/:id/approve', authenticate, spareRequestController.approveSpareRequestItem);
+
+// Reject individual spare request item
+router.post('/:id/reject', authenticate, spareRequestController.rejectSpareRequestItem);
+
+// Bulk approve multiple spare request items
+router.post('/bulk-approve', authenticate, spareRequestController.bulkApproveSpareRequestItems);
+
 module.exports = router;

@@ -32,13 +32,14 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/layout/layout';
 import TicketForm from '../../pages/tickets/components/ticketForm';
 import ServiceCenters from '../../pages/serviceCenters/serviceCenters';
-import { Tickets, TicketDashboard, SpareRequest, Inventory, ReceiveController } from '../../pages';
+import { Tickets, TicketDashboard, SpareRequest, SpareRequestApproval, Inventory, ReceiveController } from '../../pages';
 import Products from '../../pages/products/products';
 import OrganisationPage from '../../pages/organisation/organisation';
 import ProfilePage from '../../pages/profile/Profile';
 import SettingsPage from '../../pages/settings';
 import Projects from '../../pages/projects/projects';
 import DeliveryPage from '../../pages/delivery/DeliveryPage';
+
 
 const BASE_ITEMS = {
   dashboard: {
@@ -107,6 +108,14 @@ const BASE_ITEMS = {
     element: <SpareRequest />,
   },
 
+  spareRequestApproval: {
+    path: '/spare-request-approval',
+    icon: ClipboardList,
+    label: 'Spare Approval',
+    category: 'management',
+    element: <SpareRequestApproval />,
+  },
+
   inventory: {
     path: '/inventory',
     icon: Boxes,
@@ -170,6 +179,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.dashboard,
     BASE_ITEMS.tickets,
     BASE_ITEMS.spareRequest,
+    BASE_ITEMS.spareRequestApproval,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.receiveController,
@@ -190,6 +200,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.ticketNew,
     BASE_ITEMS.receiveController,
     BASE_ITEMS.spareRequest,
+    BASE_ITEMS.spareRequestApproval,
     BASE_ITEMS.products,
     BASE_ITEMS.serviceCenter, 
     BASE_ITEMS.profile,
@@ -246,6 +257,7 @@ const getRouteProtection = (item, role) => {
     '/service-center': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_SERVICE_HEAD'],
     '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'],
     '/settings': ['MACSOFT_ADMIN'], // Only MACSOFT_ADMIN can access settings
+    '/spare-request-approval': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Only these roles can approve spare requests
   };
 
   const requiredRoles = routeProtections[item.path];

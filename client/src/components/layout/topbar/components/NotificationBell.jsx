@@ -92,7 +92,7 @@ const NotificationBell = () => {
     }
 
     // Spare request notifications
-    if (type.includes('spare') || type.includes('request')) {
+    if (type.includes('spare') || type.includes('request') || type === 'SPARE_APPROVED' || type === 'SPARE_REJECTED') {
       return 'spare_request';
     }
 
@@ -229,8 +229,18 @@ const NotificationBell = () => {
         case 'spare_request':
         case 'spare_request_created':
         case 'spare_request_updated':
-          // Navigate to spare requests page
-          navigate('/spare-requests');
+          // For approval-related notifications, navigate to spare request page
+          // For general users, show their spare requests; for admin/head, show approval page
+          if (user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') {
+            // Admin or head users can see the approval page if the notification is about approval
+            if (notification.title?.includes('approved') || notification.title?.includes('rejected')) {
+              navigate('/spare-request-approval');
+            } else {
+              navigate('/spare-request');
+            }
+          } else {
+            navigate('/spare-request');
+          }
           break;
 
         case 'user':

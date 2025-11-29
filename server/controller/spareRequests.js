@@ -316,6 +316,211 @@ async function bulkApproveSpareRequestsByTicket(req, res) {
   }
 }
 
+/**
+ * Approve individual spare request item
+ * POST /api/spare-requests/:id/approve
+ */
+async function approveSpareRequestItem(req, res) {
+  try {
+    const { id } = req.params;
+    const { role: userRole, id: userId, name: userName } = req.user;
+
+    // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can approve
+    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const normalizedUserRole = userRole.toUpperCase();
+    
+    if (!allowedRoles.includes(normalizedUserRole)) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Only MACSOFT_ADMIN and MACSOFT_HEAD can approve spare requests. Your role: ${userRole}`,
+      });
+    }
+
+    const result = await spareRequestService.approveSpareRequestItem(
+      parseInt(id),
+      userId,
+      userName,
+      userRole
+    );
+
+    // Emit socket event for real-time update
+    if (req.io) {
+      req.io.emit("spare-request-approved", {
+        itemId: parseInt(id),
+        approvedBy: userId,
+        approvedByRole: userRole,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Spare request item approved successfully by ${userRole}`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("❌ Error in approveSpareRequestItem controller:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to approve spare request item",
+    });
+  }
+}
+
+/**
+ * Reject individual spare request item
+ * POST /api/spare-requests/:id/reject
+ */
+async function rejectSpareRequestItem(req, res) {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const { role: userRole, id: userId, name: userName } = req.user;
+
+    // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can reject
+    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const normalizedUserRole = userRole.toUpperCase();
+    
+    if (!allowedRoles.includes(normalizedUserRole)) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Only MACSOFT_ADMIN and MACSOFT_HEAD can reject spare requests. Your role: ${userRole}`,
+      });
+    }
+
+    const result = await spareRequestService.rejectSpareRequestItem(
+      parseInt(id),
+      userId,
+      userName,
+      userRole,
+      reason
+    );
+
+    // Emit socket event for real-time update
+    if (req.io) {
+      req.io.emit("spare-request-rejected", {
+        itemId: parseInt(id),
+        rejectedBy: userId,
+        rejectedByRole: userRole,
+        reason,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Spare request item rejected successfully by ${userRole}`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("❌ Error in rejectSpareRequestItem controller:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to reject spare request item",
+    });
+  }
+}
+
+/**
+ * Get pending spare requests for approval (admin view)
+ * GET /api/spare-requests/pending-approval
+ */
+async function getPendingSpareRequestsForApproval(req, res) {
+  try {
+    const { role: userRole, id: userId } = req.user;
+    const { skip, take } = req.query;
+
+    // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can access
+    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const normalizedUserRole = userRole.toUpperCase();
+    
+    if (!allowedRoles.includes(normalizedUserRole)) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Only MACSOFT_ADMIN and MACSOFT_HEAD can view pending approvals. Your role: ${userRole}`,
+      });
+    }
+
+    const { spareRequests, count } = await spareRequestService.getPendingSpareRequestsForApproval({
+      skip: skip ? parseInt(skip) : 0,
+      take: take ? parseInt(take) : 20,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: spareRequests,
+      totalCount: count,
+      currentPage: Math.floor((skip ? parseInt(skip) : 0) / (take ? parseInt(take) : 20)) + 1,
+      totalPages: Math.ceil(count / (take ? parseInt(take) : 20)),
+    });
+  } catch (error) {
+    console.error("❌ Error in getPendingSpareRequestsForApproval controller:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch pending spare requests",
+    });
+  }
+}
+
+/**
+ * Bulk approve multiple spare request items
+ * POST /api/spare-requests/bulk-approve
+ */
+async function bulkApproveSpareRequestItems(req, res) {
+  try {
+    const { itemIds } = req.body;
+    const { role: userRole, id: userId, name: userName } = req.user;
+
+    // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can bulk approve
+    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const normalizedUserRole = userRole.toUpperCase();
+    
+    if (!allowedRoles.includes(normalizedUserRole)) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Only MACSOFT_ADMIN and MACSOFT_HEAD can bulk approve spare requests. Your role: ${userRole}`,
+      });
+    }
+
+    if (!itemIds || !Array.isArray(itemIds) || itemIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one item ID is required for bulk approval",
+      });
+    }
+
+    const result = await spareRequestService.bulkApproveSpareRequestItems(
+      itemIds,
+      userId,
+      userName,
+      userRole
+    );
+
+    // Emit socket event for real-time update
+    if (req.io) {
+      req.io.emit("spare-requests-bulk-approved", {
+        itemIds,
+        approvedBy: userId,
+        approvedByRole: userRole,
+        timestamp: new Date().toISOString(),
+        result,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Bulk approved ${result.successful} spare request items successfully`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("❌ Error in bulkApproveSpareRequestItems controller:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to bulk approve spare request items",
+    });
+  }
+}
+
 module.exports = {
   createSpareRequest,
   getSpareRequestsByTicket,
@@ -323,4 +528,8 @@ module.exports = {
   getAllSpareRequests,
   updateSpareRequestItemStatus,
   bulkApproveSpareRequestsByTicket,
+  approveSpareRequestItem,
+  rejectSpareRequestItem,
+  getPendingSpareRequestsForApproval,
+  bulkApproveSpareRequestItems,
 };

@@ -1,4 +1,5 @@
 export { default as SpareRequest } from './spareRequest/spareRequest';
+export { default as SpareRequestApproval } from './spareRequestApproval/SpareRequestApproval';
 export { default as ServiceCenters } from './serviceCenters/serviceCenters';
 export { default as Dashboard } from './dashboard/dashboard';
 export { default as Tickets } from './tickets';

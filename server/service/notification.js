@@ -148,8 +148,85 @@ const getNotificationCounts = async (userId) => {
   }
 };
 
+const markNotificationAsRead = async (notificationId, userId) => {
+  try {
+    // Find the notification recipient record
+    const recipient = await prisma.notificationRecipient.findFirst({
+      where: {
+        notificationId: notificationId,
+        userId: userId,
+      },
+      include: {
+        notification: {
+          include: {
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
+            ticket: {
+              select: {
+                id: true,
+                ticketCode: true,
+                customerName: true,
+                status: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!recipient) {
+      throw new Error('Notification not found or unauthorized');
+    }
+
+    // Update the seen status
+    const updatedRecipient = await prisma.notificationRecipient.update({
+      where: {
+        id: recipient.id,
+      },
+      data: {
+        seen: true,
+        seenAt: new Date(),
+      },
+      include: {
+        notification: {
+          include: {
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
+            ticket: {
+              select: {
+                id: true,
+                ticketCode: true,
+                customerName: true,
+                status: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return updatedRecipient;
+  } catch (error) {
+    console.error('❌ Error marking notification as read:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getNotifications,
   updateNotification,
   getNotificationCounts,
+  markNotificationAsRead,
 };

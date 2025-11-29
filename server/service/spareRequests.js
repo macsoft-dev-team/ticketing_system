@@ -516,6 +516,345 @@ async function bulkApproveSpareRequestsByTicket(ticketCode, approvedBy = null) {
   }
 }
 
+/**
+ * Approve individual spare request item
+ */
+async function approveSpareRequestItem(itemId, approvedBy, approverName, approverRole) {
+  try {
+    // Start transaction for approval process
+    const result = await prisma.$transaction(async (tx) => {
+      // Get the spare request item with product info
+      const spareItem = await tx.spareRequestItem.findUnique({
+        where: { id: itemId },
+        include: {
+          product: true,
+          spareRequest: {
+            include: {
+              createdByUser: {
+                select: { id: true, name: true, role: true }
+              }
+            }
+          }
+        }
+      });
+
+      if (!spareItem) {
+        throw new Error('Spare request item not found');
+      }
+
+      if (spareItem.status === 'approved') {
+        throw new Error('Spare request item is already approved');
+      }
+
+      // Check inventory availability
+      const inventory = await tx.inventory.findUnique({
+        where: { productId: spareItem.productId }
+      });
+
+      if (!inventory || inventory.quantity < spareItem.quantity) {
+        throw new Error(`Insufficient inventory. Available: ${inventory?.quantity || 0}, Required: ${spareItem.quantity}`);
+      }
+
+      // Deduct inventory
+      await tx.inventory.update({
+        where: { productId: spareItem.productId },
+        data: {
+          quantity: {
+            decrement: spareItem.quantity
+          }
+        }
+      });
+
+      // Create product transaction record
+      await tx.productTransaction.create({
+        data: {
+          productId: spareItem.productId,
+          type: 'DELIVERY',
+          quantity: spareItem.quantity,
+          ticketId: null, // Can be linked to ticket if needed
+          notes: `Spare request approved - Item ID: ${itemId}`,
+          createdBy: approvedBy
+        }
+      });
+
+      // Update spare request item status
+      const updatedItem = await tx.spareRequestItem.update({
+        where: { id: itemId },
+        data: {
+          status: 'approved',
+          updatedAt: new Date()
+        },
+        include: {
+          product: true,
+          spareRequest: {
+            include: {
+              createdByUser: {
+                select: { id: true, name: true, role: true }
+              }
+            }
+          }
+        }
+      });
+
+      // Update parent spare request status if needed
+      const allItems = await tx.spareRequestItem.findMany({
+        where: { spareRequestId: spareItem.spareRequestId }
+      });
+
+      const approvedItems = allItems.filter(item => item.status === 'approved');
+      if (approvedItems.length === allItems.length) {
+        await tx.spareRequest.update({
+          where: { id: spareItem.spareRequestId },
+          data: {
+            status: 'APPROVED',
+            updatedBy: approvedBy
+          }
+        });
+      }
+
+      // Create notification for requester
+      const notification = await tx.notification.create({
+        data: {
+          title: 'Spare Request Approved',
+          description: `Your spare request for ${spareItem.product.name} (Qty: ${spareItem.quantity}) has been approved by ${approverName} (${approverRole})`,
+          type: 'SPARE_APPROVED',
+          createdById: approvedBy,
+          recipients: {
+            create: {
+              userId: spareItem.spareRequest.createdBy,
+              seen: false
+            }
+          }
+        }
+      });
+
+      return { updatedItem, notification };
+    });
+
+    return result;
+  } catch (error) {
+    console.error('❌ Error approving spare request item:', error);
+    throw error;
+  }
+}
+
+/**
+ * Reject individual spare request item
+ */
+async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecterRole, reason = '') {
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // Get the spare request item
+      const spareItem = await tx.spareRequestItem.findUnique({
+        where: { id: itemId },
+        include: {
+          product: true,
+          spareRequest: {
+            include: {
+              createdByUser: {
+                select: { id: true, name: true, role: true }
+              }
+            }
+          }
+        }
+      });
+
+      if (!spareItem) {
+        throw new Error('Spare request item not found');
+      }
+
+      if (spareItem.status === 'rejected') {
+        throw new Error('Spare request item is already rejected');
+      }
+
+      if (spareItem.status === 'approved') {
+        throw new Error('Cannot reject an already approved spare request item');
+      }
+
+      // Update spare request item status
+      const updatedItem = await tx.spareRequestItem.update({
+        where: { id: itemId },
+        data: {
+          status: 'rejected',
+          updatedAt: new Date()
+        },
+        include: {
+          product: true,
+          spareRequest: {
+            include: {
+              createdByUser: {
+                select: { id: true, name: true, role: true }
+              }
+            }
+          }
+        }
+      });
+
+      // Check if all items in the request are rejected
+      const allItems = await tx.spareRequestItem.findMany({
+        where: { spareRequestId: spareItem.spareRequestId }
+      });
+
+      const rejectedItems = allItems.filter(item => item.status === 'rejected');
+      if (rejectedItems.length === allItems.length) {
+        await tx.spareRequest.update({
+          where: { id: spareItem.spareRequestId },
+          data: {
+            status: 'REJECTED',
+            updatedBy: rejectedBy
+          }
+        });
+      }
+
+      // Create notification for requester
+      const notification = await tx.notification.create({
+        data: {
+          title: 'Spare Request Rejected',
+          description: `Your spare request for ${spareItem.product.name} (Qty: ${spareItem.quantity}) has been rejected by ${rejecterName} (${rejecterRole})${reason ? `. Reason: ${reason}` : ''}`,
+          type: 'SPARE_REJECTED',
+          createdById: rejectedBy,
+          recipients: {
+            create: {
+              userId: spareItem.spareRequest.createdBy,
+              seen: false
+            }
+          }
+        }
+      });
+
+      return { updatedItem, notification };
+    });
+
+    return result;
+  } catch (error) {
+    console.error('❌ Error rejecting spare request item:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get pending spare request items for approval
+ */
+async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) {
+  try {
+    const whereCondition = {
+      status: {
+        in: ['PENDING', 'URGENT']
+      },
+      spareItems: {
+        some: {
+          status: {
+            in: ['REQUESTED', 'pending']
+          }
+        }
+      }
+    };
+
+    const [spareRequests, count] = await Promise.all([
+      prisma.spareRequest.findMany({
+        where: whereCondition,
+        include: {
+          spareItems: {
+            where: {
+              status: {
+                in: ['REQUESTED', 'pending']
+              }
+            },
+            include: {
+              product: {
+                include: {
+                  inventory: true
+                }
+              }
+            }
+          },
+          createdByUser: {
+            select: {
+              id: true,
+              name: true,
+              role: true
+            }
+          }
+        },
+        skip,
+        take,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }),
+      prisma.spareRequest.count({
+        where: whereCondition
+      })
+    ]);
+
+    // Flatten the result to show individual items for approval
+    const approvalItems = [];
+    spareRequests.forEach(request => {
+      request.spareItems.forEach(item => {
+        approvalItems.push({
+          itemId: item.id,
+          requestId: request.id,
+          ticketCode: request.ticketCode,
+          productId: item.productId,
+          productName: item.product.name,
+          productCode: item.product.productCode,
+          requestedQuantity: item.quantity,
+          availableQuantity: item.product.inventory?.quantity || 0,
+          status: item.status,
+          requestedBy: request.createdByUser.name,
+          requestedByRole: request.createdByUser.role,
+          requestedDate: request.createdAt,
+          canApprove: (item.product.inventory?.quantity || 0) >= item.quantity
+        });
+      });
+    });
+
+    return { spareRequests: approvalItems, count };
+  } catch (error) {
+    console.error('❌ Error getting pending spare requests for approval:', error);
+    throw error;
+  }
+}
+
+/**
+ * Bulk approve multiple spare request items
+ */
+async function bulkApproveSpareRequestItems(itemIds, approvedBy, approverName, approverRole) {
+  try {
+    const results = {
+      successful: [],
+      failed: [],
+      insufficientStock: [],
+      totalProcessed: itemIds.length
+    };
+
+    // Process each item individually to handle failures gracefully
+    for (const itemId of itemIds) {
+      try {
+        await approveSpareRequestItem(parseInt(itemId), approvedBy, approverName, approverRole);
+        results.successful.push(itemId);
+      } catch (error) {
+        if (error.message.includes('Insufficient inventory')) {
+          results.insufficientStock.push({
+            itemId,
+            error: error.message
+          });
+        } else {
+          results.failed.push({
+            itemId,
+            error: error.message
+          });
+        }
+      }
+    }
+
+    return results;
+  } catch (error) {
+    console.error('❌ Error bulk approving spare request items:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   createSpareRequest,
   getSpareRequestsByTicket,
@@ -523,4 +862,8 @@ module.exports = {
   updateSpareRequestItemStatus,
   getAllSpareRequests,
   bulkApproveSpareRequestsByTicket,
+  approveSpareRequestItem,
+  rejectSpareRequestItem,
+  getPendingSpareRequestsForApproval,
+  bulkApproveSpareRequestItems,
 };
