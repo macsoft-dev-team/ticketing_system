@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle } from 'lucide-react';
+import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download } from 'lucide-react';
 import DocumentModal from './DocumentModal';
 
 const TicketClosedView = ({ onViewChat }) => {
@@ -150,7 +150,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
               className="w-3 h-3 border border-current border-t-transparent rounded-full"
             />
           ) : (
-            <File className="w-3 h-3" />
+              <Download className="w-3 h-3" />
           )}
         </button>
       </div>

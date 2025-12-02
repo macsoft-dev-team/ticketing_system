@@ -5,6 +5,7 @@ import moment from 'moment';
 import MilestoneTimeline from '../../components/MilestoneTimeline';
 import PhotoUploadModal from '../../components/PhotoUploadModal';
 import ServiceCenterAssignmentModal from '../../components/ServiceCenterAssignmentModal';
+import DocumentModal from '../../components/ui/DocumentModal';
 import {
   ArrowLeft,
   Calendar,
@@ -22,7 +23,8 @@ import {
   XCircle,
   MessageSquare,
   GitBranch,
-  Building
+  Building,
+  Eye
 } from 'lucide-react';
 import { Badge } from '../../components/ui/badge';
 import { ChatWindow } from '../../components/ui/chat';
@@ -111,7 +113,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) => {
+const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPreview }) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const getIcon = (type) => {
@@ -123,93 +125,85 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) =>
     setIsDownloading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const baseApiUrl = import.meta.env.VITE_API_URL;
+      const baseUrl = baseApiUrl?.replace('/api', '') || 'http://localhost:3057'; // Remove /api for file URLs
       let downloadUrl;
 
-      // Use dedicated download endpoint if attachment has an ID
-      if (attachment.id) {
-        downloadUrl = `${baseUrl}/api/attachments/download/${attachment.id}`;
-      } else {
-        // Fallback to direct file URL
-        downloadUrl = `${baseUrl}${attachment.url}`;
+      // Try multiple download strategies
+      const downloadStrategies = [];
+      
+      // Strategy 1: Use API endpoint if we have an ID and token
+      if (attachment.id && token) {
+        downloadStrategies.push({
+          url: `${baseApiUrl}/attachments/download/${attachment.id}`,
+          headers: { 'Authorization': `Bearer ${token}` },
+          name: 'API with auth'
+        });
       }
-      const headers = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      
+      // Strategy 2: Direct file access
+      if (attachment.url) {
+        const fileUrl = attachment.url.startsWith('/uploads/') ? attachment.url : `/uploads/${attachment.url}`;
+        downloadStrategies.push({
+          url: `${baseUrl}${fileUrl}`,
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          name: 'Direct file'
+        });
       }
-
-      const response = await fetch(downloadUrl, {
-        method: 'GET',
-        headers,
-      });
-
-      if (!response.ok) {
-        // Try fallback method - direct link
-        if (attachment.url) {
-          const fallbackUrl = `${baseUrl}${attachment.url}`;
-           window.open(fallbackUrl, '_blank');
-          if (addToast) addToast({
-            title: `Opening ${attachment.name}`,
-            description: 'File opened in new tab',
-            variant: 'success'
+      
+      // Try each strategy until one works
+      let successful = false;
+      for (const strategy of downloadStrategies) {
+        try {
+          const response = await fetch(strategy.url, {
+            method: 'GET',
+            headers: strategy.headers,
           });
-          return;
+
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = attachment.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            if (addToast) addToast({
+              title: `Downloaded ${attachment.name}`,
+              description: 'File saved to your downloads folder',
+              variant: 'success'
+            });
+            successful = true;
+            break;
+          }
+        } catch (error) {
+          console.warn(`${strategy.name} failed:`, error);
         }
-        throw new Error(`Server responded with status: ${response.status}`);
       }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = attachment.name;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      if (addToast) addToast({
-        title: `Downloaded ${attachment.name}`,
-        description: 'File saved to your downloads folder',
-        variant: 'success'
-      });
+      
+      if (!successful) {
+        throw new Error('All download strategies failed');
+      }
     } catch (error) {
       console.error('Download failed:', error);
-
-      // Final fallback - try direct URL in new tab
-      if (attachment.url) {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-        const fallbackUrl = `${baseUrl}${attachment.url}`;
-         window.open(fallbackUrl, '_blank');
-        if (addToast) addToast({
-          title: `Opening ${attachment.name}`,
-          description: 'File opened in new tab',
-          variant: 'success'
-        });
-      } else {
-        if (addToast) addToast({
-          title: 'Download failed',
-          description: 'Please check your connection and try again',
-          variant: 'error',
-          id: 'download-error',
-          duration: 7000
-        });
-        else alert('Download failed. Please try again.');
-      }
+      if (addToast) addToast({
+        title: 'Download failed',
+        description: 'Please check your connection and try again',
+        variant: 'error',
+        duration: 7000
+      });
     } finally {
       setIsDownloading(false);
     }
   };
 
-  const handlePreview = () => {
-    if (attachment.type === 'image') {
-      // Open image in a new tab/window
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      window.open(`${baseUrl}${attachment.url}`, '_blank');
-    } else {
-      // For non-image files, trigger download
-      handleDownload();
+  const handlePreview = (e) => {
+    e.stopPropagation();
+    if (onPreview) {
+      onPreview(attachment);
     }
   };
 
@@ -242,10 +236,10 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast }) =>
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handlePreview}
-            className="p-2 text-gray-500 hover:text-blue-600 transition-colors opacity-0 group-hover:opacity-100"
+            className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
             title="Preview"
           >
-            👁️
+              <Eye  size={16} />
           </motion.button>
         )}
         <motion.button
@@ -300,6 +294,8 @@ export default function TicketDashboard() {
   const [showPhotoUploadModal, setShowPhotoUploadModal] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [showServiceCenterModal, setShowServiceCenterModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
 
   // Auto-close timer simulation
   useEffect(() => {
@@ -354,8 +350,8 @@ export default function TicketDashboard() {
         expectedDelivery: formData.expectedDelivery,
         additionalNotes: formData.additionalNotes
       };
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${baseUrl}/api/spare-requests`, {
+      const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+      const response = await fetch(`${baseApiUrl}/spare-requests`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -537,15 +533,17 @@ export default function TicketDashboard() {
       for (let i = 0; i < attachments.length; i++) {
         const attachment = attachments[i];
         try {
-          const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+          const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+          const baseUrl = baseApiUrl.replace('/api', '');
           let downloadUrl;
 
           // Use dedicated download endpoint if attachment has an ID
           if (attachment.id) {
-            downloadUrl = `${baseUrl}/api/attachments/download/${attachment.id}`;
+            downloadUrl = `${baseApiUrl}/attachments/download/${attachment.id}`;
           } else {
-            // Fallback to direct file URL
-            downloadUrl = `${baseUrl}${attachment.url}`;
+            // Fallback to direct file URL - handle relative URLs properly
+            const fileUrl = attachment.url.startsWith('/') ? attachment.url : `/${attachment.url}`;
+            downloadUrl = `${baseUrl}${fileUrl}`;
           }
 
           const response = await fetch(downloadUrl, {
@@ -589,7 +587,15 @@ export default function TicketDashboard() {
     }
   }, [token]);
 
+  const handlePreviewAttachment = useCallback((attachment) => {
+    setSelectedDocument(attachment);
+    setIsDocumentModalOpen(true);
+  }, []);
 
+  const closeDocumentModal = useCallback(() => {
+    setIsDocumentModalOpen(false);
+    setSelectedDocument(null);
+  }, []);
 
   // Mobile tab navigation
   const tabs = useMemo(() => [
@@ -899,6 +905,7 @@ export default function TicketDashboard() {
                       showPreview={true}
                       token={token}
                       addToast={addToast}
+                      onPreview={handlePreviewAttachment}
                     />
                   ))}
                 </div>
@@ -1089,6 +1096,13 @@ export default function TicketDashboard() {
         onClose={() => setShowServiceCenterModal(false)}
         ticket={ticketData}
         onSuccess={handleServiceCenterAssignment}
+      />
+
+      {/* Document Modal */}
+      <DocumentModal
+        isOpen={isDocumentModalOpen}
+        onClose={closeDocumentModal}
+        document={selectedDocument}
       />
 
     </div>

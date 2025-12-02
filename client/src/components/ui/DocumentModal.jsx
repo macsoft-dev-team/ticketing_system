@@ -2,33 +2,41 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Download, Eye, FileText, Image, File as FileIcon } from 'lucide-react';
 
-const DocumentModal = ({ isOpen, onClose, document }) => {
+const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  if (!isOpen || !document) return null;
+  if (!isOpen || !fileDocument) return null;
 
-  const isImage = document.mimetype?.startsWith('image/');
-  const isPdf = document.mimetype === 'application/pdf';
-  const isText = document.mimetype === 'text/plain' || document.name?.endsWith('.txt');
+  const isImage = fileDocument.mimetype?.startsWith('image/');
+  const isPdf = fileDocument.mimetype === 'application/pdf';
+  const isText = fileDocument.mimetype === 'text/plain' || fileDocument.name?.endsWith('.txt');
   
-  const baseApiUrl = import.meta.env.VITE_API_URL || 'http:import.meta.env.VITE_WS_URL/api';
-  const baseUrl = baseApiUrl.replace('/api', ''); // Remove /api for file URLs
+  const baseApiUrl = import.meta.env.VITE_API_URL;
+  const baseUrl = baseApiUrl?.replace('/api', '') || 'http://localhost:3057'; // Remove /api for file URLs
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   
   // Construct the proper file URL
   const getFileUrl = () => {
+    if (!fileDocument.url) {
+      console.error('No file URL provided:', fileDocument);
+      return '';
+    }
+
     let fileUrl;
      
-    if (document.url?.startsWith('/uploads/')) {
-      fileUrl = `${baseUrl}${document.url}`;
-    } else if (document.url?.startsWith('http')) {
-      fileUrl = document.url;
+    if (fileDocument.url.startsWith('/uploads/')) {
+      // URL already has /uploads prefix, just prepend base URL
+      fileUrl = `${baseUrl}${fileDocument.url}`;
+    } else if (fileDocument.url.startsWith('http')) {
+      // Full URL already provided
+      fileUrl = fileDocument.url;
     } else {
-      // Fallback construction
-      fileUrl = `${baseUrl}/uploads/${document.url}`;
+      // Add /uploads prefix if missing
+      fileUrl = `${baseUrl}/uploads/${fileDocument.url}`;
     }
     
+    console.log('Constructed file URL:', fileUrl, 'from:', fileDocument.url);
     return fileUrl;
   };
 
@@ -43,9 +51,9 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
       const downloadStrategies = [];
       
       // Strategy 1: Use API endpoint if we have an ID and token
-      if (document.id && token) {
+      if (fileDocument.id && token && baseApiUrl) {
         downloadStrategies.push({
-          url: `${baseApiUrl}/attachments/download/${document.id}`,
+          url: `${baseApiUrl}/attachments/download/${fileDocument.id}`,
           headers: { 'Authorization': `Bearer ${token}` },
           name: 'API with auth'
         });
@@ -59,8 +67,8 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
       });
       
       // Strategy 3: Try with /api/uploads prefix
-      if (document.url) {
-        const fileUrl = document.url.startsWith('/uploads/') ? document.url : `/uploads/${document.url}`;
+      if (fileDocument.url && baseApiUrl) {
+        const fileUrl = fileDocument.url.startsWith('/uploads/') ? fileDocument.url : `/uploads/${fileDocument.url}`;
         downloadStrategies.push({
           url: `${baseApiUrl}${fileUrl}`,
           headers: token ? { 'Authorization': `Bearer ${token}` } : {},
@@ -109,16 +117,16 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = window.document.createElement('a');
       link.href = url;
-      link.download = document.name;
-      document.body.appendChild(link);
+      link.download = fileDocument.name;
+      window.document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      window.document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
-      console.error('Document data:', document);
+      console.error('Document data:', fileDocument);
       console.error('Download URL attempted:', downloadUrl);
       setError(`Failed to download file: ${error.message}`)
     } finally {
@@ -134,7 +142,7 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
         <div className="flex items-center justify-center h-full min-h-[400px]">
           <img 
             src={fileUrl}
-            alt={document.name}
+            alt={fileDocument.name}
             className="max-w-full max-h-full object-contain"
             onLoad={() => console.log('Image loaded successfully:', fileUrl)}
             onError={(e) => {
@@ -151,7 +159,7 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
         <div className="h-full min-h-screen">
           <iframe
             src={fileUrl}
-            title={document.name}
+            title={fileDocument.name}
                   className="w-full h-full min-h-screen border-0"
             onError={() => setError('Failed to load PDF')}
           />
@@ -164,7 +172,7 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
         <div className="h-full min-h-[400px]">
           <iframe
             src={fileUrl}
-            title={document.name}
+            title={fileDocument.name}
             className="w-full h-full border-0 bg-white"
             onError={() => setError('Failed to load text file')}
           />
@@ -172,14 +180,14 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
       );
     }
     
-    // For other file types, show file info and download option
+      // For other file types, show file info and download option
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[400px] space-y-4">
         <FileIcon className="w-16 h-16 text-gray-400" />
         <div className="text-center">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{document.name}</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{fileDocument.name}</h3>
           <p className="text-sm text-gray-600 mb-4">
-            File type: {document.mimetype || 'Unknown'} • Size: {document.size}
+            File type: {fileDocument.mimetype || 'Unknown'} • Size: {fileDocument.size}
           </p>
           <p className="text-sm text-gray-500 mb-6">
             This file type cannot be previewed. Click download to view it.
@@ -225,10 +233,10 @@ const DocumentModal = ({ isOpen, onClose, document }) => {
               )}
               <div>
                 <h2 className="text-sm font-semibold text-gray-900 truncate">
-                  {document.name}
+                  {fileDocument.name}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {document.size} • {document.mimetype}
+                  {fileDocument.size} • {fileDocument.mimetype}
                 </p>
               </div>
             </div>
