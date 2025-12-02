@@ -230,6 +230,8 @@ const addPhotosToCurrentMilestone = async (req, res) => {
     const { id: userId } = req.user;
     const files = req.files; // Uploaded photos
 
+    console.log(`[addPhotosToCurrentMilestone] Adding photos to ticket ${ticketId} by user ${userId}`);
+
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No photos provided" });
     }
@@ -243,6 +245,8 @@ const addPhotosToCurrentMilestone = async (req, res) => {
       path: file.path,
     }));
 
+    console.log(`[addPhotosToCurrentMilestone] Processing ${attachments.length} attachments`);
+
     const updatedMilestone = await milestoneService.addPhotosToCurrentMilestone(
       parseInt(ticketId),
       userId,
@@ -254,7 +258,7 @@ const addPhotosToCurrentMilestone = async (req, res) => {
       milestone: updatedMilestone,
     });
   } catch (error) {
-    console.error("Error adding photos to milestone:", error);
+    console.error("[addPhotosToCurrentMilestone] Error adding photos to milestone:", error);
     res.status(400).json({
       message: "Failed to add photos to milestone",
       error: error.message,

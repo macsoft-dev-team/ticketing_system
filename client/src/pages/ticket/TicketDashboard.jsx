@@ -406,6 +406,15 @@ export default function TicketDashboard() {
         // Open service center assignment modal
         setShowServiceCenterModal(true);
       } else if (action === 'transition') {
+        // Validate that we have a valid target stage and it's different from current
+        if (!targetStage) {
+          throw new Error('No target stage specified for transition');
+        }
+        
+        if (currentStage && targetStage === currentStage) {
+          throw new Error(`Cannot transition from ${currentStage} to ${targetStage} - same stage`);
+        }
+
         // Transition to next stage using updateMilestone hook
         const resultAction = await updateMilestone({
           ticketId: parseInt(ticketId),
@@ -448,9 +457,19 @@ export default function TicketDashboard() {
       }
     } catch (error) {
       console.error('Error handling milestone action:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = error.message || 'An error occurred';
+      
+      if (error.message?.includes('Invalid transition')) {
+        errorMessage = 'This milestone transition is not allowed. Please check the current status.';
+      } else if (error.message?.includes('same stage')) {
+        errorMessage = 'Milestone is already at the target stage.';
+      }
+      
       addToast({
         title: 'Action Failed',
-        description: error.message || 'An error occurred',
+        description: errorMessage,
         variant: 'error',
         id: 'milestone-action-error',
         duration: 7000
@@ -464,7 +483,7 @@ export default function TicketDashboard() {
     try {
       setUploadingPhotos(true);
 
-      // Use updateMilestone from ticket hook
+      // Use updateMilestone from ticket hook - only add photos, don't transition
       const resultAction = await updateMilestone({
         ticketId: parseInt(ticketId),
         milestoneData: {

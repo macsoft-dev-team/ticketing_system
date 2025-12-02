@@ -348,6 +348,15 @@ function validateMilestoneTransition(
   // Validate that this is an allowed transition
   if (currentMilestone) {
     const currentStage = currentMilestone.stage;
+    
+    // Prevent transition to the same stage
+    if (currentStage === targetStage) {
+      return {
+        valid: false,
+        error: `Invalid transition from ${targetConfig?.label || currentStage} to ${targetConfig?.label || targetStage} - cannot transition to the same stage`,
+      };
+    }
+    
     const currentConfig = getStageConfig(currentStage);
     const allowedTransitions = {
       TICKET_RAISED: ["REQUEST_CLEARED_AT_FIELD", "SERVICE_CENTER_ASSIGNED"],
@@ -375,6 +384,8 @@ function validateMilestoneTransition(
     };
     const allowed = allowedTransitions[currentStage] || [];
     if (!allowed.includes(targetStage)) {
+      console.log(`[Milestone Validation] Invalid transition: ${currentStage} -> ${targetStage}`);
+      console.log(`[Milestone Validation] Allowed transitions for ${currentStage}:`, allowed);
       return {
         valid: false,
         error: `Invalid transition from ${
