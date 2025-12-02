@@ -109,7 +109,7 @@ export default function ReusableTable({
     return (
         <div className={`overflow-x-auto w-full ${tableChrome} ${darkMode ? "bg-white dark:bg-neutral-900" : "bg-white"}`}>
             <table className={`w-full table-auto ${textSize}`}>
-                <thead className="sticky top-0 z-10">
+                <thead className="sticky top-0 z-10 select-none">
                     <tr>
                         {SNo && (
                             <th

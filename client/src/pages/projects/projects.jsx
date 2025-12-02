@@ -147,10 +147,16 @@ export default function Projects() {
         }
     };
 
-    const handleFilterChange = (status) => {
-         // Get the current filter to preserve customer filter
+    const handleFilterChange = (statusOrFilter) => {
+        // Get the current filter to preserve all existing filters
         const currentFilter = filter || {};
-        const newFilter = { ...currentFilter, status };
+        
+        // If statusOrFilter is a string, it's just the status
+        // If it's an object, it contains multiple filter properties
+        const newFilter = typeof statusOrFilter === 'string' 
+            ? { ...currentFilter, status: statusOrFilter }
+            : { ...currentFilter, ...statusOrFilter };
+        
         setFilters(newFilter);
         getProjects({
             skip: 0,
@@ -194,7 +200,9 @@ export default function Projects() {
 
             <div className="px-6">
                 {loading ? (
-                    <div>Loading projects...</div>
+                    <div className="flex items-start justify-center h-screen">
+                        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+                    </div>
                 ) : error ? (
                     <div className="text-red-500">Error: {error?.message || error}</div>
                 ) : (

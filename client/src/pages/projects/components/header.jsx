@@ -19,6 +19,15 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
         getOrganisations({ skip: 0, take: 100, filter: null });
     }, [getOrganisations]);
 
+    // Synchronize local state with global filter state
+    useEffect(() => {
+        if (filter) {
+            setActiveFilter(filter.status || '');
+            setSelectedCustomer(filter.organisationId || '');
+            setSearchTerm(filter.search || '');
+        }
+    }, [filter]);
+
     const filterTabItems = [
         { id: '', label: 'All Projects', shortLabel: 'All', count: statusCount?.ALL || 0, key: 'ALL' },
         { id: 'ACTIVE', label: 'Active', shortLabel: 'Active', count: statusCount?.ACTIVE || 0, key: 'ACTIVE' },
@@ -28,8 +37,9 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
     // Handle filter changes
     const handleFilterChange = (status) => {
         setActiveFilter(status);
-        setFilters({ ...filter, status });
-        onFilterChange(status);
+        const newFilter = { ...filter, status };
+        setFilters(newFilter);
+        onFilterChange(newFilter); // Pass the complete filter object
     };
 
     // Handle search changes
@@ -45,7 +55,7 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
         setSelectedCustomer(customerId);
         const newFilter = { ...filter, organisationId: customerId || undefined };
         setFilters(newFilter);
-        onFilterChange(newFilter.status || '');
+        onFilterChange(newFilter); // Pass the complete filter object
     };
 
     const headerVariants = {
@@ -76,7 +86,7 @@ export default function Header({ onAddProject, onUploadProjects, onFilterChange,
             variants={headerVariants}
             initial="initial"
             animate="animate"
-            className="bg-white md:bg-transparent border-b border-gray-200 shadow-sm md:shadow-none md:border-0"
+            className="bg-white select-none md:bg-transparent border-b border-gray-200 shadow-sm md:shadow-none md:border-0"
         >
             {/* Main Header - Desktop & Mobile */}
             <div className="flex justify-between items-center px-4 sm:px-6 py-3 sm:py-4">

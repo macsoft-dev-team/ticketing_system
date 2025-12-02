@@ -29,7 +29,7 @@ The system intelligently determines which users should receive notifications bas
 - **Field-related stages** (`REQUEST_CLEARED_AT_FIELD`, `FIELD_CLEARANCE_APPROVED`):
   - Also notifies `CUSTOMER_FIELD_ENGINEER`
   
-- **Service center stages** (`RECEIVED_AT_SERVICE_CENTER`, `DIAGNOSIS_IN_PROGRESS`, `REPAIR_IN_PROGRESS`, `REPLACEMENT_IN_PROGRESS`, `REPAIRED`):
+- **Service center stages** (`RECEIVED_AT_SERVICE_CENTER`, `DIAGNOSIS_IN_PROGRESS`, `REPAIR_IN_PROGRESS`, `REPLACEMENT_IN_PROGRESS`, `REPAIRED`, `READY_FOR_DISPATCH`):
   - Also notifies `SERVICE_CENTER_TECHNICIAN`
 
 ### 3. Notification Scenarios

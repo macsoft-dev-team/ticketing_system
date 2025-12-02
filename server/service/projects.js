@@ -24,31 +24,39 @@ const getAllProjects = async (skip, take, filter) => {
     }
 
     // Handle organisation filter
-    if (filter?.organisationId && filter.organisationId.trim() !== '') {
-      where.organisationId = parseInt(filter.organisationId);
+    if (filter?.organisationId) {
+      const orgId = typeof filter.organisationId === 'string' ? filter.organisationId.trim() : String(filter.organisationId);
+      if (orgId !== '') {
+        where.organisationId = parseInt(orgId);
+      }
     }
 
     // Handle search filter
-    if (filter?.search && filter.search.trim() !== '') {
-      const searchTerm = filter.search.trim();
-      const organisationId = parseInt(filter.organisationId);
-      const stateId = parseInt(filter.stateId);
-      where.OR = [
-        { name: { contains: searchTerm } },
-        { projectCode: { contains: searchTerm } },
-        { email: { contains: searchTerm } },
-        { organisationId: isNaN(organisationId) ? undefined : organisationId },
-        { stateId: isNaN(stateId) ? undefined : stateId }
-      ];
+    if (filter?.search) {
+      const searchValue = typeof filter.search === 'string' ? filter.search.trim() : String(filter.search);
+      if (searchValue !== '') {
+        const searchTerm = searchValue;
+        const organisationId = filter.organisationId ? parseInt(typeof filter.organisationId === 'string' ? filter.organisationId : String(filter.organisationId)) : NaN;
+        const stateId = filter.stateId ? parseInt(typeof filter.stateId === 'string' ? filter.stateId : String(filter.stateId)) : NaN;
+        where.OR = [
+          { name: { contains: searchTerm } },
+          { projectCode: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { organisationId: isNaN(organisationId) ? undefined : organisationId },
+          { stateId: isNaN(stateId) ? undefined : stateId }
+        ];
+      }
     }
 
-
+    params.where = where;
+    params.include = { organisation: true };
 
     const _statusCount = await prisma.project.groupBy({
       by: ["isActive"],
       _count: {
         id: true,
       },
+      where: params.where,
     });
 
     const statusCount = _statusCount.reduce((acc, item) => {
@@ -59,8 +67,6 @@ const getAllProjects = async (skip, take, filter) => {
 
 
 
-    params.where = where;
-    params.include = { organisation: true };
     const count = await prisma.project.count({ where: params.where });
     const projects = await prisma.project.findMany({
       ...params,
