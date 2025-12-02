@@ -636,7 +636,21 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         {...register('imei')}
                                         className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.imei ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
-                                        placeholder="IMEI"
+                                        placeholder="IMEI (15 digits)"
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+                                            // Auto-format IMEI if it contains semicolons (extract first 15 digits)
+                                            if (value.includes(';')) {
+                                                const firstPart = value.split(';')[0];
+                                                value = firstPart.substring(0, 15);
+                                            } else {
+                                                // Limit to 15 digits only
+                                                value = value.replace(/\D/g, '').substring(0, 15);
+                                            }
+                                            setValue('imei', value);
+                                            clearErrors('imei');
+                                        }}
+                                        maxLength={15}
                                     />
                                     <p className="text-xs text-amber-600 flex items-center gap-1">
                                         <AlertCircle className="w-3 h-3" />
