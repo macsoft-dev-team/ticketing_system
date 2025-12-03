@@ -113,6 +113,16 @@ export type batch = $Result.DefaultSelection<Prisma.$batchPayload>
  * 
  */
 export type batchItem = $Result.DefaultSelection<Prisma.$batchItemPayload>
+/**
+ * Model settings
+ * 
+ */
+export type settings = $Result.DefaultSelection<Prisma.$settingsPayload>
+/**
+ * Model motorhp
+ * 
+ */
+export type motorhp = $Result.DefaultSelection<Prisma.$motorhpPayload>
 
 /**
  * Enums
@@ -138,12 +148,14 @@ export const ServiceStage: {
   DIAGNOSIS_IN_PROGRESS: 'DIAGNOSIS_IN_PROGRESS',
   SPARE_REQUESTED: 'SPARE_REQUESTED',
   SPARE_APPROVED: 'SPARE_APPROVED',
+  PARTIALY_SPARE_APPROVED: 'PARTIALY_SPARE_APPROVED',
   REPAIR_IN_PROGRESS: 'REPAIR_IN_PROGRESS',
   REPLACEMENT_IN_PROGRESS: 'REPLACEMENT_IN_PROGRESS',
   REPAIRED: 'REPAIRED',
   READY_FOR_DISPATCH: 'READY_FOR_DISPATCH',
   DELIVERED_TO_FIELD: 'DELIVERED_TO_FIELD',
-  FIELD_CLEARANCE_APPROVED: 'FIELD_CLEARANCE_APPROVED'
+  FIELD_CLEARANCE_APPROVED: 'FIELD_CLEARANCE_APPROVED',
+  TICKET_CLOSED: 'TICKET_CLOSED'
 };
 
 export type ServiceStage = (typeof ServiceStage)[keyof typeof ServiceStage]
@@ -559,6 +571,26 @@ export class PrismaClient<
     * ```
     */
   get batchItem(): Prisma.batchItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.settings`: Exposes CRUD operations for the **settings** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Settings
+    * const settings = await prisma.settings.findMany()
+    * ```
+    */
+  get settings(): Prisma.settingsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.motorhp`: Exposes CRUD operations for the **motorhp** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Motorhps
+    * const motorhps = await prisma.motorhp.findMany()
+    * ```
+    */
+  get motorhp(): Prisma.motorhpDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1018,7 +1050,9 @@ export namespace Prisma {
     NotificationRecipient: 'NotificationRecipient',
     TicketSequence: 'TicketSequence',
     batch: 'batch',
-    batchItem: 'batchItem'
+    batchItem: 'batchItem',
+    settings: 'settings',
+    motorhp: 'motorhp'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1037,7 +1071,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "state" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem"
+      modelProps: "state" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2361,6 +2395,138 @@ export namespace Prisma {
           }
         }
       }
+      settings: {
+        payload: Prisma.$settingsPayload<ExtArgs>
+        fields: Prisma.settingsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.settingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.settingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+          }
+          findFirst: {
+            args: Prisma.settingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.settingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+          }
+          findMany: {
+            args: Prisma.settingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>[]
+          }
+          create: {
+            args: Prisma.settingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+          }
+          createMany: {
+            args: Prisma.settingsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.settingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+          }
+          update: {
+            args: Prisma.settingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+          }
+          deleteMany: {
+            args: Prisma.settingsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.settingsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.settingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$settingsPayload>
+          }
+          aggregate: {
+            args: Prisma.SettingsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSettings>
+          }
+          groupBy: {
+            args: Prisma.settingsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SettingsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.settingsCountArgs<ExtArgs>
+            result: $Utils.Optional<SettingsCountAggregateOutputType> | number
+          }
+        }
+      }
+      motorhp: {
+        payload: Prisma.$motorhpPayload<ExtArgs>
+        fields: Prisma.motorhpFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.motorhpFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.motorhpFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>
+          }
+          findFirst: {
+            args: Prisma.motorhpFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.motorhpFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>
+          }
+          findMany: {
+            args: Prisma.motorhpFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>[]
+          }
+          create: {
+            args: Prisma.motorhpCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>
+          }
+          createMany: {
+            args: Prisma.motorhpCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.motorhpDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>
+          }
+          update: {
+            args: Prisma.motorhpUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>
+          }
+          deleteMany: {
+            args: Prisma.motorhpDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.motorhpUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.motorhpUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$motorhpPayload>
+          }
+          aggregate: {
+            args: Prisma.MotorhpAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMotorhp>
+          }
+          groupBy: {
+            args: Prisma.motorhpGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MotorhpGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.motorhpCountArgs<ExtArgs>
+            result: $Utils.Optional<MotorhpCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2477,6 +2643,8 @@ export namespace Prisma {
     ticketSequence?: TicketSequenceOmit
     batch?: batchOmit
     batchItem?: batchItemOmit
+    settings?: settingsOmit
+    motorhp?: motorhpOmit
   }
 
   /* Types for Logging */
@@ -3155,6 +3323,37 @@ export namespace Prisma {
    */
   export type BatchCountOutputTypeCountBatchItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: batchItemWhereInput
+  }
+
+
+  /**
+   * Count Type MotorhpCountOutputType
+   */
+
+  export type MotorhpCountOutputType = {
+    tickets: number
+  }
+
+  export type MotorhpCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tickets?: boolean | MotorhpCountOutputTypeCountTicketsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MotorhpCountOutputType without action
+   */
+  export type MotorhpCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MotorhpCountOutputType
+     */
+    select?: MotorhpCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MotorhpCountOutputType without action
+   */
+  export type MotorhpCountOutputTypeCountTicketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
   }
 
 
@@ -9062,12 +9261,14 @@ export namespace Prisma {
 
   export type TicketAvgAggregateOutputType = {
     id: number | null
+    motorHpId: number | null
     createdBy: number | null
     updatedBy: number | null
   }
 
   export type TicketSumAggregateOutputType = {
     id: number | null
+    motorHpId: number | null
     createdBy: number | null
     updatedBy: number | null
   }
@@ -9078,8 +9279,11 @@ export namespace Prisma {
     description: string | null
     customerName: string | null
     controllerNo: string | null
+    farmerName: string | null
     imei: string | null
     hp: string | null
+    motorHpId: number | null
+    head: string | null
     motorType: string | null
     stateCode: string | null
     district: string | null
@@ -9106,8 +9310,11 @@ export namespace Prisma {
     description: string | null
     customerName: string | null
     controllerNo: string | null
+    farmerName: string | null
     imei: string | null
     hp: string | null
+    motorHpId: number | null
+    head: string | null
     motorType: string | null
     stateCode: string | null
     district: string | null
@@ -9134,8 +9341,11 @@ export namespace Prisma {
     description: number
     customerName: number
     controllerNo: number
+    farmerName: number
     imei: number
     hp: number
+    motorHpId: number
+    head: number
     motorType: number
     stateCode: number
     district: number
@@ -9160,12 +9370,14 @@ export namespace Prisma {
 
   export type TicketAvgAggregateInputType = {
     id?: true
+    motorHpId?: true
     createdBy?: true
     updatedBy?: true
   }
 
   export type TicketSumAggregateInputType = {
     id?: true
+    motorHpId?: true
     createdBy?: true
     updatedBy?: true
   }
@@ -9176,8 +9388,11 @@ export namespace Prisma {
     description?: true
     customerName?: true
     controllerNo?: true
+    farmerName?: true
     imei?: true
     hp?: true
+    motorHpId?: true
+    head?: true
     motorType?: true
     stateCode?: true
     district?: true
@@ -9204,8 +9419,11 @@ export namespace Prisma {
     description?: true
     customerName?: true
     controllerNo?: true
+    farmerName?: true
     imei?: true
     hp?: true
+    motorHpId?: true
+    head?: true
     motorType?: true
     stateCode?: true
     district?: true
@@ -9232,8 +9450,11 @@ export namespace Prisma {
     description?: true
     customerName?: true
     controllerNo?: true
+    farmerName?: true
     imei?: true
     hp?: true
+    motorHpId?: true
+    head?: true
     motorType?: true
     stateCode?: true
     district?: true
@@ -9347,8 +9568,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName: string | null
     imei: string | null
     hp: string | null
+    motorHpId: number | null
+    head: string | null
     motorType: string | null
     stateCode: string | null
     district: string | null
@@ -9394,8 +9618,11 @@ export namespace Prisma {
     description?: boolean
     customerName?: boolean
     controllerNo?: boolean
+    farmerName?: boolean
     imei?: boolean
     hp?: boolean
+    motorHpId?: boolean
+    head?: boolean
     motorType?: boolean
     stateCode?: boolean
     district?: boolean
@@ -9418,6 +9645,7 @@ export namespace Prisma {
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
     state?: boolean | Ticket$stateArgs<ExtArgs>
+    motorhp?: boolean | Ticket$motorhpArgs<ExtArgs>
     messages?: boolean | Ticket$messagesArgs<ExtArgs>
     notifications?: boolean | Ticket$notificationsArgs<ExtArgs>
     productTransactions?: boolean | Ticket$productTransactionsArgs<ExtArgs>
@@ -9435,8 +9663,11 @@ export namespace Prisma {
     description?: boolean
     customerName?: boolean
     controllerNo?: boolean
+    farmerName?: boolean
     imei?: boolean
     hp?: boolean
+    motorHpId?: boolean
+    head?: boolean
     motorType?: boolean
     stateCode?: boolean
     district?: boolean
@@ -9457,12 +9688,13 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "imei" | "hp" | "motorType" | "stateCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
     state?: boolean | Ticket$stateArgs<ExtArgs>
+    motorhp?: boolean | Ticket$motorhpArgs<ExtArgs>
     messages?: boolean | Ticket$messagesArgs<ExtArgs>
     notifications?: boolean | Ticket$notificationsArgs<ExtArgs>
     productTransactions?: boolean | Ticket$productTransactionsArgs<ExtArgs>
@@ -9479,6 +9711,7 @@ export namespace Prisma {
       updatedByUser: Prisma.$UserPayload<ExtArgs> | null
       serviceCenter: Prisma.$ServiceCenterPayload<ExtArgs> | null
       state: Prisma.$StatePayload<ExtArgs> | null
+      motorhp: Prisma.$motorhpPayload<ExtArgs> | null
       messages: Prisma.$MessagePayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       productTransactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
@@ -9492,8 +9725,11 @@ export namespace Prisma {
       description: string
       customerName: string
       controllerNo: string
+      farmerName: string | null
       imei: string | null
       hp: string | null
+      motorHpId: number | null
+      head: string | null
       motorType: string | null
       stateCode: string | null
       district: string | null
@@ -9856,6 +10092,7 @@ export namespace Prisma {
     updatedByUser<T extends Ticket$updatedByUserArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$updatedByUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     serviceCenter<T extends Ticket$serviceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$serviceCenterArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     state<T extends Ticket$stateArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$stateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    motorhp<T extends Ticket$motorhpArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$motorhpArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     messages<T extends Ticket$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends Ticket$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     productTransactions<T extends Ticket$productTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$productTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9896,8 +10133,11 @@ export namespace Prisma {
     readonly description: FieldRef<"Ticket", 'String'>
     readonly customerName: FieldRef<"Ticket", 'String'>
     readonly controllerNo: FieldRef<"Ticket", 'String'>
+    readonly farmerName: FieldRef<"Ticket", 'String'>
     readonly imei: FieldRef<"Ticket", 'String'>
     readonly hp: FieldRef<"Ticket", 'String'>
+    readonly motorHpId: FieldRef<"Ticket", 'Int'>
+    readonly head: FieldRef<"Ticket", 'String'>
     readonly motorType: FieldRef<"Ticket", 'String'>
     readonly stateCode: FieldRef<"Ticket", 'String'>
     readonly district: FieldRef<"Ticket", 'String'>
@@ -10313,6 +10553,25 @@ export namespace Prisma {
      */
     include?: StateInclude<ExtArgs> | null
     where?: StateWhereInput
+  }
+
+  /**
+   * Ticket.motorhp
+   */
+  export type Ticket$motorhpArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    where?: motorhpWhereInput
   }
 
   /**
@@ -24938,6 +25197,1952 @@ export namespace Prisma {
 
 
   /**
+   * Model settings
+   */
+
+  export type AggregateSettings = {
+    _count: SettingsCountAggregateOutputType | null
+    _avg: SettingsAvgAggregateOutputType | null
+    _sum: SettingsSumAggregateOutputType | null
+    _min: SettingsMinAggregateOutputType | null
+    _max: SettingsMaxAggregateOutputType | null
+  }
+
+  export type SettingsAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type SettingsSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type SettingsMinAggregateOutputType = {
+    id: number | null
+    key: string | null
+    value: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SettingsMaxAggregateOutputType = {
+    id: number | null
+    key: string | null
+    value: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SettingsCountAggregateOutputType = {
+    id: number
+    key: number
+    value: number
+    description: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SettingsAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type SettingsSumAggregateInputType = {
+    id?: true
+  }
+
+  export type SettingsMinAggregateInputType = {
+    id?: true
+    key?: true
+    value?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SettingsMaxAggregateInputType = {
+    id?: true
+    key?: true
+    value?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SettingsCountAggregateInputType = {
+    id?: true
+    key?: true
+    value?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SettingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which settings to aggregate.
+     */
+    where?: settingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of settings to fetch.
+     */
+    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: settingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned settings
+    **/
+    _count?: true | SettingsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SettingsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SettingsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SettingsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SettingsMaxAggregateInputType
+  }
+
+  export type GetSettingsAggregateType<T extends SettingsAggregateArgs> = {
+        [P in keyof T & keyof AggregateSettings]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSettings[P]>
+      : GetScalarType<T[P], AggregateSettings[P]>
+  }
+
+
+
+
+  export type settingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: settingsWhereInput
+    orderBy?: settingsOrderByWithAggregationInput | settingsOrderByWithAggregationInput[]
+    by: SettingsScalarFieldEnum[] | SettingsScalarFieldEnum
+    having?: settingsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SettingsCountAggregateInputType | true
+    _avg?: SettingsAvgAggregateInputType
+    _sum?: SettingsSumAggregateInputType
+    _min?: SettingsMinAggregateInputType
+    _max?: SettingsMaxAggregateInputType
+  }
+
+  export type SettingsGroupByOutputType = {
+    id: number
+    key: string
+    value: string
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SettingsCountAggregateOutputType | null
+    _avg: SettingsAvgAggregateOutputType | null
+    _sum: SettingsSumAggregateOutputType | null
+    _min: SettingsMinAggregateOutputType | null
+    _max: SettingsMaxAggregateOutputType | null
+  }
+
+  type GetSettingsGroupByPayload<T extends settingsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SettingsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SettingsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SettingsGroupByOutputType[P]>
+            : GetScalarType<T[P], SettingsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type settingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    value?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["settings"]>
+
+
+
+  export type settingsSelectScalar = {
+    id?: boolean
+    key?: boolean
+    value?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type settingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "value" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["settings"]>
+
+  export type $settingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "settings"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      key: string
+      value: string
+      description: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["settings"]>
+    composites: {}
+  }
+
+  type settingsGetPayload<S extends boolean | null | undefined | settingsDefaultArgs> = $Result.GetResult<Prisma.$settingsPayload, S>
+
+  type settingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<settingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SettingsCountAggregateInputType | true
+    }
+
+  export interface settingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['settings'], meta: { name: 'settings' } }
+    /**
+     * Find zero or one Settings that matches the filter.
+     * @param {settingsFindUniqueArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends settingsFindUniqueArgs>(args: SelectSubset<T, settingsFindUniqueArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Settings that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {settingsFindUniqueOrThrowArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends settingsFindUniqueOrThrowArgs>(args: SelectSubset<T, settingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Settings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {settingsFindFirstArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends settingsFindFirstArgs>(args?: SelectSubset<T, settingsFindFirstArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Settings that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {settingsFindFirstOrThrowArgs} args - Arguments to find a Settings
+     * @example
+     * // Get one Settings
+     * const settings = await prisma.settings.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends settingsFindFirstOrThrowArgs>(args?: SelectSubset<T, settingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Settings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {settingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Settings
+     * const settings = await prisma.settings.findMany()
+     * 
+     * // Get first 10 Settings
+     * const settings = await prisma.settings.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const settingsWithIdOnly = await prisma.settings.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends settingsFindManyArgs>(args?: SelectSubset<T, settingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Settings.
+     * @param {settingsCreateArgs} args - Arguments to create a Settings.
+     * @example
+     * // Create one Settings
+     * const Settings = await prisma.settings.create({
+     *   data: {
+     *     // ... data to create a Settings
+     *   }
+     * })
+     * 
+     */
+    create<T extends settingsCreateArgs>(args: SelectSubset<T, settingsCreateArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Settings.
+     * @param {settingsCreateManyArgs} args - Arguments to create many Settings.
+     * @example
+     * // Create many Settings
+     * const settings = await prisma.settings.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends settingsCreateManyArgs>(args?: SelectSubset<T, settingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Settings.
+     * @param {settingsDeleteArgs} args - Arguments to delete one Settings.
+     * @example
+     * // Delete one Settings
+     * const Settings = await prisma.settings.delete({
+     *   where: {
+     *     // ... filter to delete one Settings
+     *   }
+     * })
+     * 
+     */
+    delete<T extends settingsDeleteArgs>(args: SelectSubset<T, settingsDeleteArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Settings.
+     * @param {settingsUpdateArgs} args - Arguments to update one Settings.
+     * @example
+     * // Update one Settings
+     * const settings = await prisma.settings.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends settingsUpdateArgs>(args: SelectSubset<T, settingsUpdateArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Settings.
+     * @param {settingsDeleteManyArgs} args - Arguments to filter Settings to delete.
+     * @example
+     * // Delete a few Settings
+     * const { count } = await prisma.settings.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends settingsDeleteManyArgs>(args?: SelectSubset<T, settingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {settingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Settings
+     * const settings = await prisma.settings.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends settingsUpdateManyArgs>(args: SelectSubset<T, settingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Settings.
+     * @param {settingsUpsertArgs} args - Arguments to update or create a Settings.
+     * @example
+     * // Update or create a Settings
+     * const settings = await prisma.settings.upsert({
+     *   create: {
+     *     // ... data to create a Settings
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Settings we want to update
+     *   }
+     * })
+     */
+    upsert<T extends settingsUpsertArgs>(args: SelectSubset<T, settingsUpsertArgs<ExtArgs>>): Prisma__settingsClient<$Result.GetResult<Prisma.$settingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {settingsCountArgs} args - Arguments to filter Settings to count.
+     * @example
+     * // Count the number of Settings
+     * const count = await prisma.settings.count({
+     *   where: {
+     *     // ... the filter for the Settings we want to count
+     *   }
+     * })
+    **/
+    count<T extends settingsCountArgs>(
+      args?: Subset<T, settingsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SettingsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SettingsAggregateArgs>(args: Subset<T, SettingsAggregateArgs>): Prisma.PrismaPromise<GetSettingsAggregateType<T>>
+
+    /**
+     * Group by Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {settingsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends settingsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: settingsGroupByArgs['orderBy'] }
+        : { orderBy?: settingsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, settingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the settings model
+   */
+  readonly fields: settingsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for settings.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__settingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the settings model
+   */
+  interface settingsFieldRefs {
+    readonly id: FieldRef<"settings", 'Int'>
+    readonly key: FieldRef<"settings", 'String'>
+    readonly value: FieldRef<"settings", 'String'>
+    readonly description: FieldRef<"settings", 'String'>
+    readonly createdAt: FieldRef<"settings", 'DateTime'>
+    readonly updatedAt: FieldRef<"settings", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * settings findUnique
+   */
+  export type settingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * Filter, which settings to fetch.
+     */
+    where: settingsWhereUniqueInput
+  }
+
+  /**
+   * settings findUniqueOrThrow
+   */
+  export type settingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * Filter, which settings to fetch.
+     */
+    where: settingsWhereUniqueInput
+  }
+
+  /**
+   * settings findFirst
+   */
+  export type settingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * Filter, which settings to fetch.
+     */
+    where?: settingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of settings to fetch.
+     */
+    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for settings.
+     */
+    cursor?: settingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of settings.
+     */
+    distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
+  }
+
+  /**
+   * settings findFirstOrThrow
+   */
+  export type settingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * Filter, which settings to fetch.
+     */
+    where?: settingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of settings to fetch.
+     */
+    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for settings.
+     */
+    cursor?: settingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of settings.
+     */
+    distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
+  }
+
+  /**
+   * settings findMany
+   */
+  export type settingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * Filter, which settings to fetch.
+     */
+    where?: settingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of settings to fetch.
+     */
+    orderBy?: settingsOrderByWithRelationInput | settingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing settings.
+     */
+    cursor?: settingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` settings.
+     */
+    skip?: number
+    distinct?: SettingsScalarFieldEnum | SettingsScalarFieldEnum[]
+  }
+
+  /**
+   * settings create
+   */
+  export type settingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * The data needed to create a settings.
+     */
+    data: XOR<settingsCreateInput, settingsUncheckedCreateInput>
+  }
+
+  /**
+   * settings createMany
+   */
+  export type settingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many settings.
+     */
+    data: settingsCreateManyInput | settingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * settings update
+   */
+  export type settingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * The data needed to update a settings.
+     */
+    data: XOR<settingsUpdateInput, settingsUncheckedUpdateInput>
+    /**
+     * Choose, which settings to update.
+     */
+    where: settingsWhereUniqueInput
+  }
+
+  /**
+   * settings updateMany
+   */
+  export type settingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update settings.
+     */
+    data: XOR<settingsUpdateManyMutationInput, settingsUncheckedUpdateManyInput>
+    /**
+     * Filter which settings to update
+     */
+    where?: settingsWhereInput
+    /**
+     * Limit how many settings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * settings upsert
+   */
+  export type settingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * The filter to search for the settings to update in case it exists.
+     */
+    where: settingsWhereUniqueInput
+    /**
+     * In case the settings found by the `where` argument doesn't exist, create a new settings with this data.
+     */
+    create: XOR<settingsCreateInput, settingsUncheckedCreateInput>
+    /**
+     * In case the settings was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<settingsUpdateInput, settingsUncheckedUpdateInput>
+  }
+
+  /**
+   * settings delete
+   */
+  export type settingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+    /**
+     * Filter which settings to delete.
+     */
+    where: settingsWhereUniqueInput
+  }
+
+  /**
+   * settings deleteMany
+   */
+  export type settingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which settings to delete
+     */
+    where?: settingsWhereInput
+    /**
+     * Limit how many settings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * settings without action
+   */
+  export type settingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the settings
+     */
+    select?: settingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the settings
+     */
+    omit?: settingsOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model motorhp
+   */
+
+  export type AggregateMotorhp = {
+    _count: MotorhpCountAggregateOutputType | null
+    _avg: MotorhpAvgAggregateOutputType | null
+    _sum: MotorhpSumAggregateOutputType | null
+    _min: MotorhpMinAggregateOutputType | null
+    _max: MotorhpMaxAggregateOutputType | null
+  }
+
+  export type MotorhpAvgAggregateOutputType = {
+    id: number | null
+    value: number | null
+    sortOrder: number | null
+  }
+
+  export type MotorhpSumAggregateOutputType = {
+    id: number | null
+    value: number | null
+    sortOrder: number | null
+  }
+
+  export type MotorhpMinAggregateOutputType = {
+    id: number | null
+    label: string | null
+    value: number | null
+    sortOrder: number | null
+    active: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MotorhpMaxAggregateOutputType = {
+    id: number | null
+    label: string | null
+    value: number | null
+    sortOrder: number | null
+    active: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MotorhpCountAggregateOutputType = {
+    id: number
+    label: number
+    value: number
+    sortOrder: number
+    active: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MotorhpAvgAggregateInputType = {
+    id?: true
+    value?: true
+    sortOrder?: true
+  }
+
+  export type MotorhpSumAggregateInputType = {
+    id?: true
+    value?: true
+    sortOrder?: true
+  }
+
+  export type MotorhpMinAggregateInputType = {
+    id?: true
+    label?: true
+    value?: true
+    sortOrder?: true
+    active?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MotorhpMaxAggregateInputType = {
+    id?: true
+    label?: true
+    value?: true
+    sortOrder?: true
+    active?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MotorhpCountAggregateInputType = {
+    id?: true
+    label?: true
+    value?: true
+    sortOrder?: true
+    active?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MotorhpAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which motorhp to aggregate.
+     */
+    where?: motorhpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of motorhps to fetch.
+     */
+    orderBy?: motorhpOrderByWithRelationInput | motorhpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: motorhpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` motorhps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` motorhps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned motorhps
+    **/
+    _count?: true | MotorhpCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MotorhpAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MotorhpSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MotorhpMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MotorhpMaxAggregateInputType
+  }
+
+  export type GetMotorhpAggregateType<T extends MotorhpAggregateArgs> = {
+        [P in keyof T & keyof AggregateMotorhp]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMotorhp[P]>
+      : GetScalarType<T[P], AggregateMotorhp[P]>
+  }
+
+
+
+
+  export type motorhpGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: motorhpWhereInput
+    orderBy?: motorhpOrderByWithAggregationInput | motorhpOrderByWithAggregationInput[]
+    by: MotorhpScalarFieldEnum[] | MotorhpScalarFieldEnum
+    having?: motorhpScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MotorhpCountAggregateInputType | true
+    _avg?: MotorhpAvgAggregateInputType
+    _sum?: MotorhpSumAggregateInputType
+    _min?: MotorhpMinAggregateInputType
+    _max?: MotorhpMaxAggregateInputType
+  }
+
+  export type MotorhpGroupByOutputType = {
+    id: number
+    label: string
+    value: number
+    sortOrder: number | null
+    active: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: MotorhpCountAggregateOutputType | null
+    _avg: MotorhpAvgAggregateOutputType | null
+    _sum: MotorhpSumAggregateOutputType | null
+    _min: MotorhpMinAggregateOutputType | null
+    _max: MotorhpMaxAggregateOutputType | null
+  }
+
+  type GetMotorhpGroupByPayload<T extends motorhpGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MotorhpGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MotorhpGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MotorhpGroupByOutputType[P]>
+            : GetScalarType<T[P], MotorhpGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type motorhpSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    label?: boolean
+    value?: boolean
+    sortOrder?: boolean
+    active?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    tickets?: boolean | motorhp$ticketsArgs<ExtArgs>
+    _count?: boolean | MotorhpCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["motorhp"]>
+
+
+
+  export type motorhpSelectScalar = {
+    id?: boolean
+    label?: boolean
+    value?: boolean
+    sortOrder?: boolean
+    active?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type motorhpOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "label" | "value" | "sortOrder" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["motorhp"]>
+  export type motorhpInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tickets?: boolean | motorhp$ticketsArgs<ExtArgs>
+    _count?: boolean | MotorhpCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $motorhpPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "motorhp"
+    objects: {
+      tickets: Prisma.$TicketPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      label: string
+      value: number
+      sortOrder: number | null
+      active: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["motorhp"]>
+    composites: {}
+  }
+
+  type motorhpGetPayload<S extends boolean | null | undefined | motorhpDefaultArgs> = $Result.GetResult<Prisma.$motorhpPayload, S>
+
+  type motorhpCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<motorhpFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MotorhpCountAggregateInputType | true
+    }
+
+  export interface motorhpDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['motorhp'], meta: { name: 'motorhp' } }
+    /**
+     * Find zero or one Motorhp that matches the filter.
+     * @param {motorhpFindUniqueArgs} args - Arguments to find a Motorhp
+     * @example
+     * // Get one Motorhp
+     * const motorhp = await prisma.motorhp.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends motorhpFindUniqueArgs>(args: SelectSubset<T, motorhpFindUniqueArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Motorhp that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {motorhpFindUniqueOrThrowArgs} args - Arguments to find a Motorhp
+     * @example
+     * // Get one Motorhp
+     * const motorhp = await prisma.motorhp.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends motorhpFindUniqueOrThrowArgs>(args: SelectSubset<T, motorhpFindUniqueOrThrowArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Motorhp that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {motorhpFindFirstArgs} args - Arguments to find a Motorhp
+     * @example
+     * // Get one Motorhp
+     * const motorhp = await prisma.motorhp.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends motorhpFindFirstArgs>(args?: SelectSubset<T, motorhpFindFirstArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Motorhp that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {motorhpFindFirstOrThrowArgs} args - Arguments to find a Motorhp
+     * @example
+     * // Get one Motorhp
+     * const motorhp = await prisma.motorhp.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends motorhpFindFirstOrThrowArgs>(args?: SelectSubset<T, motorhpFindFirstOrThrowArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Motorhps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {motorhpFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Motorhps
+     * const motorhps = await prisma.motorhp.findMany()
+     * 
+     * // Get first 10 Motorhps
+     * const motorhps = await prisma.motorhp.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const motorhpWithIdOnly = await prisma.motorhp.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends motorhpFindManyArgs>(args?: SelectSubset<T, motorhpFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Motorhp.
+     * @param {motorhpCreateArgs} args - Arguments to create a Motorhp.
+     * @example
+     * // Create one Motorhp
+     * const Motorhp = await prisma.motorhp.create({
+     *   data: {
+     *     // ... data to create a Motorhp
+     *   }
+     * })
+     * 
+     */
+    create<T extends motorhpCreateArgs>(args: SelectSubset<T, motorhpCreateArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Motorhps.
+     * @param {motorhpCreateManyArgs} args - Arguments to create many Motorhps.
+     * @example
+     * // Create many Motorhps
+     * const motorhp = await prisma.motorhp.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends motorhpCreateManyArgs>(args?: SelectSubset<T, motorhpCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Motorhp.
+     * @param {motorhpDeleteArgs} args - Arguments to delete one Motorhp.
+     * @example
+     * // Delete one Motorhp
+     * const Motorhp = await prisma.motorhp.delete({
+     *   where: {
+     *     // ... filter to delete one Motorhp
+     *   }
+     * })
+     * 
+     */
+    delete<T extends motorhpDeleteArgs>(args: SelectSubset<T, motorhpDeleteArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Motorhp.
+     * @param {motorhpUpdateArgs} args - Arguments to update one Motorhp.
+     * @example
+     * // Update one Motorhp
+     * const motorhp = await prisma.motorhp.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends motorhpUpdateArgs>(args: SelectSubset<T, motorhpUpdateArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Motorhps.
+     * @param {motorhpDeleteManyArgs} args - Arguments to filter Motorhps to delete.
+     * @example
+     * // Delete a few Motorhps
+     * const { count } = await prisma.motorhp.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends motorhpDeleteManyArgs>(args?: SelectSubset<T, motorhpDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Motorhps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {motorhpUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Motorhps
+     * const motorhp = await prisma.motorhp.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends motorhpUpdateManyArgs>(args: SelectSubset<T, motorhpUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Motorhp.
+     * @param {motorhpUpsertArgs} args - Arguments to update or create a Motorhp.
+     * @example
+     * // Update or create a Motorhp
+     * const motorhp = await prisma.motorhp.upsert({
+     *   create: {
+     *     // ... data to create a Motorhp
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Motorhp we want to update
+     *   }
+     * })
+     */
+    upsert<T extends motorhpUpsertArgs>(args: SelectSubset<T, motorhpUpsertArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Motorhps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {motorhpCountArgs} args - Arguments to filter Motorhps to count.
+     * @example
+     * // Count the number of Motorhps
+     * const count = await prisma.motorhp.count({
+     *   where: {
+     *     // ... the filter for the Motorhps we want to count
+     *   }
+     * })
+    **/
+    count<T extends motorhpCountArgs>(
+      args?: Subset<T, motorhpCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MotorhpCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Motorhp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MotorhpAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MotorhpAggregateArgs>(args: Subset<T, MotorhpAggregateArgs>): Prisma.PrismaPromise<GetMotorhpAggregateType<T>>
+
+    /**
+     * Group by Motorhp.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {motorhpGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends motorhpGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: motorhpGroupByArgs['orderBy'] }
+        : { orderBy?: motorhpGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, motorhpGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMotorhpGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the motorhp model
+   */
+  readonly fields: motorhpFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for motorhp.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__motorhpClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    tickets<T extends motorhp$ticketsArgs<ExtArgs> = {}>(args?: Subset<T, motorhp$ticketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the motorhp model
+   */
+  interface motorhpFieldRefs {
+    readonly id: FieldRef<"motorhp", 'Int'>
+    readonly label: FieldRef<"motorhp", 'String'>
+    readonly value: FieldRef<"motorhp", 'Int'>
+    readonly sortOrder: FieldRef<"motorhp", 'Int'>
+    readonly active: FieldRef<"motorhp", 'Boolean'>
+    readonly createdAt: FieldRef<"motorhp", 'DateTime'>
+    readonly updatedAt: FieldRef<"motorhp", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * motorhp findUnique
+   */
+  export type motorhpFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * Filter, which motorhp to fetch.
+     */
+    where: motorhpWhereUniqueInput
+  }
+
+  /**
+   * motorhp findUniqueOrThrow
+   */
+  export type motorhpFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * Filter, which motorhp to fetch.
+     */
+    where: motorhpWhereUniqueInput
+  }
+
+  /**
+   * motorhp findFirst
+   */
+  export type motorhpFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * Filter, which motorhp to fetch.
+     */
+    where?: motorhpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of motorhps to fetch.
+     */
+    orderBy?: motorhpOrderByWithRelationInput | motorhpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for motorhps.
+     */
+    cursor?: motorhpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` motorhps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` motorhps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of motorhps.
+     */
+    distinct?: MotorhpScalarFieldEnum | MotorhpScalarFieldEnum[]
+  }
+
+  /**
+   * motorhp findFirstOrThrow
+   */
+  export type motorhpFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * Filter, which motorhp to fetch.
+     */
+    where?: motorhpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of motorhps to fetch.
+     */
+    orderBy?: motorhpOrderByWithRelationInput | motorhpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for motorhps.
+     */
+    cursor?: motorhpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` motorhps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` motorhps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of motorhps.
+     */
+    distinct?: MotorhpScalarFieldEnum | MotorhpScalarFieldEnum[]
+  }
+
+  /**
+   * motorhp findMany
+   */
+  export type motorhpFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * Filter, which motorhps to fetch.
+     */
+    where?: motorhpWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of motorhps to fetch.
+     */
+    orderBy?: motorhpOrderByWithRelationInput | motorhpOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing motorhps.
+     */
+    cursor?: motorhpWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` motorhps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` motorhps.
+     */
+    skip?: number
+    distinct?: MotorhpScalarFieldEnum | MotorhpScalarFieldEnum[]
+  }
+
+  /**
+   * motorhp create
+   */
+  export type motorhpCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * The data needed to create a motorhp.
+     */
+    data: XOR<motorhpCreateInput, motorhpUncheckedCreateInput>
+  }
+
+  /**
+   * motorhp createMany
+   */
+  export type motorhpCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many motorhps.
+     */
+    data: motorhpCreateManyInput | motorhpCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * motorhp update
+   */
+  export type motorhpUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * The data needed to update a motorhp.
+     */
+    data: XOR<motorhpUpdateInput, motorhpUncheckedUpdateInput>
+    /**
+     * Choose, which motorhp to update.
+     */
+    where: motorhpWhereUniqueInput
+  }
+
+  /**
+   * motorhp updateMany
+   */
+  export type motorhpUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update motorhps.
+     */
+    data: XOR<motorhpUpdateManyMutationInput, motorhpUncheckedUpdateManyInput>
+    /**
+     * Filter which motorhps to update
+     */
+    where?: motorhpWhereInput
+    /**
+     * Limit how many motorhps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * motorhp upsert
+   */
+  export type motorhpUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * The filter to search for the motorhp to update in case it exists.
+     */
+    where: motorhpWhereUniqueInput
+    /**
+     * In case the motorhp found by the `where` argument doesn't exist, create a new motorhp with this data.
+     */
+    create: XOR<motorhpCreateInput, motorhpUncheckedCreateInput>
+    /**
+     * In case the motorhp was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<motorhpUpdateInput, motorhpUncheckedUpdateInput>
+  }
+
+  /**
+   * motorhp delete
+   */
+  export type motorhpDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+    /**
+     * Filter which motorhp to delete.
+     */
+    where: motorhpWhereUniqueInput
+  }
+
+  /**
+   * motorhp deleteMany
+   */
+  export type motorhpDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which motorhps to delete
+     */
+    where?: motorhpWhereInput
+    /**
+     * Limit how many motorhps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * motorhp.tickets
+   */
+  export type motorhp$ticketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
+
+  /**
+   * motorhp without action
+   */
+  export type motorhpDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the motorhp
+     */
+    select?: motorhpSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the motorhp
+     */
+    omit?: motorhpOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: motorhpInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -25036,8 +27241,11 @@ export namespace Prisma {
     description: 'description',
     customerName: 'customerName',
     controllerNo: 'controllerNo',
+    farmerName: 'farmerName',
     imei: 'imei',
     hp: 'hp',
+    motorHpId: 'motorHpId',
+    head: 'head',
     motorType: 'motorType',
     stateCode: 'stateCode',
     district: 'district',
@@ -25249,6 +27457,31 @@ export namespace Prisma {
   export type BatchItemScalarFieldEnum = (typeof BatchItemScalarFieldEnum)[keyof typeof BatchItemScalarFieldEnum]
 
 
+  export const SettingsScalarFieldEnum: {
+    id: 'id',
+    key: 'key',
+    value: 'value',
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
+
+
+  export const MotorhpScalarFieldEnum: {
+    id: 'id',
+    label: 'label',
+    value: 'value',
+    sortOrder: 'sortOrder',
+    active: 'active',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MotorhpScalarFieldEnum = (typeof MotorhpScalarFieldEnum)[keyof typeof MotorhpScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -25323,8 +27556,10 @@ export namespace Prisma {
     description: 'description',
     customerName: 'customerName',
     controllerNo: 'controllerNo',
+    farmerName: 'farmerName',
     imei: 'imei',
     hp: 'hp',
+    head: 'head',
     motorType: 'motorType',
     stateCode: 'stateCode',
     district: 'district',
@@ -25427,6 +27662,22 @@ export namespace Prisma {
   };
 
   export type batchOrderByRelevanceFieldEnum = (typeof batchOrderByRelevanceFieldEnum)[keyof typeof batchOrderByRelevanceFieldEnum]
+
+
+  export const settingsOrderByRelevanceFieldEnum: {
+    key: 'key',
+    value: 'value',
+    description: 'description'
+  };
+
+  export type settingsOrderByRelevanceFieldEnum = (typeof settingsOrderByRelevanceFieldEnum)[keyof typeof settingsOrderByRelevanceFieldEnum]
+
+
+  export const motorhpOrderByRelevanceFieldEnum: {
+    label: 'label'
+  };
+
+  export type motorhpOrderByRelevanceFieldEnum = (typeof motorhpOrderByRelevanceFieldEnum)[keyof typeof motorhpOrderByRelevanceFieldEnum]
 
 
   /**
@@ -26022,8 +28273,11 @@ export namespace Prisma {
     description?: StringFilter<"Ticket"> | string
     customerName?: StringFilter<"Ticket"> | string
     controllerNo?: StringFilter<"Ticket"> | string
+    farmerName?: StringNullableFilter<"Ticket"> | string | null
     imei?: StringNullableFilter<"Ticket"> | string | null
     hp?: StringNullableFilter<"Ticket"> | string | null
+    motorHpId?: IntNullableFilter<"Ticket"> | number | null
+    head?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     stateCode?: StringNullableFilter<"Ticket"> | string | null
     district?: StringNullableFilter<"Ticket"> | string | null
@@ -26046,6 +28300,7 @@ export namespace Prisma {
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
+    motorhp?: XOR<MotorhpNullableScalarRelationFilter, motorhpWhereInput> | null
     messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
     productTransactions?: ProductTransactionListRelationFilter
@@ -26060,8 +28315,11 @@ export namespace Prisma {
     description?: SortOrder
     customerName?: SortOrder
     controllerNo?: SortOrder
+    farmerName?: SortOrderInput | SortOrder
     imei?: SortOrderInput | SortOrder
     hp?: SortOrderInput | SortOrder
+    motorHpId?: SortOrderInput | SortOrder
+    head?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
     stateCode?: SortOrderInput | SortOrder
     district?: SortOrderInput | SortOrder
@@ -26084,6 +28342,7 @@ export namespace Prisma {
     updatedByUser?: UserOrderByWithRelationInput
     serviceCenter?: ServiceCenterOrderByWithRelationInput
     state?: StateOrderByWithRelationInput
+    motorhp?: motorhpOrderByWithRelationInput
     messages?: MessageOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
     productTransactions?: ProductTransactionOrderByRelationAggregateInput
@@ -26102,8 +28361,11 @@ export namespace Prisma {
     description?: StringFilter<"Ticket"> | string
     customerName?: StringFilter<"Ticket"> | string
     controllerNo?: StringFilter<"Ticket"> | string
+    farmerName?: StringNullableFilter<"Ticket"> | string | null
     imei?: StringNullableFilter<"Ticket"> | string | null
     hp?: StringNullableFilter<"Ticket"> | string | null
+    motorHpId?: IntNullableFilter<"Ticket"> | number | null
+    head?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     stateCode?: StringNullableFilter<"Ticket"> | string | null
     district?: StringNullableFilter<"Ticket"> | string | null
@@ -26126,6 +28388,7 @@ export namespace Prisma {
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
+    motorhp?: XOR<MotorhpNullableScalarRelationFilter, motorhpWhereInput> | null
     messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
     productTransactions?: ProductTransactionListRelationFilter
@@ -26140,8 +28403,11 @@ export namespace Prisma {
     description?: SortOrder
     customerName?: SortOrder
     controllerNo?: SortOrder
+    farmerName?: SortOrderInput | SortOrder
     imei?: SortOrderInput | SortOrder
     hp?: SortOrderInput | SortOrder
+    motorHpId?: SortOrderInput | SortOrder
+    head?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
     stateCode?: SortOrderInput | SortOrder
     district?: SortOrderInput | SortOrder
@@ -26176,8 +28442,11 @@ export namespace Prisma {
     description?: StringWithAggregatesFilter<"Ticket"> | string
     customerName?: StringWithAggregatesFilter<"Ticket"> | string
     controllerNo?: StringWithAggregatesFilter<"Ticket"> | string
+    farmerName?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     imei?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     hp?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    motorHpId?: IntNullableWithAggregatesFilter<"Ticket"> | number | null
+    head?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     motorType?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     stateCode?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     district?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
@@ -27246,6 +29515,134 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"batchItem"> | Date | string
   }
 
+  export type settingsWhereInput = {
+    AND?: settingsWhereInput | settingsWhereInput[]
+    OR?: settingsWhereInput[]
+    NOT?: settingsWhereInput | settingsWhereInput[]
+    id?: IntFilter<"settings"> | number
+    key?: StringFilter<"settings"> | string
+    value?: StringFilter<"settings"> | string
+    description?: StringNullableFilter<"settings"> | string | null
+    createdAt?: DateTimeFilter<"settings"> | Date | string
+    updatedAt?: DateTimeFilter<"settings"> | Date | string
+  }
+
+  export type settingsOrderByWithRelationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    value?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: settingsOrderByRelevanceInput
+  }
+
+  export type settingsWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    key?: string
+    AND?: settingsWhereInput | settingsWhereInput[]
+    OR?: settingsWhereInput[]
+    NOT?: settingsWhereInput | settingsWhereInput[]
+    value?: StringFilter<"settings"> | string
+    description?: StringNullableFilter<"settings"> | string | null
+    createdAt?: DateTimeFilter<"settings"> | Date | string
+    updatedAt?: DateTimeFilter<"settings"> | Date | string
+  }, "id" | "key">
+
+  export type settingsOrderByWithAggregationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    value?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: settingsCountOrderByAggregateInput
+    _avg?: settingsAvgOrderByAggregateInput
+    _max?: settingsMaxOrderByAggregateInput
+    _min?: settingsMinOrderByAggregateInput
+    _sum?: settingsSumOrderByAggregateInput
+  }
+
+  export type settingsScalarWhereWithAggregatesInput = {
+    AND?: settingsScalarWhereWithAggregatesInput | settingsScalarWhereWithAggregatesInput[]
+    OR?: settingsScalarWhereWithAggregatesInput[]
+    NOT?: settingsScalarWhereWithAggregatesInput | settingsScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"settings"> | number
+    key?: StringWithAggregatesFilter<"settings"> | string
+    value?: StringWithAggregatesFilter<"settings"> | string
+    description?: StringNullableWithAggregatesFilter<"settings"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"settings"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"settings"> | Date | string
+  }
+
+  export type motorhpWhereInput = {
+    AND?: motorhpWhereInput | motorhpWhereInput[]
+    OR?: motorhpWhereInput[]
+    NOT?: motorhpWhereInput | motorhpWhereInput[]
+    id?: IntFilter<"motorhp"> | number
+    label?: StringFilter<"motorhp"> | string
+    value?: IntFilter<"motorhp"> | number
+    sortOrder?: IntNullableFilter<"motorhp"> | number | null
+    active?: BoolFilter<"motorhp"> | boolean
+    createdAt?: DateTimeFilter<"motorhp"> | Date | string
+    updatedAt?: DateTimeFilter<"motorhp"> | Date | string
+    tickets?: TicketListRelationFilter
+  }
+
+  export type motorhpOrderByWithRelationInput = {
+    id?: SortOrder
+    label?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrderInput | SortOrder
+    active?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    tickets?: TicketOrderByRelationAggregateInput
+    _relevance?: motorhpOrderByRelevanceInput
+  }
+
+  export type motorhpWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    label?: string
+    AND?: motorhpWhereInput | motorhpWhereInput[]
+    OR?: motorhpWhereInput[]
+    NOT?: motorhpWhereInput | motorhpWhereInput[]
+    value?: IntFilter<"motorhp"> | number
+    sortOrder?: IntNullableFilter<"motorhp"> | number | null
+    active?: BoolFilter<"motorhp"> | boolean
+    createdAt?: DateTimeFilter<"motorhp"> | Date | string
+    updatedAt?: DateTimeFilter<"motorhp"> | Date | string
+    tickets?: TicketListRelationFilter
+  }, "id" | "label">
+
+  export type motorhpOrderByWithAggregationInput = {
+    id?: SortOrder
+    label?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrderInput | SortOrder
+    active?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: motorhpCountOrderByAggregateInput
+    _avg?: motorhpAvgOrderByAggregateInput
+    _max?: motorhpMaxOrderByAggregateInput
+    _min?: motorhpMinOrderByAggregateInput
+    _sum?: motorhpSumOrderByAggregateInput
+  }
+
+  export type motorhpScalarWhereWithAggregatesInput = {
+    AND?: motorhpScalarWhereWithAggregatesInput | motorhpScalarWhereWithAggregatesInput[]
+    OR?: motorhpScalarWhereWithAggregatesInput[]
+    NOT?: motorhpScalarWhereWithAggregatesInput | motorhpScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"motorhp"> | number
+    label?: StringWithAggregatesFilter<"motorhp"> | string
+    value?: IntWithAggregatesFilter<"motorhp"> | number
+    sortOrder?: IntNullableWithAggregatesFilter<"motorhp"> | number | null
+    active?: BoolWithAggregatesFilter<"motorhp"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"motorhp"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"motorhp"> | Date | string
+  }
+
   export type StateCreateInput = {
     name: string
     stateCode?: string | null
@@ -27769,8 +30166,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -27789,6 +30188,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -27803,8 +30203,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -27836,8 +30239,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27856,6 +30261,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -27870,8 +30276,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27904,8 +30313,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -27931,8 +30343,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27955,8 +30369,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28971,6 +31388,137 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type settingsCreateInput = {
+    key: string
+    value: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type settingsUncheckedCreateInput = {
+    id?: number
+    key: string
+    value: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type settingsUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type settingsUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type settingsCreateManyInput = {
+    id?: number
+    key: string
+    value: string
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type settingsUpdateManyMutationInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type settingsUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type motorhpCreateInput = {
+    label: string
+    value: number
+    sortOrder?: number | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    tickets?: TicketCreateNestedManyWithoutMotorhpInput
+  }
+
+  export type motorhpUncheckedCreateInput = {
+    id?: number
+    label: string
+    value: number
+    sortOrder?: number | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    tickets?: TicketUncheckedCreateNestedManyWithoutMotorhpInput
+  }
+
+  export type motorhpUpdateInput = {
+    label?: StringFieldUpdateOperationsInput | string
+    value?: IntFieldUpdateOperationsInput | number
+    sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tickets?: TicketUpdateManyWithoutMotorhpNestedInput
+  }
+
+  export type motorhpUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    label?: StringFieldUpdateOperationsInput | string
+    value?: IntFieldUpdateOperationsInput | number
+    sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    tickets?: TicketUncheckedUpdateManyWithoutMotorhpNestedInput
+  }
+
+  export type motorhpCreateManyInput = {
+    id?: number
+    label: string
+    value: number
+    sortOrder?: number | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type motorhpUpdateManyMutationInput = {
+    label?: StringFieldUpdateOperationsInput | string
+    value?: IntFieldUpdateOperationsInput | number
+    sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type motorhpUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    label?: StringFieldUpdateOperationsInput | string
+    value?: IntFieldUpdateOperationsInput | number
+    sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -29611,6 +32159,11 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
+  export type MotorhpNullableScalarRelationFilter = {
+    is?: motorhpWhereInput | null
+    isNot?: motorhpWhereInput | null
+  }
+
   export type AttachmentsListRelationFilter = {
     every?: AttachmentsWhereInput
     some?: AttachmentsWhereInput
@@ -29643,8 +32196,11 @@ export namespace Prisma {
     description?: SortOrder
     customerName?: SortOrder
     controllerNo?: SortOrder
+    farmerName?: SortOrder
     imei?: SortOrder
     hp?: SortOrder
+    motorHpId?: SortOrder
+    head?: SortOrder
     motorType?: SortOrder
     stateCode?: SortOrder
     district?: SortOrder
@@ -29667,6 +32223,7 @@ export namespace Prisma {
 
   export type TicketAvgOrderByAggregateInput = {
     id?: SortOrder
+    motorHpId?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
   }
@@ -29677,8 +32234,11 @@ export namespace Prisma {
     description?: SortOrder
     customerName?: SortOrder
     controllerNo?: SortOrder
+    farmerName?: SortOrder
     imei?: SortOrder
     hp?: SortOrder
+    motorHpId?: SortOrder
+    head?: SortOrder
     motorType?: SortOrder
     stateCode?: SortOrder
     district?: SortOrder
@@ -29705,8 +32265,11 @@ export namespace Prisma {
     description?: SortOrder
     customerName?: SortOrder
     controllerNo?: SortOrder
+    farmerName?: SortOrder
     imei?: SortOrder
     hp?: SortOrder
+    motorHpId?: SortOrder
+    head?: SortOrder
     motorType?: SortOrder
     stateCode?: SortOrder
     district?: SortOrder
@@ -29729,6 +32292,7 @@ export namespace Prisma {
 
   export type TicketSumOrderByAggregateInput = {
     id?: SortOrder
+    motorHpId?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
   }
@@ -30604,6 +33168,95 @@ export namespace Prisma {
     id?: SortOrder
     batchId?: SortOrder
     ticketId?: SortOrder
+  }
+
+  export type settingsOrderByRelevanceInput = {
+    fields: settingsOrderByRelevanceFieldEnum | settingsOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type settingsCountOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    value?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type settingsAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type settingsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    value?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type settingsMinOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    value?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type settingsSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type motorhpOrderByRelevanceInput = {
+    fields: motorhpOrderByRelevanceFieldEnum | motorhpOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type motorhpCountOrderByAggregateInput = {
+    id?: SortOrder
+    label?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrder
+    active?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type motorhpAvgOrderByAggregateInput = {
+    id?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type motorhpMaxOrderByAggregateInput = {
+    id?: SortOrder
+    label?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrder
+    active?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type motorhpMinOrderByAggregateInput = {
+    id?: SortOrder
+    label?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrder
+    active?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type motorhpSumOrderByAggregateInput = {
+    id?: SortOrder
+    value?: SortOrder
+    sortOrder?: SortOrder
   }
 
   export type UserCreateNestedManyWithoutStateInput = {
@@ -31740,6 +34393,12 @@ export namespace Prisma {
     connect?: StateWhereUniqueInput
   }
 
+  export type motorhpCreateNestedOneWithoutTicketsInput = {
+    create?: XOR<motorhpCreateWithoutTicketsInput, motorhpUncheckedCreateWithoutTicketsInput>
+    connectOrCreate?: motorhpCreateOrConnectWithoutTicketsInput
+    connect?: motorhpWhereUniqueInput
+  }
+
   export type MessageCreateNestedManyWithoutTicketInput = {
     create?: XOR<MessageCreateWithoutTicketInput, MessageUncheckedCreateWithoutTicketInput> | MessageCreateWithoutTicketInput[] | MessageUncheckedCreateWithoutTicketInput[]
     connectOrCreate?: MessageCreateOrConnectWithoutTicketInput | MessageCreateOrConnectWithoutTicketInput[]
@@ -31864,6 +34523,16 @@ export namespace Prisma {
     delete?: StateWhereInput | boolean
     connect?: StateWhereUniqueInput
     update?: XOR<XOR<StateUpdateToOneWithWhereWithoutTicketsInput, StateUpdateWithoutTicketsInput>, StateUncheckedUpdateWithoutTicketsInput>
+  }
+
+  export type motorhpUpdateOneWithoutTicketsNestedInput = {
+    create?: XOR<motorhpCreateWithoutTicketsInput, motorhpUncheckedCreateWithoutTicketsInput>
+    connectOrCreate?: motorhpCreateOrConnectWithoutTicketsInput
+    upsert?: motorhpUpsertWithoutTicketsInput
+    disconnect?: motorhpWhereInput | boolean
+    delete?: motorhpWhereInput | boolean
+    connect?: motorhpWhereUniqueInput
+    update?: XOR<XOR<motorhpUpdateToOneWithWhereWithoutTicketsInput, motorhpUpdateWithoutTicketsInput>, motorhpUncheckedUpdateWithoutTicketsInput>
   }
 
   export type MessageUpdateManyWithoutTicketNestedInput = {
@@ -32850,6 +35519,48 @@ export namespace Prisma {
     update?: XOR<XOR<TicketUpdateToOneWithWhereWithoutBatchItemsInput, TicketUpdateWithoutBatchItemsInput>, TicketUncheckedUpdateWithoutBatchItemsInput>
   }
 
+  export type TicketCreateNestedManyWithoutMotorhpInput = {
+    create?: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput> | TicketCreateWithoutMotorhpInput[] | TicketUncheckedCreateWithoutMotorhpInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutMotorhpInput | TicketCreateOrConnectWithoutMotorhpInput[]
+    createMany?: TicketCreateManyMotorhpInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
+  export type TicketUncheckedCreateNestedManyWithoutMotorhpInput = {
+    create?: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput> | TicketCreateWithoutMotorhpInput[] | TicketUncheckedCreateWithoutMotorhpInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutMotorhpInput | TicketCreateOrConnectWithoutMotorhpInput[]
+    createMany?: TicketCreateManyMotorhpInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
+  export type TicketUpdateManyWithoutMotorhpNestedInput = {
+    create?: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput> | TicketCreateWithoutMotorhpInput[] | TicketUncheckedCreateWithoutMotorhpInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutMotorhpInput | TicketCreateOrConnectWithoutMotorhpInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutMotorhpInput | TicketUpsertWithWhereUniqueWithoutMotorhpInput[]
+    createMany?: TicketCreateManyMotorhpInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutMotorhpInput | TicketUpdateWithWhereUniqueWithoutMotorhpInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutMotorhpInput | TicketUpdateManyWithWhereWithoutMotorhpInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
+  export type TicketUncheckedUpdateManyWithoutMotorhpNestedInput = {
+    create?: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput> | TicketCreateWithoutMotorhpInput[] | TicketUncheckedCreateWithoutMotorhpInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutMotorhpInput | TicketCreateOrConnectWithoutMotorhpInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutMotorhpInput | TicketUpsertWithWhereUniqueWithoutMotorhpInput[]
+    createMany?: TicketCreateManyMotorhpInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutMotorhpInput | TicketUpdateWithWhereUniqueWithoutMotorhpInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutMotorhpInput | TicketUpdateManyWithWhereWithoutMotorhpInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -33364,8 +36075,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -33383,6 +36096,7 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -33397,8 +36111,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -33544,8 +36261,11 @@ export namespace Prisma {
     description?: StringFilter<"Ticket"> | string
     customerName?: StringFilter<"Ticket"> | string
     controllerNo?: StringFilter<"Ticket"> | string
+    farmerName?: StringNullableFilter<"Ticket"> | string | null
     imei?: StringNullableFilter<"Ticket"> | string | null
     hp?: StringNullableFilter<"Ticket"> | string | null
+    motorHpId?: IntNullableFilter<"Ticket"> | number | null
+    head?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     stateCode?: StringNullableFilter<"Ticket"> | string | null
     district?: StringNullableFilter<"Ticket"> | string | null
@@ -34085,8 +36805,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -34104,6 +36826,7 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -34118,8 +36841,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -34266,8 +36992,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -34285,6 +37013,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -34299,8 +37028,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -34341,8 +37073,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -34360,6 +37094,7 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -34374,8 +37109,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -35476,6 +38214,30 @@ export namespace Prisma {
     create: XOR<StateCreateWithoutTicketsInput, StateUncheckedCreateWithoutTicketsInput>
   }
 
+  export type motorhpCreateWithoutTicketsInput = {
+    label: string
+    value: number
+    sortOrder?: number | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type motorhpUncheckedCreateWithoutTicketsInput = {
+    id?: number
+    label: string
+    value: number
+    sortOrder?: number | null
+    active?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type motorhpCreateOrConnectWithoutTicketsInput = {
+    where: motorhpWhereUniqueInput
+    create: XOR<motorhpCreateWithoutTicketsInput, motorhpUncheckedCreateWithoutTicketsInput>
+  }
+
   export type MessageCreateWithoutTicketInput = {
     content: string
     createdAt?: Date | string
@@ -35872,6 +38634,36 @@ export namespace Prisma {
     projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
   }
 
+  export type motorhpUpsertWithoutTicketsInput = {
+    update: XOR<motorhpUpdateWithoutTicketsInput, motorhpUncheckedUpdateWithoutTicketsInput>
+    create: XOR<motorhpCreateWithoutTicketsInput, motorhpUncheckedCreateWithoutTicketsInput>
+    where?: motorhpWhereInput
+  }
+
+  export type motorhpUpdateToOneWithWhereWithoutTicketsInput = {
+    where?: motorhpWhereInput
+    data: XOR<motorhpUpdateWithoutTicketsInput, motorhpUncheckedUpdateWithoutTicketsInput>
+  }
+
+  export type motorhpUpdateWithoutTicketsInput = {
+    label?: StringFieldUpdateOperationsInput | string
+    value?: IntFieldUpdateOperationsInput | number
+    sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type motorhpUncheckedUpdateWithoutTicketsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    label?: StringFieldUpdateOperationsInput | string
+    value?: IntFieldUpdateOperationsInput | number
+    sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
+    active?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MessageUpsertWithWhereUniqueWithoutTicketInput = {
     where: MessageWhereUniqueInput
     update: XOR<MessageUpdateWithoutTicketInput, MessageUncheckedUpdateWithoutTicketInput>
@@ -35999,8 +38791,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -36019,6 +38813,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -36032,8 +38827,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -36173,8 +38971,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36193,6 +38993,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -36206,8 +39007,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36388,8 +39192,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -36408,6 +39214,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -36421,8 +39228,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -36547,8 +39357,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36567,6 +39379,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -36580,8 +39393,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37218,8 +40034,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -37238,6 +40056,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
@@ -37251,8 +40070,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -37397,8 +40219,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37417,6 +40241,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
@@ -37430,8 +40255,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37658,8 +40486,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -37678,6 +40508,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
@@ -37691,8 +40522,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -37890,8 +40724,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37910,6 +40746,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
@@ -37923,8 +40760,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38273,8 +41113,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -38293,6 +41135,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsCreateNestedManyWithoutTicketInput
@@ -38306,8 +41149,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -38475,8 +41321,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38495,6 +41343,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
@@ -38508,8 +41357,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39069,8 +41921,10 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -39089,6 +41943,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -39102,8 +41957,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -39182,8 +42040,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39202,6 +42062,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -39215,8 +42076,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39240,6 +42104,103 @@ export namespace Prisma {
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketCreateWithoutMotorhpInput = {
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    farmerName?: string | null
+    imei?: string | null
+    hp?: string | null
+    head?: string | null
+    motorType?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
+    updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
+    notifications?: NotificationCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutMotorhpInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    farmerName?: string | null
+    imei?: string | null
+    hp?: string | null
+    head?: string | null
+    motorType?: string | null
+    stateCode?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutMotorhpInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput>
+  }
+
+  export type TicketCreateManyMotorhpInputEnvelope = {
+    data: TicketCreateManyMotorhpInput | TicketCreateManyMotorhpInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TicketUpsertWithWhereUniqueWithoutMotorhpInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutMotorhpInput, TicketUncheckedUpdateWithoutMotorhpInput>
+    create: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput>
+  }
+
+  export type TicketUpdateWithWhereUniqueWithoutMotorhpInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutMotorhpInput, TicketUncheckedUpdateWithoutMotorhpInput>
+  }
+
+  export type TicketUpdateManyWithWhereWithoutMotorhpInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutMotorhpInput>
   }
 
   export type UserCreateManyStateInput = {
@@ -39277,8 +42238,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     district?: string | null
     village?: string | null
@@ -39492,8 +42456,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39511,6 +42477,7 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -39525,8 +42492,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39558,8 +42528,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39889,8 +42862,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -39988,8 +42964,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40007,6 +42985,7 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -40021,8 +43000,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40054,8 +43036,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40081,8 +43066,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -40108,8 +43096,11 @@ export namespace Prisma {
     description: string
     customerName: string
     controllerNo: string
+    farmerName?: string | null
     imei?: string | null
     hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
     motorType?: string | null
     stateCode?: string | null
     district?: string | null
@@ -40231,8 +43222,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40250,6 +43243,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -40264,8 +43258,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40297,8 +43294,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40323,8 +43323,10 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40342,6 +43344,7 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -40356,8 +43359,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40389,8 +43395,11 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     customerName?: StringFieldUpdateOperationsInput | string
     controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
     imei?: NullableStringFieldUpdateOperationsInput | string | null
     hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41307,6 +44316,137 @@ export namespace Prisma {
     ticketId?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TicketCreateManyMotorhpInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    farmerName?: string | null
+    imei?: string | null
+    hp?: string | null
+    head?: string | null
+    motorType?: string | null
+    stateCode?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+  }
+
+  export type TicketUpdateWithoutMotorhpInput = {
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
+    updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutMotorhpInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateManyWithoutMotorhpInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
 

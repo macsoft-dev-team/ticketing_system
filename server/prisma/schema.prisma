@@ -173,9 +173,12 @@ model Ticket {
   description           String
   customerName          String
   controllerNo          String
+  farmerName            String?
   imei                  String?
   hp                    String?
-  motorType             String?
+  motorHpId             Int?
+  head                  String?
+  motorType             String? 
   stateCode             String?
   district              String?
   village               String?
@@ -200,6 +203,7 @@ model Ticket {
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
   serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
   state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
+  motorhp             motorhp?             @relation(fields: [motorHpId], references: [id])
   messages            Message[]
   notifications       Notification[]
   productTransactions ProductTransaction[]
@@ -427,6 +431,29 @@ model batchItem {
   batch  batch  @relation(fields: [batchId], references: [id])
   ticket Ticket @relation(fields: [ticketId], references: [id])
 }
+
+model settings {
+  id               Int      @id @default(autoincrement())
+  key              String   @unique
+  value            String
+  description      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model motorhp {
+  id        Int      @id @default(autoincrement())
+  label     String   @unique             // e.g. "50HP"
+  value     Int                          // numeric value e.g. 50
+  sortOrder Int?                         // optional for ordering in dropdowns
+  active    Boolean  @default(true)      
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  tickets   Ticket[]
+}
+
 
 enum batchType {
   RECEIVE_CONTROLLER

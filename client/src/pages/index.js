@@ -9,3 +9,4 @@ export { default as LoginPage } from './login/login';
 export { default as SignupPage } from './signup/signup';
 export { default as Inventory } from './inventory/inventory';
 export { default as ReceiveController } from './receiveController/ReceiveController';
+export { default as MotorHP } from './motorhp/motorhp';

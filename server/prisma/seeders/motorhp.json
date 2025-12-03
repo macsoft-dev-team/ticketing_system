@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "label": "1HP",
+    "value": 1,
+    "sortOrder": 1,
+    "active": true
+  },
+  {
+    "id": 2,
+    "label": "2HP",
+    "value": 2,
+    "sortOrder": 2,
+    "active": true
+  },
+  {
+    "id": 3,
+    "label": "3HP",
+    "value": 3,
+    "sortOrder": 3,
+    "active": true
+  },
+  {
+    "id": 4,
+    "label": "5HP",
+    "value": 5,
+    "sortOrder": 4,
+    "active": true
+  },
+  {
+    "id": 5,
+    "label": "7.5HP",
+    "value": 7.5,
+    "sortOrder": 5,
+    "active": true
+  },
+  {
+    "id": 6,
+    "label": "10HP",
+    "value": 10,
+    "sortOrder": 6,
+    "active": true
+  },
+  {
+    "id": 7,
+    "label": "12.5HP",
+    "value": 12.5,
+    "sortOrder": 7,
+    "active": true
+  },
+  {
+    "id": 8,
+    "label": "15HP",
+    "value": 15,
+    "sortOrder": 8,
+    "active": true
+  },
+  {
+    "id": 9,
+    "label": "17.5HP",
+    "value": 17.5,
+    "sortOrder": 9,
+    "active": true
+  },
+  {
+    "id": 10,
+    "label": "20HP",
+    "value": 20,
+    "sortOrder": 10,
+    "active": true
+  },
+  {
+    "id": 11,
+    "label": "25HP",
+    "value": 25,
+    "sortOrder": 11,
+    "active": true
+  },
+  {
+    "id": 12,
+    "label": "30HP",
+    "value": 30,
+    "sortOrder": 12,
+    "active": true
+  },
+  {
+    "id": 13,
+    "label": "40HP",
+    "value": 40,
+    "sortOrder": 13,
+    "active": true
+  },
+  {
+    "id": 14,
+    "label": "50HP",
+    "value": 50,
+    "sortOrder": 14,
+    "active": true
+  },
+  {
+    "id": 15,
+    "label": "100HP",
+    "value": 100,
+    "sortOrder": 15,
+    "active": true
+  }
+]

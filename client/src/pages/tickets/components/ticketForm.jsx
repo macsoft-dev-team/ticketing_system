@@ -28,6 +28,7 @@ import { controllerAPI, projectAPI, stateAPI, ticketAPI } from '../../../lib/ser
 import { useToast } from '../../../components/ui/toast';
 import { API_ENDPOINTS } from '../../../lib/constants/api';
 import useTickets from '../../../lib/hooks/useTickets';
+import MotorHPSelect from '../../../components/ui/MotorHPSelect';
 
 export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -211,6 +212,10 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             // Extract HP from lot.product.powerrating
             const powerRating = data.lot?.product?.powerrating || '';
             setValue('hp', powerRating);
+            
+            // Try to match the power rating with available MotorHP options
+            // This will be handled by the MotorHPSelect component's internal logic
+            // For now, we'll keep the hp field for backward compatibility
 
             // Extract motor type from lot.product.motortype
             const motorType = data.lot?.product?.motortype || '';
@@ -276,7 +281,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             }
 
             // Clear any previous errors for these fields
-            clearErrors(['imei', 'hp', 'motorType', 'customerName', 'district', 'state', 'project']);
+            clearErrors(['imei', 'hp', 'motorType', 'motorHpId', 'customerName', 'district', 'state', 'project']);
 
         } catch (error) {
             console.error('Error fetching controller details:', error);
@@ -303,6 +308,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             // Clear the auto-filled fields if error occurs
             setValue('imei', '');
             setValue('hp', '');
+            setValue('motorHpId', null);
             setValue('motorType', '');
             setValue('project', '');
             // Don't clear customer name, district, or state as user might have entered them manually
@@ -419,6 +425,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 controllerNo: data.controllerNo,
                 imei: data.imei || '',
                 hp: data.hp || '',
+                motorHpId: data.motorHpId || null,
                 motorType: data.motorType,
                 project: data.project,
                 state: data.state, // This will now be the state code
@@ -668,28 +675,39 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     )}
                                 </motion.div>
 
-                                {/* HP */}
+                                {/* Motor HP Select */}
                                 <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
-                                        HP
-                                        {watchedValues.hp && controllerNo && (
-                                            <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">Auto-filled</span>
+                                        Motor HP *
+                                        {watchedValues.motorHpId && controllerNo && (
+                                            <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">From Controller</span>
                                         )}
                                     </label>
+                                    <MotorHPSelect
+                                        value={watchedValues.motorHpId}
+                                        onChange={(id, motorhpObject) => {
+                                            setValue('motorHpId', id);
+                                            setValue('hp', motorhpObject?.value?.toString() || '');
+                                            clearErrors('motorHpId');
+                                        }}
+                                        className={`${errors.motorHpId ? 'border-red-300 bg-red-50' : ''}`}
+                                        placeholder="Select Motor HP"
+                                        autoSelectByHp={watchedValues.hp}
+                                        required
+                                    />
+                                    {/* Keep the HP field hidden for backward compatibility */}
                                     <input
                                         {...register('hp')}
-                                        className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.hp ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                                            }`}
-                                        placeholder="HP"
+                                        type="hidden"
                                     />
-                                    {errors.hp && (
+                                    {errors.motorHpId && (
                                         <motion.p
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
                                         >
                                             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                            {errors.hp.message}
+                                            {errors.motorHpId.message}
                                         </motion.p>
                                     )}
                                 </motion.div>
@@ -717,8 +735,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         </motion.p>
                                     )}
                                 </motion.div>
-
-
                                 {/* Priority */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="block text-xs sm:text-sm font-medium text-gray-700">

@@ -27,6 +27,7 @@ const projectWA = require("./projectsWA");
 const organisationWA = require("./organisationWA");
 const statesWA = require("./statesWA");
 const batch = require("./batch");
+const motorhp = require("./motorhp");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -50,6 +51,7 @@ router.use("/ticket-code", authenticate, ticketCode);
 router.use("/settings", authenticate, settings);
 router.use("/inventory", authenticate, inventory);
 router.use("/inbound-activities", authenticate, inboundActivity);
+router.use("/motorhp", authenticate, motorhp);
 
 // without authentication
 router.use("/states", states);

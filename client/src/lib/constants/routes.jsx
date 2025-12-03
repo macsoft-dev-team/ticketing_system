@@ -32,7 +32,7 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/layout/layout';
 import TicketForm from '../../pages/tickets/components/ticketForm';
 import ServiceCenters from '../../pages/serviceCenters/serviceCenters';
-import { Tickets, TicketDashboard, SpareRequest, SpareRequestApproval, Inventory, ReceiveController } from '../../pages';
+import { Tickets, TicketDashboard, SpareRequest, SpareRequestApproval, Inventory, ReceiveController, MotorHP } from '../../pages';
 import Products from '../../pages/products/products';
 import OrganisationPage from '../../pages/organisation/organisation';
 import ProfilePage from '../../pages/profile/Profile';
@@ -92,6 +92,14 @@ const BASE_ITEMS = {
     label: 'Products',
     category: 'main',
     element: <Products />,
+  },
+
+  motorhp: {
+    path: '/motorhp',
+    icon: Wrench,
+    label: 'Motor HP',
+    category: 'management',
+    element: <MotorHP />,
   },
 
   // -------------------------
@@ -203,6 +211,7 @@ const ROLE_ITEMS = {
 
     BASE_ITEMS.spareRequestApproval,
 
+    BASE_ITEMS.motorhp,
     BASE_ITEMS.settings,
 
     BASE_ITEMS.profile,
@@ -225,6 +234,8 @@ const ROLE_ITEMS = {
 
     BASE_ITEMS.organisation,
     BASE_ITEMS.project,
+
+    BASE_ITEMS.motorhp,
 
     BASE_ITEMS.profile,
   ],
@@ -289,6 +300,7 @@ const getRouteProtection = (item, role) => {
     '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'],
     '/settings': ['MACSOFT_ADMIN'], // Only MACSOFT_ADMIN can access settings
     '/spare-request-approval': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Only these roles can approve spare requests
+    '/motorhp': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Motor HP management for admin and head roles
   };
 
   const requiredRoles = routeProtections[item.path];

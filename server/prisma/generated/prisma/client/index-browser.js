@@ -190,8 +190,11 @@ exports.Prisma.TicketScalarFieldEnum = {
   description: 'description',
   customerName: 'customerName',
   controllerNo: 'controllerNo',
+  farmerName: 'farmerName',
   imei: 'imei',
   hp: 'hp',
+  motorHpId: 'motorHpId',
+  head: 'head',
   motorType: 'motorType',
   stateCode: 'stateCode',
   district: 'district',
@@ -358,6 +361,25 @@ exports.Prisma.BatchItemScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SettingsScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MotorhpScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  value: 'value',
+  sortOrder: 'sortOrder',
+  active: 'active',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -411,8 +433,10 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   description: 'description',
   customerName: 'customerName',
   controllerNo: 'controllerNo',
+  farmerName: 'farmerName',
   imei: 'imei',
   hp: 'hp',
+  head: 'head',
   motorType: 'motorType',
   stateCode: 'stateCode',
   district: 'district',
@@ -480,6 +504,16 @@ exports.Prisma.TicketSequenceOrderByRelevanceFieldEnum = {
 exports.Prisma.batchOrderByRelevanceFieldEnum = {
   batchCode: 'batchCode'
 };
+
+exports.Prisma.settingsOrderByRelevanceFieldEnum = {
+  key: 'key',
+  value: 'value',
+  description: 'description'
+};
+
+exports.Prisma.motorhpOrderByRelevanceFieldEnum = {
+  label: 'label'
+};
 exports.Role = exports.$Enums.Role = {
   MACSOFT_ADMIN: 'MACSOFT_ADMIN',
   MACSOFT_HEAD: 'MACSOFT_HEAD',
@@ -506,12 +540,14 @@ exports.ServiceStage = exports.$Enums.ServiceStage = {
   DIAGNOSIS_IN_PROGRESS: 'DIAGNOSIS_IN_PROGRESS',
   SPARE_REQUESTED: 'SPARE_REQUESTED',
   SPARE_APPROVED: 'SPARE_APPROVED',
+  PARTIALY_SPARE_APPROVED: 'PARTIALY_SPARE_APPROVED',
   REPAIR_IN_PROGRESS: 'REPAIR_IN_PROGRESS',
   REPLACEMENT_IN_PROGRESS: 'REPLACEMENT_IN_PROGRESS',
   REPAIRED: 'REPAIRED',
   READY_FOR_DISPATCH: 'READY_FOR_DISPATCH',
   DELIVERED_TO_FIELD: 'DELIVERED_TO_FIELD',
-  FIELD_CLEARANCE_APPROVED: 'FIELD_CLEARANCE_APPROVED'
+  FIELD_CLEARANCE_APPROVED: 'FIELD_CLEARANCE_APPROVED',
+  TICKET_CLOSED: 'TICKET_CLOSED'
 };
 
 exports.MilestoneStatus = exports.$Enums.MilestoneStatus = {
@@ -567,7 +603,9 @@ exports.Prisma.ModelName = {
   NotificationRecipient: 'NotificationRecipient',
   TicketSequence: 'TicketSequence',
   batch: 'batch',
-  batchItem: 'batchItem'
+  batchItem: 'batchItem',
+  settings: 'settings',
+  motorhp: 'motorhp'
 };
 
 /**

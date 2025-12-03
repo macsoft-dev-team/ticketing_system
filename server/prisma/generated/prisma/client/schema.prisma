@@ -31,12 +31,14 @@ enum ServiceStage {
   DIAGNOSIS_IN_PROGRESS // Diagnosis started to decide repair or replacement
   SPARE_REQUESTED // Spare parts requested (photo required)
   SPARE_APPROVED // Spare request approved by head
+  PARTIALY_SPARE_APPROVED // Partial spare request approved by head
   REPAIR_IN_PROGRESS // Controller repair initiated
   REPLACEMENT_IN_PROGRESS // Replacement initiated (alternate to repair)
   REPAIRED // Controller repaired
   READY_FOR_DISPATCH // Controller ready for dispatch (photo required)
   DELIVERED_TO_FIELD // Controller delivered/dispatched back to field
   FIELD_CLEARANCE_APPROVED // Field clearance approved by Head
+  TICKET_CLOSED // Ticket formally closed
 }
 
 enum TicketStatus {
@@ -171,8 +173,11 @@ model Ticket {
   description           String
   customerName          String
   controllerNo          String
+  farmerName            String?
   imei                  String?
   hp                    String?
+  motorHpId             Int?
+  head                  String?
   motorType             String?
   stateCode             String?
   district              String?
@@ -198,6 +203,7 @@ model Ticket {
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
   serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
   state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
+  motorhp             motorhp?             @relation(fields: [motorHpId], references: [id])
   messages            Message[]
   notifications       Notification[]
   productTransactions ProductTransaction[]
@@ -424,6 +430,28 @@ model batchItem {
   // Relations
   batch  batch  @relation(fields: [batchId], references: [id])
   ticket Ticket @relation(fields: [ticketId], references: [id])
+}
+
+model settings {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model motorhp {
+  id        Int      @id @default(autoincrement())
+  label     String   @unique // e.g. "50HP"
+  value     Int // numeric value e.g. 50
+  sortOrder Int? // optional for ordering in dropdowns
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tickets Ticket[]
 }
 
 enum batchType {

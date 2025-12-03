@@ -5,12 +5,13 @@ const path = require("path");
 
 async function main() {
   const files = [
-    "organisation",
+  /*   "organisation",
     "project",
     "serviceCenter",
     "user",
     "product",
-    "state",
+    "state", */
+    "motorhp",
   ];
 
   for (const file of files) {
@@ -38,6 +39,10 @@ async function main() {
           // For Organisation model, use orgCode for upsert
           else if (file === 'organisation' && item.orgCode) {
             whereClause = { orgCode: item.orgCode };
+          }
+          // For MotorHP model, use label for upsert
+          else if (file === 'motorhp' && item.label) {
+            whereClause = { label: item.label };
           }
           
           await model.upsert({
