@@ -45,7 +45,6 @@ const getBatchByUser = async (userId, batchType) => {
     });
     return batches;
   } catch (error) {
-    console.error("❌ Error fetching batches by user:", error);
     throw error;
   }
 };
@@ -91,7 +90,6 @@ const getActiveBatchByUser = async (userId, batchType) => {
     });
     return activeBatch;
   } catch (error) {
-    console.error("❌ Error fetching active batch by user:", error);
     throw error;
   }
 };
@@ -138,7 +136,6 @@ const getCompletedBatchesByUser = async (userId, batchType) => {
     });
     return completedBatches;
   } catch (error) {
-    console.error("❌ Error fetching completed batches by user:", error);
     throw error;
   }
 };
@@ -172,7 +169,6 @@ const createBatch = async (userId, batchType = "RECEIVE_CONTROLLER") => {
 
     return batch;
   } catch (error) {
-    console.error("❌ Error creating batch:", error);
     throw error;
   }
 };
@@ -211,7 +207,6 @@ const addTicketToBatch = async (batchId, ticketId) => {
 
     return batchItem;
   } catch (error) {
-    console.error("❌ Error adding ticket to batch:", error);
     throw error;
   }
 };
@@ -227,7 +222,6 @@ const removeTicketFromBatch = async (batchId, ticketId) => {
 
     return deletedItem;
   } catch (error) {
-    console.error("❌ Error removing ticket from batch:", error);
     throw error;
   }
 };
@@ -247,7 +241,6 @@ const getOrCreateActiveBatch = async (
 
     return activeBatch;
   } catch (error) {
-    console.error("❌ Error getting or creating active batch:", error);
     throw error;
   }
 };
@@ -304,7 +297,6 @@ const getBatchImages = async (batchId) => {
 
     return images;
   } catch (error) {
-    console.error("❌ Error getting batch images:", error);
     throw error;
   }
 };
@@ -321,7 +313,6 @@ const receiveControllerBatch = async (batchId) => {
     });
     return updatedBatch;
   } catch (error) {
-    console.error("❌ Error receiving controller batch:", error);
     throw error;
   }
 };
@@ -338,7 +329,6 @@ const deliveryControllerBatch = async (batchId) => {
     });
     return updatedBatch;
   } catch (error) {
-    console.error("❌ Error completing delivery batch:", error);
     throw error;
   }
 };

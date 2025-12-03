@@ -94,7 +94,6 @@ export const useConversation = (ticketId) => {
       const formattedMessages = messagesData.map(formatMessage);
       setMessages(formattedMessages);
     } catch (err) {
-      console.error("Error fetching messages:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -137,7 +136,6 @@ export const useConversation = (ticketId) => {
         });
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("Send message error response:", errorText);
           let errorMessage = `Failed to send message: ${response.status}`;
 
           if (response.status === 401) {
@@ -159,7 +157,6 @@ export const useConversation = (ticketId) => {
          // The real-time update will add the message to the UI
         // But we can add optimistic update here if needed
       } catch (err) {
-        console.error("Error sending message:", err);
         setError(err.message);
         throw err;
       }
@@ -189,7 +186,6 @@ export const useConversation = (ticketId) => {
           );
         });
       } catch (error) {
-        console.error("Error handling new message:", error);
       }
     },
     [formatMessage]
@@ -233,7 +229,6 @@ export const useConversation = (ticketId) => {
       });
       return response.ok;
     } catch (error) {
-      console.error("API connection test failed:", error);
       return false;
     }
   }, []);

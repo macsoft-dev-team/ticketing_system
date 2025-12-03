@@ -1,14 +1,14 @@
 /**
  * Migration Script: Add Milestones to Existing Tickets
- * 
+ *
  * This script creates milestone records for all existing tickets
  * that don't have milestones yet.
- * 
+ *
  * Usage: node scripts/add-milestones-to-existing-tickets.js
  */
 
-const { prisma } = require('../lib/clients');
-const { createInitialMilestones } = require('../service/milestones');
+const { prisma } = require("../lib/clients");
+const { createInitialMilestones } = require("../service/milestones");
 
 async function addMilestonesToExistingTickets() {
   try {
@@ -28,20 +28,18 @@ async function addMilestonesToExistingTickets() {
       try {
         // Check if ticket already has milestones
         if (ticket.ticketMilestones && ticket.ticketMilestones.length > 0) {
-           skippedCount++;
+          skippedCount++;
           continue;
         }
 
         // Create milestones for this ticket
-         await createInitialMilestones(ticket.id, ticket.createdBy);
-         migratedCount++;
+        await createInitialMilestones(ticket.id, ticket.createdBy);
+        migratedCount++;
       } catch (error) {
-         errorCount++;
+        errorCount++;
       }
     }
-
-   } catch (error) {
-    console.error('❌ Migration failed:', error);
+  } catch (error) {
     process.exit(1);
   } finally {
     await prisma.$disconnect();
@@ -51,9 +49,8 @@ async function addMilestonesToExistingTickets() {
 // Run the migration
 addMilestonesToExistingTickets()
   .then(() => {
-     process.exit(0);
+    process.exit(0);
   })
   .catch((error) => {
-    console.error('💥 Fatal error:', error);
     process.exit(1);
   });

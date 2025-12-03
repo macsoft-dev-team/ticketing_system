@@ -14,7 +14,6 @@ export const getPendingSpareRequests = async (skip = 0, take = 20) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching pending spare requests:', error);
     throw error;
   }
 };
@@ -29,7 +28,6 @@ export const approveSpareRequestItem = async (itemId) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error approving spare request item:', error);
     throw error;
   }
 };
@@ -46,7 +44,6 @@ export const rejectSpareRequestItem = async (itemId, reason = '') => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error rejecting spare request item:', error);
     throw error;
   }
 };
@@ -63,7 +60,6 @@ export const bulkApproveSpareRequestItems = async (itemIds) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error bulk approving spare request items:', error);
     throw error;
   }
 };
@@ -78,7 +74,6 @@ export const getNotifications = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching notifications:', error);
     throw error;
   }
 };
@@ -93,7 +88,6 @@ export const markNotificationAsRead = async (notificationId) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error marking notification as read:', error);
     throw error;
   }
 };
@@ -108,7 +102,6 @@ export const getNotificationCounts = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching notification counts:', error);
     throw error;
   }
 };
@@ -123,7 +116,6 @@ export const getProductInventoryDetails = async (productId) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching product inventory details:', error);
     throw error;
   }
 };
@@ -139,7 +131,6 @@ export const getProductTransactionHistory = async (productId, limit = 10) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching product transaction history:', error);
     throw error;
   }
 };

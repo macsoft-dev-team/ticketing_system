@@ -63,6 +63,7 @@ const mapTicketData = (apiTicket) => {
     id: apiTicket.id,
     ticketCode: apiTicket.ticketCode,
     raisedDate: apiTicket.createdAt,
+    farmerName: apiTicket.farmerName || '',
     updatedAt: apiTicket.updatedAt,
     dueDate: null, // Add due date logic if available in your API
     status: apiTicket.status?.toLowerCase() || 'open',
@@ -200,7 +201,6 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
         throw new Error('All download strategies failed');
       }
     } catch (error) {
-      console.error('Download failed:', error);
       if (addToast) addToast({
         title: 'Download failed',
         description: 'Please check your connection and try again',
@@ -476,7 +476,6 @@ export default function TicketDashboard() {
         }
       }
     } catch (error) {
-      console.error('Error handling milestone action:', error);
       
       // Provide more specific error messages
       let errorMessage = error.message || 'An error occurred';
@@ -524,7 +523,6 @@ export default function TicketDashboard() {
         throw new Error(resultAction.payload || 'Failed to upload photos');
       }
     } catch (error) {
-      console.error('Error uploading photos:', error);
       addToast({
         title: 'Upload Failed',
         description: error.message || 'Failed to upload photos',
@@ -668,7 +666,6 @@ export default function TicketDashboard() {
       
       setSpareRequests(transformedRequests);
     } catch (error) {
-      console.error('Error fetching spare requests:', error);
       addToast({
         title: 'Error',
         description: 'Failed to fetch spare requests',
@@ -696,7 +693,6 @@ export default function TicketDashboard() {
       await Promise.all([fetchSpareRequests(), fetchTicketById(ticketId)]);
       
     } catch (error) {
-      console.error('Error approving spare request:', error);
       addToast({
         title: 'Error',
         description: error.response?.data?.message || 'Failed to approve spare request',
@@ -739,7 +735,6 @@ export default function TicketDashboard() {
       await Promise.all([fetchSpareRequests(), fetchTicketById(ticketId)]);
       
     } catch (error) {
-      console.error('Error rejecting spare request:', error);
       addToast({
         title: 'Error',
         description: error.response?.data?.message || 'Failed to reject spare request',
@@ -775,7 +770,6 @@ export default function TicketDashboard() {
         setTransactionHistory(transactionResponse.data);
       }
     } catch (error) {
-      console.error('Error fetching inventory details:', error);
       addToast({
         title: 'Warning',
         description: 'Could not fetch detailed inventory information',
@@ -1034,7 +1028,7 @@ export default function TicketDashboard() {
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+               {/*  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-gray-600">Complaint Type</p>
                     <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
@@ -1042,7 +1036,7 @@ export default function TicketDashboard() {
                       {ticketData.complaintType || 'N/A'}
                     </p>
                   </div>
-                </div>
+                </div> */}
                 {/* Service Center Assignment */}
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Assigned Service Center</p>
@@ -1073,6 +1067,60 @@ export default function TicketDashboard() {
               </div>
             </div>
 
+            {/* Customer Details */}
+            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                <User className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                Farmer/Customer Details
+              </h2>
+              <div className="space-y-3">
+                 <div>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Farmer Name</p>
+                  <p className="text-sm sm:text-base font-semibold text-gray-900">{ticketData?.farmerName || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Customer Name</p>
+                  <p className="text-sm sm:text-base font-semibold text-gray-900">{ticketData.customer?.name || 'N/A'}</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Phone</p>
+                    <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
+                      <Phone className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
+                      <span className="break-all">{ticketData.customer?.phone || 'N/A'}</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Created By</p>
+                    <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
+                      <User className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
+                      <span className="break-all">{ticketData.createdBy?.name || 'N/A'}</span>
+                    </p>
+                  </div>
+                </div>
+                {ticketData.updatedBy && (
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-600">Last Updated By</p>
+                    <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
+                      <User className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
+                      <span className="break-all">{ticketData.updatedBy.name}</span>
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Address</p>
+                  <p className="text-sm sm:text-base text-gray-900">
+                    {[
+                      ticketData.customer?.village,
+                      ticketData.customer?.block,
+                      ticketData.customer?.district,
+                      ticketData.customer?.state
+                    ].filter(Boolean).join(', ') || 'N/A'}
+                  </p>
+                </div>
+
+              </div>
+            </div>
             {/* Attachments */}
             {ticketData.attachments && ticketData.attachments.length > 0 && (
               <div className="bg-orange-50 p-3 sm:p-4 rounded-lg">
@@ -1125,56 +1173,6 @@ export default function TicketDashboard() {
               </div>
             )}
 
-            {/* Customer Details */}
-            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                <User className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
-                Customer Details
-              </h2>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Name</p>
-                  <p className="text-sm sm:text-base font-semibold text-gray-900">{ticketData.customer?.name || 'N/A'}</p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Phone</p>
-                    <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
-                      <Phone className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
-                      <span className="break-all">{ticketData.customer?.phone || 'N/A'}</span>
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Created By</p>
-                    <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
-                      <User className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
-                      <span className="break-all">{ticketData.createdBy?.name || 'N/A'}</span>
-                    </p>
-                  </div>
-                </div>
-                {ticketData.updatedBy && (
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-600">Last Updated By</p>
-                    <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
-                      <User className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
-                      <span className="break-all">{ticketData.updatedBy.name}</span>
-                    </p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Address</p>
-                  <p className="text-sm sm:text-base text-gray-900">
-                    {[
-                      ticketData.customer?.village,
-                      ticketData.customer?.block,
-                      ticketData.customer?.district,
-                      ticketData.customer?.state
-                    ].filter(Boolean).join(', ') || 'N/A'}
-                  </p>
-                </div>
-
-              </div>
-            </div>
           </div>
         </motion.div>
 

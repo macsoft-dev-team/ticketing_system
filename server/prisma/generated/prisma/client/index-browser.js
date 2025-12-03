@@ -126,6 +126,13 @@ exports.Prisma.StateScalarFieldEnum = {
   stateCode: 'stateCode'
 };
 
+exports.Prisma.DistrictScalarFieldEnum = {
+  id: 'id',
+  districtName: 'districtName',
+  districtCode: 'districtCode',
+  stateCode: 'stateCode'
+};
+
 exports.Prisma.OrganisationScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -197,6 +204,7 @@ exports.Prisma.TicketScalarFieldEnum = {
   head: 'head',
   motorType: 'motorType',
   stateCode: 'stateCode',
+  districtCode: 'districtCode',
   district: 'district',
   village: 'village',
   block: 'block',
@@ -395,6 +403,10 @@ exports.Prisma.StateOrderByRelevanceFieldEnum = {
   stateCode: 'stateCode'
 };
 
+exports.Prisma.districtOrderByRelevanceFieldEnum = {
+  districtName: 'districtName'
+};
+
 exports.Prisma.OrganisationOrderByRelevanceFieldEnum = {
   name: 'name',
   orgCode: 'orgCode',
@@ -585,6 +597,7 @@ exports.batchStatus = exports.$Enums.batchStatus = {
 
 exports.Prisma.ModelName = {
   State: 'State',
+  district: 'district',
   Organisation: 'Organisation',
   Project: 'Project',
   ServiceCenter: 'ServiceCenter',

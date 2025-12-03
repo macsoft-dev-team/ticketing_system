@@ -33,7 +33,6 @@ const getAllProjects = async (req, res) => {
       statusCount,
     });
   } catch (error) {
-    console.error("Error fetching projects:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -47,7 +46,6 @@ const getProjectById = async (req, res) => {
     }
     res.json(project);
   } catch (error) {
-    console.error("Error fetching project by ID:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -60,7 +58,6 @@ const createProject = async (req, res) => {
     const newProject = await projectService.createProject(projectData);
     res.status(201).json(newProject);
   } catch (error) {
-    console.error("Error creating project:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -80,7 +77,6 @@ const updateProject = async (req, res) => {
     }
     res.json(updatedProject);
   } catch (error) {
-    console.error("Error updating project:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -91,7 +87,6 @@ const deleteProject = async (req, res) => {
     await projectService.deleteProject(parseInt(id));
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting project:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

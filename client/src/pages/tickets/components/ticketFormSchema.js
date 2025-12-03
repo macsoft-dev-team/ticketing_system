@@ -4,12 +4,14 @@ import * as yup from 'yup';
 export const ticketFormSchema = yup.object({
   // ticketCode is now auto-generated, so no validation needed
   customerName: yup.string().required('Customer name is required'),
+  farmerName: yup.string().required('Farmer name is required'),
   controllerNo: yup.string().required('Controller number is required'),
   imei: yup.string().nullable(),
   hp: yup.string().nullable(),
   motorHpId: yup.number().nullable().required('Motor HP is required'),
   motorType: yup.string().required('Motor type is required'),
-  district: yup.string().required('District is required'),
+  head: yup.string().nullable(),
+  district: yup.string().nullable(),
   block: yup.string().nullable(),
   village: yup.string().nullable(),
   faultType: yup.string().required('Fault type is required'),
@@ -25,11 +27,13 @@ export const ticketFormSchema = yup.object({
 export const defaultValues = {
   // ticketCode is auto-generated, so no default value needed
   customerName: '',
+  farmerName: '',
   controllerNo: '',
   imei: '',
   hp: '',
   motorHpId: null,
   motorType: '',
+  head: '',
   district: '',
   block: '',
   village: '',

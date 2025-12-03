@@ -1,14 +1,12 @@
-const express = require('express');
-const { prisma } = require('../lib/clients');
-
+const express = require("express");
+const { prisma } = require("../lib/clients");
 
 const router = express.Router();
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const states = await prisma.state.findMany();
     res.json(states);
   } catch (error) {
-    console.error("Error fetching states:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

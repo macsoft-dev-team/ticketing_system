@@ -3,7 +3,6 @@ const notificationService = require('../service/notification');
 const getNotifications = async (req, res) => {
     try {        
         if (!req.user || !req.user.id) {
-            console.error('❌ No user ID in request');
             return res.status(401).json({ 
                 success: false,
                 message: "User not authenticated properly" 
@@ -57,7 +56,6 @@ const getNotificationCounts = async (req, res) => {
             data: counts
         });
     } catch (error) {
-        console.error('❌ Error in getNotificationCounts:', error);
         res.status(500).json({ 
             success: false,
             message: "Internal server error",
@@ -77,7 +75,6 @@ const markNotificationAsRead = async (req, res) => {
             message: "Notification marked as read"
         });
     } catch (error) {
-        console.error('❌ Error in markNotificationAsRead:', error);
         res.status(500).json({ 
             success: false,
             message: error.message || "Internal server error",

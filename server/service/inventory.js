@@ -44,7 +44,6 @@ async function getAllInventory(skip = 0, take = 10, filter = null) {
 
     return { inventory, count };
   } catch (error) {
-    console.error("❌ Error fetching inventory:", error);
     throw error;
   }
 }
@@ -63,7 +62,6 @@ async function getInventoryByProductId(productId) {
 
     return inventory;
   } catch (error) {
-    console.error("❌ Error fetching inventory by product ID:", error);
     throw error;
   }
 }
@@ -97,7 +95,6 @@ async function upsertInventory(data) {
     });
     return inventory;
   } catch (error) {
-    console.error("❌ Error upserting inventory:", error);
     throw error;
   }
 }
@@ -147,7 +144,6 @@ async function checkStockAvailability(items) {
       insufficientItems,
     };
   } catch (error) {
-    console.error("❌ Error checking stock availability:", error);
     throw error;
   }
 }
@@ -212,7 +208,6 @@ async function deductInventory(items, ticketCode = null, updatedBy = null) {
 
     return results;
   } catch (error) {
-    console.error("❌ Error deducting inventory:", error);
     throw error;
   }
 }
@@ -325,7 +320,6 @@ async function getLowStockItems() {
 
     return lowStockItems;
   } catch (error) {
-    console.error("❌ Error fetching low stock items:", error);
     throw error;
   }
 }
@@ -371,7 +365,6 @@ async function getInventoryTransactionHistory(productId = null, limit = 50) {
 
     return transactions;
   } catch (error) {
-    console.error("❌ Error fetching inventory transaction history:", error);
     throw error;
   }
 }
@@ -387,7 +380,6 @@ async function getTicketIdFromCode(ticketCode) {
     });
     return ticket?.id || null;
   } catch (error) {
-    console.error("❌ Error getting ticket ID:", error);
     return null;
   }
 }

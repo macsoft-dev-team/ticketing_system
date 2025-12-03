@@ -47,7 +47,6 @@ export const ticketAPI = {
         return response.data;
       }
     } catch (error) {
-      console.error('Error creating ticket:', error);
       throw error;
     }
   },
@@ -58,7 +57,6 @@ export const ticketAPI = {
       const response = await apiClient.get(`/tickets/check-controller/${controllerNo}`);
       return response.data;
     } catch (error) {
-      console.error('Error checking active ticket for controller:', error);
       throw error;
     }
   },
@@ -236,7 +234,6 @@ export const controllerAPI = {
       const response = await lmsClient.get(url);
       return response.data;
     } catch (error) {
-      console.error('Error fetching controller details from LMS:', error);
       throw error;
     }
   }
@@ -255,12 +252,10 @@ export const createWebSocketConnection = (ticketId, onMessage, onError) => {
       const data = JSON.parse(event.data);
       if (onMessage) onMessage(data);
     } catch (error) {
-      console.error('Error parsing WebSocket message:', error);
     }
   };
 
   socket.onerror = (error) => {
-    console.error('WebSocket error:', error);
     if (onError) onError(error);
   };
 
@@ -305,7 +300,6 @@ export const projectAPI = {
       const response = await apiClient.get('/projectsWA');
       return response.data;
     } catch (error) {
-      console.error('Error fetching projects:', error);
       throw error;
     }
   }
@@ -319,7 +313,29 @@ export const stateAPI = {
       const response = await apiClient.get('/statesWA');
       return response.data;
     } catch (error) {
-      console.error('Error fetching states:', error);
+      throw error;
+    }
+  }
+};
+
+// District API endpoints
+export const districtAPI = {
+  // Get districts by state ID (without authentication)
+  getDistrictsByState: async (stateId) => {
+    try {
+      const response = await apiClient.get(`/districts/by-state/${stateId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  
+  // Get all districts (without authentication)
+  getAllDistricts: async () => {
+    try {
+      const response = await apiClient.get('/districts');
+      return response.data;
+    } catch (error) {
       throw error;
     }
   }
@@ -399,7 +415,6 @@ export const authAPI = {
       const response = await apiClient.post(API_ENDPOINTS.forgotPassword, { phone: phoneNumber });
       return response.data;
     } catch (error) {
-      console.error('Error sending forgot password code:', error);
       throw error;
     }
   },
@@ -413,7 +428,6 @@ export const authAPI = {
       });
       return response.data;
     } catch (error) {
-      console.error('Error verifying reset code:', error);
       throw error;
     }
   },
@@ -428,7 +442,6 @@ export const authAPI = {
       });
       return response.data;
     } catch (error) {
-      console.error('Error resetting password:', error);
       throw error;
     }
   }

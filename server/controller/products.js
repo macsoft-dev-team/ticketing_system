@@ -24,7 +24,6 @@ const getProducts = async (req, res) => {
       currentPage: parseInt(skip) || 1,
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -38,7 +37,6 @@ const getProductById = async (req, res) => {
     }
     res.json(product);
   } catch (error) {
-    console.error("Error fetching product by ID:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -49,7 +47,6 @@ const createProduct = async (req, res) => {
     const newProduct = await productService.createProduct(productData);
     res.status(201).json(newProduct);
   } catch (error) {
-    console.error("Error creating product:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -67,7 +64,6 @@ const updateProduct = async (req, res) => {
     }
     res.json(updatedProduct);
   } catch (error) {
-    console.error("Error updating product:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -78,7 +74,6 @@ const deleteProduct = async (req, res) => {
     await productService.deleteProduct(parseInt(id));
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting product:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

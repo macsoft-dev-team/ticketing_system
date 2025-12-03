@@ -73,13 +73,25 @@ enum Category {
 }
 
 model State {
-  id           Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   name         String
-  stateCode    String?   @unique
-  primaryUsers User[]    @relation("PrimaryState")
-  users        User[]    @relation("UserStates")
-  projects     Project[] @relation("StateProjects")
-  tickets      Ticket[]  @relation("ticketState")
+  stateCode    String?    @unique
+  primaryUsers User[]     @relation("PrimaryState")
+  users        User[]     @relation("UserStates")
+  projects     Project[]  @relation("StateProjects")
+  tickets      Ticket[]   @relation("ticketState")
+  districts    district[]
+}
+
+model district {
+  id           Int    @id @default(autoincrement())
+  districtName String
+  districtCode Int    @unique
+  stateCode    Int
+
+  // Relations
+  state   State    @relation(fields: [stateCode], references: [id])
+  tickets Ticket[]
 }
 
 model Organisation {
@@ -178,8 +190,9 @@ model Ticket {
   hp                    String?
   motorHpId             Int?
   head                  String?
-  motorType             String? 
+  motorType             String?
   stateCode             String?
+  districtCode          Int?
   district              String?
   village               String?
   block                 String?
@@ -203,6 +216,7 @@ model Ticket {
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
   serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
   state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
+  selectedDistrict    district?            @relation(fields: [districtCode], references: [districtCode])
   motorhp             motorhp?             @relation(fields: [motorHpId], references: [id])
   messages            Message[]
   notifications       Notification[]
@@ -433,27 +447,26 @@ model batchItem {
 }
 
 model settings {
-  id               Int      @id @default(autoincrement())
-  key              String   @unique
-  value            String
-  description      String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model motorhp {
   id        Int      @id @default(autoincrement())
-  label     String   @unique             // e.g. "50HP"
-  value     Int                          // numeric value e.g. 50
-  sortOrder Int?                         // optional for ordering in dropdowns
-  active    Boolean  @default(true)      
+  label     String   @unique // e.g. "50HP"
+  value     Int // numeric value e.g. 50
+  sortOrder Int? // optional for ordering in dropdowns
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  // Relations
-  tickets   Ticket[]
-}
 
+  // Relations
+  tickets Ticket[]
+}
 
 enum batchType {
   RECEIVE_CONTROLLER

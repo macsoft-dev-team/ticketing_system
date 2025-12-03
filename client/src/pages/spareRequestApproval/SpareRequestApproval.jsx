@@ -72,7 +72,6 @@ export default function SpareRequestApproval() {
       setTotalPages(response.totalPages || 1);
       setCurrentPage(page);
     } catch (error) {
-      console.error('Error fetching pending requests:', error);
       addToast({
         title: 'Error',
         description: 'Failed to fetch pending spare requests',
@@ -105,7 +104,6 @@ export default function SpareRequestApproval() {
       await fetchPendingRequests(currentPage);
       
     } catch (error) {
-      console.error('Error approving request:', error);
       const errorMessage = error.response?.data?.message || 'Failed to approve spare request';
       addToast({
         title: 'Error',
@@ -147,7 +145,6 @@ export default function SpareRequestApproval() {
         setTransactionHistory(transactionResponse.data);
       }
     } catch (error) {
-      console.error('Error fetching inventory details:', error);
       addToast({
         title: 'Warning',
         description: 'Could not fetch detailed inventory information',
@@ -181,7 +178,6 @@ export default function SpareRequestApproval() {
       await fetchPendingRequests(currentPage);
       
     } catch (error) {
-      console.error('Error approving request:', error);
       const errorMessage = error.response?.data?.message || 'Failed to approve spare request';
       addToast({
         title: 'Error',
@@ -223,7 +219,6 @@ export default function SpareRequestApproval() {
       await fetchPendingRequests(currentPage);
       
     } catch (error) {
-      console.error('Error rejecting request:', error);
       const errorMessage = error.response?.data?.message || 'Failed to reject spare request';
       addToast({
         title: 'Error',
@@ -277,7 +272,6 @@ export default function SpareRequestApproval() {
       await fetchPendingRequests(currentPage);
       
     } catch (error) {
-      console.error('Error bulk approving:', error);
       const errorMessage = error.response?.data?.message || 'Failed to bulk approve requests';
       addToast({
         title: 'Error',

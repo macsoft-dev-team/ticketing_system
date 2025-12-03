@@ -40,7 +40,6 @@ const getAll = async (req, res) => {
           statusCounts,
         });
     } catch (error) {
-        console.error('Error in getAll users controller:', error);
         res.status(500).json({ 
             message: "Failed to fetch users",
             error: error.message 
@@ -64,7 +63,6 @@ const getCurrentUser = async (req, res) => {
         
         res.status(200).json({ user: transformedUser });
     } catch (error) {
-        console.error('Error in getCurrentUser controller:', error);
         if (error.message === "User not found") {
             res.status(404).json({ message: error.message });
         } else {
@@ -94,7 +92,6 @@ const getById = async (req, res) => {
         
         res.status(200).json(transformedUser);
     } catch (error) {
-        console.error('Error in getById controller:', error);
         if (error.message === "User not found") {
             res.status(404).json({ message: error.message });
         } else {
@@ -132,7 +129,6 @@ const create = async (req, res) => {
         
         res.status(201).json(transformedUser);
     } catch (error) {
-        console.error('Error in create user controller:', error);
         
         // Handle specific validation errors
         if (error.message.includes("already exists") || 
@@ -166,7 +162,6 @@ const update = async (req, res) => {
         
         res.status(200).json(transformedUser);
     } catch (error) {
-        console.error('Error in update user controller:', error);
         
         // Handle specific errors
         if (error.message === "User not found") {
@@ -206,7 +201,6 @@ const deleteUser = async (req, res) => {
             id: transformedUser.id 
         });
     } catch (error) {
-        console.error('Error in delete user controller:', error);
         
         if (error.message === "User not found") {
             res.status(404).json({ message: error.message });
@@ -256,7 +250,6 @@ const updateProfile = async (req, res) => {
             user: transformedUser
         });
     } catch (error) {
-        console.error('Error in updateProfile controller:', error);
         
         // Handle specific errors
         if (error.message === "User not found") {

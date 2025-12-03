@@ -25,7 +25,6 @@ const getMotorHPs = async (req, res) => {
       totalCount: count
     });
   } catch (error) {
-    console.error("Error fetching motor HPs:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -39,7 +38,6 @@ const getMotorHPById = async (req, res) => {
     }
     res.json(motorhp);
   } catch (error) {
-    console.error("Error fetching motor HP by ID:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -60,7 +58,6 @@ const createMotorHP = async (req, res) => {
       motorhp: newMotorHP
     });
   } catch (error) {
-    console.error("Error creating motor HP:", error);
     if (error.code === 'P2002') {
       res.status(409).json({ error: "Motor HP with this label already exists" });
     } else {
@@ -86,7 +83,6 @@ const updateMotorHP = async (req, res) => {
       motorhp: updatedMotorHP
     });
   } catch (error) {
-    console.error("Error updating motor HP:", error);
     if (error.code === 'P2002') {
       res.status(409).json({ error: "Motor HP with this label already exists" });
     } else if (error.code === 'P2025') {
@@ -106,7 +102,6 @@ const deleteMotorHP = async (req, res) => {
       motorhp: deletedMotorHP
     });
   } catch (error) {
-    console.error("Error deleting motor HP:", error);
     if (error.code === 'P2025') {
       res.status(404).json({ error: "Motor HP not found" });
     } else {
@@ -120,7 +115,6 @@ const getAllActiveMotorHPs = async (req, res) => {
     const motorhps = await motorhpService.getAllActiveMotorHPs();
     res.json(motorhps);
   } catch (error) {
-    console.error("Error fetching active motor HPs:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

@@ -35,9 +35,7 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
       // Add /uploads prefix if missing
       fileUrl = `${baseUrl}/uploads/${fileDocument.url}`;
     }
-    
-    console.log('Constructed file URL:', fileUrl, 'from:', fileDocument.url);
-    return fileUrl;
+        return fileUrl;
   };
 
   const handleDownload = async () => {

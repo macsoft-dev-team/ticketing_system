@@ -19,7 +19,6 @@ export const useMotorHPOptions = () => {
         const response = await axios.get(`${API_ENDPOINTS.motorhp}/active`);
         setMotorHPOptions(response.data || []);
       } catch (err) {
-        console.error('Error fetching Motor HP options:', err);
         setError(err.response?.data?.error || 'Failed to fetch Motor HP options');
         setMotorHPOptions([]);
       } finally {

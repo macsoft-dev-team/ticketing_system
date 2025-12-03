@@ -73,13 +73,25 @@ enum Category {
 }
 
 model State {
-  id           Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   name         String
-  stateCode    String?   @unique
-  primaryUsers User[]    @relation("PrimaryState")
-  users        User[]    @relation("UserStates")
-  projects     Project[] @relation("StateProjects")
-  tickets      Ticket[]  @relation("ticketState")
+  stateCode    String?    @unique
+  primaryUsers User[]     @relation("PrimaryState")
+  users        User[]     @relation("UserStates")
+  projects     Project[]  @relation("StateProjects")
+  tickets      Ticket[]   @relation("ticketState")
+  districts    district[]
+}
+
+model district {
+  id           Int    @id @default(autoincrement())
+  districtName String
+  districtCode Int    @unique
+  stateCode    Int
+
+  // Relations
+  state   State    @relation(fields: [stateCode], references: [id])
+  tickets Ticket[]
 }
 
 model Organisation {
@@ -180,6 +192,7 @@ model Ticket {
   head                  String?
   motorType             String?
   stateCode             String?
+  districtCode          Int?
   district              String?
   village               String?
   block                 String?
@@ -203,6 +216,7 @@ model Ticket {
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
   serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
   state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
+  selectedDistrict    district?            @relation(fields: [districtCode], references: [districtCode])
   motorhp             motorhp?             @relation(fields: [motorHpId], references: [id])
   messages            Message[]
   notifications       Notification[]

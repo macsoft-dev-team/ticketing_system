@@ -62,7 +62,6 @@ async function createInboundActivity(req, res) {
       data: result
     });
   } catch (error) {
-    console.error("❌ Error in createInboundActivity controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to create inbound activity"
@@ -114,7 +113,6 @@ async function getInboundActivityHistory(req, res) {
       }
     });
   } catch (error) {
-    console.error("❌ Error in getInboundActivityHistory controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch inbound activity history"
@@ -172,7 +170,6 @@ async function processBulkInboundActivity(req, res) {
       data: result
     });
   } catch (error) {
-    console.error("❌ Error in processBulkInboundActivity controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to process bulk inbound activity"
@@ -218,7 +215,6 @@ async function getInboundActivitySummary(req, res) {
       totalTransactions: transformedSummary.reduce((sum, item) => sum + item.transactionCount, 0)
     });
   } catch (error) {
-    console.error("❌ Error in getInboundActivitySummary controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch inbound activity summary"

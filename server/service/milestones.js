@@ -64,13 +64,11 @@ const createMilestone = async (milestoneData, io) => {
         }
       }
     } catch (notificationError) {
-      console.error('❌ Error sending milestone creation notification:', notificationError);
       // Don't throw - milestone creation should succeed even if notification fails
     }
 
     return milestone;
   } catch (error) {
-    console.error("Error creating initial milestones:", error);
     throw error;
   }
 };
@@ -101,7 +99,6 @@ const getTicketMilestones = async (ticketId) => {
       };
     });
   } catch (error) {
-    console.error("Error fetching ticket milestones:", error);
     throw error;
   }
 };
@@ -134,7 +131,6 @@ const getCurrentMilestone = async (ticketId) => {
       config,
     };
   } catch (error) {
-    console.error("Error fetching current milestone:", error);
     throw error;
   }
 };
@@ -223,10 +219,7 @@ const transitionMilestone = async (
             userId
           );
       } catch (spareApprovalError) {
-        console.error(
-          "❌ Error auto-approving spare requests during milestone transition:",
-          spareApprovalError
-        );
+    
         // Continue with milestone creation even if spare approval fails
       }
     }
@@ -358,7 +351,6 @@ const transitionMilestone = async (
         await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
       }
     } catch (notificationError) {
-      console.error('❌ Error sending milestone notification:', notificationError);
       // Don't throw - milestone transition should succeed even if notification fails
     }
 
@@ -404,7 +396,6 @@ const transitionMilestone = async (
 
     return result;
   } catch (error) {
-    console.error("Error transitioning milestone:", error);
     throw error;
   }
 };
@@ -428,7 +419,6 @@ const getAvailableTransitions = async (ticketId, userRole) => {
     );
     return availableStages;
   } catch (error) {
-    console.error("Error getting available transitions:", error);
     throw error;
   }
 };
@@ -503,13 +493,11 @@ const updateMilestoneNotes = async (milestoneId, notes, userId) => {
         await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
       }
     } catch (notificationError) {
-      console.error('❌ Error sending milestone notes update notification:', notificationError);
       // Don't throw - notes update should succeed even if notification fails
     }
 
     return milestoneWithConfig;
   } catch (error) {
-    console.error("Error updating milestone notes:", error);
     throw error;
   }
 };
@@ -612,13 +600,11 @@ const addPhotosToCurrentMilestone = async (
         await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
       }
     } catch (notificationError) {
-      console.error('❌ Error sending milestone photos update notification:', notificationError);
       // Don't throw - photos update should succeed even if notification fails
     }
 
     return milestoneWithConfig;
   } catch (error) {
-    console.error("Error adding photos to milestone:", error);
     throw error;
   }
 };
@@ -674,7 +660,6 @@ const updateMilestone = async (milestoneId, milestoneData, userId) => {
       config,
     };
   } catch (error) {
-    console.error("Error updating milestone:", error);
     throw error;
   }
 };
@@ -801,7 +786,6 @@ const receiveControllerAtServiceCenter = async (
       milestone,
     };
   } catch (error) {
-    console.error('Error receiving controller at service center:', error);
     throw error;
   }
 };

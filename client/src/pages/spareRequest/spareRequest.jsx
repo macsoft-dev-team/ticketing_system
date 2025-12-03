@@ -51,7 +51,6 @@ export default function SpareRequest() {
       setTotalPages(res.data.totalPages);
       setCurrentPage(res.data.currentPage);
     } catch (error) {
-      console.error('Error fetching spare requests:', error);
       if (error.response?.status === 401) {
         showNotification('Session expired. Please log in again.', 'error');
       } else {
@@ -187,7 +186,6 @@ export default function SpareRequest() {
         throw new Error(res.data.message || 'Failed to update status');
       }
     } catch (error) {
-      console.error('Error updating status:', error);
       const errorMessage = error.response?.data?.message || error.message;
       showNotification(`Error: ${errorMessage}`, 'error');
     } finally {

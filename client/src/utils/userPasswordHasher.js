@@ -54,9 +54,6 @@ export const hashUserPasswords = async (users, onProgress, saltRounds = 10, shou
             if (error.message === 'Process cancelled by user') {
                 throw error;
             }
-            
-            console.error(`Error hashing password for user ${user.name || i}:`, error);
-            // Don't add users with password hashing errors
             throw new Error(`Failed to hash password for user: ${user.name || 'Unknown'} - ${error.message}`);
         }
     }

@@ -20,7 +20,6 @@ const getAll = async (req, res) => {
       currentPage: Math.ceil(skip / take),
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -37,7 +36,6 @@ const getById = async (req, res) => {
     
     res.status(200).json(transformedOrg);
   } catch (error) {
-    console.error('Error in getById organisation controller:', error);
     if (error.message === "Organisation not found") {
       res.status(404).json({ message: error.message });
     } else {
@@ -70,7 +68,6 @@ const create = async (req, res) => {
     
     res.status(201).json(transformedOrg);
   } catch (error) {
-    console.error('Error in create organisation controller:', error);
     
     if (error.message.includes("already exists") || 
         error.message.includes("required") ||
@@ -100,7 +97,6 @@ const update = async (req, res) => {
     
     res.status(200).json(transformedOrg);
   } catch (error) {
-    console.error('Error in update organisation controller:', error);
     
     if (error.message === "Organisation not found") {
       res.status(404).json({ message: error.message });
@@ -128,7 +124,6 @@ const deleteOrganisation = async (req, res) => {
       id: deletedOrganisation.id 
     });
   } catch (error) {
-    console.error('Error in delete organisation controller:', error);
     
     if (error.message === "Organisation not found") {
       res.status(404).json({ message: error.message });

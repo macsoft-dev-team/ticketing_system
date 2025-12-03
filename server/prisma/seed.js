@@ -12,6 +12,7 @@ async function main() {
     "product",
     "state", */
     "motorhp",
+    "district",
   ];
 
   for (const file of files) {

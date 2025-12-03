@@ -16,7 +16,6 @@ const getTicketStatistics = async (req, res) => {
     const stats = await getTicketStats(targetYear);
     res.status(200).json(stats);
   } catch (error) {
-    console.error('Error getting ticket statistics:', error);
     res.status(500).json({ 
       message: "Failed to get ticket statistics",
       error: error.message 
@@ -47,7 +46,6 @@ const getNextTicketPreview = async (req, res) => {
       suffix: suffix || ''
     });
   } catch (error) {
-    console.error('Error getting next ticket preview:', error);
     res.status(500).json({ 
       message: "Failed to get ticket preview",
       error: error.message 
@@ -76,7 +74,6 @@ const updatePrefix = async (req, res) => {
       sequence: updatedSequence
     });
   } catch (error) {
-    console.error('Error updating ticket prefix:', error);
     res.status(500).json({ 
       message: "Failed to update ticket prefix",
       error: error.message 
@@ -99,7 +96,6 @@ const generateSampleCode = async (req, res) => {
       message: "Sample ticket code generated (this incremented the actual sequence)"
     });
   } catch (error) {
-    console.error('Error generating sample code:', error);
     res.status(500).json({ 
       message: "Failed to generate sample code",
       error: error.message 

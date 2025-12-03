@@ -8,7 +8,6 @@ const getConversations = async (req, res) => {
     );
     res.status(200).json(conversations);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -35,7 +34,6 @@ const createConversation = async (req, res) => {
     );
     res.status(201).json(conversation);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -50,7 +48,6 @@ const updateSeen = async (req, res) => {
     );
     res.status(200).json(updatedConversation);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

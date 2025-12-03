@@ -75,7 +75,6 @@ const getAllProjects = async (skip, take, filter) => {
         
     return { projects, count, statusCount };
   } catch (error) {
-    console.error("Error fetching projects:", error);
     throw error;
   }
 };
@@ -89,7 +88,6 @@ const getProjectById = async (projectId) => {
     });
     return project;
   } catch (error) {
-    console.error("Error fetching project by ID:", error);
     throw error;
   }
 };
@@ -101,7 +99,6 @@ const createProject = async (projectData) => {
     });
     return newProject;
   } catch (error) {
-    console.error("Error creating project:", error);
     throw error;
   }
 };
@@ -115,7 +112,6 @@ const updateProject = async (projectId, projectData) => {
     });
     return updatedProject;
   } catch (error) {
-    console.error("Error updating project:", error);
     throw error;
   }
 };
@@ -127,7 +123,6 @@ const deleteProject = async (projectId) => {
     });
     return deletedProject;
   } catch (error) {
-    console.error("Error deleting project:", error);
     throw error;
   }
 };

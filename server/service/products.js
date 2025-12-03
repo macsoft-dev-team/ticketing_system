@@ -21,7 +21,6 @@ const getProducts = async (skip, take, filter) => {
     const products = await prisma.product.findMany(params);
     return { products, count };
   } catch (error) {
-    console.error("Error fetching products:", error);
     throw error;
   }
 };
@@ -32,7 +31,6 @@ const getProductById = async (productId) => {
     });
     return product;
   } catch (error) {
-    console.error("Error fetching product by ID:", error);
     throw error;
   }
 };
@@ -44,7 +42,6 @@ const createProduct = async (productData) => {
     });
     return newProduct;
   } catch (error) {
-    console.error("Error creating product:", error);
     throw error;
   }
 };
@@ -57,7 +54,6 @@ const updateProduct = async (productId, productData) => {
     });
     return updatedProduct;
   } catch (error) {
-    console.error("Error updating product:", error);
     throw error;
   }
 };
@@ -68,7 +64,6 @@ const deleteProduct = async (productId) => {
       where: { id: productId },
     });
   } catch (error) {
-    console.error("Error deleting product:", error);
     throw error;
   }
 };

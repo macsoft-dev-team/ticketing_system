@@ -28,6 +28,7 @@ const organisationWA = require("./organisationWA");
 const statesWA = require("./statesWA");
 const batch = require("./batch");
 const motorhp = require("./motorhp");
+const districts = require("./districts");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -55,6 +56,7 @@ router.use("/motorhp", authenticate, motorhp);
 
 // without authentication
 router.use("/states", states);
+router.use("/districts", districts);
 router.use("/projectsWA", projectWA);
 router.use("/organisationsWA", organisationWA);
 router.use("/statesWA", statesWA);

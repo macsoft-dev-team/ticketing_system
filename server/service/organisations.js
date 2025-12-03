@@ -43,7 +43,6 @@ const getAll = async (skip, take, filter, userId) => {
 
     return { organisations, count, statusCount: _transformedStatusCount };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to fetch organisations");
   }
 };
@@ -60,7 +59,6 @@ const getById = async (id) => {
     
     return organisation;
   } catch (error) {
-    console.error('Error in getById organisation service:', error);
     if (error.message === "Organisation not found") {
       throw error;
     }
@@ -112,7 +110,6 @@ const create = async (data) => {
     
     return newOrganisation;
   } catch (error) {
-    console.error('Error in create organisation service:', error);
     throw error;
   }
 };
@@ -178,7 +175,6 @@ const update = async (id, data) => {
     
     return updatedOrganisation;
   } catch (error) {
-    console.error('Error in update organisation service:', error);
     throw error;
   }
 };
@@ -202,7 +198,6 @@ const deleteOrganisation = async (id) => {
     
     return deletedOrganisation;
   } catch (error) {
-    console.error('Error in delete organisation service:', error);
     throw error;
   }
 };

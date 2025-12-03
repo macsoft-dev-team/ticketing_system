@@ -53,7 +53,6 @@ async function createInboundActivity(data) {
       createdAt: new Date(),
     };
   } catch (error) {
-    console.error("❌ Error creating inbound activity:", error);
     throw error;
   }
 }
@@ -116,7 +115,6 @@ async function getInboundActivityHistory(options = {}) {
       totalPages: Math.ceil(count / limit),
     };
   } catch (error) {
-    console.error("❌ Error fetching inbound activity history:", error);
     throw error;
   }
 }
@@ -184,7 +182,6 @@ async function processBulkInboundActivity(data) {
 
     return result;
   } catch (error) {
-    console.error("❌ Error processing bulk inbound activity:", error);
     throw error;
   }
 }
@@ -239,7 +236,6 @@ async function getInboundActivitySummary(startDate, endDate) {
 
     return summaryWithProducts;
   } catch (error) {
-    console.error("❌ Error fetching inbound activity summary:", error);
     throw error;
   }
 }

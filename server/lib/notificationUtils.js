@@ -1,13 +1,12 @@
 // Notification broadcasting utility
 const broadcastNotification = (io, notificationData) => {
-  
   // If targetUserId is specified, send to specific user's notification room
   if (notificationData.targetUserId) {
     const userRoom = `notifications-${notificationData.targetUserId}`;
-    io.to(userRoom).emit('notification', notificationData);
+    io.to(userRoom).emit("notification", notificationData);
   } else {
     // Broadcast to all connected clients
-    io.emit('notification', notificationData);
+    io.emit("notification", notificationData);
   }
 };
 
@@ -31,247 +30,320 @@ const createNotification = (type, title, message, options = {}) => {
 // Comprehensive notification types for all CRUD operations
 const NOTIFICATION_TYPES = {
   // Ticket operations
-  TICKET_CREATED: 'ticket_created',
-  TICKET_UPDATED: 'ticket_updated', 
-  TICKET_CLOSED: 'ticket_closed',
-  TICKET_REOPENED: 'ticket_reopened',
-  TICKET_ASSIGNED: 'ticket_assigned',
-  
+  TICKET_CREATED: "ticket_created",
+  TICKET_UPDATED: "ticket_updated",
+  TICKET_CLOSED: "ticket_closed",
+  TICKET_REOPENED: "ticket_reopened",
+  TICKET_ASSIGNED: "ticket_assigned",
+
   // Message/Conversation operations
-  MESSAGE_RECEIVED: 'message_received',
-  MESSAGE_REPLY: 'message_reply',
-  CONVERSATION_UPDATE: 'conversation_update',
-  
+  MESSAGE_RECEIVED: "message_received",
+  MESSAGE_REPLY: "message_reply",
+  CONVERSATION_UPDATE: "conversation_update",
+
   // User operations
-  USER_CREATED: 'user_created',
-  USER_UPDATED: 'user_updated',
-  USER_DELETED: 'user_deleted',
-  USER_ROLE_CHANGED: 'user_role_changed',
-  USER_STATUS_CHANGED: 'user_status_changed',
-  
+  USER_CREATED: "user_created",
+  USER_UPDATED: "user_updated",
+  USER_DELETED: "user_deleted",
+  USER_ROLE_CHANGED: "user_role_changed",
+  USER_STATUS_CHANGED: "user_status_changed",
+
   // Service Center operations
-  SERVICE_CENTER_CREATED: 'service_center_created',
-  SERVICE_CENTER_UPDATED: 'service_center_updated',
-  SERVICE_CENTER_DELETED: 'service_center_deleted',
-  
+  SERVICE_CENTER_CREATED: "service_center_created",
+  SERVICE_CENTER_UPDATED: "service_center_updated",
+  SERVICE_CENTER_DELETED: "service_center_deleted",
+
   // Product operations
-  PRODUCT_CREATED: 'product_created',
-  PRODUCT_UPDATED: 'product_updated',
-  PRODUCT_DELETED: 'product_deleted',
-  PRODUCT_STOCK_LOW: 'product_stock_low',
-  
+  PRODUCT_CREATED: "product_created",
+  PRODUCT_UPDATED: "product_updated",
+  PRODUCT_DELETED: "product_deleted",
+  PRODUCT_STOCK_LOW: "product_stock_low",
+
   // Spare Request operations
-  SPARE_REQUEST_CREATED: 'spare_request_created',
-  SPARE_REQUEST_UPDATED: 'spare_request_updated',
-  SPARE_REQUEST_APPROVED: 'spare_request_approved',
-  SPARE_REQUEST_REJECTED: 'spare_request_rejected',
-  SPARE_REQUEST_FULFILLED: 'spare_request_fulfilled',
-  
+  SPARE_REQUEST_CREATED: "spare_request_created",
+  SPARE_REQUEST_UPDATED: "spare_request_updated",
+  SPARE_REQUEST_APPROVED: "spare_request_approved",
+  SPARE_REQUEST_REJECTED: "spare_request_rejected",
+  SPARE_REQUEST_FULFILLED: "spare_request_fulfilled",
+
   // Inventory operations
-  INVENTORY_UPDATED: 'inventory_updated',
-  INVENTORY_LOW_STOCK: 'inventory_low_stock',
-  INVENTORY_RESTOCK: 'inventory_restock',
-  
+  INVENTORY_UPDATED: "inventory_updated",
+  INVENTORY_LOW_STOCK: "inventory_low_stock",
+  INVENTORY_RESTOCK: "inventory_restock",
+
   // Milestone operations
-  MILESTONE_CREATED: 'milestone_created',
-  MILESTONE_UPDATED: 'milestone_updated',
-  MILESTONE_STAGE_CHANGED: 'milestone_stage_changed',
-  MILESTONE_COMPLETED: 'milestone_completed',
-  
+  MILESTONE_CREATED: "milestone_created",
+  MILESTONE_UPDATED: "milestone_updated",
+  MILESTONE_STAGE_CHANGED: "milestone_stage_changed",
+  MILESTONE_COMPLETED: "milestone_completed",
+
   // System operations
-  SYSTEM_ALERT: 'system_alert',
-  SYSTEM_MAINTENANCE: 'system_maintenance',
-  REMINDER: 'reminder',
-  USER_MENTIONED: 'user_mentioned',
-  FILE_UPLOADED: 'file_uploaded',
+  SYSTEM_ALERT: "system_alert",
+  SYSTEM_MAINTENANCE: "system_maintenance",
+  REMINDER: "reminder",
+  USER_MENTIONED: "user_mentioned",
+  FILE_UPLOADED: "file_uploaded",
 };
 
 // Helper functions for creating specific notification types
-const createTicketNotification = (action, ticket, userId, additionalData = {}) => {
+const createTicketNotification = (
+  action,
+  ticket,
+  userId,
+  additionalData = {}
+) => {
   const actions = {
-    'created': `New ticket ${ticket.ticketCode} has been created for ${ticket.customerName || 'customer'}. Priority: ${ticket.priority || 'Normal'}`,
-    'updated': `Ticket ${ticket.ticketCode} has been updated`,
-    'closed': `Ticket ${ticket.ticketCode} has been closed`,
-    'reopened': `Ticket ${ticket.ticketCode} has been reopened`,
-    'assigned': `Ticket ${ticket.ticketCode} has been assigned to you`,
+    created: `New ticket ${ticket.ticketCode} has been created for ${
+      ticket.customerName || "customer"
+    }. Priority: ${ticket.priority || "Normal"}`,
+    updated: `Ticket ${ticket.ticketCode} has been updated`,
+    closed: `Ticket ${ticket.ticketCode} has been closed`,
+    reopened: `Ticket ${ticket.ticketCode} has been reopened`,
+    assigned: `Ticket ${ticket.ticketCode} has been assigned to you`,
   };
 
   const titles = {
-    'created': '🎫 New Ticket Created',
-    'updated': '📝 Ticket Updated',
-    'closed': '✅ Ticket Closed',
-    'reopened': '🔄 Ticket Reopened',
-    'assigned': '📋 Ticket Assigned',
+    created: "🎫 New Ticket Created",
+    updated: "📝 Ticket Updated",
+    closed: "✅ Ticket Closed",
+    reopened: "🔄 Ticket Reopened",
+    assigned: "📋 Ticket Assigned",
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`TICKET_${action.toUpperCase()}`] || NOTIFICATION_TYPES.TICKET_UPDATED,
-    titles[action] || `Ticket ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+    NOTIFICATION_TYPES[`TICKET_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.TICKET_UPDATED,
+    titles[action] ||
+      `Ticket ${action.charAt(0).toUpperCase() + action.slice(1)}`,
     actions[action] || `Ticket ${ticket.ticketCode} has been ${action}`,
     {
       ticketId: ticket.id,
       ticketCode: ticket.ticketCode,
       userId: userId,
       entityId: ticket.id,
-      entityType: 'ticket',
+      entityType: "ticket",
       action: action,
       priority: ticket.priority,
       customerName: ticket.customerName,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
 const createUserNotification = (action, user, userId, additionalData = {}) => {
   const actions = {
-    'registered': `New user ${user.name} has registered with phone ${user.phone}`,
-    'created': `New user ${user.name} has been added to the system`,
-    'updated': `User ${user.name} profile has been updated`,
-    'deleted': `User ${user.name} has been removed from the system`,
-    'role_changed': `User ${user.name} role has been changed`,
-    'status_changed': `User ${user.name} status has been updated`,
+    registered: `New user ${user.name} has registered with phone ${user.phone}`,
+    created: `New user ${user.name} has been added to the system`,
+    updated: `User ${user.name} profile has been updated`,
+    deleted: `User ${user.name} has been removed from the system`,
+    role_changed: `User ${user.name} role has been changed`,
+    status_changed: `User ${user.name} status has been updated`,
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`USER_${action.toUpperCase()}`] || NOTIFICATION_TYPES.USER_UPDATED,
+    NOTIFICATION_TYPES[`USER_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.USER_UPDATED,
     `User ${action.charAt(0).toUpperCase() + action.slice(1)}`,
     actions[action] || `User ${user.name} has been ${action}`,
     {
       userId: userId,
       entityId: user.id,
-      entityType: 'user',
+      entityType: "user",
       action: action,
       targetUser: user,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
-const createServiceCenterNotification = (action, serviceCenter, userId, additionalData = {}) => {
+const createServiceCenterNotification = (
+  action,
+  serviceCenter,
+  userId,
+  additionalData = {}
+) => {
   const actions = {
-    'created': `New service center ${serviceCenter.name} has been added`,
-    'updated': `Service center ${serviceCenter.name} has been updated`,
-    'deleted': `Service center ${serviceCenter.name} has been removed`,
+    created: `New service center ${serviceCenter.name} has been added`,
+    updated: `Service center ${serviceCenter.name} has been updated`,
+    deleted: `Service center ${serviceCenter.name} has been removed`,
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`SERVICE_CENTER_${action.toUpperCase()}`] || NOTIFICATION_TYPES.SERVICE_CENTER_UPDATED,
+    NOTIFICATION_TYPES[`SERVICE_CENTER_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.SERVICE_CENTER_UPDATED,
     `Service Center ${action.charAt(0).toUpperCase() + action.slice(1)}`,
-    actions[action] || `Service center ${serviceCenter.name} has been ${action}`,
+    actions[action] ||
+      `Service center ${serviceCenter.name} has been ${action}`,
     {
       userId: userId,
       entityId: serviceCenter.id,
-      entityType: 'service_center',
+      entityType: "service_center",
       action: action,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
-const createProductNotification = (action, product, userId, additionalData = {}) => {
+const createProductNotification = (
+  action,
+  product,
+  userId,
+  additionalData = {}
+) => {
   const actions = {
-    'created': `New product ${product.name} has been added`,
-    'updated': `Product ${product.name} has been updated`,
-    'deleted': `Product ${product.name} has been removed`,
-    'stock_low': `Product ${product.name} is running low on stock`,
+    created: `New product ${product.name} has been added`,
+    updated: `Product ${product.name} has been updated`,
+    deleted: `Product ${product.name} has been removed`,
+    stock_low: `Product ${product.name} is running low on stock`,
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`PRODUCT_${action.toUpperCase()}`] || NOTIFICATION_TYPES.PRODUCT_UPDATED,
+    NOTIFICATION_TYPES[`PRODUCT_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.PRODUCT_UPDATED,
     `Product ${action.charAt(0).toUpperCase() + action.slice(1)}`,
     actions[action] || `Product ${product.name} has been ${action}`,
     {
       userId: userId,
       entityId: product.id,
-      entityType: 'product',
+      entityType: "product",
       action: action,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
-const createSpareRequestNotification = (action, spareRequest, userId, additionalData = {}) => {
+const createSpareRequestNotification = (
+  action,
+  spareRequest,
+  userId,
+  additionalData = {}
+) => {
   const actions = {
-    'created': `New spare request #${spareRequest.id} has been submitted`,
-    'updated': `Spare request #${spareRequest.id} has been updated`,
-    'approved': `Spare request #${spareRequest.id} has been approved`,
-    'rejected': `Spare request #${spareRequest.id} has been rejected`,
-    'fulfilled': `Spare request #${spareRequest.id} has been fulfilled`,
+    created: `New spare request #${spareRequest.id} has been submitted`,
+    updated: `Spare request #${spareRequest.id} has been updated`,
+    approved: `Spare request #${spareRequest.id} has been approved`,
+    rejected: `Spare request #${spareRequest.id} has been rejected`,
+    fulfilled: `Spare request #${spareRequest.id} has been fulfilled`,
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`SPARE_REQUEST_${action.toUpperCase()}`] || NOTIFICATION_TYPES.SPARE_REQUEST_UPDATED,
+    NOTIFICATION_TYPES[`SPARE_REQUEST_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.SPARE_REQUEST_UPDATED,
     `Spare Request ${action.charAt(0).toUpperCase() + action.slice(1)}`,
     actions[action] || `Spare request #${spareRequest.id} has been ${action}`,
     {
       userId: userId,
       entityId: spareRequest.id,
-      entityType: 'spare_request',
+      entityType: "spare_request",
       action: action,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
-const createInventoryNotification = (action, inventory, userId, additionalData = {}) => {
+const createInventoryNotification = (
+  action,
+  inventory,
+  userId,
+  additionalData = {}
+) => {
   const actions = {
-    'updated': `Inventory for ${inventory.productName || inventory.name} has been updated`,
-    'low_stock': `Low stock alert: ${inventory.productName || inventory.name} is running low`,
-    'restock': `${inventory.productName || inventory.name} has been restocked`,
+    updated: `Inventory for ${
+      inventory.productName || inventory.name
+    } has been updated`,
+    low_stock: `Low stock alert: ${
+      inventory.productName || inventory.name
+    } is running low`,
+    restock: `${inventory.productName || inventory.name} has been restocked`,
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`INVENTORY_${action.toUpperCase()}`] || NOTIFICATION_TYPES.INVENTORY_UPDATED,
+    NOTIFICATION_TYPES[`INVENTORY_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.INVENTORY_UPDATED,
     `Inventory ${action.charAt(0).toUpperCase() + action.slice(1)}`,
     actions[action] || `Inventory has been ${action}`,
     {
       userId: userId,
       entityId: inventory.id,
-      entityType: 'inventory',
+      entityType: "inventory",
       action: action,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
-const createMilestoneNotification = (action, milestone, ticket, userId, additionalData = {}) => {
+const createMilestoneNotification = (
+  action,
+  milestone,
+  ticket,
+  userId,
+  additionalData = {}
+) => {
   const actions = {
-    'stage_changed': `Ticket ${ticket.ticketCode} milestone updated to "${milestone.config?.label || milestone.stage}". ${additionalData.previousStage ? `Previous: "${additionalData.previousStageLabel || additionalData.previousStage}"` : ''}`,
-    'created': `New milestone "${milestone.config?.label || milestone.stage}" created for ticket ${ticket.ticketCode}`,
-    'updated': `Milestone "${milestone.config?.label || milestone.stage}" updated for ticket ${ticket.ticketCode}`,
-    'completed': `Milestone "${milestone.config?.label || milestone.stage}" completed for ticket ${ticket.ticketCode}${milestone.config?.isFinal ? ' - Ticket Closed' : ''}`,
+    stage_changed: `Ticket ${ticket.ticketCode} milestone updated to "${
+      milestone.config?.label || milestone.stage
+    }". ${
+      additionalData.previousStage
+        ? `Previous: "${
+            additionalData.previousStageLabel || additionalData.previousStage
+          }"`
+        : ""
+    }`,
+    created: `New milestone "${
+      milestone.config?.label || milestone.stage
+    }" created for ticket ${ticket.ticketCode}`,
+    updated: `Milestone "${
+      milestone.config?.label || milestone.stage
+    }" updated for ticket ${ticket.ticketCode}`,
+    completed: `Milestone "${
+      milestone.config?.label || milestone.stage
+    }" completed for ticket ${ticket.ticketCode}${
+      milestone.config?.isFinal ? " - Ticket Closed" : ""
+    }`,
   };
 
   const titles = {
-    'stage_changed': ' Milestone Stage Updated',
-    'created': 'New Milestone Created',
-    'updated': 'Milestone Updated', 
-    'completed': milestone.config?.isFinal ? '✅ Ticket Completed' : '✅ Milestone Completed',
+    stage_changed: " Milestone Stage Updated",
+    created: "New Milestone Created",
+    updated: "Milestone Updated",
+    completed: milestone.config?.isFinal
+      ? "✅ Ticket Completed"
+      : "✅ Milestone Completed",
   };
 
   return createNotification(
-    NOTIFICATION_TYPES[`MILESTONE_${action.toUpperCase()}`] || NOTIFICATION_TYPES.MILESTONE_UPDATED,
-    titles[action] || `Milestone ${action.charAt(0).toUpperCase() + action.slice(1)}`,
-    actions[action] || `Milestone ${milestone.config?.label || milestone.stage} has been ${action}`,
+    NOTIFICATION_TYPES[`MILESTONE_${action.toUpperCase()}`] ||
+      NOTIFICATION_TYPES.MILESTONE_UPDATED,
+    titles[action] ||
+      `Milestone ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+    actions[action] ||
+      `Milestone ${
+        milestone.config?.label || milestone.stage
+      } has been ${action}`,
     {
       ticketId: ticket.id,
       ticketCode: ticket.ticketCode,
       userId: userId,
       entityId: milestone.id,
-      entityType: 'milestone',
+      entityType: "milestone",
       action: action,
       milestoneStage: milestone.stage,
       milestoneLabel: milestone.config?.label,
       isTicketClosed: milestone.config?.isFinal,
       priority: ticket.priority,
       customerName: ticket.customerName,
-      ...additionalData
+      ...additionalData,
     }
   );
 };
 
 // Enhanced broadcast function that saves to database and emits via socket
-const saveAndBroadcastNotification = async (prisma, io, notificationData, targetUserIds = null) => {
+const saveAndBroadcastNotification = async (
+  prisma,
+  io,
+  notificationData,
+  targetUserIds = null
+) => {
   try {
     // Create notification in database
     const notification = await prisma.notification.create({
@@ -288,7 +360,7 @@ const saveAndBroadcastNotification = async (prisma, io, notificationData, target
     // If specific target users are provided, create recipients for them
     // Otherwise, create recipients for all users except the creator
     let recipients;
-    
+
     if (targetUserIds && Array.isArray(targetUserIds)) {
       recipients = await Promise.all(
         targetUserIds.map(async (userId) => {
@@ -343,12 +415,11 @@ const saveAndBroadcastNotification = async (prisma, io, notificationData, target
 
     // Broadcast via socket
     if (io && recipients.length > 0) {
-      io.emit('notification', recipients);
+      io.emit("notification", recipients);
     }
 
     return { notification, recipients };
   } catch (error) {
-    console.error('Error saving and broadcasting notification:', error);
     throw error;
   }
 };

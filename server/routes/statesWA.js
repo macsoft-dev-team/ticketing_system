@@ -1,32 +1,30 @@
-const express = require('express');
-const { prisma } = require('../lib/clients');
+const express = require("express");
+const { prisma } = require("../lib/clients");
 
 const router = express.Router();
 
 // Get all states without authentication
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const states = await prisma.state.findMany({
-      select: {
-        id: true,
-        name: true,
-        stateCode: true
+      include: {
+        districts: true,
       },
       orderBy: {
-        name: 'asc'
-      }
+        name: "asc",
+      },
     });
 
     // Map to ensure we return consistent format with 'code' field
-    const formattedStates = states.map(state => ({
+    const formattedStates = states.map((state) => ({
       id: state.id,
       name: state.name,
-      code: state.stateCode
+      code: state.stateCode,
+      districts: state.districts,
     }));
 
     res.json(formattedStates);
   } catch (error) {
-    console.error("Error fetching states:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

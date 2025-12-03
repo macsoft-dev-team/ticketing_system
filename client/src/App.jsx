@@ -41,7 +41,6 @@ function App() {
             // Verify token is still valid with the server
             await checkAuth();
           } catch (error) {
-            console.error('Token validation failed:', error);
             // Token is invalid, clear storage
             SessionManager.logout();
           }
@@ -50,12 +49,10 @@ function App() {
           try {
             await checkAuth();
           } catch (error) {
-            console.error('Auth check failed:', error);
             SessionManager.logout();
           }
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
         SessionManager.logout();
       } finally {
         setInitializing(false);

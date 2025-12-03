@@ -233,7 +233,6 @@ export const useNotification = () => {
                     break;
             }
         } catch (error) {
-            console.error('Error navigating to notification target:', error);
             navigate('/dashboard');
         }
     }, []);

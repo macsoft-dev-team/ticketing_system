@@ -54,8 +54,6 @@ const getNotifications = async (userId) => {
     });
         return notifications;
   } catch (error) {
-    console.error('❌ Error fetching notifications:', error);
-    console.error('❌ Error stack:', error.stack);
     throw error;
   }
 };
@@ -120,7 +118,6 @@ const updateNotification = async (notificationId, userId, io) => {
 
     return notification;
   } catch (error) {
-    console.error('❌ Error updating notification:', error);
     throw error;
   }
 };
@@ -143,7 +140,6 @@ const getNotificationCounts = async (userId) => {
     const counts = { total, unread, read: total - unread };
     return counts;
   } catch (error) {
-    console.error('❌ Error getting notification counts:', error);
     throw error;
   }
 };
@@ -219,7 +215,6 @@ const markNotificationAsRead = async (notificationId, userId) => {
 
     return updatedRecipient;
   } catch (error) {
-    console.error('❌ Error marking notification as read:', error);
     throw error;
   }
 };

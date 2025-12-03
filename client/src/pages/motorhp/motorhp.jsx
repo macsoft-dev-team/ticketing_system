@@ -81,8 +81,7 @@ export default function MotorHP() {
             setCurrentPage(page);
             setTotalCount(response.data.totalCount || 0);
         } catch (error) {
-            console.error("Error fetching motor HPs:", error);
-            setMotorHPs([]);
+             setMotorHPs([]);
         } finally {
             setLoading(false);
         }

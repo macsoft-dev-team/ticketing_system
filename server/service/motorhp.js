@@ -25,7 +25,6 @@ const getMotorHPs = async (skip, take, filter) => {
     const motorhps = await prisma.motorhp.findMany(params);
     return { motorhps, count };
   } catch (error) {
-    console.error("Error fetching motor HPs:", error);
     throw error;
   }
 };
@@ -37,7 +36,6 @@ const getMotorHPById = async (motorhpId) => {
     });
     return motorhp;
   } catch (error) {
-    console.error("Error fetching motor HP by ID:", error);
     throw error;
   }
 };
@@ -54,7 +52,6 @@ const createMotorHP = async (motorhpData) => {
     });
     return newMotorHP;
   } catch (error) {
-    console.error("Error creating motor HP:", error);
     throw error;
   }
 };
@@ -74,7 +71,6 @@ const updateMotorHP = async (motorhpId, updateData) => {
     });
     return updatedMotorHP;
   } catch (error) {
-    console.error("Error updating motor HP:", error);
     throw error;
   }
 };
@@ -88,7 +84,6 @@ const deleteMotorHP = async (motorhpId) => {
     });
     return deletedMotorHP;
   } catch (error) {
-    console.error("Error deleting motor HP:", error);
     throw error;
   }
 };
@@ -104,7 +99,6 @@ const getAllActiveMotorHPs = async () => {
     });
     return motorhps;
   } catch (error) {
-    console.error("Error fetching active motor HPs:", error);
     throw error;
   }
 };

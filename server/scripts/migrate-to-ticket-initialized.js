@@ -57,8 +57,7 @@ async function migrateToTicketInitialized() {
       WHERE stage != 'TICKET_INITIALIZED' AND \`order\` < 99
     `;
   } catch (error) {
-    console.error('❌ Migration failed:', error);
-    throw error;
+     throw error;
   } finally {
     await prisma.$disconnect();
   }
@@ -68,8 +67,7 @@ async function migrateToTicketInitialized() {
 if (require.main === module) {
   migrateToTicketInitialized()
     .catch((error) => {
-      console.error('Migration failed:', error);
-      process.exit(1);
+       process.exit(1);
     });
 }
 

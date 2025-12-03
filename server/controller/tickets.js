@@ -31,7 +31,6 @@ const getTickets = async (req, res) => {
       statusCount,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -47,7 +46,6 @@ const getTicketById = async (req, res) => {
     }
     res.status(200).json(ticket);
   } catch (error) {
-    console.error(error);
     // Check if it's an access denied error
     if (error.message.startsWith("Access denied:")) {
       return res.status(403).json({ message: error.message });
@@ -86,9 +84,7 @@ const createTicket = async (req, res) => {
     
     res.status(201).json(newTicket);
   } catch (error) {
-    console.error('❌ Error creating ticket:', error);
-    console.error('❌ Error stack:', error.stack);
-    res.status(500).json({ 
+     res.status(500).json({ 
       message: "Internal server error",
       error: error.message 
     });
@@ -111,7 +107,6 @@ const updateTicket = async (req, res) => {
     );
     res.status(200).json(updatedTicket);
   } catch (error) {
-    console.error(error);
     // Check if it's an access denied error
     if (error.message.startsWith("Access denied:")) {
       return res.status(403).json({ message: error.message });
@@ -136,7 +131,6 @@ const updateStatus = async (req, res) => {
     );
     res.status(200).json(updatedTicket);
   } catch (error) {
-    console.error(error);
     // Check if it's an access denied error
     if (error.message.startsWith("Access denied:")) {
       return res.status(403).json({ message: error.message });
@@ -162,7 +156,6 @@ const deleteTicket = async (req, res) => {
     }
     res.status(200).json({ message: "Ticket deleted successfully" });
   } catch (error) {
-    console.error(error);
     // Check if it's an access denied error
     if (error.message.startsWith("Access denied:")) {
       return res.status(403).json({ message: error.message });
@@ -192,7 +185,6 @@ const searchByControllerNumber = async (req, res) => {
 
     res.status(200).json(ticket);
   } catch (error) {
-    console.error("Error searching by controller number:", error);
     res.status(500).json({ 
       message: "Internal server error",
       error: error.message 
@@ -224,7 +216,6 @@ const searchTickets = async (req, res) => {
       message: `Found ${tickets.length} tickets matching "${keyword}"`
     });
   } catch (error) {
-    console.error("Error searching tickets:", error);
     res.status(500).json({
       message: "Internal server error",
       error: error.message
@@ -261,7 +252,6 @@ const checkActiveTicketForController = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error checking active ticket:", error);
     res.status(500).json({ 
       message: "Internal server error",
       error: "Failed to check for existing tickets"

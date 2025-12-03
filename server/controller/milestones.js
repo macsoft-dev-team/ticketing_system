@@ -77,7 +77,6 @@ const handleMilestoneFileUpload = async (req, res, next) => {
     const upload = createMilestoneUpload(ticket.ticketCode);
     upload.array("photos", 5)(req, res, next); // Max 5 photos per milestone
   } catch (error) {
-    console.error("Error in milestone file upload middleware:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -93,7 +92,6 @@ const getTicketMilestones = async (req, res) => {
     );
     res.status(200).json(milestones);
   } catch (error) {
-    console.error("Error fetching milestones:", error);
     res.status(500).json({
       message: "Failed to fetch milestones",
       error: error.message,
@@ -114,7 +112,6 @@ const getCurrentMilestone = async (req, res) => {
 
     res.status(200).json(milestone);
   } catch (error) {
-    console.error("Error fetching current milestone:", error);
     res.status(500).json({
       message: "Failed to fetch current milestone",
       error: error.message,
@@ -134,7 +131,6 @@ const getAvailableTransitions = async (req, res) => {
 
     res.status(200).json(availableStages);
   } catch (error) {
-    console.error("Error fetching available transitions:", error);
     res.status(500).json({
       message: "Failed to fetch available transitions",
       error: error.message,
@@ -191,7 +187,6 @@ const transitionMilestone = async (req, res) => {
       isTicketClosed,
     });
   } catch (error) {
-    console.error("Error transitioning milestone:", error);
     res.status(400).json({
       message: error.message,
       error: error.message,
@@ -216,7 +211,6 @@ const updateMilestoneNotes = async (req, res) => {
       milestone: updatedMilestone,
     });
   } catch (error) {
-    console.error("Error updating milestone notes:", error);
     res.status(400).json({
       message: "Failed to update milestone notes",
       error: error.message,
@@ -229,8 +223,6 @@ const addPhotosToCurrentMilestone = async (req, res) => {
     const { ticketId } = req.params;
     const { id: userId } = req.user;
     const files = req.files; // Uploaded photos
-
-    console.log(`[addPhotosToCurrentMilestone] Adding photos to ticket ${ticketId} by user ${userId}`);
 
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No photos provided" });
@@ -245,8 +237,6 @@ const addPhotosToCurrentMilestone = async (req, res) => {
       path: file.path,
     }));
 
-    console.log(`[addPhotosToCurrentMilestone] Processing ${attachments.length} attachments`);
-
     const updatedMilestone = await milestoneService.addPhotosToCurrentMilestone(
       parseInt(ticketId),
       userId,
@@ -258,7 +248,6 @@ const addPhotosToCurrentMilestone = async (req, res) => {
       milestone: updatedMilestone,
     });
   } catch (error) {
-    console.error("[addPhotosToCurrentMilestone] Error adding photos to milestone:", error);
     res.status(400).json({
       message: "Failed to add photos to milestone",
       error: error.message,
@@ -287,7 +276,6 @@ const updateMilestone = async (req, res) => {
       milestone: newMilestoneData,
     });
   } catch (error) {
-    console.error("Error updating milestone:", error);
     res.status(400).json({
       message: "Failed to update milestone",
       error: error.message,
@@ -319,7 +307,6 @@ const createMilestone = async (req, res) => {
       milestone: newMilestone,
     });
   } catch (error) {
-    console.error("Error creating milestone:", error);
     res.status(400).json({
       message: "Failed to create milestone",
       error: error.message,
@@ -422,7 +409,6 @@ const receiveControllerAtServiceCenter = async (req, res) => {
       milestone: result.milestone,
     });
   } catch (error) {
-    console.error("Error receiving controller at service center:", error);
     
     // Determine appropriate status code based on error type
     let statusCode = 400;
@@ -454,7 +440,6 @@ const batch = await batchService.receiveControllerBatch(batchId);
     });
 
   } catch (error) {
-    console.error("Error processing receive batch:", error);
     res.status(500).json({
       message: "Failed to process batch",
       error: error.message,
@@ -466,8 +451,6 @@ const batch = await batchService.receiveControllerBatch(batchId);
 const deliveryControllerBatch = async (req, res) => {
   try {
     const { batchCount, batchId } = req.body;
-
-    console.log('🚀 Processing delivery batch:', { batchCount, batchId });
      
     const batch = await batchService.deliveryControllerBatch(batchId);
  
@@ -477,7 +460,6 @@ const deliveryControllerBatch = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Error processing delivery batch:", error);
     res.status(500).json({
       message: "Failed to process delivery batch",
       error: error.message,

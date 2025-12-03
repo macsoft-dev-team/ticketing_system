@@ -63,7 +63,6 @@ export const fetchTickets = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      console.error("Fetch tickets error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -80,7 +79,6 @@ export const fetchTicketById = createAsyncThunk(
       const response = await axios.get(`${API_ENDPOINTS.ticket}/${ticketId}`);
       return response.data;
     } catch (error) {
-      console.error("Fetch ticket by ID error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -99,7 +97,6 @@ export const searchTickets = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      console.error("Search tickets error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -154,7 +151,6 @@ export const createNewTicket = createAsyncThunk(
         return response.data;
       }
     } catch (error) {
-      console.error("Create ticket error:", error);
       // Try to get the most specific error message available
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
@@ -189,7 +185,6 @@ export const updateTicketById = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      console.error("Update ticket error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -211,7 +206,6 @@ export const updateTicketStatusAPI = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      console.error("Update ticket status error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -230,7 +224,6 @@ export const deleteTicketById = createAsyncThunk(
       );
       return { ticketId, ...response.data };
     } catch (error) {
-      console.error("Delete ticket error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -319,7 +312,6 @@ export const updateMilestone = createAsyncThunk(
         return response.data;
       }
     } catch (error) {
-      console.error("Update milestone error:", error);
       const errorMessage = error.response?.data?.error || 
                           error.response?.data?.message || 
                           error.message || 
@@ -426,7 +418,6 @@ const ticketSlice = createSlice({
       .addCase(fetchTickets.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch tickets";
-        console.error("Failed to fetch tickets:", action.payload);
       })
       .addCase(fetchTicketById.pending, (state) => {
         state.loading = true;

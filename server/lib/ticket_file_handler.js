@@ -136,7 +136,6 @@ function moveFilesToTicketFolder(tempTicketCode, actualTicketCode, files = []) {
       
       updatedFiles.push(updatedFile);
     } catch (error) {
-      console.error(`Error moving file ${file.filename}:`, error);
       // Keep original file info if move fails
       updatedFiles.push(file);
     }

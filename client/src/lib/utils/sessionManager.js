@@ -203,7 +203,6 @@ export class SessionManager {
       
       return true;
     } catch (error) {
-      console.error('Error extending session:', error);
       return false;
     }
   }

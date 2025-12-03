@@ -12,7 +12,6 @@ router.get("/", async (req, res) => {
     });
     res.json(organisations);
   } catch (error) {
-    console.error("Error fetching organisations:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

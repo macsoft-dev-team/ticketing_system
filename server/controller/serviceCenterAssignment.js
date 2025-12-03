@@ -18,7 +18,6 @@ const getSuggestedServiceCenters = async (req, res) => {
       suggestedServiceCenters: suggestions
     });
   } catch (error) {
-    console.error('Error getting suggested service centers:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -55,12 +54,7 @@ const assignServiceCenter = async (req, res) => {
       ticket: updatedTicket
     });
   } catch (error) {
-    console.error('❌ Controller Error assigning service center:', error);
-    console.error('❌ Full error details:', {
-      message: error.message,
-      code: error.code,
-      meta: error.meta
-    });
+ 
     
     if (error.message.includes('not found') || error.message.includes('not active')) {
       return res.status(400).json({ message: error.message });
@@ -100,7 +94,6 @@ const removeServiceCenterAssignment = async (req, res) => {
       ticket: updatedTicket
     });
   } catch (error) {
-    console.error('Error removing service center assignment:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -126,7 +119,6 @@ const getUnassignedTickets = async (req, res) => {
       tickets: unassignedTickets
     });
   } catch (error) {
-    console.error('Error fetching unassigned tickets:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -151,7 +143,6 @@ const getServiceCenterStats = async (req, res) => {
       serviceCenters: stats
     });
   } catch (error) {
-    console.error('Error fetching service center stats:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -180,7 +171,6 @@ const getServiceCentersWithStates = async (req, res) => {
       serviceCenters
     });
   } catch (error) {
-    console.error('Error fetching service centers:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -215,7 +205,6 @@ const updateServiceCenterStates = async (req, res) => {
       serviceCenter: updatedServiceCenter
     });
   } catch (error) {
-    console.error('Error updating service center states:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

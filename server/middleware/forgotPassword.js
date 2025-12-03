@@ -72,7 +72,6 @@ exports.forgotPassword = async (req, res) => {
     try {
       await sendSMS(phone, message);
     } catch (smsError) {
-      console.error('SMS sending failed:', smsError);
       return res.status(500).json({
         success: false,
         message: "Failed to send verification code. Please try again."
@@ -86,7 +85,6 @@ exports.forgotPassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Forgot password error:', error);
     res.status(500).json({
       success: false,
       message: "Internal server error"
@@ -154,7 +152,6 @@ exports.verifyResetCode = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Verify reset code error:', error);
     res.status(500).json({
       success: false,
       message: "Internal server error"
@@ -234,8 +231,7 @@ exports.resetPassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Reset password error:', error);
-    res.status(500).json({
+     res.status(500).json({
       success: false,
       message: "Internal server error"
     });

@@ -49,7 +49,6 @@ const generateTicketCode = async (prefix = "TKT", suffix = "") => {
 
     return result;
   } catch (error) {
-    console.error('Error generating ticket code:', error);
     throw new Error('Failed to generate ticket code');
   }
 };
@@ -67,7 +66,6 @@ const getNextTicketNumber = async (year = new Date().getFullYear()) => {
 
     return sequence ? sequence.lastNumber + 1 : 1;
   } catch (error) {
-    console.error('Error getting next ticket number:', error);
     throw new Error('Failed to get next ticket number');
   }
 };
@@ -99,7 +97,6 @@ const getTicketStats = async (year = new Date().getFullYear()) => {
       prefix: sequence?.prefix || "TKT"
     };
   } catch (error) {
-    console.error('Error getting ticket stats:', error);
     throw new Error('Failed to get ticket stats');
   }
 };
@@ -124,7 +121,6 @@ const updateTicketPrefix = async (newPrefix, year = new Date().getFullYear()) =>
 
     return sequence;
   } catch (error) {
-    console.error('Error updating ticket prefix:', error);
     throw new Error('Failed to update ticket prefix');
   }
 };

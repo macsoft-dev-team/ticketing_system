@@ -62,8 +62,7 @@ const handleConversationFileUpload = async (req, res, next) => {
     const upload = createConversationUpload(ticket.ticketCode);
     upload.array('attachments', 5)(req, res, next);
   } catch (error) {
-    console.error("Error in conversation file upload middleware:", error);
-    res.status(500).json({ message: "Internal server error" });
+     res.status(500).json({ message: "Internal server error" });
   }
 };
 

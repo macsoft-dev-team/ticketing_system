@@ -21,7 +21,6 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('❌ Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -32,12 +31,7 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('❌ API Response Error:', {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      url: error.config?.url,
-      method: error.config?.method
-    });
+ 
     
     if (error.response?.status === 401 || error.response?.status === 403) {
       console.warn('🔒 Unauthorized access - clearing session');

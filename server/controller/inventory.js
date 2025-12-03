@@ -39,7 +39,6 @@ async function getAllInventory(req, res) {
       totalItems: count
     });
   } catch (error) {
-    console.error("❌ Error in getAllInventory controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch inventory",
@@ -83,7 +82,6 @@ async function getInventoryByProductId(req, res) {
       data: transformedInventory
     });
   } catch (error) {
-    console.error("❌ Error in getInventoryByProductId controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch inventory"
@@ -158,7 +156,6 @@ async function upsertInventory(req, res) {
       }
     });
   } catch (error) {
-    console.error("❌ Error in upsertInventory controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to update inventory"
@@ -188,7 +185,6 @@ async function checkStockAvailability(req, res) {
       data: stockCheck
     });
   } catch (error) {
-    console.error("❌ Error in checkStockAvailability controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to check stock availability"
@@ -253,7 +249,6 @@ async function processInboundActivity(req, res) {
       data: results
     });
   } catch (error) {
-    console.error("❌ Error in processInboundActivity controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to process inbound activity"
@@ -289,7 +284,6 @@ async function getLowStockItems(req, res) {
       count: transformedItems.length
     });
   } catch (error) {
-    console.error("❌ Error in getLowStockItems controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch low stock items"
@@ -332,7 +326,6 @@ async function getInventoryTransactionHistory(req, res) {
       count: transformedTransactions.length
     });
   } catch (error) {
-    console.error("❌ Error in getInventoryTransactionHistory controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch transaction history"
@@ -364,7 +357,6 @@ async function deleteInventory(req, res) {
       message: "Inventory record deleted successfully"
     });
   } catch (error) {
-    console.error("❌ Error in deleteInventory controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to delete inventory record"

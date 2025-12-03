@@ -92,7 +92,6 @@ const handleTicketFileUpload = (req, res, next) => {
     
     upload.array('attachments', 12)(req, res, next);
   } catch (error) {
-    console.error("Error in ticket file upload middleware:", error);
     res.status(500).json({ message: "Failed to handle file upload" });
   }
 };
@@ -117,7 +116,6 @@ const handleTicketUpdateFileUpload = async (req, res, next) => {
     const upload = createTicketUpload(ticket.ticketCode);
     upload.single('picture')(req, res, next);
   } catch (error) {
-    console.error("Error in ticket update file upload middleware:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

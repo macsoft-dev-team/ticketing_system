@@ -158,8 +158,6 @@ const MilestoneAttachmentItem = ({ attachment, token, addToast }) => {
                 variant: 'success'
             });
         } catch (error) {
-            console.error('Download failed:', error);
-
             // Final fallback - try direct URL in new tab
             if (attachment.fileUrl) {
                 const baseUrl = import.meta.env.VITE_API_URL;
@@ -895,7 +893,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 onMilestoneUpdate(response.data);
             }
         } catch (error) {
-            console.error('Error fetching milestones:', error);
             addToast({
                 title: 'Failed to load milestones',
                 description: getErrorMessage(error),

@@ -451,8 +451,10 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     priority,
     category,
     ticketCodePrefix, // Optional custom prefix
-    ticketCodeSuffix, // Optional custom suffix
-  } = ticket;
+    ticketCodeSuffix,
+    farmerName
+    // Optional custom suffix
+  } = ticket;  
   try {
     // Validate controller number - check for active tickets
     if (controllerNo) {
@@ -502,7 +504,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         }
       });
     }
-
+    
     const newTicket = await prisma.ticket.create({
       data: {
         ticketCode: ticketCode,
@@ -523,6 +525,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         complaintType: complaintType || category,
         faultCode: faultCode,
         createdBy: userId,
+        farmerName: farmerName,
       },
       include: {
         createdByUser: true,
@@ -542,6 +545,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         ticketMilestones: true,
       },
     });
+
 
     // Create initial milestones for the ticket
     const milestonesData = {

@@ -1,6 +1,6 @@
 const spareRequestService = require("../service/spareRequests");
 const moment = require("moment");
-async function createSpareRequest(req, res) {  
+async function createSpareRequest(req, res) {
   try {
     const userId = req.user.id; // From authentication middleware
     const userRole = req.user.role; // Get user role
@@ -72,7 +72,6 @@ async function createSpareRequest(req, res) {
       data: spareRequest,
     });
   } catch (error) {
-    console.error("❌ Error in createSpareRequest controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to create spare request",
@@ -94,7 +93,6 @@ async function getSpareRequestsByTicket(req, res) {
       data: spareRequests,
     });
   } catch (error) {
-    console.error("❌ Error in getSpareRequestsByTicket controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch spare requests",
@@ -138,7 +136,6 @@ async function updateSpareRequestStatus(req, res) {
       data: spareRequest,
     });
   } catch (error) {
-    console.error("❌ Error in updateSpareRequestStatus controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to update spare request status",
@@ -160,12 +157,12 @@ async function getAllSpareRequests(req, res) {
         take,
         transformedFilter
       );
-    
+
     const _transformSpareRequests = spareRequests.map((request) => {
       return {
         ...request,
-        createdAt: moment(request.createdAt).format('DD MMM YYYY, hh:mm A'),
-        updatedAt: moment(request.updatedAt).format('DD MMM YYYY, hh:mm A'),
+        createdAt: moment(request.createdAt).format("DD MMM YYYY, hh:mm A"),
+        updatedAt: moment(request.updatedAt).format("DD MMM YYYY, hh:mm A"),
         createdBy: request.createdByUser ? request.createdByUser.name : null,
         updatedBy: request.updatedByUser ? request.updatedByUser.name : null,
       };
@@ -183,7 +180,6 @@ async function getAllSpareRequests(req, res) {
       take: takeNum,
     });
   } catch (error) {
-    console.error("❌ Error in getAllSpareRequests controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch spare requests",
@@ -210,9 +206,9 @@ async function updateSpareRequestItemStatus(req, res) {
     }
 
     // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can approve/reject
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD"];
     const normalizedUserRole = userRole.toUpperCase();
-    
+
     if (!allowedRoles.includes(normalizedUserRole)) {
       return res.status(403).json({
         success: false,
@@ -221,11 +217,11 @@ async function updateSpareRequestItemStatus(req, res) {
     }
 
     // Validate status values
-    const validStatuses = ['pending', 'approved', 'rejected', 'in-progress'];
+    const validStatuses = ["pending", "approved", "rejected", "in-progress"];
     if (!validStatuses.includes(status.toLowerCase())) {
       return res.status(400).json({
         success: false,
-        message: `Invalid status. Allowed values: ${validStatuses.join(', ')}`,
+        message: `Invalid status. Allowed values: ${validStatuses.join(", ")}`,
       });
     }
 
@@ -252,10 +248,6 @@ async function updateSpareRequestItemStatus(req, res) {
       data: item,
     });
   } catch (error) {
-    console.error(
-      "❌ Error in updateSpareRequestItemStatus controller:",
-      error
-    );
     res.status(500).json({
       success: false,
       message: error.message || "Failed to update spare request item status",
@@ -273,9 +265,9 @@ async function bulkApproveSpareRequestsByTicket(req, res) {
     const { role: userRole, id: userId } = req.user;
 
     // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can bulk approve
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD"];
     const normalizedUserRole = userRole.toUpperCase();
-    
+
     if (!allowedRoles.includes(normalizedUserRole)) {
       return res.status(403).json({
         success: false,
@@ -305,10 +297,6 @@ async function bulkApproveSpareRequestsByTicket(req, res) {
       data: result,
     });
   } catch (error) {
-    console.error(
-      "❌ Error in bulkApproveSpareRequestsByTicket controller:",
-      error
-    );
     res.status(500).json({
       success: false,
       message: error.message || "Failed to bulk approve spare requests",
@@ -326,9 +314,9 @@ async function approveSpareRequestItem(req, res) {
     const { role: userRole, id: userId, name: userName } = req.user;
 
     // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can approve
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD"];
     const normalizedUserRole = userRole.toUpperCase();
-    
+
     if (!allowedRoles.includes(normalizedUserRole)) {
       return res.status(403).json({
         success: false,
@@ -354,8 +342,9 @@ async function approveSpareRequestItem(req, res) {
 
       // If milestone transition occurred, emit milestone update
       if (result.milestoneTransitionResult) {
-        const { previousStage, newStage, milestoneId, ticketId } = result.milestoneTransitionResult;
-        
+        const { previousStage, newStage, milestoneId, ticketId } =
+          result.milestoneTransitionResult;
+
         req.io.emit("milestone-updated", {
           ticketId,
           milestoneId,
@@ -369,8 +358,6 @@ async function approveSpareRequestItem(req, res) {
           spareRequestsApproved: true,
           timestamp: new Date().toISOString(),
         });
-
-        console.log(`✅ Milestone transition: ${previousStage} → ${newStage} for ticket ID ${ticketId}`);
       }
     }
 
@@ -380,7 +367,6 @@ async function approveSpareRequestItem(req, res) {
       data: result,
     });
   } catch (error) {
-    console.error("❌ Error in approveSpareRequestItem controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to approve spare request item",
@@ -399,9 +385,9 @@ async function rejectSpareRequestItem(req, res) {
     const { role: userRole, id: userId, name: userName } = req.user;
 
     // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can reject
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD"];
     const normalizedUserRole = userRole.toUpperCase();
-    
+
     if (!allowedRoles.includes(normalizedUserRole)) {
       return res.status(403).json({
         success: false,
@@ -429,8 +415,9 @@ async function rejectSpareRequestItem(req, res) {
 
       // If milestone transition occurred, emit milestone update
       if (result.milestoneTransitionResult) {
-        const { previousStage, newStage, milestoneId, ticketId } = result.milestoneTransitionResult;
-        
+        const { previousStage, newStage, milestoneId, ticketId } =
+          result.milestoneTransitionResult;
+
         req.io.emit("milestone-updated", {
           ticketId,
           milestoneId,
@@ -444,8 +431,6 @@ async function rejectSpareRequestItem(req, res) {
           spareRequestsProcessed: true,
           timestamp: new Date().toISOString(),
         });
-
-        console.log(`✅ Milestone transition after rejection: ${previousStage} → ${newStage} for ticket ID ${ticketId}`);
       }
     }
 
@@ -455,7 +440,6 @@ async function rejectSpareRequestItem(req, res) {
       data: result,
     });
   } catch (error) {
-    console.error("❌ Error in rejectSpareRequestItem controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to reject spare request item",
@@ -473,9 +457,9 @@ async function getPendingSpareRequestsForApproval(req, res) {
     const { skip, take } = req.query;
 
     // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can access
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD"];
     const normalizedUserRole = userRole.toUpperCase();
-    
+
     if (!allowedRoles.includes(normalizedUserRole)) {
       return res.status(403).json({
         success: false,
@@ -483,20 +467,22 @@ async function getPendingSpareRequestsForApproval(req, res) {
       });
     }
 
-    const { spareRequests, count } = await spareRequestService.getPendingSpareRequestsForApproval({
-      skip: skip ? parseInt(skip) : 0,
-      take: take ? parseInt(take) : 20,
-    });
+    const { spareRequests, count } =
+      await spareRequestService.getPendingSpareRequestsForApproval({
+        skip: skip ? parseInt(skip) : 0,
+        take: take ? parseInt(take) : 20,
+      });
 
     res.status(200).json({
       success: true,
       data: spareRequests,
       totalCount: count,
-      currentPage: Math.floor((skip ? parseInt(skip) : 0) / (take ? parseInt(take) : 20)) + 1,
+      currentPage:
+        Math.floor((skip ? parseInt(skip) : 0) / (take ? parseInt(take) : 20)) +
+        1,
       totalPages: Math.ceil(count / (take ? parseInt(take) : 20)),
     });
   } catch (error) {
-    console.error("❌ Error in getPendingSpareRequestsForApproval controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch pending spare requests",
@@ -514,9 +500,9 @@ async function bulkApproveSpareRequestItems(req, res) {
     const { role: userRole, id: userId, name: userName } = req.user;
 
     // Role-based validation - Only MACSOFT_ADMIN and MACSOFT_HEAD can bulk approve
-    const allowedRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD'];
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD"];
     const normalizedUserRole = userRole.toUpperCase();
-    
+
     if (!allowedRoles.includes(normalizedUserRole)) {
       return res.status(403).json({
         success: false,
@@ -549,8 +535,11 @@ async function bulkApproveSpareRequestItems(req, res) {
       });
 
       // Emit milestone transition events for any tickets that completed
-      if (result.milestoneTransitions && result.milestoneTransitions.length > 0) {
-        result.milestoneTransitions.forEach(transition => {
+      if (
+        result.milestoneTransitions &&
+        result.milestoneTransitions.length > 0
+      ) {
+        result.milestoneTransitions.forEach((transition) => {
           req.io.emit("milestone-updated", {
             ticketId: transition.ticketId,
             milestoneId: transition.milestoneId,
@@ -564,8 +553,6 @@ async function bulkApproveSpareRequestItems(req, res) {
             spareRequestsApproved: true,
             timestamp: new Date().toISOString(),
           });
-
-          console.log(`✅ Bulk approval milestone transition: ${transition.previousStage} → ${transition.newStage} for ticket ID ${transition.ticketId}`);
         });
       }
     }
@@ -576,7 +563,6 @@ async function bulkApproveSpareRequestItems(req, res) {
       data: result,
     });
   } catch (error) {
-    console.error("❌ Error in bulkApproveSpareRequestItems controller:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Failed to bulk approve spare request items",

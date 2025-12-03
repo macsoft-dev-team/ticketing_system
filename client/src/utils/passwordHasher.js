@@ -58,7 +58,6 @@ export const hashDevicePasswords = async (devices, onProgress, saltRounds = 10, 
                 throw error;
             }
             
-            console.error(`Error hashing password for device ${device.imeinumber || i}:`, error);
             // Still add the device but without hashed password
             hashedDevices.push({ ...device, hashError: error.message });
             

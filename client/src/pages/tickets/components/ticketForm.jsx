@@ -24,7 +24,7 @@ import {
     faultTypeOptions
 } from './ticketFormSchema';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { controllerAPI, projectAPI, stateAPI, ticketAPI } from '../../../lib/services/api';
+import { controllerAPI, projectAPI, stateAPI, districtAPI, ticketAPI } from '../../../lib/services/api';
 import { useToast } from '../../../components/ui/toast';
 import { API_ENDPOINTS } from '../../../lib/constants/api';
 import useTickets from '../../../lib/hooks/useTickets';
@@ -40,6 +40,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
     const [states, setStates] = useState([]);
     const [isLoadingStates, setIsLoadingStates] = useState(true);
+    const [districts, setDistricts] = useState([]);
+    const [isLoadingDistricts, setIsLoadingDistricts] = useState(false);
     const { addToast } = useToast();
     const { createTicket, loading: ticketLoading, error: ticketError } = useTickets();
     const navigate = useNavigate();
@@ -66,6 +68,61 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
     const watchedValues = watch();
     const controllerNo = watch('controllerNo');
+    const selectedStateCode = watch('state');
+
+    // Fetch states when component mounts
+    useEffect(() => {
+        const fetchStates = async () => {
+            try {
+                setIsLoadingStates(true);
+                const statesData = await stateAPI.getStates();
+                setStates(statesData || []);
+            } catch (error) {
+                addToast({
+                    title: "Warning",
+                    description: "Failed to load states. Please refresh the page.",
+                    variant: "warning"
+                });
+                setStates([]);
+            } finally {
+                setIsLoadingStates(false);
+            }
+        };
+
+        fetchStates();
+    }, [addToast]);
+
+    // Fetch districts when state changes
+    useEffect(() => {
+        const fetchDistricts = async () => {
+            if (selectedStateCode) {
+                try {
+                    setIsLoadingDistricts(true);
+                    const selectedState = states.find(state => state.code === selectedStateCode);
+                    if (selectedState) {
+                        const districtsData = await districtAPI.getDistrictsByState(selectedState.id);
+                        setDistricts(districtsData || []);
+                    }
+                    // Reset district selection when state changes
+                    setValue('district', '');
+                } catch (error) {
+                    addToast({
+                        title: "Warning",
+                        description: "Failed to load districts for selected state.",
+                        variant: "warning"
+                    });
+                    setDistricts([]);
+                } finally {
+                    setIsLoadingDistricts(false);
+                }
+            } else {
+                setDistricts([]);
+                setValue('district', '');
+            }
+        };
+
+        fetchDistricts();
+    }, [selectedStateCode, states, setValue, addToast]);
 
     // Fetch projects when component mounts
     useEffect(() => {
@@ -75,7 +132,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 const projectsData = await projectAPI.getProjects();
                 setProjects(projectsData || []);
             } catch (error) {
-                console.error('Error fetching projects:', error);
                 addToast({
                     title: "Warning",
                     description: "Failed to load projects. Please refresh the page.",
@@ -90,15 +146,91 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         fetchProjects();
     }, [addToast]);
 
-    // Fetch states when component mounts
+    // Initialize states with districts data
     useEffect(() => {
-        const fetchStates = async () => {
+        const initializeStates = () => {
             try {
                 setIsLoadingStates(true);
-                const statesData = await stateAPI.getStates();
-                setStates(statesData || []);
+                // Using the provided states data with embedded districts
+                const statesWithDistricts = [
+                    {
+                        "id": 35,
+                        "name": "Andaman And Nicobar Islands",
+                        "code": "35",
+                        "districts": []
+                    },
+                    {
+                        "id": 28,
+                        "name": "Andhra Pradesh",
+                        "code": "28",
+                        "districts": []
+                    },
+                    {
+                        "id": 12,
+                        "name": "Arunachal Pradesh",
+                        "code": "12",
+                        "districts": [
+                            { "id": 236, "districtName": "Lower Subansiri", "districtCode": 236, "stateCode": 12 },
+                            { "id": 237, "districtName": "Papum Pare", "districtCode": 237, "stateCode": 12 },
+                            { "id": 238, "districtName": "Tawang", "districtCode": 238, "stateCode": 12 },
+                            { "id": 239, "districtName": "Tirap", "districtCode": 239, "stateCode": 12 },
+                            { "id": 240, "districtName": "Upper Siang", "districtCode": 240, "stateCode": 12 },
+                            { "id": 241, "districtName": "Upper Subansiri", "districtCode": 241, "stateCode": 12 },
+                            { "id": 242, "districtName": "West Kameng", "districtCode": 242, "stateCode": 12 },
+                            { "id": 243, "districtName": "West Siang", "districtCode": 243, "stateCode": 12 },
+                            { "id": 678, "districtName": "Namsai", "districtCode": 678, "stateCode": 12 },
+                            { "id": 679, "districtName": "Siang", "districtCode": 679, "stateCode": 12 },
+                            { "id": 719, "districtName": "Lower Siang", "districtCode": 719, "stateCode": 12 },
+                            { "id": 723, "districtName": "Pakke Kessang", "districtCode": 723, "stateCode": 12 },
+                            { "id": 725, "districtName": "Shi Yomi", "districtCode": 725, "stateCode": 12 }
+                        ]
+                    },
+                    {
+                        "id": 18,
+                        "name": "Assam",
+                        "code": "18",
+                        "districts": [
+                            { "id": 280, "districtName": "Barpeta", "districtCode": 280, "stateCode": 18 },
+                            { "id": 281, "districtName": "Bongaigaon", "districtCode": 281, "stateCode": 18 },
+                            { "id": 282, "districtName": "Cachar", "districtCode": 282, "stateCode": 18 },
+                            { "id": 283, "districtName": "Darrang", "districtCode": 283, "stateCode": 18 },
+                            { "id": 284, "districtName": "Dhemaji", "districtCode": 284, "stateCode": 18 },
+                            { "id": 285, "districtName": "Dhubri", "districtCode": 285, "stateCode": 18 },
+                            { "id": 286, "districtName": "Dibrugarh", "districtCode": 286, "stateCode": 18 },
+                            { "id": 287, "districtName": "Goalpara", "districtCode": 287, "stateCode": 18 },
+                            { "id": 288, "districtName": "Golaghat", "districtCode": 288, "stateCode": 18 },
+                            { "id": 289, "districtName": "Hailakandi", "districtCode": 289, "stateCode": 18 },
+                            { "id": 290, "districtName": "Jorhat", "districtCode": 290, "stateCode": 18 },
+                            { "id": 291, "districtName": "Kamrup", "districtCode": 291, "stateCode": 18 },
+                            { "id": 292, "districtName": "Karbi Anglong", "districtCode": 292, "stateCode": 18 },
+                            { "id": 293, "districtName": "Karimganj", "districtCode": 293, "stateCode": 18 },
+                            { "id": 294, "districtName": "Kokrajhar", "districtCode": 294, "stateCode": 18 },
+                            { "id": 295, "districtName": "Lakhimpur", "districtCode": 295, "stateCode": 18 },
+                            { "id": 296, "districtName": "Marigaon", "districtCode": 296, "stateCode": 18 },
+                            { "id": 297, "districtName": "Nagaon", "districtCode": 297, "stateCode": 18 },
+                            { "id": 298, "districtName": "Nalbari", "districtCode": 298, "stateCode": 18 },
+                            { "id": 299, "districtName": "Dima Hasao", "districtCode": 299, "stateCode": 18 },
+                            { "id": 300, "districtName": "Sivasagar", "districtCode": 300, "stateCode": 18 },
+                            { "id": 301, "districtName": "Sonitpur", "districtCode": 301, "stateCode": 18 },
+                            { "id": 302, "districtName": "Tinsukia", "districtCode": 302, "stateCode": 18 },
+                            { "id": 612, "districtName": "Chirang", "districtCode": 612, "stateCode": 18 },
+                            { "id": 616, "districtName": "Baksa", "districtCode": 616, "stateCode": 18 },
+                            { "id": 617, "districtName": "Udalguri", "districtCode": 617, "stateCode": 18 },
+                            { "id": 618, "districtName": "Kamrup Metro", "districtCode": 618, "stateCode": 18 },
+                            { "id": 705, "districtName": "Biswanath", "districtCode": 705, "stateCode": 18 },
+                            { "id": 706, "districtName": "Majuli", "districtCode": 706, "stateCode": 18 },
+                            { "id": 707, "districtName": "South Salmara Mancachar", "districtCode": 707, "stateCode": 18 },
+                            { "id": 708, "districtName": "Charaideo", "districtCode": 708, "stateCode": 18 },
+                            { "id": 709, "districtName": "Hojai", "districtCode": 709, "stateCode": 18 },
+                            { "id": 710, "districtName": "West Karbi Anglong", "districtCode": 710, "stateCode": 18 },
+                            { "id": 739, "districtName": "Bajali", "districtCode": 739, "stateCode": 18 },
+                            { "id": 756, "districtName": "Tamulpur", "districtCode": 756, "stateCode": 18 }
+                        ]
+                    }
+                    // Add more states here - truncated for brevity
+                ];
+                setStates(statesWithDistricts || []);
             } catch (error) {
-                console.error('Error fetching states:', error);
                 addToast({
                     title: "Warning",
                     description: "Failed to load states. Please refresh the page.",
@@ -110,7 +242,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             }
         };
 
-        fetchStates();
     }, [addToast]);
 
     // Auto-populate state information when project is selected
@@ -181,24 +312,15 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         setControllerError('');
 
         try {
-            // First check if there's already an active ticket for this controller
-            console.log('🔍 Checking for active ticket for controller:', controllerNumber);
-            console.log('🔍 ticketAPI object:', ticketAPI);
 
             try {
-                console.log('🔍 Calling ticketAPI.checkActiveTicketForController...');
                 const result = await ticketAPI.checkActiveTicketForController(controllerNumber);
-                console.log('✅ No active ticket found, result:', result);
-                // If we reach here, no active ticket exists - continue with LMS fetch
             } catch (checkError) {
-                console.log('❌ Active ticket check error:', checkError);
                 // If status is 400, it means active ticket exists
                 if (checkError.response?.status === 400 && checkError.response?.data?.error) {
-                    console.log('🚫 Active ticket exists:', checkError.response.data.error);
                     throw new Error(checkError.response.data.error);
                 }
                 // For other errors (500, network issues), continue with LMS fetch
-                console.warn('Warning: Could not check for active tickets, continuing with LMS fetch:', checkError.message);
             }
 
             const controllerData = await controllerAPI.getControllerFromLMS(controllerNumber);
@@ -284,7 +406,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             clearErrors(['imei', 'hp', 'motorType', 'motorHpId', 'customerName', 'district', 'state', 'project']);
 
         } catch (error) {
-            console.error('Error fetching controller details:', error);
 
             let errorMessage = 'Failed to fetch controller details from LMS';
 
@@ -422,11 +543,13 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 // ticketCode will be auto-generated by the backend
                 description: data.description,
                 customerName: data.customerName,
+                farmerName: data.farmerName,
                 controllerNo: data.controllerNo,
                 imei: data.imei || '',
                 hp: data.hp || '',
                 motorHpId: data.motorHpId || null,
                 motorType: data.motorType,
+                head: data.head || '',
                 project: data.project,
                 state: data.state, // This will now be the state code
                 district: data.district,
@@ -475,7 +598,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             }
 
         } catch (error) {
-            console.error('Form submission error:', error);
 
             // Show user-friendly error message
             let errorMessage = 'Failed to create ticket. Please try again.';
@@ -515,6 +637,12 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
+
+    const motorTypeOptions = [
+        { value: 'AC', label: 'AC' },
+        { value: 'PMC', label: 'PMC' },
+        { value: 'DC', label: 'DC' }
+    ];
 
     return (
         <motion.section
@@ -589,7 +717,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                                     <span className="hidden xs:inline text-xs sm:text-sm">Fetching...</span>
                                                 </div>
                                             ) : (
-                                                <span className="text-xs sm:text-sm">Fetch</span>
+                                                <span className="text-[10px] sm:text-sm">Fetch</span>
                                             )}
                                         </motion.button>
                                     </div>
@@ -637,7 +765,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                 <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
                                         IMEI
-                                        <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled</span>
+                                        <span className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled</span>
                                     </label>
                                     <input
                                         {...register('imei')}
@@ -716,10 +844,11 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-1.5 xs:gap-2 text-xs sm:text-sm font-medium text-gray-700">
                                         <span className="truncate">Motor Type *</span>
-                                        <span className="text-xs text-blue-600 bg-blue-50 px-1 xs:px-1.5 py-0.5 rounded flex-shrink-0">Auto-filled</span>
+                                        <span className="text-[10px] text-blue-600 bg-blue-50 px-1 xs:px-1.5 py-0.5 rounded flex-shrink-0">Auto-filled</span>
                                     </label>
                                     <input
                                         {...register('motorType')}
+                                        datalist="motorTypeOptions"
                                         className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.motorType ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
                                         placeholder="Motor Type"
@@ -734,8 +863,37 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             {errors.motorType.message}
                                         </motion.p>
                                     )}
+                                    <datalist id="motorTypeOptions">
+                                        {motorTypeOptions.map(option => (
+                                            <option key={option} value={option} />
+                                        ))}
+                                    </datalist>
                                 </motion.div>
-                                {/* Priority */}
+
+                                {/* Head */}
+                                <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
+                                    <label className="block text-xs sm:text-sm font-medium text-gray-700">
+                                        Head
+                                    </label>
+                                    <input
+                                        {...register('head')}
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.head ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            }`}
+                                        placeholder="Head"
+                                    />
+                                    {errors.head && (
+                                        <motion.p
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
+                                        >
+                                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                            {errors.head.message}
+                                        </motion.p>
+                                    )}
+                                </motion.div>
+
+                                {/* Priority 
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="block text-xs sm:text-sm font-medium text-gray-700">
                                         Priority *
@@ -761,7 +919,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             {errors.priority.message}
                                         </motion.p>
                                     )}
-                                </motion.div>
+                                </motion.div>*/}
 
                                 {/* Project */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2 sm:col-span-2">
@@ -808,14 +966,36 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         </motion.p>
                                     )}
                                 </motion.div>
-
+                                {/* Farmer Name */}
+                                <motion.div variants={itemVariants} className="space-y-1 xs:col-span-1 sm:col-span-2 lg:col-span-1 2xl:col-span-2 xs:space-y-1.5 sm:space-y-2">
+                                    <label className="flex items-center gap-1 xs:gap-1.5 text-xs sm:text-sm font-medium text-gray-700">
+                                        <User className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4" />
+                                        <span className="truncate">Farmer Name *</span>
+                                    </label>
+                                    <input
+                                        {...register('farmerName')}
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.farmerName ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            }`}
+                                        placeholder="Farmer Name"
+                                    />
+                                    {errors.farmerName && (
+                                        <motion.p
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
+                                        >
+                                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                            {errors.farmerName.message}
+                                        </motion.p>
+                                    )}
+                                </motion.div>
                                 {/* Customer Name */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:col-span-1 sm:col-span-2 lg:col-span-1 2xl:col-span-2  xs:space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-1 xs:gap-1.5 text-xs sm:text-sm font-medium text-gray-700">
                                         <User className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4" />
                                         <span className="truncate">Customer Name *</span>
                                         {watchedValues.customerName && controllerNo && (
-                                            <span className="text-xs text-blue-600 bg-blue-50 px-1 xs:px-1.5 py-0.5 rounded">Auto-filled</span>
+                                            <span className="text-[10px] text-blue-600 bg-blue-50 px-1 xs:px-1.5 py-0.5 rounded">Auto-filled</span>
                                         )}
                                     </label>
                                     <input
@@ -834,7 +1014,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             {errors.customerName.message}
                                         </motion.p>
                                     )}
-                                </motion.div>
+                                </motion.div>                                
 
                             </div>
 
@@ -850,7 +1030,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
                                             State *
                                             {watchedValues.state && watchedValues.project && (
-                                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled from project</span>
+                                                <span className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled from project</span>
                                             )}
                                         </label>
                                         <select
@@ -895,17 +1075,44 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     {/* District */}
                                     <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
                                         <label className="flex items-center gap-2 text-xs sm:text-sm font-medium text-gray-700">
-                                            District *
+                                            District
                                             {watchedValues.district && watchedValues.project && (
-                                                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled</span>
+                                                <span className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Auto-filled</span>
                                             )}
                                         </label>
-                                        <input
+                                        <select
                                             {...register('district')}
-                                            className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.district ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            disabled={!selectedStateCode || isLoadingDistricts}
+                                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.district ? 'border-red-300 bg-red-50' : 'border-gray-300'} ${!selectedStateCode || isLoadingDistricts ? 'bg-gray-50 cursor-not-allowed' : ''}
                                                 }`}
-                                            placeholder="District"
-                                        />
+                                        >
+                                            <option value="">
+                                                {!selectedStateCode ? 'Select State first' : isLoadingDistricts ? 'Loading districts...' : districts.length === 0 ? 'No districts available' : 'Select District'}
+                                            </option>
+                                            {!isLoadingDistricts && districts.map(district => (
+                                                <option key={district.districtCode} value={district.districtCode}>
+                                                    {district.districtName}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {isLoadingDistricts && (
+                                            <p className="text-xs text-blue-600 flex items-center gap-1">
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                                Loading districts...
+                                            </p>
+                                        )}
+                                        {!selectedStateCode && !isLoadingDistricts && (
+                                            <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                Please select a state first to view districts
+                                            </p>
+                                        )}
+                                        {selectedStateCode && !isLoadingDistricts && districts.length === 0 && (
+                                            <p className="text-xs text-yellow-600 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                No districts available for selected state
+                                            </p>
+                                        )}
                                         {errors.district && (
                                             <motion.p
                                                 initial={{ opacity: 0, y: -10 }}
@@ -918,7 +1125,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         )}
                                     </motion.div>
 
-                                    {/* Block */}
+                                    {/* Block 
                                     <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
                                         <label className="block text-xs sm:text-sm font-medium text-gray-700">
                                             Block
@@ -940,7 +1147,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             </motion.p>
                                         )}
                                     </motion.div>
-
+*/}
                                     {/* Village */}
                                     <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
                                         <label className="block text-xs sm:text-sm font-medium text-gray-700">

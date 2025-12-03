@@ -5,36 +5,35 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
-        where: {
-            isActive: true // Only fetch active projects
-        },
-        select: {
-            projectCode: true,
+      where: {
+        isActive: true, // Only fetch active projects
+      },
+      select: {
+        projectCode: true,
+        name: true,
+        address: true,
+        state: {
+          select: {
+            id: true,
             name: true,
-            address: true,
-            state: {
-                select: {
-                    id: true,
-                    name: true,
-                    stateCode: true
-                }
-            },
-            organisation: {
-                select: {
-                    id: true,
-                    name: true,
-                    orgCode: true,
-                    address: true
-                }
-            }
+            stateCode: true,
+          },
         },
-        orderBy: {
-            name: 'asc'
-        }
+        organisation: {
+          select: {
+            id: true,
+            name: true,
+            orgCode: true,
+            address: true,
+          },
+        },
+      },
+      orderBy: {
+        name: "asc",
+      },
     });
     res.json(projects);
   } catch (error) {
-    console.error("Error fetching projects:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

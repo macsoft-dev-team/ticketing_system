@@ -100,7 +100,6 @@ export default function OrganisationPage() {
                 fetchOrganisations({ skip: 0, take: 10, filter });
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
             // Don't close the modal on error - let user see the error and try again
             throw error; // Re-throw to let the form handle it
         }
@@ -119,7 +118,6 @@ export default function OrganisationPage() {
             setMode(null);
             fetchOrganisations({ skip: 0, take: 10, filter });
         } catch (error) {
-            console.error("Error uploading organisations:", error);
             throw error;
         }
     };

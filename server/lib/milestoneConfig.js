@@ -409,8 +409,6 @@ function validateMilestoneTransition(
     };
     const allowed = allowedTransitions[currentStage] || [];
     if (!allowed.includes(targetStage)) {
-      console.log(`[Milestone Validation] Invalid transition: ${currentStage} -> ${targetStage}`);
-      console.log(`[Milestone Validation] Allowed transitions for ${currentStage}:`, allowed);
       return {
         valid: false,
         error: `Invalid transition from ${

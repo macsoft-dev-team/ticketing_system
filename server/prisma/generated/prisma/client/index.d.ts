@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type State = $Result.DefaultSelection<Prisma.$StatePayload>
 /**
+ * Model district
+ * 
+ */
+export type district = $Result.DefaultSelection<Prisma.$districtPayload>
+/**
  * Model Organisation
  * 
  */
@@ -381,6 +386,16 @@ export class PrismaClient<
     * ```
     */
   get state(): Prisma.StateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.district`: Exposes CRUD operations for the **district** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Districts
+    * const districts = await prisma.district.findMany()
+    * ```
+    */
+  get district(): Prisma.districtDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.organisation`: Exposes CRUD operations for the **Organisation** model.
@@ -1032,6 +1047,7 @@ export namespace Prisma {
 
   export const ModelName: {
     State: 'State',
+    district: 'district',
     Organisation: 'Organisation',
     Project: 'Project',
     ServiceCenter: 'ServiceCenter',
@@ -1071,7 +1087,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "state" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp"
+      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1138,6 +1154,72 @@ export namespace Prisma {
           count: {
             args: Prisma.StateCountArgs<ExtArgs>
             result: $Utils.Optional<StateCountAggregateOutputType> | number
+          }
+        }
+      }
+      district: {
+        payload: Prisma.$districtPayload<ExtArgs>
+        fields: Prisma.districtFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.districtFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.districtFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>
+          }
+          findFirst: {
+            args: Prisma.districtFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.districtFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>
+          }
+          findMany: {
+            args: Prisma.districtFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>[]
+          }
+          create: {
+            args: Prisma.districtCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>
+          }
+          createMany: {
+            args: Prisma.districtCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.districtDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>
+          }
+          update: {
+            args: Prisma.districtUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>
+          }
+          deleteMany: {
+            args: Prisma.districtDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.districtUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.districtUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$districtPayload>
+          }
+          aggregate: {
+            args: Prisma.DistrictAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDistrict>
+          }
+          groupBy: {
+            args: Prisma.districtGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DistrictGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.districtCountArgs<ExtArgs>
+            result: $Utils.Optional<DistrictCountAggregateOutputType> | number
           }
         }
       }
@@ -2624,6 +2706,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     state?: StateOmit
+    district?: districtOmit
     organisation?: OrganisationOmit
     project?: ProjectOmit
     serviceCenter?: ServiceCenterOmit
@@ -2729,6 +2812,7 @@ export namespace Prisma {
     users: number
     projects: number
     tickets: number
+    districts: number
   }
 
   export type StateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2736,6 +2820,7 @@ export namespace Prisma {
     users?: boolean | StateCountOutputTypeCountUsersArgs
     projects?: boolean | StateCountOutputTypeCountProjectsArgs
     tickets?: boolean | StateCountOutputTypeCountTicketsArgs
+    districts?: boolean | StateCountOutputTypeCountDistrictsArgs
   }
 
   // Custom InputTypes
@@ -2774,6 +2859,44 @@ export namespace Prisma {
    * StateCountOutputType without action
    */
   export type StateCountOutputTypeCountTicketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TicketWhereInput
+  }
+
+  /**
+   * StateCountOutputType without action
+   */
+  export type StateCountOutputTypeCountDistrictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: districtWhereInput
+  }
+
+
+  /**
+   * Count Type DistrictCountOutputType
+   */
+
+  export type DistrictCountOutputType = {
+    tickets: number
+  }
+
+  export type DistrictCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tickets?: boolean | DistrictCountOutputTypeCountTicketsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DistrictCountOutputType without action
+   */
+  export type DistrictCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DistrictCountOutputType
+     */
+    select?: DistrictCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DistrictCountOutputType without action
+   */
+  export type DistrictCountOutputTypeCountTicketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TicketWhereInput
   }
 
@@ -3547,6 +3670,7 @@ export namespace Prisma {
     users?: boolean | State$usersArgs<ExtArgs>
     projects?: boolean | State$projectsArgs<ExtArgs>
     tickets?: boolean | State$ticketsArgs<ExtArgs>
+    districts?: boolean | State$districtsArgs<ExtArgs>
     _count?: boolean | StateCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["state"]>
 
@@ -3564,6 +3688,7 @@ export namespace Prisma {
     users?: boolean | State$usersArgs<ExtArgs>
     projects?: boolean | State$projectsArgs<ExtArgs>
     tickets?: boolean | State$ticketsArgs<ExtArgs>
+    districts?: boolean | State$districtsArgs<ExtArgs>
     _count?: boolean | StateCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -3574,6 +3699,7 @@ export namespace Prisma {
       users: Prisma.$UserPayload<ExtArgs>[]
       projects: Prisma.$ProjectPayload<ExtArgs>[]
       tickets: Prisma.$TicketPayload<ExtArgs>[]
+      districts: Prisma.$districtPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -3923,6 +4049,7 @@ export namespace Prisma {
     users<T extends State$usersArgs<ExtArgs> = {}>(args?: Subset<T, State$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     projects<T extends State$projectsArgs<ExtArgs> = {}>(args?: Subset<T, State$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tickets<T extends State$ticketsArgs<ExtArgs> = {}>(args?: Subset<T, State$ticketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    districts<T extends State$districtsArgs<ExtArgs> = {}>(args?: Subset<T, State$districtsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4394,6 +4521,30 @@ export namespace Prisma {
   }
 
   /**
+   * State.districts
+   */
+  export type State$districtsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    where?: districtWhereInput
+    orderBy?: districtOrderByWithRelationInput | districtOrderByWithRelationInput[]
+    cursor?: districtWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
    * State without action
    */
   export type StateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4409,6 +4560,996 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: StateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model district
+   */
+
+  export type AggregateDistrict = {
+    _count: DistrictCountAggregateOutputType | null
+    _avg: DistrictAvgAggregateOutputType | null
+    _sum: DistrictSumAggregateOutputType | null
+    _min: DistrictMinAggregateOutputType | null
+    _max: DistrictMaxAggregateOutputType | null
+  }
+
+  export type DistrictAvgAggregateOutputType = {
+    id: number | null
+    districtCode: number | null
+    stateCode: number | null
+  }
+
+  export type DistrictSumAggregateOutputType = {
+    id: number | null
+    districtCode: number | null
+    stateCode: number | null
+  }
+
+  export type DistrictMinAggregateOutputType = {
+    id: number | null
+    districtName: string | null
+    districtCode: number | null
+    stateCode: number | null
+  }
+
+  export type DistrictMaxAggregateOutputType = {
+    id: number | null
+    districtName: string | null
+    districtCode: number | null
+    stateCode: number | null
+  }
+
+  export type DistrictCountAggregateOutputType = {
+    id: number
+    districtName: number
+    districtCode: number
+    stateCode: number
+    _all: number
+  }
+
+
+  export type DistrictAvgAggregateInputType = {
+    id?: true
+    districtCode?: true
+    stateCode?: true
+  }
+
+  export type DistrictSumAggregateInputType = {
+    id?: true
+    districtCode?: true
+    stateCode?: true
+  }
+
+  export type DistrictMinAggregateInputType = {
+    id?: true
+    districtName?: true
+    districtCode?: true
+    stateCode?: true
+  }
+
+  export type DistrictMaxAggregateInputType = {
+    id?: true
+    districtName?: true
+    districtCode?: true
+    stateCode?: true
+  }
+
+  export type DistrictCountAggregateInputType = {
+    id?: true
+    districtName?: true
+    districtCode?: true
+    stateCode?: true
+    _all?: true
+  }
+
+  export type DistrictAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which district to aggregate.
+     */
+    where?: districtWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of districts to fetch.
+     */
+    orderBy?: districtOrderByWithRelationInput | districtOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: districtWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` districts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned districts
+    **/
+    _count?: true | DistrictCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DistrictAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DistrictSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DistrictMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DistrictMaxAggregateInputType
+  }
+
+  export type GetDistrictAggregateType<T extends DistrictAggregateArgs> = {
+        [P in keyof T & keyof AggregateDistrict]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDistrict[P]>
+      : GetScalarType<T[P], AggregateDistrict[P]>
+  }
+
+
+
+
+  export type districtGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: districtWhereInput
+    orderBy?: districtOrderByWithAggregationInput | districtOrderByWithAggregationInput[]
+    by: DistrictScalarFieldEnum[] | DistrictScalarFieldEnum
+    having?: districtScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DistrictCountAggregateInputType | true
+    _avg?: DistrictAvgAggregateInputType
+    _sum?: DistrictSumAggregateInputType
+    _min?: DistrictMinAggregateInputType
+    _max?: DistrictMaxAggregateInputType
+  }
+
+  export type DistrictGroupByOutputType = {
+    id: number
+    districtName: string
+    districtCode: number
+    stateCode: number
+    _count: DistrictCountAggregateOutputType | null
+    _avg: DistrictAvgAggregateOutputType | null
+    _sum: DistrictSumAggregateOutputType | null
+    _min: DistrictMinAggregateOutputType | null
+    _max: DistrictMaxAggregateOutputType | null
+  }
+
+  type GetDistrictGroupByPayload<T extends districtGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DistrictGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DistrictGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DistrictGroupByOutputType[P]>
+            : GetScalarType<T[P], DistrictGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type districtSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    districtName?: boolean
+    districtCode?: boolean
+    stateCode?: boolean
+    state?: boolean | StateDefaultArgs<ExtArgs>
+    tickets?: boolean | district$ticketsArgs<ExtArgs>
+    _count?: boolean | DistrictCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["district"]>
+
+
+
+  export type districtSelectScalar = {
+    id?: boolean
+    districtName?: boolean
+    districtCode?: boolean
+    stateCode?: boolean
+  }
+
+  export type districtOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "districtName" | "districtCode" | "stateCode", ExtArgs["result"]["district"]>
+  export type districtInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    state?: boolean | StateDefaultArgs<ExtArgs>
+    tickets?: boolean | district$ticketsArgs<ExtArgs>
+    _count?: boolean | DistrictCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $districtPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "district"
+    objects: {
+      state: Prisma.$StatePayload<ExtArgs>
+      tickets: Prisma.$TicketPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      districtName: string
+      districtCode: number
+      stateCode: number
+    }, ExtArgs["result"]["district"]>
+    composites: {}
+  }
+
+  type districtGetPayload<S extends boolean | null | undefined | districtDefaultArgs> = $Result.GetResult<Prisma.$districtPayload, S>
+
+  type districtCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<districtFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DistrictCountAggregateInputType | true
+    }
+
+  export interface districtDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['district'], meta: { name: 'district' } }
+    /**
+     * Find zero or one District that matches the filter.
+     * @param {districtFindUniqueArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends districtFindUniqueArgs>(args: SelectSubset<T, districtFindUniqueArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one District that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {districtFindUniqueOrThrowArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends districtFindUniqueOrThrowArgs>(args: SelectSubset<T, districtFindUniqueOrThrowArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first District that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {districtFindFirstArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends districtFindFirstArgs>(args?: SelectSubset<T, districtFindFirstArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first District that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {districtFindFirstOrThrowArgs} args - Arguments to find a District
+     * @example
+     * // Get one District
+     * const district = await prisma.district.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends districtFindFirstOrThrowArgs>(args?: SelectSubset<T, districtFindFirstOrThrowArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Districts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {districtFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Districts
+     * const districts = await prisma.district.findMany()
+     * 
+     * // Get first 10 Districts
+     * const districts = await prisma.district.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const districtWithIdOnly = await prisma.district.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends districtFindManyArgs>(args?: SelectSubset<T, districtFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a District.
+     * @param {districtCreateArgs} args - Arguments to create a District.
+     * @example
+     * // Create one District
+     * const District = await prisma.district.create({
+     *   data: {
+     *     // ... data to create a District
+     *   }
+     * })
+     * 
+     */
+    create<T extends districtCreateArgs>(args: SelectSubset<T, districtCreateArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Districts.
+     * @param {districtCreateManyArgs} args - Arguments to create many Districts.
+     * @example
+     * // Create many Districts
+     * const district = await prisma.district.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends districtCreateManyArgs>(args?: SelectSubset<T, districtCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a District.
+     * @param {districtDeleteArgs} args - Arguments to delete one District.
+     * @example
+     * // Delete one District
+     * const District = await prisma.district.delete({
+     *   where: {
+     *     // ... filter to delete one District
+     *   }
+     * })
+     * 
+     */
+    delete<T extends districtDeleteArgs>(args: SelectSubset<T, districtDeleteArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one District.
+     * @param {districtUpdateArgs} args - Arguments to update one District.
+     * @example
+     * // Update one District
+     * const district = await prisma.district.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends districtUpdateArgs>(args: SelectSubset<T, districtUpdateArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Districts.
+     * @param {districtDeleteManyArgs} args - Arguments to filter Districts to delete.
+     * @example
+     * // Delete a few Districts
+     * const { count } = await prisma.district.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends districtDeleteManyArgs>(args?: SelectSubset<T, districtDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Districts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {districtUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Districts
+     * const district = await prisma.district.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends districtUpdateManyArgs>(args: SelectSubset<T, districtUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one District.
+     * @param {districtUpsertArgs} args - Arguments to update or create a District.
+     * @example
+     * // Update or create a District
+     * const district = await prisma.district.upsert({
+     *   create: {
+     *     // ... data to create a District
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the District we want to update
+     *   }
+     * })
+     */
+    upsert<T extends districtUpsertArgs>(args: SelectSubset<T, districtUpsertArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Districts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {districtCountArgs} args - Arguments to filter Districts to count.
+     * @example
+     * // Count the number of Districts
+     * const count = await prisma.district.count({
+     *   where: {
+     *     // ... the filter for the Districts we want to count
+     *   }
+     * })
+    **/
+    count<T extends districtCountArgs>(
+      args?: Subset<T, districtCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DistrictCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a District.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DistrictAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DistrictAggregateArgs>(args: Subset<T, DistrictAggregateArgs>): Prisma.PrismaPromise<GetDistrictAggregateType<T>>
+
+    /**
+     * Group by District.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {districtGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends districtGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: districtGroupByArgs['orderBy'] }
+        : { orderBy?: districtGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, districtGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDistrictGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the district model
+   */
+  readonly fields: districtFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for district.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__districtClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    state<T extends StateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StateDefaultArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    tickets<T extends district$ticketsArgs<ExtArgs> = {}>(args?: Subset<T, district$ticketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the district model
+   */
+  interface districtFieldRefs {
+    readonly id: FieldRef<"district", 'Int'>
+    readonly districtName: FieldRef<"district", 'String'>
+    readonly districtCode: FieldRef<"district", 'Int'>
+    readonly stateCode: FieldRef<"district", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * district findUnique
+   */
+  export type districtFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * Filter, which district to fetch.
+     */
+    where: districtWhereUniqueInput
+  }
+
+  /**
+   * district findUniqueOrThrow
+   */
+  export type districtFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * Filter, which district to fetch.
+     */
+    where: districtWhereUniqueInput
+  }
+
+  /**
+   * district findFirst
+   */
+  export type districtFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * Filter, which district to fetch.
+     */
+    where?: districtWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of districts to fetch.
+     */
+    orderBy?: districtOrderByWithRelationInput | districtOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for districts.
+     */
+    cursor?: districtWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` districts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of districts.
+     */
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
+   * district findFirstOrThrow
+   */
+  export type districtFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * Filter, which district to fetch.
+     */
+    where?: districtWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of districts to fetch.
+     */
+    orderBy?: districtOrderByWithRelationInput | districtOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for districts.
+     */
+    cursor?: districtWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` districts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of districts.
+     */
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
+   * district findMany
+   */
+  export type districtFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * Filter, which districts to fetch.
+     */
+    where?: districtWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of districts to fetch.
+     */
+    orderBy?: districtOrderByWithRelationInput | districtOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing districts.
+     */
+    cursor?: districtWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` districts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` districts.
+     */
+    skip?: number
+    distinct?: DistrictScalarFieldEnum | DistrictScalarFieldEnum[]
+  }
+
+  /**
+   * district create
+   */
+  export type districtCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * The data needed to create a district.
+     */
+    data: XOR<districtCreateInput, districtUncheckedCreateInput>
+  }
+
+  /**
+   * district createMany
+   */
+  export type districtCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many districts.
+     */
+    data: districtCreateManyInput | districtCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * district update
+   */
+  export type districtUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * The data needed to update a district.
+     */
+    data: XOR<districtUpdateInput, districtUncheckedUpdateInput>
+    /**
+     * Choose, which district to update.
+     */
+    where: districtWhereUniqueInput
+  }
+
+  /**
+   * district updateMany
+   */
+  export type districtUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update districts.
+     */
+    data: XOR<districtUpdateManyMutationInput, districtUncheckedUpdateManyInput>
+    /**
+     * Filter which districts to update
+     */
+    where?: districtWhereInput
+    /**
+     * Limit how many districts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * district upsert
+   */
+  export type districtUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * The filter to search for the district to update in case it exists.
+     */
+    where: districtWhereUniqueInput
+    /**
+     * In case the district found by the `where` argument doesn't exist, create a new district with this data.
+     */
+    create: XOR<districtCreateInput, districtUncheckedCreateInput>
+    /**
+     * In case the district was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<districtUpdateInput, districtUncheckedUpdateInput>
+  }
+
+  /**
+   * district delete
+   */
+  export type districtDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    /**
+     * Filter which district to delete.
+     */
+    where: districtWhereUniqueInput
+  }
+
+  /**
+   * district deleteMany
+   */
+  export type districtDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which districts to delete
+     */
+    where?: districtWhereInput
+    /**
+     * Limit how many districts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * district.tickets
+   */
+  export type district$ticketsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Ticket
+     */
+    select?: TicketSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Ticket
+     */
+    omit?: TicketOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TicketInclude<ExtArgs> | null
+    where?: TicketWhereInput
+    orderBy?: TicketOrderByWithRelationInput | TicketOrderByWithRelationInput[]
+    cursor?: TicketWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
+
+  /**
+   * district without action
+   */
+  export type districtDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
   }
 
 
@@ -9262,6 +10403,7 @@ export namespace Prisma {
   export type TicketAvgAggregateOutputType = {
     id: number | null
     motorHpId: number | null
+    districtCode: number | null
     createdBy: number | null
     updatedBy: number | null
   }
@@ -9269,6 +10411,7 @@ export namespace Prisma {
   export type TicketSumAggregateOutputType = {
     id: number | null
     motorHpId: number | null
+    districtCode: number | null
     createdBy: number | null
     updatedBy: number | null
   }
@@ -9286,6 +10429,7 @@ export namespace Prisma {
     head: string | null
     motorType: string | null
     stateCode: string | null
+    districtCode: number | null
     district: string | null
     village: string | null
     block: string | null
@@ -9317,6 +10461,7 @@ export namespace Prisma {
     head: string | null
     motorType: string | null
     stateCode: string | null
+    districtCode: number | null
     district: string | null
     village: string | null
     block: string | null
@@ -9348,6 +10493,7 @@ export namespace Prisma {
     head: number
     motorType: number
     stateCode: number
+    districtCode: number
     district: number
     village: number
     block: number
@@ -9371,6 +10517,7 @@ export namespace Prisma {
   export type TicketAvgAggregateInputType = {
     id?: true
     motorHpId?: true
+    districtCode?: true
     createdBy?: true
     updatedBy?: true
   }
@@ -9378,6 +10525,7 @@ export namespace Prisma {
   export type TicketSumAggregateInputType = {
     id?: true
     motorHpId?: true
+    districtCode?: true
     createdBy?: true
     updatedBy?: true
   }
@@ -9395,6 +10543,7 @@ export namespace Prisma {
     head?: true
     motorType?: true
     stateCode?: true
+    districtCode?: true
     district?: true
     village?: true
     block?: true
@@ -9426,6 +10575,7 @@ export namespace Prisma {
     head?: true
     motorType?: true
     stateCode?: true
+    districtCode?: true
     district?: true
     village?: true
     block?: true
@@ -9457,6 +10607,7 @@ export namespace Prisma {
     head?: true
     motorType?: true
     stateCode?: true
+    districtCode?: true
     district?: true
     village?: true
     block?: true
@@ -9575,6 +10726,7 @@ export namespace Prisma {
     head: string | null
     motorType: string | null
     stateCode: string | null
+    districtCode: number | null
     district: string | null
     village: string | null
     block: string | null
@@ -9625,6 +10777,7 @@ export namespace Prisma {
     head?: boolean
     motorType?: boolean
     stateCode?: boolean
+    districtCode?: boolean
     district?: boolean
     village?: boolean
     block?: boolean
@@ -9645,6 +10798,7 @@ export namespace Prisma {
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
     state?: boolean | Ticket$stateArgs<ExtArgs>
+    selectedDistrict?: boolean | Ticket$selectedDistrictArgs<ExtArgs>
     motorhp?: boolean | Ticket$motorhpArgs<ExtArgs>
     messages?: boolean | Ticket$messagesArgs<ExtArgs>
     notifications?: boolean | Ticket$notificationsArgs<ExtArgs>
@@ -9670,6 +10824,7 @@ export namespace Prisma {
     head?: boolean
     motorType?: boolean
     stateCode?: boolean
+    districtCode?: boolean
     district?: boolean
     village?: boolean
     block?: boolean
@@ -9688,12 +10843,13 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "districtCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
     state?: boolean | Ticket$stateArgs<ExtArgs>
+    selectedDistrict?: boolean | Ticket$selectedDistrictArgs<ExtArgs>
     motorhp?: boolean | Ticket$motorhpArgs<ExtArgs>
     messages?: boolean | Ticket$messagesArgs<ExtArgs>
     notifications?: boolean | Ticket$notificationsArgs<ExtArgs>
@@ -9711,6 +10867,7 @@ export namespace Prisma {
       updatedByUser: Prisma.$UserPayload<ExtArgs> | null
       serviceCenter: Prisma.$ServiceCenterPayload<ExtArgs> | null
       state: Prisma.$StatePayload<ExtArgs> | null
+      selectedDistrict: Prisma.$districtPayload<ExtArgs> | null
       motorhp: Prisma.$motorhpPayload<ExtArgs> | null
       messages: Prisma.$MessagePayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
@@ -9732,6 +10889,7 @@ export namespace Prisma {
       head: string | null
       motorType: string | null
       stateCode: string | null
+      districtCode: number | null
       district: string | null
       village: string | null
       block: string | null
@@ -10092,6 +11250,7 @@ export namespace Prisma {
     updatedByUser<T extends Ticket$updatedByUserArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$updatedByUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     serviceCenter<T extends Ticket$serviceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$serviceCenterArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     state<T extends Ticket$stateArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$stateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    selectedDistrict<T extends Ticket$selectedDistrictArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$selectedDistrictArgs<ExtArgs>>): Prisma__districtClient<$Result.GetResult<Prisma.$districtPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     motorhp<T extends Ticket$motorhpArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$motorhpArgs<ExtArgs>>): Prisma__motorhpClient<$Result.GetResult<Prisma.$motorhpPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     messages<T extends Ticket$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends Ticket$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, Ticket$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -10140,6 +11299,7 @@ export namespace Prisma {
     readonly head: FieldRef<"Ticket", 'String'>
     readonly motorType: FieldRef<"Ticket", 'String'>
     readonly stateCode: FieldRef<"Ticket", 'String'>
+    readonly districtCode: FieldRef<"Ticket", 'Int'>
     readonly district: FieldRef<"Ticket", 'String'>
     readonly village: FieldRef<"Ticket", 'String'>
     readonly block: FieldRef<"Ticket", 'String'>
@@ -10553,6 +11713,25 @@ export namespace Prisma {
      */
     include?: StateInclude<ExtArgs> | null
     where?: StateWhereInput
+  }
+
+  /**
+   * Ticket.selectedDistrict
+   */
+  export type Ticket$selectedDistrictArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the district
+     */
+    select?: districtSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the district
+     */
+    omit?: districtOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: districtInclude<ExtArgs> | null
+    where?: districtWhereInput
   }
 
   /**
@@ -27165,6 +28344,16 @@ export namespace Prisma {
   export type StateScalarFieldEnum = (typeof StateScalarFieldEnum)[keyof typeof StateScalarFieldEnum]
 
 
+  export const DistrictScalarFieldEnum: {
+    id: 'id',
+    districtName: 'districtName',
+    districtCode: 'districtCode',
+    stateCode: 'stateCode'
+  };
+
+  export type DistrictScalarFieldEnum = (typeof DistrictScalarFieldEnum)[keyof typeof DistrictScalarFieldEnum]
+
+
   export const OrganisationScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -27248,6 +28437,7 @@ export namespace Prisma {
     head: 'head',
     motorType: 'motorType',
     stateCode: 'stateCode',
+    districtCode: 'districtCode',
     district: 'district',
     village: 'village',
     block: 'block',
@@ -27504,6 +28694,13 @@ export namespace Prisma {
   };
 
   export type StateOrderByRelevanceFieldEnum = (typeof StateOrderByRelevanceFieldEnum)[keyof typeof StateOrderByRelevanceFieldEnum]
+
+
+  export const districtOrderByRelevanceFieldEnum: {
+    districtName: 'districtName'
+  };
+
+  export type districtOrderByRelevanceFieldEnum = (typeof districtOrderByRelevanceFieldEnum)[keyof typeof districtOrderByRelevanceFieldEnum]
 
 
   export const OrganisationOrderByRelevanceFieldEnum: {
@@ -27790,6 +28987,7 @@ export namespace Prisma {
     users?: UserListRelationFilter
     projects?: ProjectListRelationFilter
     tickets?: TicketListRelationFilter
+    districts?: DistrictListRelationFilter
   }
 
   export type StateOrderByWithRelationInput = {
@@ -27800,6 +28998,7 @@ export namespace Prisma {
     users?: UserOrderByRelationAggregateInput
     projects?: ProjectOrderByRelationAggregateInput
     tickets?: TicketOrderByRelationAggregateInput
+    districts?: districtOrderByRelationAggregateInput
     _relevance?: StateOrderByRelevanceInput
   }
 
@@ -27814,6 +29013,7 @@ export namespace Prisma {
     users?: UserListRelationFilter
     projects?: ProjectListRelationFilter
     tickets?: TicketListRelationFilter
+    districts?: DistrictListRelationFilter
   }, "id" | "stateCode">
 
   export type StateOrderByWithAggregationInput = {
@@ -27834,6 +29034,62 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"State"> | number
     name?: StringWithAggregatesFilter<"State"> | string
     stateCode?: StringNullableWithAggregatesFilter<"State"> | string | null
+  }
+
+  export type districtWhereInput = {
+    AND?: districtWhereInput | districtWhereInput[]
+    OR?: districtWhereInput[]
+    NOT?: districtWhereInput | districtWhereInput[]
+    id?: IntFilter<"district"> | number
+    districtName?: StringFilter<"district"> | string
+    districtCode?: IntFilter<"district"> | number
+    stateCode?: IntFilter<"district"> | number
+    state?: XOR<StateScalarRelationFilter, StateWhereInput>
+    tickets?: TicketListRelationFilter
+  }
+
+  export type districtOrderByWithRelationInput = {
+    id?: SortOrder
+    districtName?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
+    state?: StateOrderByWithRelationInput
+    tickets?: TicketOrderByRelationAggregateInput
+    _relevance?: districtOrderByRelevanceInput
+  }
+
+  export type districtWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    districtCode?: number
+    AND?: districtWhereInput | districtWhereInput[]
+    OR?: districtWhereInput[]
+    NOT?: districtWhereInput | districtWhereInput[]
+    districtName?: StringFilter<"district"> | string
+    stateCode?: IntFilter<"district"> | number
+    state?: XOR<StateScalarRelationFilter, StateWhereInput>
+    tickets?: TicketListRelationFilter
+  }, "id" | "districtCode">
+
+  export type districtOrderByWithAggregationInput = {
+    id?: SortOrder
+    districtName?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
+    _count?: districtCountOrderByAggregateInput
+    _avg?: districtAvgOrderByAggregateInput
+    _max?: districtMaxOrderByAggregateInput
+    _min?: districtMinOrderByAggregateInput
+    _sum?: districtSumOrderByAggregateInput
+  }
+
+  export type districtScalarWhereWithAggregatesInput = {
+    AND?: districtScalarWhereWithAggregatesInput | districtScalarWhereWithAggregatesInput[]
+    OR?: districtScalarWhereWithAggregatesInput[]
+    NOT?: districtScalarWhereWithAggregatesInput | districtScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"district"> | number
+    districtName?: StringWithAggregatesFilter<"district"> | string
+    districtCode?: IntWithAggregatesFilter<"district"> | number
+    stateCode?: IntWithAggregatesFilter<"district"> | number
   }
 
   export type OrganisationWhereInput = {
@@ -28280,6 +29536,7 @@ export namespace Prisma {
     head?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     stateCode?: StringNullableFilter<"Ticket"> | string | null
+    districtCode?: IntNullableFilter<"Ticket"> | number | null
     district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
@@ -28300,6 +29557,7 @@ export namespace Prisma {
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
+    selectedDistrict?: XOR<DistrictNullableScalarRelationFilter, districtWhereInput> | null
     motorhp?: XOR<MotorhpNullableScalarRelationFilter, motorhpWhereInput> | null
     messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
@@ -28322,6 +29580,7 @@ export namespace Prisma {
     head?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
     stateCode?: SortOrderInput | SortOrder
+    districtCode?: SortOrderInput | SortOrder
     district?: SortOrderInput | SortOrder
     village?: SortOrderInput | SortOrder
     block?: SortOrderInput | SortOrder
@@ -28342,6 +29601,7 @@ export namespace Prisma {
     updatedByUser?: UserOrderByWithRelationInput
     serviceCenter?: ServiceCenterOrderByWithRelationInput
     state?: StateOrderByWithRelationInput
+    selectedDistrict?: districtOrderByWithRelationInput
     motorhp?: motorhpOrderByWithRelationInput
     messages?: MessageOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
@@ -28368,6 +29628,7 @@ export namespace Prisma {
     head?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     stateCode?: StringNullableFilter<"Ticket"> | string | null
+    districtCode?: IntNullableFilter<"Ticket"> | number | null
     district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
@@ -28388,6 +29649,7 @@ export namespace Prisma {
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
+    selectedDistrict?: XOR<DistrictNullableScalarRelationFilter, districtWhereInput> | null
     motorhp?: XOR<MotorhpNullableScalarRelationFilter, motorhpWhereInput> | null
     messages?: MessageListRelationFilter
     notifications?: NotificationListRelationFilter
@@ -28410,6 +29672,7 @@ export namespace Prisma {
     head?: SortOrderInput | SortOrder
     motorType?: SortOrderInput | SortOrder
     stateCode?: SortOrderInput | SortOrder
+    districtCode?: SortOrderInput | SortOrder
     district?: SortOrderInput | SortOrder
     village?: SortOrderInput | SortOrder
     block?: SortOrderInput | SortOrder
@@ -28449,6 +29712,7 @@ export namespace Prisma {
     head?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     motorType?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     stateCode?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    districtCode?: IntNullableWithAggregatesFilter<"Ticket"> | number | null
     district?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     village?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     block?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
@@ -29650,6 +30914,7 @@ export namespace Prisma {
     users?: UserCreateNestedManyWithoutStatesInput
     projects?: ProjectCreateNestedManyWithoutStateInput
     tickets?: TicketCreateNestedManyWithoutStateInput
+    districts?: districtCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateInput = {
@@ -29660,6 +30925,7 @@ export namespace Prisma {
     users?: UserUncheckedCreateNestedManyWithoutStatesInput
     projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
     tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
+    districts?: districtUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateUpdateInput = {
@@ -29669,6 +30935,7 @@ export namespace Prisma {
     users?: UserUpdateManyWithoutStatesNestedInput
     projects?: ProjectUpdateManyWithoutStateNestedInput
     tickets?: TicketUpdateManyWithoutStateNestedInput
+    districts?: districtUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateInput = {
@@ -29679,6 +30946,7 @@ export namespace Prisma {
     users?: UserUncheckedUpdateManyWithoutStatesNestedInput
     projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
     tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
+    districts?: districtUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type StateCreateManyInput = {
@@ -29696,6 +30964,55 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type districtCreateInput = {
+    districtName: string
+    districtCode: number
+    state: StateCreateNestedOneWithoutDistrictsInput
+    tickets?: TicketCreateNestedManyWithoutSelectedDistrictInput
+  }
+
+  export type districtUncheckedCreateInput = {
+    id?: number
+    districtName: string
+    districtCode: number
+    stateCode: number
+    tickets?: TicketUncheckedCreateNestedManyWithoutSelectedDistrictInput
+  }
+
+  export type districtUpdateInput = {
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    state?: StateUpdateOneRequiredWithoutDistrictsNestedInput
+    tickets?: TicketUpdateManyWithoutSelectedDistrictNestedInput
+  }
+
+  export type districtUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    stateCode?: IntFieldUpdateOperationsInput | number
+    tickets?: TicketUncheckedUpdateManyWithoutSelectedDistrictNestedInput
+  }
+
+  export type districtCreateManyInput = {
+    id?: number
+    districtName: string
+    districtCode: number
+    stateCode: number
+  }
+
+  export type districtUpdateManyMutationInput = {
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type districtUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    stateCode?: IntFieldUpdateOperationsInput | number
   }
 
   export type OrganisationCreateInput = {
@@ -30188,6 +31505,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -30210,6 +31528,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30261,6 +31580,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -30283,6 +31603,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30320,6 +31641,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -30376,6 +31698,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31578,6 +32901,12 @@ export namespace Prisma {
     none?: TicketWhereInput
   }
 
+  export type DistrictListRelationFilter = {
+    every?: districtWhereInput
+    some?: districtWhereInput
+    none?: districtWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -31592,6 +32921,10 @@ export namespace Prisma {
   }
 
   export type TicketOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type districtOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31677,6 +33010,50 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type StateScalarRelationFilter = {
+    is?: StateWhereInput
+    isNot?: StateWhereInput
+  }
+
+  export type districtOrderByRelevanceInput = {
+    fields: districtOrderByRelevanceFieldEnum | districtOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type districtCountOrderByAggregateInput = {
+    id?: SortOrder
+    districtName?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
+  }
+
+  export type districtAvgOrderByAggregateInput = {
+    id?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
+  }
+
+  export type districtMaxOrderByAggregateInput = {
+    id?: SortOrder
+    districtName?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
+  }
+
+  export type districtMinOrderByAggregateInput = {
+    id?: SortOrder
+    districtName?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
+  }
+
+  export type districtSumOrderByAggregateInput = {
+    id?: SortOrder
+    districtCode?: SortOrder
+    stateCode?: SortOrder
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -32159,6 +33536,11 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
+  export type DistrictNullableScalarRelationFilter = {
+    is?: districtWhereInput | null
+    isNot?: districtWhereInput | null
+  }
+
   export type MotorhpNullableScalarRelationFilter = {
     is?: motorhpWhereInput | null
     isNot?: motorhpWhereInput | null
@@ -32203,6 +33585,7 @@ export namespace Prisma {
     head?: SortOrder
     motorType?: SortOrder
     stateCode?: SortOrder
+    districtCode?: SortOrder
     district?: SortOrder
     village?: SortOrder
     block?: SortOrder
@@ -32224,6 +33607,7 @@ export namespace Prisma {
   export type TicketAvgOrderByAggregateInput = {
     id?: SortOrder
     motorHpId?: SortOrder
+    districtCode?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
   }
@@ -32241,6 +33625,7 @@ export namespace Prisma {
     head?: SortOrder
     motorType?: SortOrder
     stateCode?: SortOrder
+    districtCode?: SortOrder
     district?: SortOrder
     village?: SortOrder
     block?: SortOrder
@@ -32272,6 +33657,7 @@ export namespace Prisma {
     head?: SortOrder
     motorType?: SortOrder
     stateCode?: SortOrder
+    districtCode?: SortOrder
     district?: SortOrder
     village?: SortOrder
     block?: SortOrder
@@ -32293,6 +33679,7 @@ export namespace Prisma {
   export type TicketSumOrderByAggregateInput = {
     id?: SortOrder
     motorHpId?: SortOrder
+    districtCode?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
   }
@@ -33286,6 +34673,13 @@ export namespace Prisma {
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
 
+  export type districtCreateNestedManyWithoutStateInput = {
+    create?: XOR<districtCreateWithoutStateInput, districtUncheckedCreateWithoutStateInput> | districtCreateWithoutStateInput[] | districtUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: districtCreateOrConnectWithoutStateInput | districtCreateOrConnectWithoutStateInput[]
+    createMany?: districtCreateManyStateInputEnvelope
+    connect?: districtWhereUniqueInput | districtWhereUniqueInput[]
+  }
+
   export type UserUncheckedCreateNestedManyWithoutStateInput = {
     create?: XOR<UserCreateWithoutStateInput, UserUncheckedCreateWithoutStateInput> | UserCreateWithoutStateInput[] | UserUncheckedCreateWithoutStateInput[]
     connectOrCreate?: UserCreateOrConnectWithoutStateInput | UserCreateOrConnectWithoutStateInput[]
@@ -33311,6 +34705,13 @@ export namespace Prisma {
     connectOrCreate?: TicketCreateOrConnectWithoutStateInput | TicketCreateOrConnectWithoutStateInput[]
     createMany?: TicketCreateManyStateInputEnvelope
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
+  export type districtUncheckedCreateNestedManyWithoutStateInput = {
+    create?: XOR<districtCreateWithoutStateInput, districtUncheckedCreateWithoutStateInput> | districtCreateWithoutStateInput[] | districtUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: districtCreateOrConnectWithoutStateInput | districtCreateOrConnectWithoutStateInput[]
+    createMany?: districtCreateManyStateInputEnvelope
+    connect?: districtWhereUniqueInput | districtWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -33376,6 +34777,20 @@ export namespace Prisma {
     deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
   }
 
+  export type districtUpdateManyWithoutStateNestedInput = {
+    create?: XOR<districtCreateWithoutStateInput, districtUncheckedCreateWithoutStateInput> | districtCreateWithoutStateInput[] | districtUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: districtCreateOrConnectWithoutStateInput | districtCreateOrConnectWithoutStateInput[]
+    upsert?: districtUpsertWithWhereUniqueWithoutStateInput | districtUpsertWithWhereUniqueWithoutStateInput[]
+    createMany?: districtCreateManyStateInputEnvelope
+    set?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    disconnect?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    delete?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    connect?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    update?: districtUpdateWithWhereUniqueWithoutStateInput | districtUpdateWithWhereUniqueWithoutStateInput[]
+    updateMany?: districtUpdateManyWithWhereWithoutStateInput | districtUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: districtScalarWhereInput | districtScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -33436,6 +34851,76 @@ export namespace Prisma {
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
     update?: TicketUpdateWithWhereUniqueWithoutStateInput | TicketUpdateWithWhereUniqueWithoutStateInput[]
     updateMany?: TicketUpdateManyWithWhereWithoutStateInput | TicketUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
+  export type districtUncheckedUpdateManyWithoutStateNestedInput = {
+    create?: XOR<districtCreateWithoutStateInput, districtUncheckedCreateWithoutStateInput> | districtCreateWithoutStateInput[] | districtUncheckedCreateWithoutStateInput[]
+    connectOrCreate?: districtCreateOrConnectWithoutStateInput | districtCreateOrConnectWithoutStateInput[]
+    upsert?: districtUpsertWithWhereUniqueWithoutStateInput | districtUpsertWithWhereUniqueWithoutStateInput[]
+    createMany?: districtCreateManyStateInputEnvelope
+    set?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    disconnect?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    delete?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    connect?: districtWhereUniqueInput | districtWhereUniqueInput[]
+    update?: districtUpdateWithWhereUniqueWithoutStateInput | districtUpdateWithWhereUniqueWithoutStateInput[]
+    updateMany?: districtUpdateManyWithWhereWithoutStateInput | districtUpdateManyWithWhereWithoutStateInput[]
+    deleteMany?: districtScalarWhereInput | districtScalarWhereInput[]
+  }
+
+  export type StateCreateNestedOneWithoutDistrictsInput = {
+    create?: XOR<StateCreateWithoutDistrictsInput, StateUncheckedCreateWithoutDistrictsInput>
+    connectOrCreate?: StateCreateOrConnectWithoutDistrictsInput
+    connect?: StateWhereUniqueInput
+  }
+
+  export type TicketCreateNestedManyWithoutSelectedDistrictInput = {
+    create?: XOR<TicketCreateWithoutSelectedDistrictInput, TicketUncheckedCreateWithoutSelectedDistrictInput> | TicketCreateWithoutSelectedDistrictInput[] | TicketUncheckedCreateWithoutSelectedDistrictInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutSelectedDistrictInput | TicketCreateOrConnectWithoutSelectedDistrictInput[]
+    createMany?: TicketCreateManySelectedDistrictInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
+  export type TicketUncheckedCreateNestedManyWithoutSelectedDistrictInput = {
+    create?: XOR<TicketCreateWithoutSelectedDistrictInput, TicketUncheckedCreateWithoutSelectedDistrictInput> | TicketCreateWithoutSelectedDistrictInput[] | TicketUncheckedCreateWithoutSelectedDistrictInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutSelectedDistrictInput | TicketCreateOrConnectWithoutSelectedDistrictInput[]
+    createMany?: TicketCreateManySelectedDistrictInputEnvelope
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
+  export type StateUpdateOneRequiredWithoutDistrictsNestedInput = {
+    create?: XOR<StateCreateWithoutDistrictsInput, StateUncheckedCreateWithoutDistrictsInput>
+    connectOrCreate?: StateCreateOrConnectWithoutDistrictsInput
+    upsert?: StateUpsertWithoutDistrictsInput
+    connect?: StateWhereUniqueInput
+    update?: XOR<XOR<StateUpdateToOneWithWhereWithoutDistrictsInput, StateUpdateWithoutDistrictsInput>, StateUncheckedUpdateWithoutDistrictsInput>
+  }
+
+  export type TicketUpdateManyWithoutSelectedDistrictNestedInput = {
+    create?: XOR<TicketCreateWithoutSelectedDistrictInput, TicketUncheckedCreateWithoutSelectedDistrictInput> | TicketCreateWithoutSelectedDistrictInput[] | TicketUncheckedCreateWithoutSelectedDistrictInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutSelectedDistrictInput | TicketCreateOrConnectWithoutSelectedDistrictInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutSelectedDistrictInput | TicketUpsertWithWhereUniqueWithoutSelectedDistrictInput[]
+    createMany?: TicketCreateManySelectedDistrictInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutSelectedDistrictInput | TicketUpdateWithWhereUniqueWithoutSelectedDistrictInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutSelectedDistrictInput | TicketUpdateManyWithWhereWithoutSelectedDistrictInput[]
+    deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
+  export type TicketUncheckedUpdateManyWithoutSelectedDistrictNestedInput = {
+    create?: XOR<TicketCreateWithoutSelectedDistrictInput, TicketUncheckedCreateWithoutSelectedDistrictInput> | TicketCreateWithoutSelectedDistrictInput[] | TicketUncheckedCreateWithoutSelectedDistrictInput[]
+    connectOrCreate?: TicketCreateOrConnectWithoutSelectedDistrictInput | TicketCreateOrConnectWithoutSelectedDistrictInput[]
+    upsert?: TicketUpsertWithWhereUniqueWithoutSelectedDistrictInput | TicketUpsertWithWhereUniqueWithoutSelectedDistrictInput[]
+    createMany?: TicketCreateManySelectedDistrictInputEnvelope
+    set?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    disconnect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    delete?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+    update?: TicketUpdateWithWhereUniqueWithoutSelectedDistrictInput | TicketUpdateWithWhereUniqueWithoutSelectedDistrictInput[]
+    updateMany?: TicketUpdateManyWithWhereWithoutSelectedDistrictInput | TicketUpdateManyWithWhereWithoutSelectedDistrictInput[]
     deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
   }
 
@@ -34393,6 +35878,12 @@ export namespace Prisma {
     connect?: StateWhereUniqueInput
   }
 
+  export type districtCreateNestedOneWithoutTicketsInput = {
+    create?: XOR<districtCreateWithoutTicketsInput, districtUncheckedCreateWithoutTicketsInput>
+    connectOrCreate?: districtCreateOrConnectWithoutTicketsInput
+    connect?: districtWhereUniqueInput
+  }
+
   export type motorhpCreateNestedOneWithoutTicketsInput = {
     create?: XOR<motorhpCreateWithoutTicketsInput, motorhpUncheckedCreateWithoutTicketsInput>
     connectOrCreate?: motorhpCreateOrConnectWithoutTicketsInput
@@ -34523,6 +36014,16 @@ export namespace Prisma {
     delete?: StateWhereInput | boolean
     connect?: StateWhereUniqueInput
     update?: XOR<XOR<StateUpdateToOneWithWhereWithoutTicketsInput, StateUpdateWithoutTicketsInput>, StateUncheckedUpdateWithoutTicketsInput>
+  }
+
+  export type districtUpdateOneWithoutTicketsNestedInput = {
+    create?: XOR<districtCreateWithoutTicketsInput, districtUncheckedCreateWithoutTicketsInput>
+    connectOrCreate?: districtCreateOrConnectWithoutTicketsInput
+    upsert?: districtUpsertWithoutTicketsInput
+    disconnect?: districtWhereInput | boolean
+    delete?: districtWhereInput | boolean
+    connect?: districtWhereUniqueInput
+    update?: XOR<XOR<districtUpdateToOneWithWhereWithoutTicketsInput, districtUpdateWithoutTicketsInput>, districtUncheckedUpdateWithoutTicketsInput>
   }
 
   export type motorhpUpdateOneWithoutTicketsNestedInput = {
@@ -36096,6 +37597,7 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -36117,6 +37619,7 @@ export namespace Prisma {
     motorHpId?: number | null
     head?: string | null
     motorType?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -36148,6 +37651,29 @@ export namespace Prisma {
 
   export type TicketCreateManyStateInputEnvelope = {
     data: TicketCreateManyStateInput | TicketCreateManyStateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type districtCreateWithoutStateInput = {
+    districtName: string
+    districtCode: number
+    tickets?: TicketCreateNestedManyWithoutSelectedDistrictInput
+  }
+
+  export type districtUncheckedCreateWithoutStateInput = {
+    id?: number
+    districtName: string
+    districtCode: number
+    tickets?: TicketUncheckedCreateNestedManyWithoutSelectedDistrictInput
+  }
+
+  export type districtCreateOrConnectWithoutStateInput = {
+    where: districtWhereUniqueInput
+    create: XOR<districtCreateWithoutStateInput, districtUncheckedCreateWithoutStateInput>
+  }
+
+  export type districtCreateManyStateInputEnvelope = {
+    data: districtCreateManyStateInput | districtCreateManyStateInput[]
     skipDuplicates?: boolean
   }
 
@@ -36268,6 +37794,7 @@ export namespace Prisma {
     head?: StringNullableFilter<"Ticket"> | string | null
     motorType?: StringNullableFilter<"Ticket"> | string | null
     stateCode?: StringNullableFilter<"Ticket"> | string | null
+    districtCode?: IntNullableFilter<"Ticket"> | number | null
     district?: StringNullableFilter<"Ticket"> | string | null
     village?: StringNullableFilter<"Ticket"> | string | null
     block?: StringNullableFilter<"Ticket"> | string | null
@@ -36284,6 +37811,185 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+  }
+
+  export type districtUpsertWithWhereUniqueWithoutStateInput = {
+    where: districtWhereUniqueInput
+    update: XOR<districtUpdateWithoutStateInput, districtUncheckedUpdateWithoutStateInput>
+    create: XOR<districtCreateWithoutStateInput, districtUncheckedCreateWithoutStateInput>
+  }
+
+  export type districtUpdateWithWhereUniqueWithoutStateInput = {
+    where: districtWhereUniqueInput
+    data: XOR<districtUpdateWithoutStateInput, districtUncheckedUpdateWithoutStateInput>
+  }
+
+  export type districtUpdateManyWithWhereWithoutStateInput = {
+    where: districtScalarWhereInput
+    data: XOR<districtUpdateManyMutationInput, districtUncheckedUpdateManyWithoutStateInput>
+  }
+
+  export type districtScalarWhereInput = {
+    AND?: districtScalarWhereInput | districtScalarWhereInput[]
+    OR?: districtScalarWhereInput[]
+    NOT?: districtScalarWhereInput | districtScalarWhereInput[]
+    id?: IntFilter<"district"> | number
+    districtName?: StringFilter<"district"> | string
+    districtCode?: IntFilter<"district"> | number
+    stateCode?: IntFilter<"district"> | number
+  }
+
+  export type StateCreateWithoutDistrictsInput = {
+    name: string
+    stateCode?: string | null
+    primaryUsers?: UserCreateNestedManyWithoutStateInput
+    users?: UserCreateNestedManyWithoutStatesInput
+    projects?: ProjectCreateNestedManyWithoutStateInput
+    tickets?: TicketCreateNestedManyWithoutStateInput
+  }
+
+  export type StateUncheckedCreateWithoutDistrictsInput = {
+    id?: number
+    name: string
+    stateCode?: string | null
+    primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
+    users?: UserUncheckedCreateNestedManyWithoutStatesInput
+    projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
+    tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
+  }
+
+  export type StateCreateOrConnectWithoutDistrictsInput = {
+    where: StateWhereUniqueInput
+    create: XOR<StateCreateWithoutDistrictsInput, StateUncheckedCreateWithoutDistrictsInput>
+  }
+
+  export type TicketCreateWithoutSelectedDistrictInput = {
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    farmerName?: string | null
+    imei?: string | null
+    hp?: string | null
+    head?: string | null
+    motorType?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
+    updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
+    state?: StateCreateNestedOneWithoutTicketsInput
+    motorhp?: motorhpCreateNestedOneWithoutTicketsInput
+    messages?: MessageCreateNestedManyWithoutTicketInput
+    notifications?: NotificationCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketUncheckedCreateWithoutSelectedDistrictInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    farmerName?: string | null
+    imei?: string | null
+    hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
+    motorType?: string | null
+    stateCode?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
+    attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
+    ticketMilestones?: TicketMilestoneUncheckedCreateNestedManyWithoutTicketInput
+    batchItems?: batchItemUncheckedCreateNestedManyWithoutTicketInput
+  }
+
+  export type TicketCreateOrConnectWithoutSelectedDistrictInput = {
+    where: TicketWhereUniqueInput
+    create: XOR<TicketCreateWithoutSelectedDistrictInput, TicketUncheckedCreateWithoutSelectedDistrictInput>
+  }
+
+  export type TicketCreateManySelectedDistrictInputEnvelope = {
+    data: TicketCreateManySelectedDistrictInput | TicketCreateManySelectedDistrictInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StateUpsertWithoutDistrictsInput = {
+    update: XOR<StateUpdateWithoutDistrictsInput, StateUncheckedUpdateWithoutDistrictsInput>
+    create: XOR<StateCreateWithoutDistrictsInput, StateUncheckedCreateWithoutDistrictsInput>
+    where?: StateWhereInput
+  }
+
+  export type StateUpdateToOneWithWhereWithoutDistrictsInput = {
+    where?: StateWhereInput
+    data: XOR<StateUpdateWithoutDistrictsInput, StateUncheckedUpdateWithoutDistrictsInput>
+  }
+
+  export type StateUpdateWithoutDistrictsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUpdateManyWithoutStateNestedInput
+    users?: UserUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUpdateManyWithoutStateNestedInput
+    tickets?: TicketUpdateManyWithoutStateNestedInput
+  }
+
+  export type StateUncheckedUpdateWithoutDistrictsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
+    users?: UserUncheckedUpdateManyWithoutStatesNestedInput
+    projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
+    tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
+  }
+
+  export type TicketUpsertWithWhereUniqueWithoutSelectedDistrictInput = {
+    where: TicketWhereUniqueInput
+    update: XOR<TicketUpdateWithoutSelectedDistrictInput, TicketUncheckedUpdateWithoutSelectedDistrictInput>
+    create: XOR<TicketCreateWithoutSelectedDistrictInput, TicketUncheckedCreateWithoutSelectedDistrictInput>
+  }
+
+  export type TicketUpdateWithWhereUniqueWithoutSelectedDistrictInput = {
+    where: TicketWhereUniqueInput
+    data: XOR<TicketUpdateWithoutSelectedDistrictInput, TicketUncheckedUpdateWithoutSelectedDistrictInput>
+  }
+
+  export type TicketUpdateManyWithWhereWithoutSelectedDistrictInput = {
+    where: TicketScalarWhereInput
+    data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutSelectedDistrictInput>
   }
 
   export type ProjectCreateWithoutOrganisationInput = {
@@ -36469,6 +38175,7 @@ export namespace Prisma {
     primaryUsers?: UserCreateNestedManyWithoutStateInput
     users?: UserCreateNestedManyWithoutStatesInput
     tickets?: TicketCreateNestedManyWithoutStateInput
+    districts?: districtCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutProjectsInput = {
@@ -36478,6 +38185,7 @@ export namespace Prisma {
     primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
     users?: UserUncheckedCreateNestedManyWithoutStatesInput
     tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
+    districts?: districtUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutProjectsInput = {
@@ -36634,6 +38342,7 @@ export namespace Prisma {
     primaryUsers?: UserUpdateManyWithoutStateNestedInput
     users?: UserUpdateManyWithoutStatesNestedInput
     tickets?: TicketUpdateManyWithoutStateNestedInput
+    districts?: districtUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateWithoutProjectsInput = {
@@ -36643,6 +38352,7 @@ export namespace Prisma {
     primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
     users?: UserUncheckedUpdateManyWithoutStatesNestedInput
     tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
+    districts?: districtUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type OrganisationUpsertWithoutProjectInput = {
@@ -36826,6 +38536,7 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -36848,6 +38559,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -37013,6 +38725,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -37035,6 +38748,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -37094,6 +38808,7 @@ export namespace Prisma {
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -37116,6 +38831,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -37395,6 +39111,7 @@ export namespace Prisma {
     users?: UserCreateNestedManyWithoutStatesInput
     projects?: ProjectCreateNestedManyWithoutStateInput
     tickets?: TicketCreateNestedManyWithoutStateInput
+    districts?: districtCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutPrimaryUsersInput = {
@@ -37404,6 +39121,7 @@ export namespace Prisma {
     users?: UserUncheckedCreateNestedManyWithoutStatesInput
     projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
     tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
+    districts?: districtUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutPrimaryUsersInput = {
@@ -37417,6 +39135,7 @@ export namespace Prisma {
     primaryUsers?: UserCreateNestedManyWithoutStateInput
     projects?: ProjectCreateNestedManyWithoutStateInput
     tickets?: TicketCreateNestedManyWithoutStateInput
+    districts?: districtCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutUsersInput = {
@@ -37426,6 +39145,7 @@ export namespace Prisma {
     primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
     projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
     tickets?: TicketUncheckedCreateNestedManyWithoutStateInput
+    districts?: districtUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutUsersInput = {
@@ -37874,6 +39594,7 @@ export namespace Prisma {
     users?: UserUpdateManyWithoutStatesNestedInput
     projects?: ProjectUpdateManyWithoutStateNestedInput
     tickets?: TicketUpdateManyWithoutStateNestedInput
+    districts?: districtUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateWithoutPrimaryUsersInput = {
@@ -37883,6 +39604,7 @@ export namespace Prisma {
     users?: UserUncheckedUpdateManyWithoutStatesNestedInput
     projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
     tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
+    districts?: districtUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type StateUpsertWithWhereUniqueWithoutUsersInput = {
@@ -38198,6 +39920,7 @@ export namespace Prisma {
     primaryUsers?: UserCreateNestedManyWithoutStateInput
     users?: UserCreateNestedManyWithoutStatesInput
     projects?: ProjectCreateNestedManyWithoutStateInput
+    districts?: districtCreateNestedManyWithoutStateInput
   }
 
   export type StateUncheckedCreateWithoutTicketsInput = {
@@ -38207,11 +39930,30 @@ export namespace Prisma {
     primaryUsers?: UserUncheckedCreateNestedManyWithoutStateInput
     users?: UserUncheckedCreateNestedManyWithoutStatesInput
     projects?: ProjectUncheckedCreateNestedManyWithoutStateInput
+    districts?: districtUncheckedCreateNestedManyWithoutStateInput
   }
 
   export type StateCreateOrConnectWithoutTicketsInput = {
     where: StateWhereUniqueInput
     create: XOR<StateCreateWithoutTicketsInput, StateUncheckedCreateWithoutTicketsInput>
+  }
+
+  export type districtCreateWithoutTicketsInput = {
+    districtName: string
+    districtCode: number
+    state: StateCreateNestedOneWithoutDistrictsInput
+  }
+
+  export type districtUncheckedCreateWithoutTicketsInput = {
+    id?: number
+    districtName: string
+    districtCode: number
+    stateCode: number
+  }
+
+  export type districtCreateOrConnectWithoutTicketsInput = {
+    where: districtWhereUniqueInput
+    create: XOR<districtCreateWithoutTicketsInput, districtUncheckedCreateWithoutTicketsInput>
   }
 
   export type motorhpCreateWithoutTicketsInput = {
@@ -38623,6 +40365,7 @@ export namespace Prisma {
     primaryUsers?: UserUpdateManyWithoutStateNestedInput
     users?: UserUpdateManyWithoutStatesNestedInput
     projects?: ProjectUpdateManyWithoutStateNestedInput
+    districts?: districtUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateWithoutTicketsInput = {
@@ -38632,6 +40375,31 @@ export namespace Prisma {
     primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
     users?: UserUncheckedUpdateManyWithoutStatesNestedInput
     projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
+    districts?: districtUncheckedUpdateManyWithoutStateNestedInput
+  }
+
+  export type districtUpsertWithoutTicketsInput = {
+    update: XOR<districtUpdateWithoutTicketsInput, districtUncheckedUpdateWithoutTicketsInput>
+    create: XOR<districtCreateWithoutTicketsInput, districtUncheckedCreateWithoutTicketsInput>
+    where?: districtWhereInput
+  }
+
+  export type districtUpdateToOneWithWhereWithoutTicketsInput = {
+    where?: districtWhereInput
+    data: XOR<districtUpdateWithoutTicketsInput, districtUncheckedUpdateWithoutTicketsInput>
+  }
+
+  export type districtUpdateWithoutTicketsInput = {
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    state?: StateUpdateOneRequiredWithoutDistrictsNestedInput
+  }
+
+  export type districtUncheckedUpdateWithoutTicketsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    stateCode?: IntFieldUpdateOperationsInput | number
   }
 
   export type motorhpUpsertWithoutTicketsInput = {
@@ -38813,6 +40581,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -38834,6 +40603,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -38993,6 +40763,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -39014,6 +40785,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39214,6 +40986,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -39235,6 +41008,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -39379,6 +41153,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -39400,6 +41175,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40056,6 +41832,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -40077,6 +41854,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -40241,6 +42019,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -40262,6 +42041,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40508,6 +42288,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -40529,6 +42310,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -40746,6 +42528,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -40767,6 +42550,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41135,6 +42919,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -41156,6 +42941,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -41343,6 +43129,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -41364,6 +43151,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41943,6 +43731,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     motorhp?: motorhpCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
@@ -41964,6 +43753,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -42062,6 +43852,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -42083,6 +43874,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42133,6 +43925,7 @@ export namespace Prisma {
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
+    selectedDistrict?: districtCreateNestedOneWithoutTicketsInput
     messages?: MessageCreateNestedManyWithoutTicketInput
     notifications?: NotificationCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutTicketInput
@@ -42153,6 +43946,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -42244,6 +44038,7 @@ export namespace Prisma {
     motorHpId?: number | null
     head?: string | null
     motorType?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -42260,6 +44055,12 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+  }
+
+  export type districtCreateManyStateInput = {
+    id?: number
+    districtName: string
+    districtCode: number
   }
 
   export type UserUpdateWithoutStateInput = {
@@ -42477,6 +44278,7 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -42498,6 +44300,7 @@ export namespace Prisma {
     motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42534,6 +44337,161 @@ export namespace Prisma {
     motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type districtUpdateWithoutStateInput = {
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    tickets?: TicketUpdateManyWithoutSelectedDistrictNestedInput
+  }
+
+  export type districtUncheckedUpdateWithoutStateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+    tickets?: TicketUncheckedUpdateManyWithoutSelectedDistrictNestedInput
+  }
+
+  export type districtUncheckedUpdateManyWithoutStateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    districtName?: StringFieldUpdateOperationsInput | string
+    districtCode?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type TicketCreateManySelectedDistrictInput = {
+    id?: number
+    ticketCode: string
+    description: string
+    customerName: string
+    controllerNo: string
+    farmerName?: string | null
+    imei?: string | null
+    hp?: string | null
+    motorHpId?: number | null
+    head?: string | null
+    motorType?: string | null
+    stateCode?: string | null
+    district?: string | null
+    village?: string | null
+    block?: string | null
+    complaintType: string
+    faultCode: string
+    faultType: string
+    status?: $Enums.TicketStatus
+    priority?: string | null
+    assignedServiceCenter?: string | null
+    createdBy: number
+    updatedBy?: number | null
+    code?: string | null
+    projectName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+  }
+
+  export type TicketUpdateWithoutSelectedDistrictInput = {
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
+    updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
+    state?: StateUpdateOneWithoutTicketsNestedInput
+    motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
+    messages?: MessageUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateWithoutSelectedDistrictInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    district?: NullableStringFieldUpdateOperationsInput | string | null
+    village?: NullableStringFieldUpdateOperationsInput | string | null
+    block?: NullableStringFieldUpdateOperationsInput | string | null
+    complaintType?: StringFieldUpdateOperationsInput | string
+    faultCode?: StringFieldUpdateOperationsInput | string
+    faultType?: StringFieldUpdateOperationsInput | string
+    status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
+    priority?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    code?: NullableStringFieldUpdateOperationsInput | string | null
+    projectName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
+    attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
+    ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
+    batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type TicketUncheckedUpdateManyWithoutSelectedDistrictInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    ticketCode?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    customerName?: StringFieldUpdateOperationsInput | string
+    controllerNo?: StringFieldUpdateOperationsInput | string
+    farmerName?: NullableStringFieldUpdateOperationsInput | string | null
+    imei?: NullableStringFieldUpdateOperationsInput | string | null
+    hp?: NullableStringFieldUpdateOperationsInput | string | null
+    motorHpId?: NullableIntFieldUpdateOperationsInput | number | null
+    head?: NullableStringFieldUpdateOperationsInput | string | null
+    motorType?: NullableStringFieldUpdateOperationsInput | string | null
+    stateCode?: NullableStringFieldUpdateOperationsInput | string | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42869,6 +44827,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -42985,6 +44944,7 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -43007,6 +44967,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43043,6 +45004,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43073,6 +45035,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -43103,6 +45066,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -43243,6 +45207,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -43265,6 +45230,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43301,6 +45267,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43344,6 +45311,7 @@ export namespace Prisma {
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     motorhp?: motorhpUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
@@ -43366,6 +45334,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43402,6 +45371,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43662,6 +45632,7 @@ export namespace Prisma {
     primaryUsers?: UserUpdateManyWithoutStateNestedInput
     projects?: ProjectUpdateManyWithoutStateNestedInput
     tickets?: TicketUpdateManyWithoutStateNestedInput
+    districts?: districtUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateWithoutUsersInput = {
@@ -43671,6 +45642,7 @@ export namespace Prisma {
     primaryUsers?: UserUncheckedUpdateManyWithoutStateNestedInput
     projects?: ProjectUncheckedUpdateManyWithoutStateNestedInput
     tickets?: TicketUncheckedUpdateManyWithoutStateNestedInput
+    districts?: districtUncheckedUpdateManyWithoutStateNestedInput
   }
 
   export type StateUncheckedUpdateManyWithoutUsersInput = {
@@ -44330,6 +46302,7 @@ export namespace Prisma {
     head?: string | null
     motorType?: string | null
     stateCode?: string | null
+    districtCode?: number | null
     district?: string | null
     village?: string | null
     block?: string | null
@@ -44375,6 +46348,7 @@ export namespace Prisma {
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
+    selectedDistrict?: districtUpdateOneWithoutTicketsNestedInput
     messages?: MessageUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutTicketNestedInput
@@ -44395,6 +46369,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44431,6 +46406,7 @@ export namespace Prisma {
     head?: NullableStringFieldUpdateOperationsInput | string | null
     motorType?: NullableStringFieldUpdateOperationsInput | string | null
     stateCode?: NullableStringFieldUpdateOperationsInput | string | null
+    districtCode?: NullableIntFieldUpdateOperationsInput | number | null
     district?: NullableStringFieldUpdateOperationsInput | string | null
     village?: NullableStringFieldUpdateOperationsInput | string | null
     block?: NullableStringFieldUpdateOperationsInput | string | null

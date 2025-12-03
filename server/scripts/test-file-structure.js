@@ -99,8 +99,7 @@ if (require.main === module) {
       });
     })
     .catch((error) => {
-      console.error("❌ Test failed:", error);
-      process.exit(1);
+       process.exit(1);
     });
 }
 

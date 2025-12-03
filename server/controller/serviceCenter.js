@@ -28,9 +28,7 @@ const getAll = async (req, res) => {
       take: takeNum,
       statusCount,
     });
-  } catch (error) {
-    console.error('Error in getAll service centers controller:', error);
-    
+  } catch (error) {   
     // Handle authorization errors differently
     if (error.message.includes('Unauthorized') || error.message.includes('Authentication required')) {
       return res.status(403).json({
@@ -63,7 +61,6 @@ const getById = async (req, res) => {
 
     res.status(200).json(transformedServiceCenter);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -74,7 +71,6 @@ const createServiceCenter = async (req, res) => {
     const newServiceCenter = await serviceCenterService.createServiceCenter(data);
     res.status(201).json(newServiceCenter);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -91,7 +87,6 @@ const updateServiceCenter = async (req, res) => {
     const updatedServiceCenter = await serviceCenterService.updateServiceCenter(parseInt(id), data);
     res.status(200).json(updatedServiceCenter);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -102,7 +97,6 @@ const deleteServiceCenter = async (req, res) => {
     await serviceCenterService.deleteServiceCenter(id);
     res.status(204).send();
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

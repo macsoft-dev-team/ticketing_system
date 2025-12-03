@@ -108,7 +108,6 @@ export default function ServiceCenters() {
             // Refresh the list
             getServiceCenters({ skip: currentPage, take: 10, filter });
         } catch (error) {
-            console.error("Error submitting form:", error);
             throw error; // Re-throw to let the form handle it
         }
     };

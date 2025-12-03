@@ -87,7 +87,6 @@ const Settings = () => {
         variant: "success"
       });
     } catch (error) {
-      console.error('Error loading settings:', error);
       addToast({
         title: "Error",
         description: "Failed to load settings",
@@ -116,7 +115,6 @@ const Settings = () => {
         previewCode: response.data.previewCode
       }));
     } catch (error) {
-      console.error('Error updating preview:', error);
     }
   };
 
@@ -140,7 +138,6 @@ const Settings = () => {
       });
       await loadSettings(); // Reload to get updated stats
     } catch (error) {
-      console.error('Error saving ticket code settings:', error);
       addToast({
         title: "Error",
         description: "Failed to update ticket code prefix",
@@ -161,7 +158,6 @@ const Settings = () => {
         variant: "success"
       });
     } catch (error) {
-      console.error('Error saving notification settings:', error);
       addToast({
         title: "Error",
         description: "Failed to save notification preferences",
