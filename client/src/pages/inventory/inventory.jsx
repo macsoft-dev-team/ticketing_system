@@ -142,67 +142,69 @@ export default function Inventory() {
 
   return (
     <section className="px-6 py-4 space-y-6">
-      <TitleHead title="Inventory Management" description="Monitor and manage your inventory levels, stock movements, and replenishment activities." />
+      <TitleHead title="Inventory Management" description="Monitor and manage your inventory levels, stock movements, and replenishment activities." >
+
+     
       
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
+      <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-1 text-xs *:lg:max-w-40 *:lg:min-w-40 lg:justify-end">
+        <div className="bg-white rounded-lg shadow py-3 px-4">
+          <div className="flex items-center gap-2">
             <div className="flex-shrink-0">
-              <Package className="h-8 w-8 text-blue-600" />
+              <Package className="sm:h-8 sm:w-8 text-blue-600" />
             </div>
-            <div className="ml-5 w-0 flex-1">
+            <div className="w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Total Items</dt>
-                <dd className="text-lg font-medium text-gray-900">{stats.totalItems}</dd>
+                <dt className="text-xs font-medium text-gray-500 truncate">Total Items</dt>
+                <dd className="font-medium text-gray-900">{stats.totalItems}</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
+        <div className="bg-white rounded-lg shadow py-3 px-4">
+          <div className="flex items-center gap-2">
             <div className="flex-shrink-0">
-              <AlertTriangle className="h-8 w-8 text-yellow-600" />
+              <AlertTriangle className="sm:h-8 sm:w-8 text-yellow-600" />
             </div>
-            <div className="ml-5 w-0 flex-1">
+            <div className="w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Low Stock Items</dt>
-                <dd className="text-lg font-medium text-gray-900">{stats.lowStockCount}</dd>
+                <dt className="text-xs font-medium text-gray-500 truncate">Low Stock</dt>
+                <dd className="font-medium text-gray-900">{stats.lowStockCount}</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
+        <div className="bg-white rounded-lg shadow py-3 px-4">
+          <div className="flex items-center gap-2">
             <div className="flex-shrink-0">
-              <XCircle className="h-8 w-8 text-red-600" />
+              <XCircle className="sm:h-8 sm:w-8 text-red-600" />
             </div>
-            <div className="ml-5 w-0 flex-1">
+            <div className="w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Out of Stock</dt>
-                <dd className="text-lg font-medium text-gray-900">{stats.outOfStockCount}</dd>
+                <dt className="text-xs font-medium text-gray-500 truncate">Out of Stock</dt>
+                <dd className="font-medium text-gray-900">{stats.outOfStockCount}</dd>
               </dl>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
+        <div className="bg-white rounded-lg shadow py-3 px-4">
+          <div className="flex items-center gap-2">
             <div className="flex-shrink-0">
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <TrendingUp className="sm:h-8 sm:w-8 text-green-600" />
             </div>
-            <div className="ml-5 w-0 flex-1">
+            <div className="w-0 flex-1">
               <dl>
-                <dt className="text-sm font-medium text-gray-500 truncate">Total Products</dt>
-                <dd className="text-lg font-medium text-gray-900">{inventoryData.length}</dd>
+                <dt className="text-xs font-medium text-gray-500 truncate">Total Products</dt>
+                <dd className="font-medium text-gray-900">{inventoryData.length}</dd>
               </dl>
             </div>
           </div>
         </div>
       </div>
-
+      </TitleHead>
       {/* Low Stock Alert */}
       {lowStockItems.length > 0 && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
@@ -221,17 +223,17 @@ export default function Inventory() {
 
       {/* Action Buttons */}
       {canManageInventory() && (
-        <div className="flex flex-wrap gap-3 mb-4">
+        <div className="flex gap-3 mb-4">
           <button
             onClick={() => setShowInboundModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center text-xs px-4 py-2 border border-transparent lg:text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
             <Upload className="w-4 h-4 mr-2" />
             Stock Inbound
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center text-xs px-4 py-2 border border-transparent lg:text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <Plus className="w-4 h-4 mr-2" />
             Update Inventory
