@@ -8,7 +8,12 @@ import {
   User, 
   Hash,
   Loader2,
-  RefreshCcw
+  RefreshCcw,
+  Eye,
+  X,
+  Truck,
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '../../lib/hooks/useAuth';
 import TitleHead from '../../components/TitleHead';
@@ -16,7 +21,9 @@ import {
   getPendingSpareRequests,
   approveSpareRequestItem,
   rejectSpareRequestItem,
-  bulkApproveSpareRequestItems
+  bulkApproveSpareRequestItems,
+  getProductInventoryDetails,
+  getProductTransactionHistory
 } from '../../lib/api/spareApproval';
 import { useToast } from '../../components/ui/toast';
 
@@ -31,6 +38,12 @@ export default function SpareRequestApproval() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  // New states for spare details modal
+  const [showSpareModal, setShowSpareModal] = useState(false);
+  const [selectedSpare, setSelectedSpare] = useState(null);
+  const [inventoryDetails, setInventoryDetails] = useState(null);
+  const [transactionHistory, setTransactionHistory] = useState([]);
+  const [loadingInventoryDetails, setLoadingInventoryDetails] = useState(false);
 
   const { user, canAccess } = useAuth();
   const { addToast } = useToast();
@@ -112,6 +125,82 @@ export default function SpareRequestApproval() {
     setRejectingItem(itemId);
     setRejectReason('');
     setShowRejectModal(true);
+  };
+
+  const handleViewSpare = async (item) => {
+    setSelectedSpare(item);
+    setShowSpareModal(true);
+    setLoadingInventoryDetails(true);
+    
+    try {
+      // Fetch detailed inventory information
+      const [inventoryResponse, transactionResponse] = await Promise.all([
+        getProductInventoryDetails(item.productId),
+        getProductTransactionHistory(item.productId, 5)
+      ]);
+      
+      if (inventoryResponse.success) {
+        setInventoryDetails(inventoryResponse.data);
+      }
+      
+      if (transactionResponse.success) {
+        setTransactionHistory(transactionResponse.data);
+      }
+    } catch (error) {
+      console.error('Error fetching inventory details:', error);
+      addToast({
+        title: 'Warning',
+        description: 'Could not fetch detailed inventory information',
+        variant: 'warning',
+      });
+    } finally {
+      setLoadingInventoryDetails(false);
+    }
+  };
+
+  const handleModalApprove = async () => {
+    if (!selectedSpare) return;
+    
+    try {
+      setActionLoading(prev => ({ ...prev, [selectedSpare.itemId]: 'approving' }));
+      
+      await approveSpareRequestItem(selectedSpare.itemId);
+      
+      addToast({
+        title: 'Success',
+        description: 'Spare request approved successfully',
+        variant: 'success',
+      });
+      
+      setShowSpareModal(false);
+      setSelectedSpare(null);
+      setInventoryDetails(null);
+      setTransactionHistory([]);
+      
+      // Refresh the list
+      await fetchPendingRequests(currentPage);
+      
+    } catch (error) {
+      console.error('Error approving request:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to approve spare request';
+      addToast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(prev => {
+        const newState = { ...prev };
+        delete newState[selectedSpare?.itemId];
+        return newState;
+      });
+    }
+  };
+
+  const handleModalReject = () => {
+    if (!selectedSpare) return;
+    setShowSpareModal(false);
+    handleReject(selectedSpare.itemId);
   };
 
   const confirmReject = async () => {
@@ -379,6 +468,14 @@ export default function SpareRequestApproval() {
                     
                     <div className="flex space-x-2 mt-4 pt-3 border-t border-gray-100">
                       <button
+                        onClick={() => handleViewSpare(item)}
+                        className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        View Details
+                      </button>
+                      
+                      <button
                         onClick={() => handleApprove(item.itemId)}
                         disabled={!item.canApprove || actionLoading[item.itemId] === 'approving'}
                         className={`flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white ${
@@ -528,6 +625,15 @@ export default function SpareRequestApproval() {
                         <td className="px-3 lg:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex flex-col lg:flex-row space-y-1 lg:space-y-0 lg:space-x-2">
                             <button
+                              onClick={() => handleViewSpare(item)}
+                              className="inline-flex items-center justify-center px-2 lg:px-3 py-1 border border-gray-300 text-xs font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                              title="View spare details"
+                            >
+                              <Eye className="h-3 w-3" />
+                              <span className="ml-1 hidden lg:inline">View</span>
+                            </button>
+                            
+                            <button
                               onClick={() => handleApprove(item.itemId)}
                               disabled={
                                 !item.canApprove || 
@@ -640,6 +746,254 @@ export default function SpareRequestApproval() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spare Details Modal */}
+      {showSpareModal && selectedSpare && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Spare Request Details</h3>
+              <button
+                onClick={() => {
+                  setShowSpareModal(false);
+                  setSelectedSpare(null);
+                  setInventoryDetails(null);
+                  setTransactionHistory([]);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Request Information */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Request Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Ticket Code</label>
+                    <p className="text-sm font-semibold text-gray-900">{selectedSpare.ticketCode}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Request Date</label>
+                    <p className="text-sm text-gray-900">{formatDate(selectedSpare.requestedDate)}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Requested By</label>
+                    <p className="text-sm text-gray-900">{selectedSpare.requestedBy}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Role</label>
+                    <p className="text-sm text-gray-900">{selectedSpare.requestedByRole}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Information */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Package className="h-4 w-4 mr-2" />
+                  Product Details
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Product Name</label>
+                    <p className="text-sm font-medium text-gray-900">{selectedSpare.productName}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Product Code</label>
+                    <p className="text-sm text-gray-900">{selectedSpare.productCode}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Inventory Information */}
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Truck className="h-4 w-4 mr-2" />
+                  Inventory Status
+                </h4>
+                
+                {loadingInventoryDetails ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    <span className="ml-2 text-sm text-gray-500">Loading inventory details...</span>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500">Requested Quantity</label>
+                        <p className="text-2xl font-bold text-blue-600">{selectedSpare.requestedQuantity}</p>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500">Available Quantity</label>
+                        <p className={`text-2xl font-bold ${
+                          selectedSpare.availableQuantity >= selectedSpare.requestedQuantity 
+                            ? 'text-green-600' 
+                            : 'text-red-600'
+                        }`}>
+                          {selectedSpare.availableQuantity}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-500">Status</label>
+                        <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          selectedSpare.canApprove 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {selectedSpare.canApprove ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Available
+                            </>
+                          ) : (
+                            <>
+                              <AlertTriangle className="h-4 w-4 mr-1" />
+                              Insufficient Stock
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Additional inventory details */}
+                    {inventoryDetails && (
+                      <div className="border-t border-green-200 pt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500">Storage Location</label>
+                            <p className="text-sm text-gray-900 flex items-center">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {inventoryDetails.location || 'Not specified'}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500">Min Stock Level</label>
+                            <p className="text-sm text-gray-900">{inventoryDetails.minStock || 'Not set'}</p>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500">Max Stock Level</label>
+                            <p className="text-sm text-gray-900">{inventoryDetails.maxStock || 'Not set'}</p>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500">Last Updated</label>
+                            <p className="text-sm text-gray-900">{formatDate(inventoryDetails.updatedAt)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Recent Transaction History */}
+              {transactionHistory.length > 0 && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Recent Transactions (Last 5)
+                  </h4>
+                  <div className="space-y-2">
+                    {transactionHistory.map((transaction, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 rounded-full ${
+                            transaction.type === 'INBOUND' ? 'bg-green-500' : 'bg-red-500'
+                          }`}></div>
+                          <span className="text-sm text-gray-900">
+                            {transaction.type === 'INBOUND' ? 'Added' : 'Issued'} {transaction.quantity} units
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(transaction.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Warning for insufficient stock */}
+              {!selectedSpare.canApprove && (
+                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
+                    <div>
+                      <h5 className="text-sm font-medium text-red-800">Insufficient Stock</h5>
+                      <p className="text-sm text-red-700 mt-1">
+                        Cannot approve this request as there is insufficient stock available. 
+                        Available: {selectedSpare.availableQuantity}, Required: {selectedSpare.requestedQuantity}
+                      </p>
+                      <p className="text-sm text-red-700 mt-2">
+                        <strong>Impact:</strong> Approving this request will update the inventory from {selectedSpare.availableQuantity} to {selectedSpare.availableQuantity - selectedSpare.requestedQuantity} units.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Approval Confirmation for sufficient stock */}
+              {selectedSpare.canApprove && (
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2" />
+                    <div>
+                      <h5 className="text-sm font-medium text-blue-800">Ready for Approval</h5>
+                      <p className="text-sm text-blue-700 mt-1">
+                        <strong>Impact:</strong> Approving this request will deduct {selectedSpare.requestedQuantity} units from inventory, 
+                        updating the stock from {selectedSpare.availableQuantity} to {selectedSpare.availableQuantity - selectedSpare.requestedQuantity} units.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setShowSpareModal(false);
+                  setSelectedSpare(null);
+                  setInventoryDetails(null);
+                  setTransactionHistory([]);
+                }}
+                className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Cancel
+              </button>
+              
+              <button
+                onClick={handleModalReject}
+                className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                <XCircle className="h-4 w-4 mr-1 inline" />
+                Reject
+              </button>
+              
+              <button
+                onClick={handleModalApprove}
+                disabled={!selectedSpare.canApprove || actionLoading[selectedSpare.itemId] === 'approving'}
+                className={`px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${
+                  selectedSpare.canApprove 
+                    ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' 
+                    : 'bg-gray-400 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50`}
+              >
+                {actionLoading[selectedSpare.itemId] === 'approving' ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin inline" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-1 inline" />
+                )}
+                {selectedSpare.canApprove ? 'Approve & Update Inventory' : 'Insufficient Stock'}
+              </button>
             </div>
           </div>
         </div>

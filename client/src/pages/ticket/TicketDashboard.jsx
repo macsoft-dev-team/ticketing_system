@@ -24,7 +24,13 @@ import {
   MessageSquare,
   GitBranch,
   Building,
-  Eye
+  Eye,
+  Package,
+  Hash,
+  Loader2,
+  X,
+  Truck,
+  MapPin
 } from 'lucide-react';
 import { Badge } from '../../components/ui/badge';
 import { ChatWindow } from '../../components/ui/chat';
@@ -33,6 +39,12 @@ import { useToast } from '../../components/ui/toast';
 import useTickets from '../../lib/hooks/useTickets';
 import { useAuth } from '../../lib/hooks/useAuth';
 import useConversation from '../../lib/hooks/useConversation';
+import { 
+  approveSpareRequestItem,
+  rejectSpareRequestItem,
+  getProductInventoryDetails,
+  getProductTransactionHistory
+} from '../../lib/api/spareApproval';
 
 // Helper function to format file size
 const formatFileSize = (bytes) => {
@@ -296,6 +308,18 @@ export default function TicketDashboard() {
   const [showServiceCenterModal, setShowServiceCenterModal] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+  // Spare request states
+  const [spareRequests, setSpareRequests] = useState([]);
+  const [loadingSpareRequests, setLoadingSpareRequests] = useState(false);
+  const [showSpareRejectModal, setShowSpareRejectModal] = useState(false);
+  const [rejectingSpareItem, setRejectingSpareItem] = useState(null);
+  const [spareRejectReason, setSpareRejectReason] = useState('');
+  const [spareActionLoading, setSpareActionLoading] = useState({});
+  const [showSpareDetailModal, setShowSpareDetailModal] = useState(false);
+  const [selectedSpareItem, setSelectedSpareItem] = useState(null);
+  const [inventoryDetails, setInventoryDetails] = useState(null);
+  const [transactionHistory, setTransactionHistory] = useState([]);
+  const [loadingInventoryDetails, setLoadingInventoryDetails] = useState(false);
 
   // Auto-close timer simulation
   useEffect(() => {
@@ -597,11 +621,199 @@ export default function TicketDashboard() {
     setSelectedDocument(null);
   }, []);
 
+  // Fetch spare requests for this ticket
+  const fetchSpareRequests = useCallback(async () => {
+    if (!ticketData.ticketCode) return;
+    
+    try {
+      setLoadingSpareRequests(true);
+      const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+      const response = await fetch(`${baseApiUrl}/spare-requests/ticket/${ticketData.ticketCode}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch spare requests');
+      }
+
+      const result = await response.json();
+      
+      // Transform spare requests to match the format expected by the approval component
+      const transformedRequests = [];
+      if (result.success && result.data) {
+        result.data.forEach(request => {
+          request.spareItems.forEach(item => {
+            transformedRequests.push({
+              itemId: item.id,
+              requestId: request.id,
+              ticketCode: request.ticketCode,
+              productId: item.productId,
+              productName: item.product.name,
+              productCode: item.product.productCode,
+              requestedQuantity: item.quantity,
+              availableQuantity: item.product.inventory?.quantity || 0,
+              status: item.status,
+              requestedBy: request.createdByUser?.name || 'Unknown',
+              requestedByRole: request.createdByUser?.role || 'Unknown',
+              requestedDate: request.createdAt,
+              canApprove: (item.product.inventory?.quantity || 0) >= item.quantity && item.status === 'REQUESTED'
+            });
+          });
+        });
+      }
+      
+      setSpareRequests(transformedRequests);
+    } catch (error) {
+      console.error('Error fetching spare requests:', error);
+      addToast({
+        title: 'Error',
+        description: 'Failed to fetch spare requests',
+        variant: 'error'
+      });
+    } finally {
+      setLoadingSpareRequests(false);
+    }
+  }, [ticketData.ticketCode, token, addToast]);
+
+  // Handle spare request approval
+  const handleSpareApprove = async (itemId) => {
+    try {
+      setSpareActionLoading(prev => ({ ...prev, [itemId]: 'approving' }));
+      
+      await approveSpareRequestItem(itemId);
+      
+      addToast({
+        title: 'Success',
+        description: 'Spare request approved successfully',
+        variant: 'success'
+      });
+      
+      // Refresh spare requests and ticket data
+      await Promise.all([fetchSpareRequests(), fetchTicketById(ticketId)]);
+      
+    } catch (error) {
+      console.error('Error approving spare request:', error);
+      addToast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to approve spare request',
+        variant: 'error'
+      });
+    } finally {
+      setSpareActionLoading(prev => {
+        const newState = { ...prev };
+        delete newState[itemId];
+        return newState;
+      });
+    }
+  };
+
+  // Handle spare request rejection
+  const handleSpareReject = (itemId) => {
+    setRejectingSpareItem(itemId);
+    setSpareRejectReason('');
+    setShowSpareRejectModal(true);
+  };
+
+  // Confirm spare request rejection
+  const confirmSpareReject = async () => {
+    try {
+      setSpareActionLoading(prev => ({ ...prev, [rejectingSpareItem]: 'rejecting' }));
+      
+      await rejectSpareRequestItem(rejectingSpareItem, spareRejectReason);
+      
+      addToast({
+        title: 'Success',
+        description: 'Spare request rejected successfully',
+        variant: 'success'
+      });
+      
+      setShowSpareRejectModal(false);
+      setRejectingSpareItem(null);
+      setSpareRejectReason('');
+      
+      // Refresh spare requests and ticket data
+      await Promise.all([fetchSpareRequests(), fetchTicketById(ticketId)]);
+      
+    } catch (error) {
+      console.error('Error rejecting spare request:', error);
+      addToast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to reject spare request',
+        variant: 'error'
+      });
+    } finally {
+      setSpareActionLoading(prev => {
+        const newState = { ...prev };
+        delete newState[rejectingSpareItem];
+        return newState;
+      });
+      setShowSpareRejectModal(false);
+    }
+  };
+
+  // Handle viewing spare details
+  const handleViewSpareDetails = async (item) => {
+    setSelectedSpareItem(item);
+    setShowSpareDetailModal(true);
+    setLoadingInventoryDetails(true);
+    
+    try {
+      const [inventoryResponse, transactionResponse] = await Promise.all([
+        getProductInventoryDetails(item.productId),
+        getProductTransactionHistory(item.productId, 5)
+      ]);
+      
+      if (inventoryResponse.success) {
+        setInventoryDetails(inventoryResponse.data);
+      }
+      
+      if (transactionResponse.success) {
+        setTransactionHistory(transactionResponse.data);
+      }
+    } catch (error) {
+      console.error('Error fetching inventory details:', error);
+      addToast({
+        title: 'Warning',
+        description: 'Could not fetch detailed inventory information',
+        variant: 'warning'
+      });
+    } finally {
+      setLoadingInventoryDetails(false);
+    }
+  };
+
+  const getStockStatus = useCallback((requested, available) => {
+    if (available >= requested) {
+      return {
+        status: 'sufficient',
+        icon: CheckCircle,
+        color: 'bg-green-100 text-green-800'
+      };
+    }
+    return {
+      status: 'insufficient',
+      icon: AlertTriangle,
+      color: 'bg-red-100 text-red-800'
+    };
+  }, []);
+
+  // Fetch spare requests when ticket data changes
+  useEffect(() => {
+    if (ticketData.ticketCode) {
+      fetchSpareRequests();
+    }
+  }, [fetchSpareRequests]);
+
   // Mobile tab navigation
   const tabs = useMemo(() => [
     { id: 'ticket', label: 'Ticket', icon: FileText },
     { id: 'controller', label: 'Controller', icon: Cpu },
     { id: 'milestones', label: 'Progress', icon: GitBranch },
+    { id: 'spares', label: 'Spares', icon: Package },
     { id: 'chat', label: 'Chat', icon: MessageSquare }
   ], []);
 
@@ -755,7 +967,7 @@ export default function TicketDashboard() {
 
       {/* Mobile Tab Navigation */}
       <div className="lg:hidden bg-white border-b border-gray-200">
-        <div className="flex">
+        <div className="flex overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -763,13 +975,14 @@ export default function TicketDashboard() {
                 key={tab.id}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${activeTab === tab.id
+                className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap min-w-fit ${activeTab === tab.id
                   ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
                   : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 <Icon size={16} />
-                {tab.label}
+                <span className="hidden xs:inline">{tab.label}</span>
+                <span className="xs:hidden">{tab.label.split(' ')[0]}</span>
               </motion.button>
             );
           })}
@@ -1029,6 +1242,287 @@ export default function TicketDashboard() {
               ticketStatus={ticketData?.status}
             />
           </div>
+
+          {/* Spare Requests Section - Desktop only */}
+          <div className="hidden lg:block p-4 sm:p-6 border-t border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Spare Requests
+                {spareRequests.length > 0 && (
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {spareRequests.length}
+                  </span>
+                )}
+              </h2>
+              {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                  Approval Access
+                </span>
+              ) : null}
+            </div>
+
+            {loadingSpareRequests ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                <span className="ml-2 text-sm text-gray-500">Loading spare requests...</span>
+              </div>
+            ) : spareRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No spare requests found for this ticket</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {spareRequests.map((item) => {
+                  const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
+                  const StockIcon = stockStatus.icon;
+                  
+                  return (
+                    <motion.div
+                      key={item.itemId}
+                      whileHover={{ scale: 1.01 }}
+                      className="bg-gray-50 p-3 rounded-lg border border-gray-200"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center space-x-1">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                            item.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            item.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </div>
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${stockStatus.color}`}>
+                          <StockIcon className="h-3 w-3 mr-1" />
+                          {stockStatus.status === 'sufficient' ? 'Available' : 'Low Stock'}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-start space-x-2">
+                          <Package className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 truncate">{item.productName}</p>
+                            <p className="text-xs text-gray-500">{item.productCode}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-gray-600">
+                            Requested: <span className="font-medium text-blue-600">{item.requestedQuantity}</span>
+                          </span>
+                          <span className="text-gray-600">
+                            Available: <span className={`font-medium ${
+                              item.availableQuantity >= item.requestedQuantity ? 'text-green-600' : 'text-red-600'
+                            }`}>{item.availableQuantity}</span>
+                          </span>
+                        </div>
+
+                        <div className="flex items-center space-x-1 text-xs text-gray-500">
+                          <User className="h-3 w-3" />
+                          <span>By: {item.requestedBy}</span>
+                        </div>
+
+                        {/* Action buttons for admins */}
+                        {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && item.status === 'REQUESTED' && (
+                          <div className="flex space-x-1 pt-2">
+                            <button
+                              onClick={() => handleViewSpareDetails(item)}
+                              className="flex-1 inline-flex items-center justify-center px-2 py-1 border border-gray-300 text-xs font-medium rounded shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </button>
+                            
+                            <button
+                              onClick={() => handleSpareApprove(item.itemId)}
+                              disabled={!item.canApprove || spareActionLoading[item.itemId] === 'approving'}
+                              className={`flex-1 inline-flex items-center justify-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
+                                item.canApprove 
+                                  ? 'bg-green-600 hover:bg-green-700' 
+                                  : 'bg-gray-400 cursor-not-allowed'
+                              } disabled:opacity-50`}
+                            >
+                              {spareActionLoading[item.itemId] === 'approving' ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                              )}
+                              Approve
+                            </button>
+                            
+                            <button
+                              onClick={() => handleSpareReject(item.itemId)}
+                              disabled={spareActionLoading[item.itemId] === 'rejecting'}
+                              className="flex-1 inline-flex items-center justify-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                            >
+                              {spareActionLoading[item.itemId] === 'rejecting' ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <XCircle className="h-3 w-3 mr-1" />
+                              )}
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Spare Requests Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className={`${activeTab === 'spares' ? 'block' : 'hidden'
+            } lg:hidden bg-white border-r border-gray-200 overflow-y-auto`}
+        >
+          <div className="p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Spare Requests
+              </h2>
+              {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                  Approval Access
+                </span>
+              ) : null}
+            </div>
+
+            {loadingSpareRequests ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                <span className="ml-2 text-sm text-gray-500">Loading spare requests...</span>
+              </div>
+            ) : spareRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No spare requests found for this ticket</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {spareRequests.map((item) => {
+                  const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
+                  const StockIcon = stockStatus.icon;
+                  
+                  return (
+                    <motion.div
+                      key={item.itemId}
+                      whileHover={{ scale: 1.01 }}
+                      className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <Hash className="h-4 w-4 text-gray-400" />
+                          <span className="text-sm font-semibold text-gray-900">{item.ticketCode}</span>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                            item.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            item.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </div>
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${stockStatus.color}`}>
+                          <StockIcon className="h-3 w-3 mr-1" />
+                          {stockStatus.status === 'sufficient' ? 'Available' : 'Low Stock'}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-start space-x-2">
+                          <Package className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 truncate">{item.productName}</p>
+                            <p className="text-xs text-gray-500">{item.productCode}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">Requested</p>
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {item.requestedQuantity}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">Available</p>
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.availableQuantity >= item.requestedQuantity 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {item.availableQuantity}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2 text-xs text-gray-500">
+                          <User className="h-3 w-3" />
+                          <span>By: {item.requestedBy}</span>
+                          <Calendar className="h-3 w-3 ml-2" />
+                          <span>{formatDate(item.requestedDate)}</span>
+                        </div>
+
+                        {/* Action buttons for admins */}
+                        {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && item.status === 'REQUESTED' && (
+                          <div className="flex space-x-2 pt-2">
+                            <button
+                              onClick={() => handleViewSpareDetails(item)}
+                              className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View Details
+                            </button>
+                            
+                            <button
+                              onClick={() => handleSpareApprove(item.itemId)}
+                              disabled={!item.canApprove || spareActionLoading[item.itemId] === 'approving'}
+                              className={`flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white ${
+                                item.canApprove 
+                                  ? 'bg-green-600 hover:bg-green-700' 
+                                  : 'bg-gray-400 cursor-not-allowed'
+                              } disabled:opacity-50`}
+                            >
+                              {spareActionLoading[item.itemId] === 'approving' ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                              )}
+                              Approve
+                            </button>
+                            
+                            <button
+                              onClick={() => handleSpareReject(item.itemId)}
+                              disabled={spareActionLoading[item.itemId] === 'rejecting'}
+                              className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                            >
+                              {spareActionLoading[item.itemId] === 'rejecting' ? (
+                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                              ) : (
+                                <XCircle className="h-3 w-3 mr-1" />
+                              )}
+                              Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </motion.div>
 
         {/* Right Panel - Conversation */}
@@ -1104,6 +1598,295 @@ export default function TicketDashboard() {
         onClose={closeDocumentModal}
         document={selectedDocument}
       />
+
+      {/* Spare Request Reject Modal */}
+      {showSpareRejectModal && (
+        <div className="fixed inset-0 bg-black/25 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative mx-auto p-4 sm:p-5 border w-full max-w-md sm:max-w-lg shadow-lg rounded-md bg-white">
+            <div className="text-center">
+              <XCircle className="w-12 h-12 sm:w-16 sm:h-16 text-red-600 mx-auto" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mt-4">Reject Spare Request</h3>
+              <div className="mt-2 px-2 sm:px-7 py-3">
+                <p className="text-sm text-gray-500">
+                  Are you sure you want to reject this spare request? Please provide a reason.
+                </p>
+                <textarea
+                  value={spareRejectReason}
+                  onChange={(e) => setSpareRejectReason(e.target.value)}
+                  placeholder="Enter rejection reason (optional)"
+                  className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                  rows={3}
+                />
+              </div>
+              <div className="px-2 sm:px-4 py-3">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 justify-center">
+                  <button
+                    onClick={confirmSpareReject}
+                    disabled={spareActionLoading[rejectingSpareItem] === 'rejecting'}
+                    className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+                  >
+                    {spareActionLoading[rejectingSpareItem] === 'rejecting' ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-1 inline animate-spin" />
+                        Rejecting...
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="h-4 w-4 mr-1 inline" />
+                        Reject
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowSpareRejectModal(false);
+                      setRejectingSpareItem(null);
+                      setSpareRejectReason('');
+                    }}
+                    className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spare Details Modal */}
+      {showSpareDetailModal && selectedSpareItem && (
+        <div className="fixed inset-0 bg-black/25 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative overflow-y-auto max-h-4/5 mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-gray-900">Spare Request Details</h3>
+              <button
+                onClick={() => {
+                  setShowSpareDetailModal(false);
+                  setSelectedSpareItem(null);
+                  setInventoryDetails(null);
+                  setTransactionHistory([]);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Request Information */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Request Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Ticket Code</label>
+                    <p className="text-sm font-semibold text-gray-900">{selectedSpareItem.ticketCode}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Request Date</label>
+                    <p className="text-sm text-gray-900">{formatDate(selectedSpareItem.requestedDate)}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Requested By</label>
+                    <p className="text-sm text-gray-900">{selectedSpareItem.requestedBy}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Role</label>
+                    <p className="text-sm text-gray-900">{selectedSpareItem.requestedByRole}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Information */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Package className="h-4 w-4 mr-2" />
+                  Product Information
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Product Name</label>
+                    <p className="text-sm font-semibold text-gray-900">{selectedSpareItem.productName}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Product Code</label>
+                    <p className="text-sm text-gray-900">{selectedSpareItem.productCode}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Requested Quantity</label>
+                    <p className="text-sm text-gray-900">{selectedSpareItem.requestedQuantity}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500">Available Quantity</label>
+                    <p className="text-sm text-gray-900">{selectedSpareItem.availableQuantity}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Inventory Status */}
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Truck className="h-4 w-4 mr-2" />
+                  Inventory Status
+                </h4>
+                
+                {loadingInventoryDetails ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    <span className="ml-2 text-sm text-gray-500">Loading inventory details...</span>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Stock Status</span>
+                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedSpareItem.canApprove ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {selectedSpareItem.canApprove ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Available
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="h-4 w-4 mr-1" />
+                            Insufficient Stock
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {inventoryDetails && (
+                      <div className="border-t border-green-200 pt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500">Storage Location</label>
+                            <p className="text-sm text-gray-900 flex items-center">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {inventoryDetails.location || 'Not specified'}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500">Last Updated</label>
+                            <p className="text-sm text-gray-900 flex items-center">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {inventoryDetails.updatedAt ? formatDate(inventoryDetails.updatedAt) : 'N/A'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Transaction History */}
+                    {transactionHistory.length > 0 && (
+                      <div className="border-t border-green-200 pt-4">
+                        <h5 className="text-xs font-medium text-gray-700 mb-2">Recent Transactions</h5>
+                        <div className="space-y-2">
+                          {transactionHistory.map((transaction, index) => (
+                            <div key={index} className="flex items-center justify-between text-xs">
+                              <span className="text-gray-600">
+                                {transaction.type} - {transaction.quantity} units
+                              </span>
+                              <span className="text-gray-500">
+                                {formatDate(transaction.createdAt)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Warning for insufficient stock */}
+              {!selectedSpareItem.canApprove && (
+                <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-red-400 mr-2" />
+                    <div>
+                      <h5 className="text-sm font-medium text-red-800">Insufficient Stock</h5>
+                      <p className="text-sm text-red-700 mt-1">
+                        Cannot approve this request as there is insufficient stock available. 
+                        Available: {selectedSpareItem.availableQuantity}, Required: {selectedSpareItem.requestedQuantity}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Approval Confirmation for sufficient stock */}
+              {selectedSpareItem.canApprove && (
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-blue-400 mr-2" />
+                    <div>
+                      <h5 className="text-sm font-medium text-blue-800">Ready for Approval</h5>
+                      <p className="text-sm text-blue-700 mt-1">
+                        <strong>Impact:</strong> Approving this request will deduct {selectedSpareItem.requestedQuantity} units from inventory, 
+                        updating the stock from {selectedSpareItem.availableQuantity} to {selectedSpareItem.availableQuantity - selectedSpareItem.requestedQuantity} units.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && selectedSpareItem.status === 'REQUESTED' && (
+              <div className="flex flex-wrap sm:justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    setShowSpareDetailModal(false);
+                    setSelectedSpareItem(null);
+                    setInventoryDetails(null);
+                    setTransactionHistory([]);
+                  }}
+                  className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Cancel
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowSpareDetailModal(false);
+                    handleSpareReject(selectedSpareItem.itemId);
+                  }}
+                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <XCircle className="h-4 w-4 mr-1 inline" />
+                  Reject
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowSpareDetailModal(false);
+                    handleSpareApprove(selectedSpareItem.itemId);
+                  }}
+                  disabled={!selectedSpareItem.canApprove || spareActionLoading[selectedSpareItem.itemId] === 'approving'}
+                  className={`px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${
+                    selectedSpareItem.canApprove 
+                      ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' 
+                      : 'bg-gray-400 cursor-not-allowed'
+                  } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50`}
+                >
+                  {spareActionLoading[selectedSpareItem.itemId] === 'approving' ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 inline animate-spin" />
+                      Approving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-1 inline" />
+                      Approve
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

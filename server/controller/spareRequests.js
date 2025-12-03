@@ -351,6 +351,27 @@ async function approveSpareRequestItem(req, res) {
         approvedByRole: userRole,
         timestamp: new Date().toISOString(),
       });
+
+      // If milestone transition occurred, emit milestone update
+      if (result.milestoneTransitionResult) {
+        const { previousStage, newStage, milestoneId, ticketId } = result.milestoneTransitionResult;
+        
+        req.io.emit("milestone-updated", {
+          ticketId,
+          milestoneId,
+          previousStage,
+          newStage,
+          changedBy: userId,
+          changedByName: userName,
+          changedByRole: userRole,
+          isTicketClosed: false,
+          ticketStatus: "IN_PROGRESS",
+          spareRequestsApproved: true,
+          timestamp: new Date().toISOString(),
+        });
+
+        console.log(`✅ Milestone transition: ${previousStage} → ${newStage} for ticket ID ${ticketId}`);
+      }
     }
 
     res.status(200).json({
@@ -405,6 +426,27 @@ async function rejectSpareRequestItem(req, res) {
         reason,
         timestamp: new Date().toISOString(),
       });
+
+      // If milestone transition occurred, emit milestone update
+      if (result.milestoneTransitionResult) {
+        const { previousStage, newStage, milestoneId, ticketId } = result.milestoneTransitionResult;
+        
+        req.io.emit("milestone-updated", {
+          ticketId,
+          milestoneId,
+          previousStage,
+          newStage,
+          changedBy: userId,
+          changedByName: userName,
+          changedByRole: userRole,
+          isTicketClosed: false,
+          ticketStatus: "IN_PROGRESS",
+          spareRequestsProcessed: true,
+          timestamp: new Date().toISOString(),
+        });
+
+        console.log(`✅ Milestone transition after rejection: ${previousStage} → ${newStage} for ticket ID ${ticketId}`);
+      }
     }
 
     res.status(200).json({
@@ -505,11 +547,32 @@ async function bulkApproveSpareRequestItems(req, res) {
         timestamp: new Date().toISOString(),
         result,
       });
+
+      // Emit milestone transition events for any tickets that completed
+      if (result.milestoneTransitions && result.milestoneTransitions.length > 0) {
+        result.milestoneTransitions.forEach(transition => {
+          req.io.emit("milestone-updated", {
+            ticketId: transition.ticketId,
+            milestoneId: transition.milestoneId,
+            previousStage: transition.previousStage,
+            newStage: transition.newStage,
+            changedBy: userId,
+            changedByName: userName,
+            changedByRole: userRole,
+            isTicketClosed: false,
+            ticketStatus: "IN_PROGRESS",
+            spareRequestsApproved: true,
+            timestamp: new Date().toISOString(),
+          });
+
+          console.log(`✅ Bulk approval milestone transition: ${transition.previousStage} → ${transition.newStage} for ticket ID ${transition.ticketId}`);
+        });
+      }
     }
 
     res.status(200).json({
       success: true,
-      message: `Bulk approved ${result.successful} spare request items successfully`,
+      message: `Bulk approved ${result.successful.length} spare request items successfully`,
       data: result,
     });
   } catch (error) {

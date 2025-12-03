@@ -13,12 +13,14 @@ const ServiceStages = {
   DIAGNOSIS_IN_PROGRESS: "DIAGNOSIS_IN_PROGRESS",
   SPARE_REQUESTED: "SPARE_REQUESTED",
   SPARE_APPROVED: "SPARE_APPROVED",
+  SPARE_REJECTED: "SPARE_REJECTED",
   REPAIR_IN_PROGRESS: "REPAIR_IN_PROGRESS",
   REPLACEMENT_IN_PROGRESS: "REPLACEMENT_IN_PROGRESS",
   REPAIRED: "REPAIRED",
   READY_FOR_DISPATCH: "READY_FOR_DISPATCH",
   DELIVERED_TO_FIELD: "DELIVERED_TO_FIELD",
   FIELD_CLEARANCE_APPROVED: "FIELD_CLEARANCE_APPROVED",
+  TICKET_CLOSED: "TICKET_CLOSED",
 };
 
 // Role definitions
@@ -196,8 +198,17 @@ const milestoneStageConfig = [
     notes: "Approval required to proceed with spare parts",
   },
   {
-    stage: ServiceStages.REPAIRED,
+    stage: ServiceStages.SPARE_REJECTED,
     order: 11,
+    label: "Spare Rejected",
+    description: "All spare requests rejected by head",
+    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN"],
+    photoRequired: false,
+    notes: "All spare requests have been rejected",
+  },
+  {
+    stage: ServiceStages.REPAIRED,
+    order: 12,
     label: "Repaired",
     description: "Controller repaired and tested",
     allowedRoles: [
@@ -251,6 +262,16 @@ const milestoneStageConfig = [
     approvalGate: true,
     notes: "Final approval for field clearance",
   },
+  {
+    stage: ServiceStages.TICKET_CLOSED,
+    order: 15,
+    label: "Ticket Closed",
+    description: "Ticket permanently closed",
+    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN"],
+    photoRequired: false,
+    isFinal: true,
+    notes: "Ticket has been permanently closed",
+  },
 ];
 
 function getAllowedRolesForStage(stage) {
@@ -271,7 +292,7 @@ function getNextAvailableStages(currentStage, userRole) {
   // Define allowed transitions based on new workflow
   const allowedTransitions = {
     TICKET_RAISED: ["REQUEST_CLEARED_AT_FIELD", "SERVICE_CENTER_ASSIGNED"],
-    REQUEST_CLEARED_AT_FIELD: [], // Final stage
+    REQUEST_CLEARED_AT_FIELD: ["TICKET_CLOSED"], // Can be closed after field clearance
     SERVICE_CENTER_ASSIGNED: [
       "REQUEST_CLEARED_AT_FIELD",
       "SENT_TO_SERVICE_CENTER",
@@ -280,8 +301,9 @@ function getNextAvailableStages(currentStage, userRole) {
     SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
     RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS"],
     DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS"],
-    SPARE_REQUESTED: ["SPARE_APPROVED"],
+    SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED"],
     SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD"], // Direct completion options after spare approval
+    SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD"], // Can close or try field clearance after rejection
     REPAIR_IN_PROGRESS: ["REPAIRED"], // Repair goes directly to repaired
     REPLACEMENT_IN_PROGRESS: [
       "SPARE_REQUESTED",
@@ -290,8 +312,9 @@ function getNextAvailableStages(currentStage, userRole) {
     ],
     REPAIRED: ["READY_FOR_DISPATCH"],
     READY_FOR_DISPATCH: ["DELIVERED_TO_FIELD"],
-    DELIVERED_TO_FIELD: [], // Final stage
-    FIELD_CLEARANCE_APPROVED: [], // No longer used as final stage
+    DELIVERED_TO_FIELD: ["TICKET_CLOSED"], // Can close after delivery
+    FIELD_CLEARANCE_APPROVED: ["TICKET_CLOSED"], // Can close after field clearance approval
+    TICKET_CLOSED: [], // Final stage
   };
 
   const nextStageNames = allowedTransitions[currentStage] || [];
@@ -360,7 +383,7 @@ function validateMilestoneTransition(
     const currentConfig = getStageConfig(currentStage);
     const allowedTransitions = {
       TICKET_RAISED: ["REQUEST_CLEARED_AT_FIELD", "SERVICE_CENTER_ASSIGNED"],
-      REQUEST_CLEARED_AT_FIELD: [], // Final stage
+      REQUEST_CLEARED_AT_FIELD: ["TICKET_CLOSED"], // Can be closed after field clearance
       SERVICE_CENTER_ASSIGNED: [
         "REQUEST_CLEARED_AT_FIELD",
         "SENT_TO_SERVICE_CENTER",
@@ -369,8 +392,9 @@ function validateMilestoneTransition(
       SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
       RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS"],
       DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS"],
-      SPARE_REQUESTED: ["SPARE_APPROVED"],
+      SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED"],
       SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD"], // Direct completion options after spare approval
+      SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD"], // Can close or try field clearance after rejection
       REPAIR_IN_PROGRESS: ["REPAIRED"], // Repair goes directly to repaired
       REPLACEMENT_IN_PROGRESS: [
         "SPARE_REQUESTED",
@@ -379,8 +403,9 @@ function validateMilestoneTransition(
       ],
       REPAIRED: ["READY_FOR_DISPATCH"],
       READY_FOR_DISPATCH: ["DELIVERED_TO_FIELD"],
-      DELIVERED_TO_FIELD: [], // Final stage
-      FIELD_CLEARANCE_APPROVED: [], // No longer used as final stage
+      DELIVERED_TO_FIELD: ["TICKET_CLOSED"], // Can close after delivery
+      FIELD_CLEARANCE_APPROVED: ["TICKET_CLOSED"], // Can close after field clearance approval
+      TICKET_CLOSED: [], // Final stage
     };
     const allowed = allowedTransitions[currentStage] || [];
     if (!allowed.includes(targetStage)) {

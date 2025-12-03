@@ -112,3 +112,34 @@ export const getNotificationCounts = async () => {
     throw error;
   }
 };
+
+/**
+ * Get detailed inventory information for a product
+ */
+export const getProductInventoryDetails = async (productId) => {
+  try {
+    const response = await axios.get(`${API_URL}/inventory/product/${productId}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product inventory details:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get inventory transaction history for a product
+ */
+export const getProductTransactionHistory = async (productId, limit = 10) => {
+  try {
+    const response = await axios.get(`${API_URL}/inventory/product/${productId}/transactions`, {
+      params: { limit },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product transaction history:', error);
+    throw error;
+  }
+};

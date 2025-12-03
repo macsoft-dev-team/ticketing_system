@@ -68,7 +68,11 @@ async function createSpareRequest(data) {
       include: {
         spareItems: {
           include: {
-            product: true,
+            product: {
+              include: {
+                inventory: true,
+              },
+            },
           },
         },
         createdByUser: {
@@ -144,7 +148,11 @@ async function getSpareRequestsByTicket(ticketCode) {
       include: {
         spareItems: {
           include: {
-            product: true,
+            product: {
+              include: {
+                inventory: true,
+              },
+            },
           },
         },
         createdByUser: {
@@ -187,7 +195,11 @@ async function updateSpareRequestStatus(id, data) {
       include: {
         spareItems: {
           include: {
-            product: true,
+            product: {
+              include: {
+                inventory: true,
+              },
+            },
           },
         },
       },
@@ -206,10 +218,22 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
     const currentItem = await prisma.spareRequestItem.findUnique({
       where: { id: itemId },
       include: {
-        product: true,
+        product: {
+          include: {
+            inventory: true,
+          },
+        },
         spareRequest: {
           include: {
-            spareItems: true,
+            spareItems: {
+              include: {
+                product: {
+                  include: {
+                    inventory: true,
+                  },
+                },
+              },
+            },
           }
         }
       },
@@ -227,7 +251,11 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
         updatedAt: new Date(),
       },
       include: {
-        product: true,
+        product: {
+          include: {
+            inventory: true,
+          },
+        },
         spareRequest: true,
       },
     });
@@ -392,7 +420,11 @@ async function getAllSpareRequests(skip, take, filters) {
       include: {
         spareItems: {
           include: {
-            product: true,
+            product: {
+              include: {
+                inventory: true,
+              },
+            },
           },
         },
         createdByUser: {
@@ -527,7 +559,11 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
       const spareItem = await tx.spareRequestItem.findUnique({
         where: { id: itemId },
         include: {
-          product: true,
+          product: {
+            include: {
+              inventory: true,
+            },
+          },
           spareRequest: {
             include: {
               createdByUser: {
@@ -585,7 +621,11 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
           updatedAt: new Date()
         },
         include: {
-          product: true,
+          product: {
+            include: {
+              inventory: true,
+            },
+          },
           spareRequest: {
             include: {
               createdByUser: {
@@ -602,14 +642,100 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
       });
 
       const approvedItems = allItems.filter(item => item.status === 'approved');
-      if (approvedItems.length === allItems.length) {
+      const rejectedItems = allItems.filter(item => item.status === 'rejected');
+      const processedItems = approvedItems.length + rejectedItems.length;
+      let milestoneTransitionResult = null;
+      
+      // Check if all items have been processed (approved or rejected)
+      if (processedItems === allItems.length) {
+        // Determine final status based on what was processed
+        let finalStatus;
+        if (approvedItems.length === allItems.length) {
+          finalStatus = 'APPROVED';
+        } else if (rejectedItems.length === allItems.length) {
+          finalStatus = 'REJECTED';
+        } else {
+          finalStatus = 'PARTIALLY_APPROVED'; // Mixed scenario
+        }
+        
         await tx.spareRequest.update({
           where: { id: spareItem.spareRequestId },
           data: {
-            status: 'APPROVED',
+            status: finalStatus,
             updatedBy: approvedBy
           }
         });
+
+        // Handle milestone transition from SPARE_REQUESTED to SPARE_APPROVED
+        try {
+          const ticket = await tx.ticket.findUnique({
+            where: { ticketCode: spareItem.spareRequest.ticketCode },
+            include: {
+              ticketMilestones: {
+                where: { status: 'IN_PROGRESS' },
+                orderBy: { order: 'desc' }
+              }
+            }
+          });
+
+          if (ticket && ticket.ticketMilestones.length > 0) {
+            const currentMilestone = ticket.ticketMilestones[0];
+            
+            if (currentMilestone.stage === 'SPARE_REQUESTED') {
+              // Complete current milestone
+              await tx.ticketMilestone.update({
+                where: { id: currentMilestone.id },
+                data: {
+                  status: 'DONE',
+                  completedAt: new Date(),
+                  changedBy: approvedBy,
+                  notes: `${currentMilestone.notes || ''} - All spare items approved by ${approverName} (${approverRole})`
+                }
+              });
+
+              // Create appropriate milestone based on final status
+              let nextStage, milestoneNotes, order;
+              if (rejectedItems.length === allItems.length) {
+                // All items rejected - create SPARE_REJECTED milestone
+                nextStage = 'SPARE_REJECTED';
+                milestoneNotes = `Spare request fully rejected - ${allItems.length} item(s) rejected`;
+                order = 11;
+              } else if (approvedItems.length === allItems.length) {
+                // All items approved - create SPARE_APPROVED milestone
+                nextStage = 'SPARE_APPROVED';
+                milestoneNotes = `Spare request fully approved - ${allItems.length} item(s) approved by ${approverName} (${approverRole})`;
+                order = 10;
+              } else {
+                // Mixed scenario - create SPARE_APPROVED milestone (partial approval)
+                nextStage = 'SPARE_APPROVED';
+                milestoneNotes = `Spare request processed - ${approvedItems.length} approved, ${rejectedItems.length} rejected by ${approverName} (${approverRole})`;
+                order = 10;
+              }
+              
+              const newMilestone = await tx.ticketMilestone.create({
+                data: {
+                  ticketId: ticket.id,
+                  stage: nextStage,
+                  status: 'IN_PROGRESS',
+                  order: order,
+                  changedBy: approvedBy,
+                  notes: milestoneNotes,
+                  startedAt: new Date()
+                }
+              });
+              
+              milestoneTransitionResult = {
+                previousStage: 'SPARE_REQUESTED',
+                newStage: nextStage,
+                milestoneId: newMilestone.id,
+                ticketId: ticket.id
+              };
+            }
+          }
+        } catch (milestoneError) {
+          console.error('❌ Error transitioning milestone after spare approval:', milestoneError);
+          // Don't throw here as the item approval was successful
+        }
       }
 
       // Create notification for requester
@@ -628,7 +754,7 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         }
       });
 
-      return { updatedItem, notification };
+      return { updatedItem, notification, milestoneTransitionResult };
     });
 
     return result;
@@ -648,7 +774,11 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
       const spareItem = await tx.spareRequestItem.findUnique({
         where: { id: itemId },
         include: {
-          product: true,
+          product: {
+            include: {
+              inventory: true,
+            },
+          },
           spareRequest: {
             include: {
               createdByUser: {
@@ -679,7 +809,11 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
           updatedAt: new Date()
         },
         include: {
-          product: true,
+          product: {
+            include: {
+              inventory: true,
+            },
+          },
           spareRequest: {
             include: {
               createdByUser: {
@@ -690,20 +824,105 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
         }
       });
 
-      // Check if all items in the request are rejected
+      // Check if all items have been processed (approved or rejected)
       const allItems = await tx.spareRequestItem.findMany({
         where: { spareRequestId: spareItem.spareRequestId }
       });
 
+      const approvedItems = allItems.filter(item => item.status === 'approved');
       const rejectedItems = allItems.filter(item => item.status === 'rejected');
-      if (rejectedItems.length === allItems.length) {
+      const processedItems = approvedItems.length + rejectedItems.length;
+      let milestoneTransitionResult = null;
+      
+      if (processedItems === allItems.length) {
+        // Determine final status based on what was processed
+        let finalStatus;
+        if (approvedItems.length === allItems.length) {
+          finalStatus = 'APPROVED';
+        } else if (rejectedItems.length === allItems.length) {
+          finalStatus = 'REJECTED';
+        } else {
+          finalStatus = 'PARTIALLY_APPROVED'; // Mixed scenario
+        }
+        
         await tx.spareRequest.update({
           where: { id: spareItem.spareRequestId },
           data: {
-            status: 'REJECTED',
+            status: finalStatus,
             updatedBy: rejectedBy
           }
         });
+        
+        // Handle milestone transition from SPARE_REQUESTED to SPARE_APPROVED (regardless of mix)
+        try {
+          const ticket = await tx.ticket.findUnique({
+            where: { ticketCode: spareItem.spareRequest.ticketCode },
+            include: {
+              ticketMilestones: {
+                where: { status: 'IN_PROGRESS' },
+                orderBy: { order: 'desc' }
+              }
+            }
+          });
+
+          if (ticket && ticket.ticketMilestones.length > 0) {
+            const currentMilestone = ticket.ticketMilestones[0];
+            
+            if (currentMilestone.stage === 'SPARE_REQUESTED') {
+              // Complete current milestone
+              await tx.ticketMilestone.update({
+                where: { id: currentMilestone.id },
+                data: {
+                  status: 'DONE',
+                  completedAt: new Date(),
+                  changedBy: rejectedBy,
+                  notes: `${currentMilestone.notes || ''} - All spare items processed: ${approvedItems.length} approved, ${rejectedItems.length} rejected`
+                }
+              });
+
+              // Create appropriate milestone based on final status
+              let nextStage, milestoneNotes, order;
+              if (rejectedItems.length === allItems.length) {
+                // All items rejected - create SPARE_REJECTED milestone
+                nextStage = 'SPARE_REJECTED';
+                milestoneNotes = `Spare request fully rejected - ${allItems.length} item(s) rejected`;
+                order = 11;
+              } else if (approvedItems.length === allItems.length) {
+                // All items approved - create SPARE_APPROVED milestone
+                nextStage = 'SPARE_APPROVED';
+                milestoneNotes = `Spare request fully approved - ${allItems.length} item(s) approved`;
+                order = 10;
+              } else {
+                // Mixed scenario - create SPARE_APPROVED milestone (partial approval)
+                nextStage = 'SPARE_APPROVED';
+                milestoneNotes = `Spare request processed - ${approvedItems.length} approved, ${rejectedItems.length} rejected`;
+                order = 10;
+              }
+              
+              const newMilestone = await tx.ticketMilestone.create({
+                data: {
+                  ticketId: ticket.id,
+                  stage: nextStage,
+                  status: 'IN_PROGRESS',
+                  order: order,
+                  changedBy: rejectedBy,
+                  notes: milestoneNotes,
+                  startedAt: new Date()
+                }
+              });
+              
+              milestoneTransitionResult = {
+                previousStage: 'SPARE_REQUESTED',
+                newStage: nextStage,
+                milestoneId: newMilestone.id,
+                ticketId: ticket.id
+              };
+            }
+          }
+        } catch (milestoneError) {
+          console.error('❌ Error transitioning milestone after spare rejection:', milestoneError);
+          // Don't throw here as the item rejection was successful
+        }
       }
 
       // Create notification for requester
@@ -722,7 +941,7 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
         }
       });
 
-      return { updatedItem, notification };
+      return { updatedItem, notification, milestoneTransitionResult };
     });
 
     return result;
@@ -825,14 +1044,20 @@ async function bulkApproveSpareRequestItems(itemIds, approvedBy, approverName, a
       successful: [],
       failed: [],
       insufficientStock: [],
-      totalProcessed: itemIds.length
+      totalProcessed: itemIds.length,
+      milestoneTransitions: []
     };
 
     // Process each item individually to handle failures gracefully
     for (const itemId of itemIds) {
       try {
-        await approveSpareRequestItem(parseInt(itemId), approvedBy, approverName, approverRole);
+        const approvalResult = await approveSpareRequestItem(parseInt(itemId), approvedBy, approverName, approverRole);
         results.successful.push(itemId);
+        
+        // Collect milestone transitions
+        if (approvalResult.milestoneTransitionResult) {
+          results.milestoneTransitions.push(approvalResult.milestoneTransitionResult);
+        }
       } catch (error) {
         if (error.message.includes('Insufficient inventory')) {
           results.insufficientStock.push({
