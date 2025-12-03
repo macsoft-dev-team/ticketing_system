@@ -1,20 +1,16 @@
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   ChevronRight,
-  Ticket,
   UserCircle,
   LogOut,
-  CrossIcon,
-  X,
   ChevronLeft,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { cn } from '../../lib/utils';
 import { setSidebarCollapsed, toggleSidebar } from '../../lib/features/uiSlice';
-const logo = "/macsoft-logo.png";
-import { menu } from '../../lib/constants/variables';
 import useAuth from '../../lib/hooks/useAuth';
 import { switchMenuItems } from '../../lib/constants/routes';
+import logo from '/macsoft-logo.png';
 
 
 
@@ -126,7 +122,7 @@ const Sidebar = () => {
           })}
         </ul>
       </nav>
-      <footer>
+      <footer className="px-4 py-4 space-y-1">
         <div>
           <Link
             to={"/profile"}
@@ -155,16 +151,12 @@ const Sidebar = () => {
             to={"/login"}
             onClick={handleLogout}
             className={cn(
-              "group flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200",
-              isProfileActive
-                ? "bg-blue-50 text-blue-700 border border-blue-200"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              "group flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 text-gray-600 hover:bg-gray-50 hover:text-red-600"
             )}
           >
             <div className="flex items-center space-x-3">
               <LogOut className={cn(
-                "w-5 h-5 transition-colors",
-                isProfileActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
+                "w-5 h-5 transition-colors text-gray-400 group-hover:text-red-600"
               )} />
               <span>Sign out</span>
             </div>

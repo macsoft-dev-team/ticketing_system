@@ -40,8 +40,10 @@ import SettingsPage from '../../pages/settings';
 import Projects from '../../pages/projects/projects';
 import DeliveryPage from '../../pages/delivery/DeliveryPage';
 
-
 const BASE_ITEMS = {
+  // -------------------------
+  // MAIN
+  // -------------------------
   dashboard: {
     path: '/dashboard',
     icon: LayoutDashboard,
@@ -76,6 +78,25 @@ const BASE_ITEMS = {
     element: <TicketForm />,
   },
 
+  inventory: {
+    path: '/inventory',
+    icon: Boxes,
+    label: 'Inventory',
+    category: 'main',
+    element: <Inventory />,
+  },
+
+  products: {
+    path: '/products',
+    icon: PackageSearch,
+    label: 'Products',
+    category: 'main',
+    element: <Products />,
+  },
+
+  // -------------------------
+  // TECHNICAL
+  // -------------------------
   receiveController: {
     path: '/receive-controller',
     icon: ScanLine,
@@ -84,12 +105,12 @@ const BASE_ITEMS = {
     element: <ReceiveController />,
   },
 
-  users: {
-    path: '/users',
-    icon: UsersRound,
-    label: 'Users',
-    category: 'management',
-    element: <UsersPage />,
+  deliver: {
+    path: '/deliver',
+    icon: Truck,
+    label: 'Deliver',
+    category: 'technical',
+    element: <DeliveryPage />,
   },
 
   serviceCenter: {
@@ -98,6 +119,33 @@ const BASE_ITEMS = {
     label: 'Service Center',
     category: 'technical',
     element: <ServiceCenters />,
+  },
+
+  // -------------------------
+  // MANAGEMENT
+  // -------------------------
+  users: {
+    path: '/users',
+    icon: UsersRound,
+    label: 'Users',
+    category: 'management',
+    element: <UsersPage />,
+  },
+
+  organisation: {
+    path: '/customers',
+    icon: Building,
+    label: 'Customers',
+    category: 'management',
+    element: <OrganisationPage />,
+  },
+
+  project: {
+    path: '/projects',
+    icon: FolderKanban,
+    label: 'Projects',
+    category: 'management',
+    element: <Projects />,
   },
 
   spareRequest: {
@@ -116,28 +164,12 @@ const BASE_ITEMS = {
     element: <SpareRequestApproval />,
   },
 
-  inventory: {
-    path: '/inventory',
-    icon: Boxes,
-    label: 'Inventory',
-    category: 'main',
-    element: <Inventory />,
-  },
-
-  products: {
-    path: '/products',
-    icon: PackageSearch,
-    label: 'Products',
-    category: 'main',
-    element: <Products />,
-  },
-
-  organisation: {
-    path: '/customers',
-    icon: Building,
-    label: 'Customers',
+  settings: {
+    path: '/settings',
+    icon: Settings,
+    label: 'Settings',
     category: 'management',
-    element: <OrganisationPage />,
+    element: <SettingsPage />,
   },
 
   profile: {
@@ -148,100 +180,103 @@ const BASE_ITEMS = {
     element: <ProfilePage />,
     hidden: true,
   },
-
-  project: {
-    path: '/projects',
-    icon: FolderKanban,
-    label: 'Projects',
-    category: 'management',
-    element: <Projects />,
-  },
-
-  deliver: {
-    path: '/deliver',
-    icon: Truck,
-    label: 'Deliver',
-    category: 'technical',
-    element: <DeliveryPage />,
-  },
-
-  settings: {
-    path: '/settings',
-    icon: Settings,
-    label: 'Settings',
-    category: 'management',
-    element: <SettingsPage />,
-  },
-
 };
 
 const ROLE_ITEMS = {
   MACSOFT_ADMIN: [
     BASE_ITEMS.dashboard,
+
     BASE_ITEMS.tickets,
-    BASE_ITEMS.spareRequestApproval,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
+
     BASE_ITEMS.receiveController,
-    BASE_ITEMS.organisation,
-    BASE_ITEMS.project,
+    BASE_ITEMS.deliver,
     BASE_ITEMS.serviceCenter,
-    BASE_ITEMS.users,
+
     BASE_ITEMS.products,
     BASE_ITEMS.inventory,
+
+    BASE_ITEMS.organisation,
+    BASE_ITEMS.project,
+    BASE_ITEMS.users,
+
+    BASE_ITEMS.spareRequestApproval,
+
     BASE_ITEMS.settings,
+
     BASE_ITEMS.profile,
-    BASE_ITEMS.deliver,
   ],
+
   MACSOFT_HEAD: [
     BASE_ITEMS.dashboard,
+
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.receiveController,
     BASE_ITEMS.spareRequestApproval,
-    BASE_ITEMS.products,
-    BASE_ITEMS.serviceCenter,
-    BASE_ITEMS.profile,
-    BASE_ITEMS.deliver,
 
+    BASE_ITEMS.receiveController,
+    BASE_ITEMS.deliver,
+    BASE_ITEMS.serviceCenter,
+
+    BASE_ITEMS.products,
+    BASE_ITEMS.inventory,
+
+    BASE_ITEMS.organisation,
+    BASE_ITEMS.project,
+
+    BASE_ITEMS.profile,
   ],
+
   MACSOFT_SUPPORT: [
     BASE_ITEMS.dashboard,
+
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.receiveController,
-    BASE_ITEMS.products,
-    BASE_ITEMS.serviceCenter,
-    BASE_ITEMS.profile,
-    BASE_ITEMS.deliver,
 
+    BASE_ITEMS.receiveController,
+    BASE_ITEMS.deliver,
+    BASE_ITEMS.serviceCenter,
+
+    BASE_ITEMS.products,
+
+    BASE_ITEMS.profile,
   ],
+
   CUSTOMER_SERVICE_HEAD: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
-    BASE_ITEMS.inventory,
-    BASE_ITEMS.receiveController,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.profile,
 
+    BASE_ITEMS.receiveController,
+
+    BASE_ITEMS.inventory,
+
+    BASE_ITEMS.profile,
   ],
+
   SERVICE_CENTER_TECHNICIAN: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
-    BASE_ITEMS.receiveController,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.profile,
+
+    BASE_ITEMS.receiveController,
     BASE_ITEMS.deliver,
+
+    BASE_ITEMS.profile,
   ],
+
   CUSTOMER_FIELD_ENGINEER: [
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
+
     BASE_ITEMS.profile,
   ],
 };
+
 
 export const switchMenuItems = (role) => (ROLE_ITEMS[role] || ROLE_ITEMS.CUSTOMER_FIELD_ENGINEER).filter(item => item && item.path);
 
