@@ -249,7 +249,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handlePreview}
-            className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+            className="p-2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors"
             title="Preview"
           >
               <Eye  size={16} />
@@ -262,7 +262,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
           disabled={isDownloading}
           className={`p-2 transition-colors ${isDownloading
             ? 'text-gray-400 cursor-not-allowed'
-            : 'text-blue-600 hover:text-blue-800'
+            : 'text-blue-600 hover:text-blue-800 cursor-pointer'
             }`}
           title={isDownloading ? 'Downloading...' : 'Download'}
         >

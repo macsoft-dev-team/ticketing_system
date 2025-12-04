@@ -137,7 +137,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
           onClick={handlePreview}
           className={`p-1 rounded transition-colors ${isOwnMessage
               ? 'text-white hover:text-blue-100'
-              : 'text-gray-600 hover:text-gray-800'
+            : 'text-gray-600 hover:text-gray-800 cursor-pointer '
             }`}
           title="Preview"
         >
@@ -150,7 +150,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
               ? 'opacity-50 cursor-not-allowed'
               : isOwnMessage
                 ? 'text-white hover:text-blue-100'
-                : 'text-gray-600 hover:text-gray-800'
+              : 'text-gray-600 hover:text-gray-800 cursor-pointer '
             }`}
           title={isDownloading ? 'Downloading...' : 'Download'}
         >
@@ -340,7 +340,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2 bg-gray-100 rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm"
+                  className="flex items-center gap-2 bg-gray-100 cursor-pointer rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm"
                 >
                   <File className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-gray-500" />
                   <span className="truncate max-w-24 sm:max-w-32">{file.name}</span>
@@ -555,7 +555,7 @@ export const ChatWindow = ({
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={onRefresh}
-                className="p-1 text-gray-500 hover:text-blue-500 transition-colors"
+                className="p-1 text-gray-500 cursor-pointer hover:text-blue-500 transition-colors"
                 title="Refresh messages"
               >
                 <RefreshCw className="w-3 h-3" />

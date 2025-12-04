@@ -311,7 +311,7 @@ const NotificationBell = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+        className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
         <Bell className="w-5 h-5" />
@@ -339,7 +339,7 @@ const NotificationBell = () => {
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
