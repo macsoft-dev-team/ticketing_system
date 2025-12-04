@@ -43,13 +43,13 @@ export default function Pagination({
     };
 
     const pageBtnBase = darkMode
-        ? "inline-flex h-9 min-w-9 items-center justify-center border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        : "inline-flex h-9 min-w-9 items-center justify-center border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed";
+        ? "inline-flex sm:h-9 min-h-6 max-h-6 sm:min-h-9 sm:min-w-9 max-w-4 items-center justify-center border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors px-3 text-[10px] sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        : "inline-flex sm:h-9 min-h-6 max-h-6 sm:min-h-9 sm:min-w-9 max-w-4 items-center justify-center border border-gray-200 bg-white text-gray-700 hover:bg-gray-100 transition-colors px-3 text-[10px] sm:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed";
 
     return (
-        <div className={`flex items-center justify-between border-t px-3 py-2 ${darkMode ? "border-gray-200 bg-gray-50/40 dark:border-gray-800 dark:bg-neutral-900/60" : "border-gray-200 bg-gray-50/40"}`}>
+        <div className={`sm:flex items-center grid gap-2 text-center sm:text-start sm:justify-between border-t px-2 sm:px-3 py-2 ${darkMode ? "border-gray-200 bg-gray-50/40 dark:border-gray-800 dark:bg-neutral-900/60" : "border-gray-200 bg-gray-50/40"}`}>
             {showItemsInfo && (
-                <div className={`text-xs ${darkMode ? "text-gray-600 dark:text-gray-400" : "text-gray-600"}`}>
+                <div className={`text-[10px] sm:text-xs ${darkMode ? "text-gray-600 dark:text-gray-400" : "text-gray-600"}`}>
                     Page {currentPage} of {totalPages}
                     {totalItems > 0 && (
                         <span className="ml-2">
@@ -59,7 +59,7 @@ export default function Pagination({
                 </div>
             )}
 
-            <nav className="flex items-center gap-1" aria-label="Pagination">
+            <nav className="flex items-center sm:text-xs text-[10px] gap-1" aria-label="Pagination">
                 <button
                     type="button"
                     className={pageBtnBase}
@@ -81,7 +81,7 @@ export default function Pagination({
 
                 {getPaginationRange(totalPages, currentPage, siblingCount).map((p, idx) => {
                     return p === "..." ? (
-                        <span key={`ellipsis-${idx}`} className="select-none px-2 text-gray-400">
+                        <span key={`ellipsis-${idx}`} className="select-none sm:px-2 text-gray-400">
                             …
                         </span>
                     ) : (
@@ -90,7 +90,7 @@ export default function Pagination({
                             type="button"
                             onClick={() => onPageChange(p)}
                             aria-current={p === currentPage ? "page" : undefined}
-                            className={`inline-flex h-9 min-w-9 items-center justify-center transition-colors px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed border  ${Number(p) === Number(currentPage) 
+                                className={`inline-flex sm:h-9 sm:min-w-9 min-h-6 sm:min-h-9 max-h-6 items-center justify-center transition-colors px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed border  ${Number(p) === Number(currentPage) 
                                 ? (darkMode ? "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300" : "border-blue-200 bg-blue-50 text-blue-700") 
                                 : (darkMode ? "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-100")}`}
                         >

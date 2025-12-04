@@ -39,10 +39,10 @@ export default function Header() {
     // Debounce the search term with 300ms delay
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const filterTabItems = [
-        { id: '', label: 'All', shortLabel: 'All', count: 12, key: 'ALL' },
-        { id: 'OPEN', label: 'Open', shortLabel: 'Open', count: 5, key: 'OPEN' },
-        { id: 'IN_PROGRESS', label: 'In Progress', shortLabel: 'Progress', count: 4, key: 'IN_PROGRESS' },
-        { id: 'CLOSED', label: 'Closed', shortLabel: 'Closed', count: 3, key: 'CLOSED' }
+        { id: '', label: 'All', shortLabel: 'All', key: 'ALL' },
+        { id: 'OPEN', label: 'Open', shortLabel: 'Open', key: 'OPEN' },
+        { id: 'IN_PROGRESS', label: 'In Progress', shortLabel: 'Progress', key: 'IN_PROGRESS' },
+        { id: 'CLOSED', label: 'Closed', shortLabel: 'Closed', key: 'CLOSED' }
     ];
 
     // Handle filter changes
@@ -243,8 +243,7 @@ export default function Header() {
                 {/* Right Section */}
                 <div className="flex items-center space-x-2 sm:space-x-3">
                     {/* Search Input - Desktop */}
-                    {tickets.length > 0 && (
-                        <motion.div
+                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
@@ -260,11 +259,8 @@ export default function Header() {
                                 className="pl-10 pr-4 py-2 w-48 lg:w-64 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                             />
                         </motion.div>
-                    )}
-
-                    {/* Search Button - Mobile */}
-                    {tickets.length > 0 && (
-                        <motion.button
+ 
+                         <motion.button
                             variants={buttonVariants}
                             whileHover="hover"
                             whileTap="tap"
@@ -273,10 +269,8 @@ export default function Header() {
                         >
                             <Search className="w-4 h-4" />
                         </motion.button>
-                    )}
-                    {/* Filter Button - Mobile & Tablet */}
-                    {tickets.length > 0 && (
-                        <motion.button
+                     {/* Filter Button - Mobile & Tablet */}
+                         <motion.button
                             variants={buttonVariants}
                             whileHover="hover"
                             whileTap="tap"
@@ -288,8 +282,7 @@ export default function Header() {
                         >
                             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Filter className="w-5 h-5" />}
                         </motion.button>
-                    )}
-                    {/* Create Ticket Button */}
+                     {/* Create Ticket Button */}
                     <NavLink to="/tickets/new" >
                         <motion.button
                             variants={buttonVariants}
@@ -370,12 +363,14 @@ export default function Header() {
                                             transition={{ delay: 0.05 * index }}
                                         >
                                             <span className="text-sm font-medium">{filter.label}</span>
-                                            <span className={`px-2 py-1 text-xs rounded-full ${activeFilter === filter.id
-                                                ? 'bg-blue-500 text-white'
-                                                : 'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                {filter.count}
-                                            </span>
+                                            {statusCount?.[filter.key] > 0 && (
+                                                <span className={`px-2 py-1 text-xs rounded-full ${activeFilter === filter.id
+                                                    ? 'bg-blue-500 text-white'
+                                                    : 'bg-gray-100 text-gray-600'
+                                                    }`}>
+                                                    {statusCount?.[filter.key]}
+                                                </span>
+                                            )}
                                         </motion.button>
                                     ))}
                                 </div>
