@@ -1,4 +1,4 @@
-import { Plus, Search, Filter, X } from "lucide-react";
+import { Plus, Search, Filter, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
@@ -8,9 +8,33 @@ import { useDebounce } from "../../../lib/hooks/ticketHooks";
 export default function Header() {
     const { tickets, setFilters, filters, statusCount, setCurrentPage } = useTickets();
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
+    const [activeStageFilter, setActiveStageFilter] = useState(filters?.stage || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isStageDropdownOpen, setIsStageDropdownOpen] = useState(false);
+
+    // Stage options based on the provided requirements
+    const stageOptions = [
+        { value: '', label: 'All Stages' },
+        { value: 'TICKET_RAISED', label: 'Ticket Raised' },
+        { value: 'SERVICE_CENTER_ASSIGNED', label: 'Service Center Assigned' },
+        { value: 'REQUEST_CLEARED_AT_FIELD', label: 'Request Cleared at Field' },
+        { value: 'SENT_TO_SERVICE_CENTER', label: 'Sent to Service Center' },
+        { value: 'SUBMITTED_TO_SERVICE_CENTER', label: 'Submitted to Service Center' },
+        { value: 'RECEIVED_AT_SERVICE_CENTER', label: 'Received at Service Center' },
+        { value: 'DIAGNOSIS_IN_PROGRESS', label: 'Diagnosis in Progress' },
+        { value: 'SPARE_REQUESTED', label: 'Spare Requested' },
+        { value: 'SPARE_APPROVED', label: 'Spare Approved' },
+        { value: 'PARTIALY_SPARE_APPROVED', label: 'Partially Spare Approved' },
+        { value: 'REPAIR_IN_PROGRESS', label: 'Repair in Progress' },
+        { value: 'REPLACEMENT_IN_PROGRESS', label: 'Replacement in Progress' },
+        { value: 'REPAIRED', label: 'Repaired' },
+        { value: 'READY_FOR_DISPATCH', label: 'Ready for Dispatch' },
+        { value: 'DELIVERED_TO_FIELD', label: 'Delivered to Field' },
+        { value: 'FIELD_CLEARANCE_APPROVED', label: 'Field Clearance Approved' },
+        { value: 'TICKET_CLOSED', label: 'Ticket Closed' }
+    ];
 
     // Debounce the search term with 300ms delay
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -24,9 +48,17 @@ export default function Header() {
     // Handle filter changes
     const handleFilterChange = useCallback((status) => {
         setActiveFilter(status);
-        setFilters({ status, search: debouncedSearchTerm || '' });
+        setFilters({ status, stage: activeStageFilter, search: debouncedSearchTerm || '' });
         setCurrentPage(0); // Reset to first page on filter change
-    }, [debouncedSearchTerm, setFilters, setCurrentPage]);
+    }, [activeStageFilter, debouncedSearchTerm, setFilters, setCurrentPage]);
+
+    // Handle stage filter changes
+    const handleStageFilterChange = useCallback((stage) => {
+        setActiveStageFilter(stage);
+        setFilters({ status: activeFilter, stage, search: debouncedSearchTerm || '' });
+        setCurrentPage(0); // Reset to first page on filter change
+        setIsStageDropdownOpen(false);
+    }, [activeFilter, debouncedSearchTerm, setFilters, setCurrentPage]);
 
     // Handle search changes
     const handleSearchChange = useCallback((search) => {
@@ -38,10 +70,24 @@ export default function Header() {
     useEffect(() => {
         // Only update if the values have actually changed and setFilters is available
         const currentSearch = debouncedSearchTerm || '';
-        if (setFilters && (filters?.status !== activeFilter || filters?.search !== currentSearch)) {
-            setFilters({ status: activeFilter, search: currentSearch });
+        if (setFilters && (filters?.status !== activeFilter || filters?.stage !== activeStageFilter || filters?.search !== currentSearch)) {
+            setFilters({ status: activeFilter, stage: activeStageFilter, search: currentSearch });
         }
-    }, [debouncedSearchTerm, activeFilter, filters?.status, filters?.search, setFilters]);
+    }, [debouncedSearchTerm, activeFilter, activeStageFilter, filters?.status, filters?.stage, filters?.search, setFilters]);
+
+    // Close stage dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isStageDropdownOpen && !event.target.closest('[data-stage-dropdown]')) {
+                setIsStageDropdownOpen(false);
+            }
+        };
+
+        if (isStageDropdownOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [isStageDropdownOpen]);
 
     const headerVariants = {
         initial: { opacity: 0, y: -20 },
@@ -135,6 +181,63 @@ export default function Header() {
                                 </motion.button>
                             ))}
                         </motion.div>
+
+                    {/* Stage Filter Dropdown - Desktop */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.25 }}
+                        className="hidden lg:block relative"
+                        data-stage-dropdown
+                    >
+                        <motion.button
+                            variants={buttonVariants}
+                            whileHover="hover"
+                            whileTap="tap"
+                            onClick={() => setIsStageDropdownOpen(!isStageDropdownOpen)}
+                            className="flex items-center gap-2 px-3 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200"
+                        >
+                             <span className="text-gray-900">
+                                {activeStageFilter ? stageOptions.find(s => s.value === activeStageFilter)?.label : 'All Stages'}
+                            </span>
+                            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                                isStageDropdownOpen ? 'rotate-180' : ''
+                            }`} />
+                        </motion.button>
+
+                        <AnimatePresence>
+                            {isStageDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute top-full right-0 mt-1 sm:min-w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
+                                >
+                                    {stageOptions.map((stage, index) => (
+                                        <motion.button
+                                            key={stage.value}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: index * 0.02 }}
+                                            onClick={() => handleStageFilterChange(stage.value)}
+                                            className={`w-full text-left px-4 py-3 text-xs sm:text-sm hover:bg-gray-50 transition-colors duration-150 ${
+                                                activeStageFilter === stage.value
+                                                    ? 'bg-blue-50 text-blue-600 font-medium'
+                                                    : 'text-gray-700'
+                                            } ${
+                                                index === 0 ? 'rounded-t-lg' : ''
+                                            } ${
+                                                index === stageOptions.length - 1 ? 'rounded-b-lg' : 'border-b border-gray-100'
+                                            }`}
+                                        >
+                                            {stage.label}
+                                        </motion.button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
                  </div>
 
                 {/* Right Section */}
@@ -243,34 +346,59 @@ export default function Header() {
                         transition={{ duration: 0.3 }}
                         className="lg:hidden px-4 pb-4 border-t border-gray-200 bg-gray-50"
                     >
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
-                            {filterTabItems.map((filter, index) => (
-                                <motion.button
-                                    key={filter.id}
-                                    variants={buttonVariants}
-                                    whileHover="hover"
-                                    whileTap="tap"
-                                    onClick={() => {
-                                        handleFilterChange(filter.id);
+                        <div className="space-y-4 mt-4">
+                            {/* Status Filter */}
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-700 mb-2">Status</h3>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    {filterTabItems.map((filter, index) => (
+                                        <motion.button
+                                            key={filter.id}
+                                            variants={buttonVariants}
+                                            whileHover="hover"
+                                            whileTap="tap"
+                                            onClick={() => {
+                                                handleFilterChange(filter.id);
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className={`flex items-center justify-between px-3 py-3 rounded-lg border transition-all duration-200 ${activeFilter === filter.id
+                                                ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                                                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+                                                }`}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.05 * index }}
+                                        >
+                                            <span className="text-sm font-medium">{filter.label}</span>
+                                            <span className={`px-2 py-1 text-xs rounded-full ${activeFilter === filter.id
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-100 text-gray-600'
+                                                }`}>
+                                                {filter.count}
+                                            </span>
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Stage Filter */}
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-700 mb-2">Stage</h3>
+                                <select
+                                    value={activeStageFilter}
+                                    onChange={(e) => {
+                                        handleStageFilterChange(e.target.value);
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className={`flex items-center justify-between px-3 py-3 rounded-lg border transition-all duration-200 ${activeFilter === filter.id
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-md'
-                                        : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
-                                        }`}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.05 * index }}
+                                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                                 >
-                                    <span className="text-sm font-medium">{filter.label}</span>
-                                    <span className={`px-2 py-1 text-xs rounded-full ${activeFilter === filter.id
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-100 text-gray-600'
-                                        }`}>
-                                        {filter.count}
-                                    </span>
-                                </motion.button>
-                            ))}
+                                    {stageOptions.map((stage) => (
+                                        <option key={stage.value} value={stage.value}>
+                                            {stage.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </motion.div>
                 )}

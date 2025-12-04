@@ -104,12 +104,13 @@ const getTickets = async (skip, take, filter, userId, role) => {
       where.status = filter.status;
     }
 
-    // milestone stage filter - filter tickets by their milestone stage and status
-    if (filter && filter.milestoneStage) {
+    // stage filter - filter tickets by their current milestone stage
+    if (filter && (filter.stage || filter.milestoneStage)) {
+      const stageToFilter = filter.stage || filter.milestoneStage;
       where.ticketMilestones = {
         some: {
-          stage: filter.milestoneStage,
-          status: 'IN_PROGRESS' // Filter by milestones that are in progress
+          stage: stageToFilter,
+          status: 'IN_PROGRESS' // Filter by milestones that are currently in progress
         }
       };
     }

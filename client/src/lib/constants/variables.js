@@ -14,6 +14,7 @@ export const initialState = {
     error: null,
     filters: {
       status: "",
+      stage: "",
       priority: "all",
       category: "all",
       search: "",
