@@ -32,8 +32,8 @@ app.use(
     exposedHeaders: ["Set-Cookie"],
   })
 );
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: "150mb" }));
+app.use(express.urlencoded({ extended: false, limit: "150mb" }));
 app.use(cookieParser());
 app.get("/", (req, res) => {
   res.send("hello from backend");
