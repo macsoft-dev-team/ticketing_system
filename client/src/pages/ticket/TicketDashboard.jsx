@@ -951,10 +951,10 @@ export default function TicketDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.3 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => navigate('/tickets')}
-              className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="p-2 text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
             >
               <ArrowLeft size={20} />
             </motion.button>

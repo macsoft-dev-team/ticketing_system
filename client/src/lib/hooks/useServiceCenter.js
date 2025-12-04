@@ -163,12 +163,7 @@ const useServiceCenter = () => {
     (ticketId, centerCode) => {
       return dispatch(assignServiceCenterToTicket({ ticketId, centerCode }))
         .unwrap()
-        .then((result) => {
-          addToast({
-            title: "Service Center Assigned!",
-            description: `Service center has been successfully assigned to the ticket.`,
-            variant: "success",
-          });
+        .then((result) => { 
           return result;
         })
         .catch(createErrorHandler(addToast, "assign", "service center"));
