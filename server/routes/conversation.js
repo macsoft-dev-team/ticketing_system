@@ -24,24 +24,58 @@ const createConversationStorage = (ticketCode) => multer.diskStorage({
   }
 });
 
-const createConversationUpload = (ticketCode) => multer({ 
-  storage: createConversationStorage(ticketCode),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
-  },
-  fileFilter: function (req, file, cb) {
-    // Allow images, PDFs, and common document types
-    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|xlsx|xls/;
-    const extname = allowedTypes.test(file.originalname.toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Only images, PDFs, and documents are allowed!'));
+const createConversationUpload = (ticketCode) => {
+  const isMediaUploadEnabled = process.env.ENABLE_MEDIA_UPLOAD === 'true';
+  const maxFileSize = parseInt(process.env.MAX_FILE_SIZE_MB || '50') * 1024 * 1024;
+
+  return multer({ 
+    storage: createConversationStorage(ticketCode),
+    limits: {
+      fileSize: maxFileSize,
+    },
+    fileFilter: function (req, file, cb) {
+      // Base file types (always allowed)
+      const baseTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|xlsx|xls/;
+      const baseExtname = baseTypes.test(file.originalname.toLowerCase());
+      
+      // Media file types (only allowed if media upload is enabled)
+      const mediaTypes = /mp4|mov|avi|webm|ogg|mp3|wav|m4a/;
+      const mediaExtname = mediaTypes.test(file.originalname.toLowerCase());
+      
+      // Check mimetype for broader support
+      const baseMimeTypes = [
+        // Images
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+        // Documents
+        'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      ];
+      
+      const mediaMimeTypes = [
+        // Videos
+        'video/mp4', 'video/webm', 'video/ogg', 'video/avi', 'video/mov', 'video/quicktime',
+        // Audio
+        'audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/m4a', 'audio/aac'
+      ];
+      
+      const baseMimetypeAllowed = baseMimeTypes.includes(file.mimetype);
+      const mediaMimetypeAllowed = mediaMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('audio/') || file.mimetype.startsWith('video/');
+      
+      // Allow base files always, media files only if enabled
+      const isAllowedFileType = (baseMimetypeAllowed && baseExtname) || 
+                                (isMediaUploadEnabled && mediaMimetypeAllowed && mediaExtname);
+      
+      if (isAllowedFileType) {
+        return cb(null, true);
+      } else {
+        const errorMsg = isMediaUploadEnabled 
+          ? 'Invalid file type. Only images, documents, videos, and audio files are allowed!'
+          : 'Invalid file type. Only images and documents are allowed! Video/audio upload is disabled.';
+        cb(new Error(errorMsg));
+      }
     }
-  }
-});
+  });
+};
 
 // Middleware to handle conversation file uploads with ticket context
 const handleConversationFileUpload = async (req, res, next) => {
@@ -65,6 +99,16 @@ const handleConversationFileUpload = async (req, res, next) => {
      res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Route to check media upload configuration
+router.get("/config/media-upload", (req, res) => {
+  res.json({
+    enabled: process.env.ENABLE_MEDIA_UPLOAD === 'true',
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE_MB || '50'),
+    maxVideoDuration: parseInt(process.env.MAX_VIDEO_DURATION_SECONDS || '300'),
+    maxAudioDuration: parseInt(process.env.MAX_AUDIO_DURATION_SECONDS || '600')
+  });
+});
 
 router.get("/:ticketId", conversationController.getConversations);
 router.post(

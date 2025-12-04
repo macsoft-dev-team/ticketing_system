@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download } from 'lucide-react';
+import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic } from 'lucide-react';
 import DocumentModal from './DocumentModal';
+import MediaCapture from './MediaCapture';
+import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
+import { useToast } from '../../lib/hooks/use-toast';
 
 const TicketClosedView = ({ onViewChat }) => {
   return (
@@ -46,8 +49,24 @@ const TicketClosedView = ({ onViewChat }) => {
 const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const getIcon = (type) => {
-    return type === 'image' ? '🖼️' : '📄';
+  const getIcon = (attachment) => {
+    const mimeType = attachment.fileType || attachment.type || '';
+    const fileName = attachment.fileName || attachment.name || '';
+    
+    if (mimeType.startsWith('image/') || attachment.type === 'image') {
+      return '🖼️';
+    } else if (mimeType.startsWith('video/') || attachment.type === 'video' || /\.(mp4|mov|avi|webm)$/i.test(fileName)) {
+      return '🎥';
+    } else if (mimeType.startsWith('audio/') || attachment.type === 'audio' || /\.(mp3|wav|ogg|m4a)$/i.test(fileName)) {
+      return '🎵';
+    } else if (mimeType.includes('pdf') || fileName.endsWith('.pdf')) {
+      return '📄';
+    } else if (mimeType.includes('document') || mimeType.includes('word') || /\.(doc|docx)$/i.test(fileName)) {
+      return '📝';
+    } else if (mimeType.includes('spreadsheet') || mimeType.includes('excel') || /\.(xls|xlsx)$/i.test(fileName)) {
+      return '📊';
+    }
+    return '📁';
   };
 
   const handleDownload = async (e) => {
@@ -112,7 +131,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
           : 'bg-gray-200'
         }`}
     >
-      <span className="text-sm">{getIcon(attachment.type)}</span>
+      <span className="text-sm">{getIcon(attachment)}</span>
       <div className="flex-1 min-w-0">
         <p className={`text-xs font-medium truncate max-w-40 ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
           {attachment.name}
@@ -199,7 +218,34 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
 export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticketStatus = null }) => {
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
+  const [showMediaCapture, setShowMediaCapture] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
+  const [mediaUploadEnabled, setMediaUploadEnabled] = useState(false);
+  const [maxVideoDuration, setMaxVideoDuration] = useState(120);
+  const [maxAudioDuration, setMaxAudioDuration] = useState(300);
   const fileInputRef = useRef(null);
+  const { toast } = useToast();
+  
+  // Load media upload configuration on component mount
+  useEffect(() => {
+    const loadMediaConfig = async () => {
+      try {
+        const enabled = await isMediaUploadEnabled();
+        const videoDuration = await getMaxVideoDuration();
+        const audioDuration = await getMaxAudioDuration();
+        
+        setMediaUploadEnabled(enabled);
+        setMaxVideoDuration(videoDuration);
+        setMaxAudioDuration(audioDuration);
+      } catch (error) {
+        console.warn('Failed to load media config:', error);
+        // Fallback to environment variables
+        setMediaUploadEnabled(import.meta.env.VITE_ENABLE_MEDIA_UPLOAD === 'true');
+      }
+    };
+    
+    loadMediaConfig();
+  }, []);
 
   const handleSend = () => {
     if (message.trim() || attachments.length > 0) {
@@ -218,12 +264,72 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
+    
+    // Check if any files are media files when media upload is disabled
+    if (!mediaUploadEnabled) {
+      const mediaFiles = files.filter(file => {
+        const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|webm)$/i.test(file.name);
+        const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(file.name);
+        return isVideo || isAudio;
+      });
+      
+      if (mediaFiles.length > 0) {
+        toast({
+          title: "Video/Voice Upload Not Enabled",
+          description: `${mediaFiles.length === 1 ? 'This file type is' : 'These file types are'} not supported. Video and audio upload features are disabled. Please contact your administrator.`,
+          variant: "destructive"
+        });
+        
+        // Filter out media files
+        const allowedFiles = files.filter(file => {
+          const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|webm)$/i.test(file.name);
+          const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(file.name);
+          return !isVideo && !isAudio;
+        });
+        
+        setAttachments(prev => [...prev, ...allowedFiles]);
+        return;
+      }
+    }
+    
     setAttachments(prev => [...prev, ...files]);
   };
 
   const removeAttachment = (index) => {
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
+
+  const handleMediaCapture = (file, mediaType) => {
+    // Add the captured media file to attachments
+    setAttachments(prev => [...prev, file]);
+    setShowMediaCapture(false);
+  };
+
+  const handleMediaCaptureClose = () => {
+    setShowMediaCapture(false);
+  };
+
+  const handleMediaCaptureAttempt = () => {
+    if (!mediaUploadEnabled) {
+      toast({
+        title: "Video/Voice Upload Not Enabled",
+        description: "Video and audio upload features are currently disabled. Please contact your administrator to enable this feature.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setShowMediaCapture(true);
+  };
+
+  // Update mobile view on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className={`border-t py-5 border-gray-200 p-2 sm:p-4  ${disabled ? 'bg-gray-200' : 'bg-white '}`}>
@@ -281,7 +387,10 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             onChange={handleFileSelect}
             multiple
             className="hidden"
-            accept="image/*,.pdf,.doc,.docx,.txt"
+            accept={mediaUploadEnabled 
+              ? "image/*,.pdf,.doc,.docx,.txt,.mp4,.mov,.avi,.webm,.mp3,.wav,.ogg,.m4a"
+              : "image/*,.pdf,.doc,.docx,.txt"
+            }
           />
 
           <motion.button
@@ -290,9 +399,28 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
             className="p-2 sm:p-3 text-gray-500 hover:text-blue-500 transition-colors disabled:text-gray-300 disabled:cursor-not-allowed"
+            title={mediaUploadEnabled ? "Attach files" : "Attach files (media upload disabled)"}
           >
             <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
+
+          {/* Media Capture Button - Show on mobile or small screens */}
+          {isMobileView && (
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleMediaCaptureAttempt}
+              disabled={disabled}
+              className={`p-2 sm:p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
+                mediaUploadEnabled
+                  ? 'text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
+                  : 'text-gray-400 bg-gray-200 hover:bg-gray-300 cursor-pointer'
+              }`}
+              title={mediaUploadEnabled ? "Capture photo/video/audio" : "Media upload disabled - Contact admin"}
+            >
+              <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+            </motion.button>
+          )}
 
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -305,6 +433,19 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
           </motion.button>
         </div>
       </div>
+
+      {/* Media Capture Modal */}
+      <AnimatePresence>
+        {showMediaCapture && mediaUploadEnabled && (
+          <MediaCapture
+            onCapture={handleMediaCapture}
+            onClose={handleMediaCaptureClose}
+            disabled={disabled}
+            maxVideoDuration={maxVideoDuration}
+            maxAudioDuration={maxAudioDuration}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

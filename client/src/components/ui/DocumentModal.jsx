@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Download, FileText, Image, File as FileIcon } from 'lucide-react';
+import { X, Download, FileText, Image, File as FileIcon, Video, Volume2 } from 'lucide-react';
 
 const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
   const [loading, setLoading] = useState(false);
@@ -8,9 +8,13 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
 
   if (!isOpen || !fileDocument) return null;
 
-  const isImage = fileDocument.mimetype?.startsWith('image/');
-  const isPdf = fileDocument.mimetype === 'application/pdf';
+  const isImage = fileDocument.mimetype?.startsWith('image/') || fileDocument.type === 'image';
+  const isPdf = fileDocument.mimetype === 'application/pdf' || fileDocument.name?.endsWith('.pdf');
   const isText = fileDocument.mimetype === 'text/plain' || fileDocument.name?.endsWith('.txt');
+  const isVideo = fileDocument.mimetype?.startsWith('video/') || fileDocument.type === 'video' || 
+    /\.(mp4|mov|avi|webm|ogg)$/i.test(fileDocument.name || '');
+  const isAudio = fileDocument.mimetype?.startsWith('audio/') || fileDocument.type === 'audio' ||
+    /\.(mp3|wav|ogg|m4a|aac)$/i.test(fileDocument.name || '');
 
   const baseApiUrl = import.meta.env.VITE_API_URL;
   const baseUrl = baseApiUrl?.replace('/api', '') || 'http://localhost:3057'; // Remove /api for file URLs
@@ -154,11 +158,11 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
 
     if (isPdf) {
       return (
-        <div className="h-full min-h-screen">
+        <div className="h-full sm:min-h-[85vh] sm:max-h-[85vh]">
           <iframe
             src={fileUrl}
             title={fileDocument.name}
-            className="w-full h-full min-h-screen border-0"
+            className="w-full h-full sm:min-h-[85vh] sm:max-h-[85vh] border-0"
             onError={() => setError('Failed to load PDF')}
           />
         </div>
@@ -174,6 +178,50 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             className="w-full h-full border-0 bg-white"
             onError={() => setError('Failed to load text file')}
           />
+        </div>
+      );
+    }
+
+    if (isVideo) {
+      return (
+        <div className="flex items-center justify-center h-full min-h-96 p-4 bg-black">
+          <video
+            src={fileUrl}
+            controls
+            className="max-w-full max-h-full sm:min-w-60 sm:max-h-96 object-contain"
+            onError={() => setError('Failed to load video file')}
+            onLoadStart={() => console.log('Video loading:', fileUrl)}
+            preload="metadata"
+          >
+            <source src={fileUrl} type={fileDocument.mimetype} />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      );
+    }
+
+    if (isAudio) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full min-h-[400px] space-y-6 p-8">
+          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-4">
+            <Volume2 className="w-16 h-16 text-white" />
+          </div>
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{fileDocument.name}</h3>
+            <p className="text-sm text-gray-600">
+              {fileDocument.size} • {fileDocument.mimetype || 'Audio file'}
+            </p>
+          </div>
+          <audio
+            src={fileUrl}
+            controls
+            className="w-full max-w-md"
+            onError={() => setError('Failed to load audio file')}
+            preload="metadata"
+          >
+            <source src={fileUrl} type={fileDocument.mimetype} />
+            Your browser does not support the audio element.
+          </audio>
         </div>
       );
     }
@@ -226,6 +274,10 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
                 <Image className="w-5 h-5 text-blue-500" />
               ) : isPdf ? (
                 <FileText className="w-5 h-5 text-red-500" />
+              ) : isVideo ? (
+                <Video className="w-5 h-5 text-purple-500" />
+              ) : isAudio ? (
+                <Volume2 className="w-5 h-5 text-green-500" />
               ) : (
                 <FileIcon className="w-5 h-5 text-gray-500" />
               )}

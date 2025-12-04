@@ -80,9 +80,32 @@ export const ticketAPI = {
   },
 
   // Send message in conversation
-  sendMessage: async (ticketId, messageData) => {
-    const response = await apiClient.post(`/tickets/${ticketId}/messages`, messageData);
-    return response.data;
+  sendMessage: async (ticketId, messageData, files = null) => {
+    // If files are provided, create FormData for multipart upload
+    if (files && files.length > 0) {
+      const formData = new FormData();
+      
+      // Add message content if provided
+      if (messageData.message) {
+        formData.append('message', messageData.message);
+      }
+      
+      // Add files
+      files.forEach((file) => {
+        formData.append('attachments', file);
+      });
+      
+      const response = await apiClient.post(`/conversations/${ticketId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } else {
+      // Regular JSON message
+      const response = await apiClient.post(`/conversations/${ticketId}`, messageData);
+      return response.data;
+    }
   },
 
   // Close conversation
