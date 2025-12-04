@@ -236,10 +236,10 @@ const NotificationBell = () => {
             if (notification.title?.includes('approved') || notification.title?.includes('rejected')) {
               navigate('/spare-request-approval');
             } else {
-              navigate('/spare-request');
+              navigate('/spare-request-approval');
             }
           } else {
-            navigate('/spare-request');
+            navigate('/spare-request-approval');
           }
           break;
 
@@ -297,14 +297,14 @@ const NotificationBell = () => {
           if (ticketId) {
             navigate(`/tickets/${ticketId}`);
           } else {
-            navigate('/dashboard');
+            navigate(`/tickets/${ticketId}`);
           }
           break;
       }
     } catch (error) {
       console.error('Error navigating to notification target:', error);
       // Fallback navigation
-      navigate('/dashboard');
+      navigate(`/tickets/${ticketId}`);
     }
   };
 
@@ -323,7 +323,7 @@ const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+        <div className="absolute -right-14 sm:right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
