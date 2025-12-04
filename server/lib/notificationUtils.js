@@ -359,29 +359,38 @@ const saveAndBroadcastNotification = async (
 
     // If specific target users are provided, create recipients for them
     // Otherwise, create recipients for all users except the creator
-    let recipients;
+    let recipients = [];
 
     if (targetUserIds && Array.isArray(targetUserIds)) {
-      recipients = await Promise.all(
-        targetUserIds.map(async (userId) => {
-          return await prisma.notificationRecipient.create({
+      for (const userId of targetUserIds) {
+        try {
+          const recipient = await prisma.notificationRecipient.create({
             data: {
-              userId: userId,
               notificationId: notification.id,
-            },
-            include: {
-              user: { select: { id: true, name: true, role: true } },
-              notification: {
-                include: {
-                  createdBy: true,
-                  ticket: true,
-                  message: true,
-                },
-              },
+              userId: userId,
+              seen: false,
             },
           });
-        })
-      );
+          recipients.push(recipient);
+        } catch (error) {
+          // If it's a unique constraint error, find the existing recipient
+          if (error.code === 'P2002') {
+            const existingRecipient = await prisma.notificationRecipient.findUnique({
+              where: {
+                notificationId_userId: {
+                  notificationId: notification.id,
+                  userId: userId,
+                },
+              },
+            });
+            if (existingRecipient) {
+              recipients.push(existingRecipient);
+            }
+          } else {
+            throw error;
+          }
+        }
+      }
     } else {
       // Get all users except the creator
       const users = await prisma.user.findMany({

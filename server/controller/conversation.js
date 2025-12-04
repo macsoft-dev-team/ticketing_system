@@ -34,6 +34,15 @@ const createConversation = async (req, res) => {
     );
     res.status(201).json(conversation);
   } catch (error) {
+    console.error("Error creating conversation:", error);
+    
+    // Handle Prisma unique constraint violation
+    if (error.code === 'P2002' && error.meta?.target?.includes('NotificationRecipient_notificationId_userId_key')) {
+      return res.status(409).json({ 
+        message: "Notification recipient already exists for this notification" 
+      });
+    }
+    
     res.status(500).json({ message: "Internal server error" });
   }
 };
