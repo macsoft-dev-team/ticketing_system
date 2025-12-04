@@ -29,13 +29,33 @@ const createTicketUpload = (ticketCode) => multer({
   },
   fileFilter: function (req, file, cb) {
     // Accept images, PDFs, and document files
-    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|xlsx|xls/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const allowedExtensions = /\.(jpeg|jpg|png|gif|pdf|doc|docx|txt|xlsx|xls)$/i;
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/jpg', 
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    
+    const extname = allowedExtensions.test(file.originalname.toLowerCase());
+    const mimetype = allowedMimeTypes.includes(file.mimetype);
     
     if (mimetype && extname) {
       return cb(null, true);
     } else {
+      console.error(`File upload rejected:`, {
+        filename: file.originalname,
+        mimetype: file.mimetype,
+        extension: path.extname(file.originalname),
+        extname_test: extname,
+        mimetype_test: mimetype
+      });
       cb(new Error('Invalid file type. Only images, PDF, DOC, DOCX, TXT, and Excel files are allowed.'));
     }
   }
@@ -78,13 +98,33 @@ const handleTicketFileUpload = (req, res, next) => {
       },
       fileFilter: function (req, file, cb) {
         // Accept images, PDFs, and document files
-        const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|txt|xlsx|xls/;
-        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedTypes.test(file.mimetype);
+        const allowedExtensions = /\.(jpeg|jpg|png|gif|pdf|doc|docx|txt|xlsx|xls)$/i;
+        const allowedMimeTypes = [
+          'image/jpeg',
+          'image/jpg', 
+          'image/png',
+          'image/gif',
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/plain',
+          'application/vnd.ms-excel',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ];
+        
+        const extname = allowedExtensions.test(file.originalname.toLowerCase());
+        const mimetype = allowedMimeTypes.includes(file.mimetype);
         
         if (mimetype && extname) {
           return cb(null, true);
         } else {
+          console.error(`File upload rejected:`, {
+            filename: file.originalname,
+            mimetype: file.mimetype,
+            extension: path.extname(file.originalname),
+            extname_test: extname,
+            mimetype_test: mimetype
+          });
           cb(new Error('Invalid file type. Only images, PDF, DOC, DOCX, TXT, and Excel files are allowed.'));
         }
       }

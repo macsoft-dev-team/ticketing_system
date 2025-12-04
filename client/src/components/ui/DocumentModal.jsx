@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Download, Eye, FileText, Image, File as FileIcon } from 'lucide-react';
-
+import { X, Download, FileText, Image, File as FileIcon } from 'lucide-react';
+import { Button } from './Button';
 const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -137,11 +137,11 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
     
     if (isImage) {
       return (
-        <div className="flex items-center justify-center h-full min-h-[400px]">
+        <div className="flex items-center justify-center max-h-3/5 min-h-[400px] p-3 ">
           <img 
             src={fileUrl}
             alt={fileDocument.name}
-            className="max-w-full max-h-full object-contain"
+            className="sm:max-w-1/2 object-contain"
             onLoad={() => console.log('Image loaded successfully:', fileUrl)}
             onError={(e) => {
               console.error('Image failed to load:', fileUrl, e);
@@ -220,7 +220,7 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
           className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-2 border-b">
+          <div className="flex items-center justify-between p-2 border-b border-gray-200">
             <div className="flex items-center gap-3">
               {isImage ? (
                 <Image className="w-5 h-5 text-blue-500" />
@@ -240,17 +240,17 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             </div>
             
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 onClick={handleDownload}
                 disabled={loading}
-                className="p-2 text-gray-500 hover:text-blue-500 transition-colors disabled:opacity-50"
+                className="p-2"
                 title="Download"
               >
                 <Download className="w-5 h-5" />
-              </button>
+              </Button>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                className="p-2 border cursor-pointer rounded-lg text-red-500 transition-colors"
                 title="Close"
               >
                 <X className="w-5 h-5" />
