@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Download, FileText, Image, File as FileIcon } from 'lucide-react';
-import { Button } from './Button';
+
 const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,11 +11,11 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
   const isImage = fileDocument.mimetype?.startsWith('image/');
   const isPdf = fileDocument.mimetype === 'application/pdf';
   const isText = fileDocument.mimetype === 'text/plain' || fileDocument.name?.endsWith('.txt');
-  
+
   const baseApiUrl = import.meta.env.VITE_API_URL;
   const baseUrl = baseApiUrl?.replace('/api', '') || 'http://localhost:3057'; // Remove /api for file URLs
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-  
+
   // Construct the proper file URL
   const getFileUrl = () => {
     if (!fileDocument.url) {
@@ -24,7 +24,7 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
     }
 
     let fileUrl;
-     
+
     if (fileDocument.url.startsWith('/uploads/')) {
       // URL already has /uploads prefix, just prepend base URL
       fileUrl = `${baseUrl}${fileDocument.url}`;
@@ -35,19 +35,19 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
       // Add /uploads prefix if missing
       fileUrl = `${baseUrl}/uploads/${fileDocument.url}`;
     }
-        return fileUrl;
+    return fileUrl;
   };
 
   const handleDownload = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       let downloadUrl;
-            
+
       // Try multiple download strategies
       const downloadStrategies = [];
-      
+
       // Strategy 1: Use API endpoint if we have an ID and token
       if (fileDocument.id && token && baseApiUrl) {
         downloadStrategies.push({
@@ -56,14 +56,14 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
           name: 'API with auth'
         });
       }
-      
+
       // Strategy 2: Direct file access
       downloadStrategies.push({
         url: getFileUrl(),
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         name: 'Direct file'
       });
-      
+
       // Strategy 3: Try with /api/uploads prefix
       if (fileDocument.url && baseApiUrl) {
         const fileUrl = fileDocument.url.startsWith('/uploads/') ? fileDocument.url : `/uploads/${fileDocument.url}`;
@@ -73,46 +73,46 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
           name: 'API uploads'
         });
       }
-            
+
       // Try each strategy until one works
       let testResponse;
       let lastError;
-      
+
       for (const strategy of downloadStrategies) {
         try {
-           testResponse = await fetch(strategy.url, {
+          testResponse = await fetch(strategy.url, {
             method: 'GET',
             headers: strategy.headers,
           });
-          
+
           if (testResponse.ok) {
-             downloadUrl = strategy.url;
+            downloadUrl = strategy.url;
             break;
           } else {
-             lastError = new Error(`${strategy.name}: ${testResponse.status} ${testResponse.statusText}`);
+            lastError = new Error(`${strategy.name}: ${testResponse.status} ${testResponse.statusText}`);
           }
         } catch (error) {
-           lastError = error;
+          lastError = error;
         }
       }
-      
+
       if (!testResponse || !testResponse.ok) {
         throw lastError || new Error('All download strategies failed');
       }
-      
+
       const response = await fetch(downloadUrl, {
         method: 'GET',
         headers: token ? {
           'Authorization': `Bearer ${token}`,
         } : {},
       });
-            
+
       if (!response.ok) {
         const errorText = await response.text().catch(() => 'Unknown error');
         console.error('Download failed response:', errorText);
         throw new Error(`Failed to download file: ${response.status} - ${response.statusText}\n${errorText}`);
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = window.document.createElement('a');
@@ -134,11 +134,11 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
 
   const renderDocumentContent = () => {
     const fileUrl = getFileUrl();
-    
+
     if (isImage) {
       return (
         <div className="flex items-center justify-center max-h-3/5 min-h-[400px] p-3 ">
-          <img 
+          <img
             src={fileUrl}
             alt={fileDocument.name}
             className="sm:max-w-1/2 object-contain"
@@ -151,20 +151,20 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
         </div>
       );
     }
-    
+
     if (isPdf) {
       return (
         <div className="h-full min-h-screen">
           <iframe
             src={fileUrl}
             title={fileDocument.name}
-                  className="w-full h-full min-h-screen border-0"
+            className="w-full h-full min-h-screen border-0"
             onError={() => setError('Failed to load PDF')}
           />
         </div>
       );
     }
-    
+
     if (isText) {
       return (
         <div className="h-full min-h-[400px]">
@@ -177,8 +177,8 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
         </div>
       );
     }
-    
-      // For other file types, show file info and download option
+
+    // For other file types, show file info and download option
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[400px] space-y-4">
         <FileIcon className="w-16 h-16 text-gray-400" />
@@ -238,26 +238,26 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <Button
+              <button
                 onClick={handleDownload}
                 disabled={loading}
-                className="p-2"
+                className="p-2 border cursor-pointer rounded-lg text-green-500 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-400"
                 title="Download"
               >
                 <Download className="w-5 h-5" />
-              </Button>
+              </button>
               <button
                 onClick={onClose}
-                className="p-2 border cursor-pointer rounded-lg text-red-500 transition-colors"
+                className="p-2 border cursor-pointer rounded-lg text-red-500 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-400"
                 title="Close"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
           </div>
-          
+
           {/* Content */}
           <div className="flex-1 overflow-hidden">
             {error ? (
