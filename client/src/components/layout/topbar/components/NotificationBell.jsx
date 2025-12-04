@@ -331,7 +331,7 @@ const NotificationBell = () => {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  className="text-sm cursor-pointer text-blue-600 hover:text-blue-800 transition-colors"
                   title="Mark all as read"
                 >
                   Mark all read
