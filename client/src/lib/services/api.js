@@ -91,6 +91,26 @@ export const ticketAPI = {
     return response.data;
   },
 
+  // Mark messages as seen
+  markMessagesAsSeen: async (ticketId, messageIds = null) => {
+    const response = await apiClient.post(`/conversations/${ticketId}/mark-seen`, {
+      messageIds: messageIds
+    });
+    return response.data;
+  },
+
+  // Mark specific message as seen
+  markMessageAsSeen: async (messageId) => {
+    const response = await apiClient.post(`/conversations/message/${messageId}/seen`);
+    return response.data;
+  },
+
+  // Get unread message count for ticket
+  getUnreadMessageCount: async (ticketId) => {
+    const response = await apiClient.get(`/conversations/${ticketId}/unread-count`);
+    return response.data;
+  },
+
   // Upload attachments
   uploadAttachments: async (ticketId, files) => {
     const formData = new FormData();

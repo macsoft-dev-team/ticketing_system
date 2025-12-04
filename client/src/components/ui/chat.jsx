@@ -319,12 +319,15 @@ export const ChatWindow = ({
   error = null,
   isConnected = true,
   onRefresh = null,
-  ticketStatus = null
+  ticketStatus = null,
+  onMarkMessagesAsSeen = null, // New prop for marking messages as seen
+  currentUserId = null // New prop for current user ID
 }) => {
   const messagesEndRef = useRef(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [showChatHistory, setShowChatHistory] = useState(false);
+  const [visibleMessages, setVisibleMessages] = useState(new Set());
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -351,6 +354,26 @@ export const ChatWindow = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Auto-mark messages as seen when they become visible
+  useEffect(() => {
+    if (!onMarkMessagesAsSeen || !currentUserId || !messages.length) return;
+
+    const unreadMessages = messages.filter(message => 
+      message.senderId !== currentUserId && // Don't mark own messages
+      !message.seenBy?.some(seen => seen.userId === currentUserId) // Not already seen
+    );
+
+    if (unreadMessages.length > 0) {
+      // Mark all unread messages as seen after a short delay to ensure they're visible
+      const timeoutId = setTimeout(() => {
+        const messageIds = unreadMessages.map(msg => msg.id);
+        onMarkMessagesAsSeen(messageIds).catch(console.error);
+      }, 1000); // 1 second delay
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, onMarkMessagesAsSeen, currentUserId]);
 
   // Show closed ticket view if ticket is closed and user hasn't requested to view chat
   if (ticketStatus === 'closed' && !showChatHistory) {

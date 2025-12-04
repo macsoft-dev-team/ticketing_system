@@ -295,7 +295,31 @@ export default function TicketDashboard() {
     isConnected: socketConnected,
     sendMessage: sendConversationMessage,
     refreshMessages,
+    // MessageSeen functions
+    markMessagesAsSeen: originalMarkMessagesAsSeen,
+    markMessageAsSeen,
+    getUnreadCount,
   } = useConversation(ticketId);
+
+  // Wrapper function to mark messages as seen and refresh ticket data
+  const markMessagesAsSeen = useCallback(async (messageIds) => {
+    try {
+      // Only proceed if there are messages to mark
+      if (!messageIds || (Array.isArray(messageIds) && messageIds.length === 0)) {
+        return;
+      }
+      
+      // Mark messages as seen
+      const result = await originalMarkMessagesAsSeen(messageIds);
+      
+      // Only refresh ticket data if messages were actually marked as seen
+      if (result && result.markedCount > 0) {
+        await fetchTicketById(ticketId);
+      }
+    } catch (error) {
+      console.error('Error marking messages as seen:', error);
+    }
+  }, [originalMarkMessagesAsSeen, fetchTicketById, ticketId]);
 
   const [ticketData, setTicketData] = useState({});
   const [isTyping, setIsTyping] = useState(false);
@@ -321,9 +345,10 @@ export default function TicketDashboard() {
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [loadingInventoryDetails, setLoadingInventoryDetails] = useState(false);
 
-  // Auto-close timer simulation
+  // Auto-close timer simulation - only trigger when last message changes
   useEffect(() => {
-    // Simulate auto-close timer when admin sends message
+    if (messages.length === 0) return;
+    
     const lastMessage = messages[messages.length - 1];
     if (lastMessage?.isOwnMessage) {
       setAutoCloseTimer(600); // 10 minutes in seconds
@@ -340,7 +365,7 @@ export default function TicketDashboard() {
 
       return () => clearInterval(interval);
     }
-  }, [messages]);
+  }, [messages[messages.length - 1]?.id, messages[messages.length - 1]?.isOwnMessage]);
 
   const handleSendMessage = useCallback(async (message, attachments) => {
     try {
@@ -620,13 +645,13 @@ export default function TicketDashboard() {
   }, []);
 
   // Fetch spare requests for this ticket
-  const fetchSpareRequests = useCallback(async () => {
-    if (!ticketData.ticketCode) return;
+  const fetchSpareRequests = useCallback(async (ticketCode = ticketData.ticketCode) => {
+    if (!ticketCode) return;
     
     try {
       setLoadingSpareRequests(true);
       const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
-      const response = await fetch(`${baseApiUrl}/spare-requests/ticket/${ticketData.ticketCode}`, {
+      const response = await fetch(`${baseApiUrl}/spare-requests/ticket/${ticketCode}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -674,7 +699,7 @@ export default function TicketDashboard() {
     } finally {
       setLoadingSpareRequests(false);
     }
-  }, [ticketData.ticketCode, token, addToast]);
+  }, [token, addToast]);
 
   // Handle spare request approval
   const handleSpareApprove = async (itemId) => {
@@ -690,7 +715,7 @@ export default function TicketDashboard() {
       });
       
       // Refresh spare requests and ticket data
-      await Promise.all([fetchSpareRequests(), fetchTicketById(ticketId)]);
+      await Promise.all([fetchSpareRequests(ticketData.ticketCode), fetchTicketById(ticketId)]);
       
     } catch (error) {
       addToast({
@@ -732,7 +757,7 @@ export default function TicketDashboard() {
       setSpareRejectReason('');
       
       // Refresh spare requests and ticket data
-      await Promise.all([fetchSpareRequests(), fetchTicketById(ticketId)]);
+      await Promise.all([fetchSpareRequests(ticketData.ticketCode), fetchTicketById(ticketId)]);
       
     } catch (error) {
       addToast({
@@ -795,12 +820,12 @@ export default function TicketDashboard() {
     };
   }, []);
 
-  // Fetch spare requests when ticket data changes
+  // Fetch spare requests when ticket code changes
   useEffect(() => {
     if (ticketData.ticketCode) {
-      fetchSpareRequests();
+      fetchSpareRequests(ticketData.ticketCode);
     }
-  }, [fetchSpareRequests]);
+  }, [ticketData.ticketCode, fetchSpareRequests]);
 
   // Mobile tab navigation
   const tabs = useMemo(() => [
@@ -860,7 +885,13 @@ export default function TicketDashboard() {
   useEffect(() => {
     if (ticket && ticket.id) {
       const mappedData = mapTicketData(ticket);
-      setTicketData(mappedData);
+      // Only update if the data actually changed to prevent unnecessary re-renders
+      setTicketData(prevData => {
+        if (prevData.id !== mappedData.id || prevData.updatedAt !== mappedData.updatedAt) {
+          return mappedData;
+        }
+        return prevData;
+      });
     }
   }, [ticket?.id, ticket?.updatedAt]); // Only re-run when ticket ID or update time changes
 
@@ -1541,6 +1572,8 @@ export default function TicketDashboard() {
             isConnected={true}
             onRefresh={refreshMessages}
             ticketStatus={ticketData.status}
+            onMarkMessagesAsSeen={markMessagesAsSeen}
+            currentUserId={user?.id}
           />
         </motion.div>
       </div>

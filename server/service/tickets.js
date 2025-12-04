@@ -32,6 +32,12 @@ const getTickets = async (skip, take, filter, userId, role) => {
           include: {
             sender: true,
             attachments: true,
+            seenBy: {
+              select: {
+                userId: true,
+                seenAt: true,
+              },
+            },
           },
         },
         notifications: {
@@ -293,6 +299,12 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
           include: {
             sender: true,
             attachments: true,
+            seenBy: {
+              select: {
+                userId: true,
+                seenAt: true,
+              },
+            },
           },
           orderBy: {
             createdAt: "asc",
@@ -596,6 +608,12 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
           include: {
             sender: true,
             attachments: true,
+            seenBy: {
+              select: {
+                userId: true,
+                seenAt: true,
+              },
+            },
           },
         },
         notifications: {

@@ -72,6 +72,11 @@ router.post(
   handleConversationFileUpload, // Use ticket-specific upload handler
   conversationController.createConversation
 );
-router.put("/:ticketId", conversationController.updateSeen);
+router.put("/:ticketId", conversationController.updateSeen); // Deprecated
+
+// New MessageSeen routes
+router.post("/:ticketId/mark-seen", conversationController.markMessagesAsSeen);
+router.post("/message/:messageId/seen", conversationController.markMessageAsSeen);
+router.get("/:ticketId/unread-count", conversationController.getUnreadCount);
 
 module.exports = router;

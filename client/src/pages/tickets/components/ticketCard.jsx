@@ -10,9 +10,12 @@ import {
     AlertCircle,
     ArrowRight,
     Zap,
-    Eye
+    Eye,
+    MessageSquare,
+    Paperclip
 } from 'lucide-react';
 import moment from 'moment';
+import { useAuth } from '../../../lib/hooks/useAuth';
 import { TICKET_STATUS, STATUS_COLORS, TICKET_PRIORITY, PRIORITY_COLORS } from '../../../lib/constants';
 
 export default function TicketCard({
@@ -36,6 +39,7 @@ export default function TicketCard({
     const [isHovered, setIsHovered] = useState(false);
     const [isActionVisible, setIsActionVisible] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const handleStatusChange = (newStatus) => {
         onStatusChange?.(ticket.id, newStatus);
@@ -66,6 +70,39 @@ export default function TicketCard({
         }
     };
 
+    // Helper function to get last message
+    const getLastMessage = () => {
+        if (!ticket.messages || ticket.messages.length === 0) return null;
+        const lastMessage = ticket.messages[ticket.messages.length - 1];
+        return {
+            content: lastMessage.content || '',
+            senderName: lastMessage.sender?.name || 'Unknown',
+            createdAt: lastMessage.createdAt,
+            hasAttachments: lastMessage.attachments && lastMessage.attachments.length > 0
+        };
+    };
+
+    // Helper function to get unread/unseen message count
+    const getUnreadMessageCount = () => {
+        if (!ticket.messages || ticket.messages.length === 0 || !user?.id) return 0;
+        
+        return ticket.messages.filter(message => {
+            // Skip messages sent by current user (they are automatically "read")
+            if (message.senderId === user.id) return false;
+            
+            // If seenBy is empty or current user hasn't seen it
+            if (!message.seenBy || message.seenBy.length === 0) return true;
+            
+            // Check if current user has seen this message
+            const hasUserSeen = message.seenBy.some(seen => seen.userId === user.id);
+            return !hasUserSeen;
+        }).length;
+    };
+
+    const lastMessage = getLastMessage();
+    const hasMessages = ticket.messages && ticket.messages.length > 0;
+    const unreadCount = getUnreadMessageCount();
+
     const isOverdue = ticket.dueDate && moment(ticket.dueDate).isBefore(moment(), 'day');
 
     return (
@@ -92,7 +129,7 @@ export default function TicketCard({
             onClick={handleCardClick}
             className={`
                 relative overflow-hidden cursor-pointer group
-                bg-white border rounded-xl h-full min-h-[280px] max-h-[320px]
+                bg-white border rounded-xl h-full min-h-4/5
                 ${isOverdue ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-200'}
                 hover:border-gray-300 shadow-sm transition-all duration-300
                 backdrop-blur-sm
@@ -113,7 +150,7 @@ export default function TicketCard({
                     animate={{ scale: 1 }}
                     className="absolute -top-1 -right-1 z-20"
                 >
-                    <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-bl-md rounded-tr-xl font-medium shadow-sm">
+                    <div className="bg-red-500 text-white text-[10px] px-1 pe-2 pt-1 pb-0.5 rounded-bl-md rounded-tr-xl font-medium shadow-sm">
                         Overdue
                     </div>
                 </motion.div>
@@ -184,6 +221,39 @@ export default function TicketCard({
                                     {milestone.stage.replace(/_/g, ' ')}{/*  by <span className='text-yellow-500'>{milestone.changer?.name || ''}</span> */}
                                 </span>
                             ))}
+                        </div>
+                    )}
+                    
+                    {/* Conversation indicator and last message - only show if there are unread messages */}
+                    {unreadCount > 0 && (
+                        <div className="mt-3 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                            <div className="flex items-center gap-2 mb-1">
+                                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                                <span className="text-xs font-medium text-emerald-800">
+                                    {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}
+                                </span>
+                                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" title="New messages" />
+                                {lastMessage && lastMessage.hasAttachments && (
+                                    <Paperclip title="Has attachments" className="w-2 h-2 sm:w-3 sm:h-3 text-green-600" />
+                                )}
+                            </div>
+                            {lastMessage && (
+                                <div className="text-xs text-emerald-700">
+                                    <span className="font-medium">{lastMessage.senderName}:</span>
+                                    <span className="ml-1 line-clamp-1">
+                                        {lastMessage.content.length > 50 
+                                            ? `${lastMessage.content.substring(0, 50)}...` 
+                                            : lastMessage.content
+                                        }
+                                        {lastMessage && lastMessage.hasAttachments && (
+                                            <span className="ml-1 text-green-600">Attachment</span>
+        )}
+                                    </span>
+                                    <div className="text-emerald-500 mt-1">
+                                        {moment(lastMessage.createdAt).fromNow()}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

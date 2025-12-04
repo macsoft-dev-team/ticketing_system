@@ -61,8 +61,74 @@ const updateSeen = async (req, res) => {
   }
 };
 
+// Mark specific message as seen
+const markMessageAsSeen = async (req, res) => {
+  const { messageId } = req.params;
+  const userId = req.user.id;
+  try {
+    const result = await conversationService.markMessageAsSeen(
+      parseInt(messageId),
+      userId
+    );
+    res.status(200).json({
+      success: true,
+      data: result,
+      message: "Message marked as seen"
+    });
+  } catch (error) {
+    console.error("Error marking message as seen:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Mark messages in a ticket as seen
+const markMessagesAsSeen = async (req, res) => {
+  const { ticketId } = req.params;
+  const { messageIds } = req.body; // Optional array of specific message IDs
+  const userId = req.user.id;
+  
+  try {
+    const result = await conversationService.markMessagesAsSeen(
+      parseInt(ticketId),
+      userId,
+      messageIds
+    );
+    res.status(200).json({
+      success: true,
+      data: result,
+      message: "Messages marked as seen"
+    });
+  } catch (error) {
+    console.error("Error marking messages as seen:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Get unread message count for a ticket
+const getUnreadCount = async (req, res) => {
+  const { ticketId } = req.params;
+  const userId = req.user.id;
+  
+  try {
+    const unreadCount = await conversationService.getUnreadMessageCount(
+      parseInt(ticketId),
+      userId
+    );
+    res.status(200).json({
+      success: true,
+      unreadCount: unreadCount
+    });
+  } catch (error) {
+    console.error("Error getting unread count:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   getConversations,
   createConversation,
   updateSeen,
+  markMessageAsSeen,
+  markMessagesAsSeen,
+  getUnreadCount,
 };

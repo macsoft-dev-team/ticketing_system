@@ -233,6 +233,103 @@ export const useConversation = (ticketId) => {
     }
   }, []);
 
+  // Mark messages as seen
+  const markMessagesAsSeen = useCallback(
+    async (messageIds = null) => {
+      if (!ticketId || !token) return;
+      
+      try {
+        const baseUrl =
+          import.meta.env.VITE_API_URL || "http:import.meta.env.VITE_WS_URL/api";
+        const url = `${baseUrl}/conversations/${ticketId}/mark-seen`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ messageIds }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to mark messages as seen: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error("Error marking messages as seen:", error);
+        throw error;
+      }
+    },
+    [ticketId, token]
+  );
+
+  // Mark specific message as seen
+  const markMessageAsSeen = useCallback(
+    async (messageId) => {
+      if (!messageId || !token) return;
+      
+      try {
+        const baseUrl =
+          import.meta.env.VITE_API_URL || "http:import.meta.env.VITE_WS_URL/api";
+        const url = `${baseUrl}/conversations/message/${messageId}/seen`;
+        
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to mark message as seen: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error("Error marking message as seen:", error);
+        throw error;
+      }
+    },
+    [token]
+  );
+
+  // Get unread message count
+  const getUnreadCount = useCallback(
+    async () => {
+      if (!ticketId || !token) return 0;
+      
+      try {
+        const baseUrl =
+          import.meta.env.VITE_API_URL || "http:import.meta.env.VITE_WS_URL/api";
+        const url = `${baseUrl}/conversations/${ticketId}/unread-count`;
+        
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to get unread count: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result.unreadCount || 0;
+      } catch (error) {
+        console.error("Error getting unread count:", error);
+        return 0;
+      }
+    },
+    [ticketId, token]
+  );
+
   // Fetch initial messages
   useEffect(() => {
     fetchMessages();
@@ -251,6 +348,10 @@ export const useConversation = (ticketId) => {
     sendMessage,
     refreshMessages: fetchMessages,
     testConnection,
+    // MessageSeen functions
+    markMessagesAsSeen,
+    markMessageAsSeen,
+    getUnreadCount,
   };
 };
 

@@ -181,18 +181,92 @@ const createConversation = async (conversation, userId, io, files = []) => {
 
 const updateSeen = async (conversationId, userId) => {
   try {
-    const conversation = await prisma.conversation.update({
-      where: { id: conversationId },
-      data: {
-        seen: true,
+    // This function is deprecated - use markMessagesAsSeen instead
+    console.warn('updateSeen is deprecated, use markMessagesAsSeen instead');
+    return { success: false, message: 'Function deprecated' };
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Mark specific message as seen by user
+const markMessageAsSeen = async (messageId, userId) => {
+  try {
+    // Use upsert to avoid duplicate entries due to unique constraint
+    const messageSeen = await prisma.messageSeen.upsert({
+      where: {
+        messageId_userId: {
+          messageId: messageId,
+          userId: userId,
+        },
+      },
+      update: {
+        seenAt: new Date(),
+      },
+      create: {
+        messageId: messageId,
+        userId: userId,
+        seenAt: new Date(),
+      },
+    });
+    return messageSeen;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Mark multiple messages as seen for a ticket
+const markMessagesAsSeen = async (ticketId, userId, messageIds = null) => {
+  try {
+    // Get messages to mark as seen
+    const whereClause = { ticketId: ticketId };
+    if (messageIds && messageIds.length > 0) {
+      whereClause.id = { in: messageIds };
+    }
+    
+    const messages = await prisma.message.findMany({
+      where: whereClause,
+      select: { id: true },
+    });
+
+    // Create MessageSeen records for messages not already seen by this user
+    const messageSeenData = messages.map(message => ({
+      messageId: message.id,
+      userId: userId,
+      seenAt: new Date(),
+    }));
+
+    // Use createMany with skipDuplicates to avoid constraint violations
+    const result = await prisma.messageSeen.createMany({
+      data: messageSeenData,
+      skipDuplicates: true,
+    });
+
+    return {
+      success: true,
+      markedCount: result.count,
+      totalMessages: messages.length,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get unread message count for a user in a ticket
+const getUnreadMessageCount = async (ticketId, userId) => {
+  try {
+    const unreadCount = await prisma.message.count({
+      where: {
+        ticketId: ticketId,
+        senderId: { not: userId }, // Exclude own messages
         seenBy: {
-          connect: {
-            id: userId,
+          none: {
+            userId: userId,
           },
         },
       },
     });
-    return conversation;
+    return unreadCount;
   } catch (error) {
     throw error;
   }
@@ -201,5 +275,8 @@ const updateSeen = async (conversationId, userId) => {
 module.exports = {
   getConversations,
   createConversation,
-  updateSeen,
+  updateSeen, // Deprecated
+  markMessageAsSeen,
+  markMessagesAsSeen,
+  getUnreadMessageCount,
 };
