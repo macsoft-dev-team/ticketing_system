@@ -30,7 +30,7 @@ import PhotoUploadModal from './PhotoUploadModal';
 const STAGE_ROLE_PERMISSIONS = {
     // ticket creation / field actions
     TICKET_RAISED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-    REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
+    REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
 
     // assigning / submitting to service centre (image shows Macsoft roles + support/head)
     SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
@@ -53,7 +53,8 @@ const STAGE_ROLE_PERMISSIONS = {
     // dispatch / field delivery / final clearance
     READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
     DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN'],
-    FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
+    FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+    TICKET_CLOSED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
 // Utility function to check if user role can transition to a specific stage
@@ -410,7 +411,7 @@ const MILESTONE_CONFIG = {
         order: 8,
     },
     SPARE_REQUESTED: {
-        label: 'Spare Requested',
+        label: 'Spare Request initiated',
         description: 'Spare parts requested for replacement (photo required)',
         photoRequired: true,
         minPhotos: 1,
@@ -440,13 +441,20 @@ const MILESTONE_CONFIG = {
         description: 'Controller delivered/dispatched',
         photoRequired: false,
         order: 13,
-        isFinal: true,
+        isFinal: false,
     },
     FIELD_CLEARANCE_APPROVED: {
         label: 'Field Clearance Approved',
-        description: 'Field clearance approved by Head (legacy)',
+        description: 'Field clearance approved by Head',
         photoRequired: false,
         order: 14,
+        isFinal: false,
+    },
+    TICKET_CLOSED: {
+        label: 'Ticket Closed',
+        description: 'Ticket permanently closed',
+        photoRequired: false,
+        order: 15,
         isFinal: true,
     },
 };
@@ -1083,11 +1091,23 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 }
             );
             const updatedMilestone = response.data;
-            // Show appropriate success message based on target stage
+            // Show appropriate success message based on target stage and auto-transition
             if (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' || selectedTargetStage === 'FIELD_CLEARANCE_APPROVED') {
                 addToast({
                     title: 'Ticket Closed',
                     description: 'Ticket has been successfully closed with field clearance',
+                    variant: 'success'
+                });
+            } else if (updatedMilestone.autoTransitioned) {
+                addToast({
+                    title: 'Ticket Automatically Closed',
+                    description: `Milestone completed and ticket automatically closed after ${updatedMilestone.config?.label || selectedTargetStage}`,
+                    variant: 'success'
+                });
+            } else if (selectedTargetStage === 'TICKET_CLOSED') {
+                addToast({
+                    title: 'Ticket Closed',
+                    description: 'Ticket has been permanently closed',
                     variant: 'success'
                 });
             } else {
@@ -1358,6 +1378,12 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                     title: 'Approve Field Clearance',
                     message: 'This will approve the field clearance and mark the ticket as fully resolved.',
                     confirmText: 'Approve Clearance',
+                    isTicketClosure: true
+                },
+                TICKET_CLOSED: {
+                    title: 'Close Ticket',
+                    message: 'This will permanently close the ticket. This action cannot be undone.',
+                    confirmText: 'Close Ticket',
                     isTicketClosure: true
                 }
             },

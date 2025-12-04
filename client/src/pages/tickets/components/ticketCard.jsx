@@ -99,6 +99,20 @@ export default function TicketCard({
         }).length;
     };
 
+    // Helper function to check if we should show new message indicator
+    const shouldShowNewMessageIndicator = () => {
+        if (!hasMessages || unreadCount === 0) return false;
+        
+        const lastMessage = getLastMessage();
+        if (!lastMessage) return false;
+        
+        // Don't show if the last message sender is the current user
+        const lastMessageFromDb = ticket.messages[ticket.messages.length - 1];
+        if (lastMessageFromDb && lastMessageFromDb.senderId === user?.id) return false;
+        
+        return unreadCount > 0;
+    };
+
     const lastMessage = getLastMessage();
     const hasMessages = ticket.messages && ticket.messages.length > 0;
     const unreadCount = getUnreadMessageCount();
@@ -224,8 +238,8 @@ export default function TicketCard({
                         </div>
                     )}
                     
-                    {/* Conversation indicator and last message - only show if there are unread messages */}
-                    {unreadCount > 0 && (
+                    {/* Conversation indicator and last message - only show if there are unread messages and last message is not from current user */}
+                    {shouldShowNewMessageIndicator() && (
                         <div className="mt-3 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
                             <div className="flex items-center gap-2 mb-1">
                                 <MessageSquare className="w-4 h-4 text-emerald-600" />

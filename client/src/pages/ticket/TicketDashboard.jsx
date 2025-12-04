@@ -30,7 +30,8 @@ import {
   Loader2,
   X,
   Truck,
-  MapPin
+  MapPin,
+  ChevronUp
 } from 'lucide-react';
 import { Badge } from '../../components/ui/badge';
 import { ChatWindow } from '../../components/ui/chat';
@@ -326,6 +327,7 @@ export default function TicketDashboard() {
   const [autoCloseTimer, setAutoCloseTimer] = useState(null);
   const [showSpareRequestForm, setShowSpareRequestForm] = useState(false);
   const [activeTab, setActiveTab] = useState('ticket'); // For mobile tabs
+  const [showScrollToTop, setShowScrollToTop] = useState(false); // For floating scroll button
   const [downloadingAll, setDownloadingAll] = useState(false);
   const [showPhotoUploadModal, setShowPhotoUploadModal] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
@@ -644,6 +646,72 @@ export default function TicketDashboard() {
     setSelectedDocument(null);
   }, []);
 
+  // Scroll tracking for floating button on mobile chat
+  useEffect(() => {
+    const updateButtonVisibility = () => {
+      const isSmallScreen = window.innerWidth < 1024;
+      const isChatActive = activeTab === 'chat';
+      
+      console.log('Button Debug:', { 
+        isSmallScreen, 
+        isChatActive, 
+        activeTab,
+        innerWidth: window.innerWidth,
+        shouldShow: isChatActive && isSmallScreen 
+      });
+      
+      // For now, show button whenever chat is active on small screen (remove scroll requirement for testing)
+      setShowScrollToTop(isChatActive && isSmallScreen);
+    };
+
+    window.addEventListener('scroll', updateButtonVisibility);
+    window.addEventListener('resize', updateButtonVisibility);
+    
+    // Initial check and whenever activeTab changes
+    updateButtonVisibility();
+    
+    return () => {
+      window.removeEventListener('scroll', updateButtonVisibility);
+      window.removeEventListener('resize', updateButtonVisibility);
+    };
+  }, [activeTab]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    console.log('Scroll to top clicked!');
+    
+    // Try multiple scroll strategies
+    // 1. Scroll main window
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    
+    // 2. Also scroll document body
+    document.body.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+    
+    // 3. Find and scroll any potential chat containers
+    const chatContainers = document.querySelectorAll('[class*="chat"], [class*="conversation"], .overflow-y-auto, .overflow-auto');
+    chatContainers.forEach(container => {
+      if (container.scrollTop > 0) {
+        console.log('Scrolling container:', container);
+        container.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+    });
+    
+    // 4. Try scrolling document element as well
+    document.documentElement.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   // Fetch spare requests for this ticket
   const fetchSpareRequests = useCallback(async (ticketCode = ticketData.ticketCode) => {
     if (!ticketCode) return;
@@ -842,6 +910,75 @@ export default function TicketDashboard() {
     return ticket.ticketMilestones.find(m => m.status === 'IN_PROGRESS') || null;
   }, [ticket?.ticketMilestones]);
 
+  // Check if all spare requests are resolved (approved or rejected)
+  const allSpareRequestsResolved = useMemo(() => {
+    if (!spareRequests || spareRequests.length === 0) return false;
+    return spareRequests.every(item => item.status === 'approved' || item.status === 'rejected');
+  }, [spareRequests]);
+
+  // Check if all spare requests are rejected
+  const allSpareRequestsRejected = useMemo(() => {
+    if (!spareRequests || spareRequests.length === 0) return false;
+    return spareRequests.every(item => item.status === 'rejected');
+  }, [spareRequests]);
+
+  // Handle bulk approve for milestone transition
+  const handleBulkApproveSpareRequests = async () => {
+    if (!allSpareRequestsResolved) {
+      addToast({
+        type: 'error',
+        title: 'Cannot Process',
+        description: 'All spare requests must be either approved or rejected before proceeding.'
+      });
+      return;
+    }
+
+    try {
+      let targetStage, description, successMessage;
+
+      if (allSpareRequestsRejected) {
+        // If all spare requests are rejected, move to spare rejected and then close ticket
+        targetStage = 'TICKET_CLOSED';
+        description = 'All spare requests rejected - ticket closed';
+        successMessage = 'All spare requests rejected. Ticket has been closed.';
+      } else {
+        // If at least one spare request is approved, move to spare approved
+        targetStage = 'SPARE_APPROVED';
+        description = 'Spare requests processed - milestone updated to Spare Approved';
+        successMessage = 'Milestone successfully updated to Spare Approved';
+      }
+
+      // Use the updateMilestone hook to transition
+      const resultAction = await updateMilestone({
+        ticketId: ticketId,
+        action: 'transition',
+        targetStage: targetStage,
+        currentStage: currentMilestone?.stage,
+        description: description
+      });
+
+      if (resultAction.success) {
+        addToast({
+          type: allSpareRequestsRejected ? 'warning' : 'success',
+          title: allSpareRequestsRejected ? 'Ticket Closed' : 'Milestone Updated',
+          description: successMessage
+        });
+
+        // Refresh ticket data
+        await fetchTicketById(ticketId);
+      } else {
+        throw new Error(resultAction.error || 'Failed to update milestone');
+      }
+    } catch (error) {
+      console.error('Error updating milestone:', error);
+      addToast({
+        type: 'error',
+        title: 'Update Failed',
+        description: error.message || 'Failed to process spare requests'
+      });
+    }
+  };
+
   // Get photo modal info based on current milestone
   const photoModalInfo = useMemo(() => {
     if (!currentMilestone) return { title: 'Upload Photos', description: 'Add photos for this milestone' };
@@ -970,9 +1107,10 @@ export default function TicketDashboard() {
           <div className="flex items-center gap-3">
             <StatusBadge status={ticketData.status} />
             {/* Service Center Assignment Button for MACSOFT_SUPPORT, MACSOFT_HEAD, and MACSOFT_ADMIN */}
-            {/* Hide button after ticket has been submitted to service center */}
+            {/* Hide button after ticket has been submitted to service center or closed */}
             {(user?.role === 'MACSOFT_SUPPORT' || user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') &&
-              !ticket?.ticketMilestones?.some(milestone => milestone.stage === 'SUBMITTED_TO_SERVICE_CENTER') && (
+              !ticket?.ticketMilestones?.some(milestone => milestone.stage === 'SUBMITTED_TO_SERVICE_CENTER' || milestone.stage === 'TICKET_CLOSED' || milestone.stage === 'REQUEST_CLEARED_AT_FIELD') &&
+              ticketData.status !== 'closed' && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -1284,11 +1422,45 @@ export default function TicketDashboard() {
                   </span>
                 )}
               </h2>
-              {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
-                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                  Approval Access
-                </span>
-              ) : null}
+              <div className="flex items-center gap-2">
+                {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
+                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                    Approval Access
+                  </span>
+                ) : null}
+                {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && spareRequests.length > 0 && currentMilestone?.stage === 'SPARE_REQUESTED' && (
+                  <button
+                    onClick={handleBulkApproveSpareRequests}
+                    disabled={!allSpareRequestsResolved}
+                    className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
+                      allSpareRequestsResolved 
+                        ? allSpareRequestsRejected
+                          ? 'bg-red-600 hover:bg-red-700'
+                          : 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    } disabled:opacity-50`}
+                    title={
+                      !allSpareRequestsResolved 
+                        ? 'All spare requests must be resolved first'
+                        : allSpareRequestsRejected
+                          ? 'Close ticket - all spares rejected'
+                          : 'Approve milestone transition'
+                    }
+                  >
+                    {allSpareRequestsRejected ? (
+                      <>
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Close Ticket
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Approve Milestone
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             {loadingSpareRequests ? (
@@ -1420,11 +1592,45 @@ export default function TicketDashboard() {
                 <Package className="w-5 h-5" />
                 Spare Requests
               </h2>
-              {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
-                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                  Approval Access
-                </span>
-              ) : null}
+              <div className="flex items-center gap-2">
+                {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
+                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                    Approval Access
+                  </span>
+                ) : null}
+                {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && spareRequests.length > 0 && currentMilestone?.stage === 'SPARE_REQUESTED' && (
+                  <button
+                    onClick={handleBulkApproveSpareRequests}
+                    disabled={!allSpareRequestsResolved}
+                    className={`inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
+                      allSpareRequestsResolved 
+                        ? allSpareRequestsRejected
+                          ? 'bg-red-600 hover:bg-red-700'
+                          : 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    } disabled:opacity-50`}
+                    title={
+                      !allSpareRequestsResolved 
+                        ? 'All spare requests must be resolved first'
+                        : allSpareRequestsRejected
+                          ? 'Close ticket - all spares rejected'
+                          : 'Approve milestone transition'
+                    }
+                  >
+                    {allSpareRequestsRejected ? (
+                      <>
+                        <XCircle className="h-3 w-3 mr-1" />
+                        Close Ticket
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Approve Milestone
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
 
             {loadingSpareRequests ? (
@@ -1919,6 +2125,24 @@ export default function TicketDashboard() {
         </div>
       )}
 
+      {/* Floating Scroll to Top Button - Only visible on mobile when chat tab is active */}
+      <AnimatePresence>
+        {showScrollToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={scrollToTop}
+            className="lg:hidden flex justify-center uppercase gap-2 items-center min-w-40 w-full my-2 z-[9999] bg-red-600 hover:bg-red-700 text-white p-2 rounded-full shadow-2xl border-2 border-white focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-offset-2"
+            aria-label="Scroll to top"
+            style={{ zIndex: 9999 }}
+          >
+            <ChevronUp className="w-6 h-6" /> scroll up
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -251,6 +251,53 @@ const transitionMilestone = async (
       },
     });
 
+    // Handle auto-transition to TICKET_CLOSED for DELIVERED_TO_FIELD or FIELD_CLEARANCE_APPROVED
+    let finalMilestone = createdMilestone;
+    let shouldCreateTicketClosed = false;
+    
+    if (targetStage === 'DELIVERED_TO_FIELD' || targetStage === 'FIELD_CLEARANCE_APPROVED') {
+      shouldCreateTicketClosed = true;
+      
+      // First mark the current milestone as DONE
+      await prisma.ticketMilestone.update({
+        where: { id: createdMilestone.id },
+        data: {
+          status: "DONE",
+          completedAt: new Date(),
+        },
+      });
+      
+      // Create TICKET_CLOSED milestone
+      const ticketClosedConfig = getStageConfig('TICKET_CLOSED');
+      const ticketClosedMilestone = await prisma.ticketMilestone.create({
+        data: {
+          ticketId,
+          stage: 'TICKET_CLOSED',
+          order: ticketClosedConfig.order,
+          status: "DONE",
+          startedAt: new Date(),
+          completedAt: new Date(),
+          changedBy: userId,
+          notes: `Automatically closed after ${targetConfig.label}`,
+          photoRequired: false,
+          description: ticketClosedConfig.description,
+          allowedRoles: String(ticketClosedConfig.allowedRoles || []),
+        },
+        include: {
+          changer: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+            },
+          },
+          attachments: true,
+        },
+      });
+      
+      finalMilestone = ticketClosedMilestone;
+    }
+
     // Handle attachments for the new milestone if provided
     if (data.attachments && data.attachments.length > 0) {
       await prisma.attachments.createMany({
@@ -270,7 +317,7 @@ const transitionMilestone = async (
     }
 
     // Update ticket status based on milestone
-    if (targetConfig.isFinal) {
+    if (targetConfig.isFinal || shouldCreateTicketClosed) {
       await prisma.ticket.update({
         where: { id: ticketId },
         data: { status: "CLOSED" },
@@ -282,9 +329,9 @@ const transitionMilestone = async (
       });
     }
 
-    // Fetch the updated milestone with attachments
-    const finalMilestone = await prisma.ticketMilestone.findUnique({
-      where: { id: createdMilestone.id },
+    // Fetch the updated milestone with attachments (use finalMilestone which could be TICKET_CLOSED)
+    const milestoneWithAttachments = await prisma.ticketMilestone.findUnique({
+      where: { id: finalMilestone.id },
       include: {
         changer: {
           select: {
@@ -296,12 +343,16 @@ const transitionMilestone = async (
         attachments: true,
       },
     });
+    
+    finalMilestone = milestoneWithAttachments;
 
     // Create and send milestone notification
     try {
+      // Use the appropriate config - if we auto-transitioned to TICKET_CLOSED, use that config
+      const configToUse = shouldCreateTicketClosed ? getStageConfig('TICKET_CLOSED') : targetConfig;
       const milestoneWithConfig = {
         ...finalMilestone,
-        config: targetConfig,
+        config: configToUse,
       };
       
       // Determine which users should receive milestone notifications
@@ -360,9 +411,11 @@ const transitionMilestone = async (
         ticketId,
         milestone: finalMilestone,
         previousStage: currentMilestone?.stage,
-        newStage: targetStage,
-        isTicketClosed: targetConfig.isFinal,
-        ticketStatus: targetConfig.isFinal ? "CLOSED" : "IN_PROGRESS",
+        newStage: shouldCreateTicketClosed ? 'TICKET_CLOSED' : targetStage,
+        isTicketClosed: targetConfig.isFinal || shouldCreateTicketClosed,
+        ticketStatus: (targetConfig.isFinal || shouldCreateTicketClosed) ? "CLOSED" : "IN_PROGRESS",
+        autoTransitioned: shouldCreateTicketClosed,
+        originalTargetStage: shouldCreateTicketClosed ? targetStage : undefined,
       };
 
       // Add spare request approval info for SPARE_APPROVED transitions
@@ -386,7 +439,9 @@ const transitionMilestone = async (
 
     const result = {
       ...finalMilestone,
-      config: targetConfig,
+      config: shouldCreateTicketClosed ? getStageConfig('TICKET_CLOSED') : targetConfig,
+      autoTransitioned: shouldCreateTicketClosed,
+      originalTargetStage: shouldCreateTicketClosed ? targetStage : undefined,
     };
 
     // Include spare approval result for SPARE_APPROVED transitions

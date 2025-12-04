@@ -18,7 +18,7 @@ import {
 const STAGE_ROLE_PERMISSIONS = {
   // ticket creation / field actions
   TICKET_RAISED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-  REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+  REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
 
   // assigning / submitting to service centre (image shows Macsoft roles + support/head)
   SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
@@ -41,7 +41,8 @@ const STAGE_ROLE_PERMISSIONS = {
   // dispatch / field delivery / final clearance
   READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
   DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'],
-  FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
+  FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+  TICKET_CLOSED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
 // Utility function to check if user role can transition to a specific stage
@@ -262,18 +263,6 @@ const MilestoneActionButton = ({
         }
       })(),
       SPARE_REQUESTED: [
-        // Always show approve button for authorized roles
-        ...(canUserTransitionToStage(userRole, 'SPARE_APPROVED') ? [{
-          title: 'Approve Spare Request',
-          shortTitle: 'Approve',
-          icon: CheckCircle,
-          color: needsPhotos ? 'gray' : 'green',
-          action: 'transition',
-          targetStage: 'SPARE_APPROVED',
-          requiresPhotos: false,
-          disabled: needsPhotos,
-          disabledNote: needsPhotos ? 'Pending for spare request photos' : null,
-        }] : []),
         // Show add photos button if photos are needed
         ...(needsPhotos ? [{
           title: 'Add Spare Photos',
@@ -337,8 +326,29 @@ const MilestoneActionButton = ({
           requiresPhotos: false,
         }
       ],
-      DELIVERED_TO_FIELD: [], // Final stage - no further actions needed
-      FIELD_CLEARANCE_APPROVED: [], // No longer used as final stage
+      DELIVERED_TO_FIELD: [
+        {
+          title: 'Close Ticket',
+          shortTitle: 'Close',
+          icon: X,
+          color: 'red',
+          action: 'transition',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }
+      ],
+      FIELD_CLEARANCE_APPROVED: [
+        {
+          title: 'Close Ticket',
+          shortTitle: 'Close',
+          icon: X,
+          color: 'red',
+          action: 'transition',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }
+      ],
+      TICKET_CLOSED: [], // Final stage - no further actions needed
     };
 
     const stageConfigs = configs[stage] || [];

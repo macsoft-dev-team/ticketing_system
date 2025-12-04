@@ -47,7 +47,7 @@ export default function Tickets() {
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                className="px-5 py-2"
+                className="px-5 py-2 sm:pb-20"
             >
                 <motion.div
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"

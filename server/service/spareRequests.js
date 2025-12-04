@@ -694,12 +694,22 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
               });
 
               // Create appropriate milestone based on final status
-              let nextStage, milestoneNotes, order;
+              let nextStage, milestoneNotes, order, milestoneStatus = 'IN_PROGRESS';
               if (rejectedItems.length === allItems.length) {
-                // All items rejected - create SPARE_REJECTED milestone
-                nextStage = 'SPARE_REJECTED';
-                milestoneNotes = `Spare request fully rejected - ${allItems.length} item(s) rejected`;
-                order = 11;
+                // All items rejected - close the ticket directly
+                nextStage = 'TICKET_CLOSED';
+                milestoneNotes = `Ticket closed - All spare requests rejected (${allItems.length} item(s))`;
+                order = 12;
+                milestoneStatus = 'DONE';
+                
+                // Update ticket status to closed
+                await tx.ticket.update({
+                  where: { id: ticket.id },
+                  data: {
+                    status: 'CLOSED',
+                    updatedAt: new Date()
+                  }
+                });
               } else if (approvedItems.length === allItems.length) {
                 // All items approved - create SPARE_APPROVED milestone
                 nextStage = 'SPARE_APPROVED';
@@ -716,11 +726,12 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
                 data: {
                   ticketId: ticket.id,
                   stage: nextStage,
-                  status: 'IN_PROGRESS',
+                  status: milestoneStatus,
                   order: order,
                   changedBy: approvedBy,
                   notes: milestoneNotes,
-                  startedAt: new Date()
+                  startedAt: new Date(),
+                  completedAt: milestoneStatus === 'DONE' ? new Date() : null
                 }
               });
               
@@ -881,12 +892,22 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
               });
 
               // Create appropriate milestone based on final status
-              let nextStage, milestoneNotes, order;
+              let nextStage, milestoneNotes, order, milestoneStatus = 'IN_PROGRESS';
               if (rejectedItems.length === allItems.length) {
-                // All items rejected - create SPARE_REJECTED milestone
-                nextStage = 'SPARE_REJECTED';
-                milestoneNotes = `Spare request fully rejected - ${allItems.length} item(s) rejected`;
-                order = 11;
+                // All items rejected - close the ticket directly
+                nextStage = 'TICKET_CLOSED';
+                milestoneNotes = `Ticket closed - All spare requests rejected (${allItems.length} item(s)) by ${rejecterName} (${rejecterRole})`;
+                order = 12;
+                milestoneStatus = 'DONE';
+                
+                // Update ticket status to closed
+                await tx.ticket.update({
+                  where: { id: ticket.id },
+                  data: {
+                    status: 'CLOSED',
+                    updatedAt: new Date()
+                  }
+                });
               } else if (approvedItems.length === allItems.length) {
                 // All items approved - create SPARE_APPROVED milestone
                 nextStage = 'SPARE_APPROVED';
@@ -903,11 +924,12 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
                 data: {
                   ticketId: ticket.id,
                   stage: nextStage,
-                  status: 'IN_PROGRESS',
+                  status: milestoneStatus,
                   order: order,
                   changedBy: rejectedBy,
                   notes: milestoneNotes,
-                  startedAt: new Date()
+                  startedAt: new Date(),
+                  completedAt: milestoneStatus === 'DONE' ? new Date() : null
                 }
               });
               

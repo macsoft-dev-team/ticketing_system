@@ -17,14 +17,6 @@ const TicketClosedView = ({ onViewChat }) => {
       >
         <div className="relative">
           <CheckCircle className="w-20 h-20 text-green-500" />
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.3, type: "spring" }}
-            className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center"
-          >
-            <span className="text-white text-xs font-bold">✓</span>
-          </motion.div>
         </div>
 
         <div className="text-center">
@@ -332,7 +324,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   }, []);
 
   return (
-    <div className={`border-t py-5 border-gray-200 p-2 sm:p-4  ${disabled ? 'bg-gray-200' : 'bg-white '}`}>
+    <div className={`border-t py-5 pb-0 border-gray-200 p-2 sm:p-4  ${disabled ? 'bg-gray-200' : 'bg-white '}`}>
       {/* Attachments Preview */}
       <AnimatePresence>
         {attachments.length > 0 && (
@@ -404,7 +396,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
 
-          {/* Media Capture Button - Show on mobile or small screens */}
+          {/* Media Capture Button - Show on mobile or small screens
           {isMobileView && (
             <motion.button
               whileHover={{ scale: 1.1 }}
@@ -421,7 +413,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
               <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
             </motion.button>
           )}
-
+ */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -468,7 +460,6 @@ export const ChatWindow = ({
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [showChatHistory, setShowChatHistory] = useState(false);
-  const [visibleMessages, setVisibleMessages] = useState(new Set());
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -532,7 +523,9 @@ export const ChatWindow = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h3 className="text-sm sm:text-base font-semibold text-gray-900">
-              {ticketStatus === 'closed' && showChatHistory ? 'Chat History' : 'Conversation'}
+              {ticketStatus === 'closed' && showChatHistory ? 'Chat History' : <div>
+                Conversation
+                </div>}
             </h3>
             {ticketStatus === 'closed' && showChatHistory && (
               <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
@@ -593,7 +586,7 @@ export const ChatWindow = ({
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto sm:max-h-full max-h-3/5 p-3 sm:p-4 space-y-3 sm:space-y-4">
+      <div className="flex-1 overflow-y-auto sm:max-h-full max-h-4/5 p-3 sm:p-4 space-y-3 sm:space-y-4">
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="flex flex-col items-center gap-2">
