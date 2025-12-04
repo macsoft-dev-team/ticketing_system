@@ -89,10 +89,25 @@ export default function Signup() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        
+        // Special handling for phone number - only allow digits and limit to 10
+        if (name === 'phone') {
+            // Remove all non-digit characters
+            const digitsOnly = value.replace(/\D/g, '');
+            // Limit to 10 digits
+            const limitedValue = digitsOnly.slice(0, 10);
+            
+            setFormData(prev => ({
+                ...prev,
+                [name]: limitedValue
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+        
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({
@@ -115,8 +130,8 @@ export default function Signup() {
         // Phone validation
         if (!formData.phone) {
             newErrors.phone = 'Mobile number is required';
-        } else if (!/^\+?[\d\s\-\(\)]{10,15}$/.test(formData.phone.replace(/\s/g, ''))) {
-            newErrors.phone = 'Please enter a valid mobile number';
+        } else if (!/^\d{10}$/.test(formData.phone)) {
+            newErrors.phone = 'Mobile number must be exactly 10 digits';
         }
 
         // State validation

@@ -31,8 +31,8 @@ export default function Login() {
 
         if (!mobileNumber) {
             newErrors.mobileNumber = 'Mobile number is required';
-        } else if (!/^\+?[\d\s\-\(\)]{10,15}$/.test(mobileNumber.replace(/\s/g, ''))) {
-            newErrors.mobileNumber = 'Please enter a valid mobile number';
+        } else if (!/^\d{10}$/.test(mobileNumber)) {
+            newErrors.mobileNumber = 'Mobile number must be exactly 10 digits';
         }
 
         if (!password) {
@@ -166,7 +166,15 @@ export default function Login() {
                                 <motion.input
                                     type="tel"
                                     value={mobileNumber}
-                                    onChange={(e) => setMobileNumber(e.target.value)}
+                                    onChange={(e) => {
+                                        // Remove all non-digit characters
+                                        const digitsOnly = e.target.value.replace(/\D/g, '');
+                                        // Remove leading zeros
+                                        const withoutLeadingZeros = digitsOnly.replace(/^0+/, '');
+                                        // Limit to 10 digits
+                                        const limitedValue = withoutLeadingZeros.slice(0, 10);
+                                        setMobileNumber(limitedValue);
+                                    }}
                                     className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.mobileNumber ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white'
                                         }`}
                                     placeholder="Enter your mobile number"
