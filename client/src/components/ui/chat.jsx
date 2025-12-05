@@ -219,7 +219,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   const { toast } = useToast();
   
   // Load media upload configuration on component mount
-  useEffect(() => {
+/*   useEffect(() => {
     const loadMediaConfig = async () => {
       try {
         const enabled = await isMediaUploadEnabled();
@@ -237,7 +237,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     };
     
     loadMediaConfig();
-  }, []);
+  }, []); */
 
   const handleSend = () => {
     if (message.trim() || attachments.length > 0) {

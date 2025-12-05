@@ -3,6 +3,7 @@ import Topbar from './topbar/Topbar';
  import { Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSidebarCollapsed } from '../../lib/features/uiSlice';
+import { useEffect } from 'react';
 
 const Layout = () => {
     const { sidebarCollapsed } = useSelector(state => state.ui);
@@ -11,6 +12,15 @@ const Layout = () => {
     const handleBackdropClick = () => {
         dispatch(setSidebarCollapsed(false));
     };
+
+    // Auto refresh page every 5 minutes to prevent stale data
+   useEffect(() => {
+        const interval = setInterval(() => {
+            window.location.reload();
+        }, 5 * 60 * 1000); // 5 minutes
+        return () => clearInterval(interval);
+    }, []);
+
 
     return (
         <div className="flex h-screen bg-gray-50">

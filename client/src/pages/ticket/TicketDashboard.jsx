@@ -686,15 +686,7 @@ export default function TicketDashboard() {
     const updateButtonVisibility = () => {
       const isSmallScreen = window.innerWidth < 1024;
       const isChatActive = activeTab === 'chat';
-      
-      console.log('Button Debug:', { 
-        isSmallScreen, 
-        isChatActive, 
-        activeTab,
-        innerWidth: window.innerWidth,
-        shouldShow: isChatActive && isSmallScreen 
-      });
-      
+           
       // For now, show button whenever chat is active on small screen (remove scroll requirement for testing)
       setShowScrollToTop(isChatActive && isSmallScreen);
     };
