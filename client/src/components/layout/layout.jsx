@@ -1,6 +1,6 @@
 import Sidebar from './Sidebar';
 import Topbar from './topbar/Topbar';
-import { Outlet } from 'react-router-dom';
+ import { Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setSidebarCollapsed } from '../../lib/features/uiSlice';
 
@@ -45,7 +45,7 @@ const Layout = () => {
                      <Outlet />
                 </main>
             </div>
-        </div>
+         </div>
     );
 };
 

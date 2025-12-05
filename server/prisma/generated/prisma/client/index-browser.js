@@ -388,6 +388,38 @@ exports.Prisma.MotorhpScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.WorkingHoursScalarFieldEnum = {
+  id: 'id',
+  dayOfWeek: 'dayOfWeek',
+  startHour: 'startHour',
+  endHour: 'endHour',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BreakTimeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  startHour: 'startHour',
+  startMinute: 'startMinute',
+  endHour: 'endHour',
+  endMinute: 'endMinute',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OfficeHolidayScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  date: 'date',
+  description: 'description',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -526,6 +558,15 @@ exports.Prisma.settingsOrderByRelevanceFieldEnum = {
 exports.Prisma.motorhpOrderByRelevanceFieldEnum = {
   label: 'label'
 };
+
+exports.Prisma.BreakTimeOrderByRelevanceFieldEnum = {
+  name: 'name'
+};
+
+exports.Prisma.OfficeHolidayOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description'
+};
 exports.Role = exports.$Enums.Role = {
   MACSOFT_ADMIN: 'MACSOFT_ADMIN',
   MACSOFT_HEAD: 'MACSOFT_HEAD',
@@ -618,7 +659,10 @@ exports.Prisma.ModelName = {
   batch: 'batch',
   batchItem: 'batchItem',
   settings: 'settings',
-  motorhp: 'motorhp'
+  motorhp: 'motorhp',
+  WorkingHours: 'WorkingHours',
+  BreakTime: 'BreakTime',
+  OfficeHoliday: 'OfficeHoliday'
 };
 
 /**

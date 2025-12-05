@@ -1,4 +1,5 @@
 import { NotificationBell, UserMenu, LogoSection } from './components';
+import BuzzerAlerts from '../../BuzzerAlerts';
 
 const Topbar = () => {
   return (
@@ -10,6 +11,9 @@ const Topbar = () => {
       <div className="flex-1"></div>
 
       <div className="flex items-center space-x-2">
+        {/* Buzzer Alerts */}
+        <BuzzerAlerts />
+        
         {/* Notifications */}
         <NotificationBell />
         

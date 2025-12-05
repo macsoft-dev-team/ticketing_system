@@ -381,7 +381,7 @@ model MessageSeen {
 model Notification {
   id          Int      @id @default(autoincrement())
   title       String
-  description String
+  description String   @db.LongText
   type        String
   createdAt   DateTime @default(now())
   createdById Int
@@ -477,4 +477,43 @@ enum batchStatus {
   PENDING
   COMPLETED
   CANCELLED
+}
+
+// Working hours configuration
+model WorkingHours {
+  id        Int      @id @default(autoincrement())
+  dayOfWeek Int // 1 = Monday, 2 = Tuesday, ..., 7 = Sunday
+  startHour Int // 24-hour format (e.g., 9 for 9 AM)
+  endHour   Int // 24-hour format (e.g., 18 for 6 PM)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([dayOfWeek])
+}
+
+// Break times configuration
+model BreakTime {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // e.g., "Morning Break", "Lunch Break", "Evening Break"
+  startHour   Int // 24-hour format
+  startMinute Int // minutes
+  endHour     Int // 24-hour format
+  endMinute   Int // minutes
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Office holidays configuration
+model OfficeHoliday {
+  id          Int      @id @default(autoincrement())
+  name        String // e.g., "New Year", "Christmas"
+  date        DateTime // specific date
+  description String? // optional description
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([date])
 }

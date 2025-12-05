@@ -5,6 +5,7 @@ import "./App.css";
 import LoadingSpinner from './components/LoadingSpinner';
 import { ToastProvider } from './components/ui/toast';
 import { SocketProvider } from './lib/contexts/SocketContext';
+import { BuzzerAlertsProvider } from './lib/contexts/BuzzerAlertsContext';
 import useAuth from './lib/hooks/useAuth';
 import { SessionManager } from './lib/utils/sessionManager';
 import { SoundProvider } from './lib/hooks/SoundManager';
@@ -88,9 +89,11 @@ function App() {
     <ToastProvider>
       <SocketProvider>
         <SoundProvider defaultVolume={0.45}>
-          <div className="App">
-            <RouterProvider router={router} />
-          </div>
+          <BuzzerAlertsProvider>
+            <div className="App">
+              <RouterProvider router={router} />
+            </div>
+          </BuzzerAlertsProvider>
         </SoundProvider>
       </SocketProvider>
     </ToastProvider>

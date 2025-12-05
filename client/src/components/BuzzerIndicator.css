@@ -1,0 +1,162 @@
+/* Buzzer Indicator Styles */
+.buzzer-indicator-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.buzzer-indicator-button {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+}
+
+.buzzer-indicator-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.buzzer-indicator-button.enabled {
+  color: #10b981;
+}
+
+.buzzer-indicator-button.disabled {
+  color: #6b7280;
+  opacity: 0.7;
+}
+
+.buzzer-indicator-button.active {
+  animation: buzzerPulse 2s infinite;
+}
+
+.buzzer-indicator-button.active.normal {
+  color: #f59e0b;
+}
+
+.buzzer-indicator-button.active.urgent {
+  color: #dc2626;
+  animation: buzzerUrgentPulse 1s infinite;
+}
+
+.buzzer-icon {
+  font-size: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.buzzer-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #dc2626;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.urgent-indicator {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  font-size: 12px;
+  animation: urgentBlink 0.8s infinite alternate;
+  z-index: 3;
+}
+
+/* Animations */
+@keyframes buzzerPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes buzzerUrgentPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes urgentBlink {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .buzzer-indicator-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .buzzer-indicator-button.disabled {
+    color: #9ca3af;
+  }
+  
+  .buzzer-badge {
+    border-color: #1f2937;
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .buzzer-indicator-button {
+    padding: 6px;
+    min-width: 36px;
+    height: 36px;
+  }
+  
+  .buzzer-icon {
+    font-size: 18px;
+  }
+  
+  .buzzer-badge {
+    font-size: 9px;
+    min-width: 14px;
+    height: 14px;
+  }
+  
+  .urgent-indicator {
+    font-size: 10px;
+  }
+}

@@ -9,7 +9,7 @@ import React, { createContext, useContext, useRef, useCallback, useEffect, useSt
  * Place sound files in /public/sounds/<filename>
  */
 
-const SOUND_URL =import.meta.env.SOUND_URL
+const SOUND_URL = import.meta.env.SOUND_URL || import.meta.env.VITE_SOUND_URL || 'http://localhost:3057/api/uploads/sounds'
 
 const SOUND_MAP = {
     notify_critical: { label: "System Alert", file: `${SOUND_URL}/system-alert.wav` },
@@ -99,12 +99,15 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
     const unmute = useCallback(() => setMuted(false), []);
     const getLabel = useCallback((key) => (SOUND_MAP[key] ? SOUND_MAP[key].label : key), []);
 
+    const getVolume = useCallback(() => volumeRef.current, []);
+
     const value = {
         play,
         mute,
         unmute,
         muted,
         setVolume,
+        getVolume,
         getLabel,
         soundKeys: Object.keys(SOUND_MAP),
         soundMap: SOUND_MAP,

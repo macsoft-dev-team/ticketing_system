@@ -29,6 +29,8 @@ const statesWA = require("./statesWA");
 const batch = require("./batch");
 const motorhp = require("./motorhp");
 const districts = require("./districts");
+const jobs = require("./jobs");
+const workingHours = require("./workingHours");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -53,6 +55,8 @@ router.use("/settings", authenticate, settings);
 router.use("/inventory", authenticate, inventory);
 router.use("/inbound-activities", authenticate, inboundActivity);
 router.use("/motorhp", authenticate, motorhp);
+router.use("/jobs", authenticate, jobs);
+router.use("/working-hours", authenticate, workingHours);
 
 // without authentication
 router.use("/states", states);

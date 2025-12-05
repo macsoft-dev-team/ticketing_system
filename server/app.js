@@ -7,6 +7,7 @@ const path = require("path");
 const { Server } = require("socket.io");
 const appRouter = require("./routes/index");
 const http = require("http");
+const jobScheduler = require("./jobs/scheduler");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -119,6 +120,19 @@ io.on("connection", (socket) => {
     // console.log(`🔕 Socket ${socket.id} left notifications room: ${room}`);
   });
 
+  // Handle Macsoft alerts room (for buzzer alerts)
+  socket.on("join-macsoft-alerts", (userRole) => {
+    if (['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole)) {
+      socket.join('macsoft_alerts');
+      // console.log(`🚨 Socket ${socket.id} joined Macsoft alerts room`);
+    }
+  });
+
+  socket.on("leave-macsoft-alerts", () => {
+    socket.leave('macsoft_alerts');
+    // console.log(`🚨 Socket ${socket.id} left Macsoft alerts room`);
+  });
+
   // Test notification event
   socket.on("send-test-notification", (data) => {
     // console.log(`📧 Sending test notification:`, data);
@@ -131,6 +145,28 @@ io.on("connection", (socket) => {
       timestamp: new Date().toISOString(),
       seen: false,
     });
+  });
+
+  // Test buzzer alert event  
+  socket.on("send-test-buzzer", (data) => {
+    console.log(`🧪 Sending test buzzer alert:`, data);
+    const testBuzzerAlert = {
+      type: 'CUSTOMER_RESPONSE_PENDING',
+      timestamp: new Date().toISOString(),
+      urgency: 'HIGH',
+      title: 'Test Customer Response Alert',
+      message: '1 test ticket has customer messages waiting for Macsoft response (1+ minute)',
+      ticketId: 999,
+      ticketCode: 'TKT-2025-TEST',
+      hoursWaiting: 1,
+      assignedTo: 'Test User',
+      conversationId: 999,
+      customerName: 'Test Customer'
+    };
+    
+    // Send to macsoft_alerts room
+    io.to('macsoft_alerts').emit('buzzer_alert', testBuzzerAlert);
+    console.log(`✅ Test buzzer alert sent to macsoft_alerts room`);
   });
 
   socket.on("disconnect", (reason) => {
@@ -146,7 +182,13 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 4055;
 
 httpServer.listen(PORT, () => {
-  // console.log(`Server running on  ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  
+  // Start the job scheduler after server starts
+  setTimeout(() => {
+    console.log('Starting background job scheduler...');
+    jobScheduler.start(io); // Pass io object for buzzer alerts
+  }, 3000); // Wait 3 seconds for database connections to be ready
 });
 
 module.exports = app;

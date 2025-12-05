@@ -7,7 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
     "migrate-files": "node scripts/migrate-files.js",
-    "test-file-structure": "node scripts/test-file-structure.js"
+    "test-file-structure": "node scripts/test-file-structure.js",
+    "test-auto-close": "node scripts/test-auto-close.js",
+    "test-message-marking": "node scripts/test-message-notification-marking.js",
+    "test-comprehensive": "node scripts/test-comprehensive-auto-close.js",
+    "test-buzzer": "node scripts/test-buzzer-alerts.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -30,6 +34,7 @@
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
     "multer": "^1.4.5-lts.2",
+    "node-cron": "^3.0.3",
     "nodemon": "^3.1.10",
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",

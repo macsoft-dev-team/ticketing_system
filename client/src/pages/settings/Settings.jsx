@@ -3,6 +3,7 @@ import { Button } from '../../components/ui/button';
 import Input from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Switch } from '../../components/ui/switch';
+import moment from 'moment';
 import { 
   Settings as SettingsIcon, 
   Bell, 
@@ -12,7 +13,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Info,
-  Eye
+  Eye,
+  Clock
 } from 'lucide-react';
 import { useToast } from '../../components/ui/toast';
 import apiClient from '../../lib/services/api';
@@ -24,6 +26,18 @@ const Settings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('ticket-codes');
+  
+  // Working Hours Settings
+  const [workingHoursSettings, setWorkingHoursSettings] = useState({
+    workingHours: [],
+    breakTimes: [],
+    holidays: []
+  });
+  
+  // Holiday form states
+  const [newHoliday, setNewHoliday] = useState({ name: '', date: '', description: '' });
+  const [showHolidayForm, setShowHolidayForm] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({ show: false, holiday: null });
   
   // Ticket Code Settings
   const [ticketCodeSettings, setTicketCodeSettings] = useState({
@@ -80,12 +94,20 @@ const Settings = () => {
       // Load notification settings
       const notificationResponse = await apiClient.get('/settings/notifications');
       setNotificationSettings(notificationResponse.data);
+
+      // Load working hours settings
+      const [workingHoursRes, breakTimesRes, holidaysRes] = await Promise.all([
+        apiClient.get('/working-hours/working-hours'),
+        apiClient.get('/working-hours/break-times'),
+        apiClient.get('/working-hours/holidays')
+      ]);
       
-      addToast({
-        title: "Success!",
-        description: "Settings loaded successfully",
-        variant: "success"
+      setWorkingHoursSettings({
+        workingHours: workingHoursRes.data.data,
+        breakTimes: breakTimesRes.data.data,
+        holidays: holidaysRes.data.data
       });
+
     } catch (error) {
       addToast({
         title: "Error",
@@ -168,6 +190,73 @@ const Settings = () => {
     }
   };
 
+  // Holiday management functions
+  const handleAddHoliday = async (e) => {
+    e.preventDefault();
+    if (!newHoliday.name || !newHoliday.date) {
+      addToast({
+        title: "Error",
+        description: "Name and date are required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await apiClient.post('/working-hours/holidays', newHoliday);
+      addToast({
+        title: "Success!",
+        description: "Holiday added successfully",
+        variant: "success"
+      });
+      setNewHoliday({ name: '', date: '', description: '' });
+      setShowHolidayForm(false);
+      await loadSettings(); // Refresh holidays
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: "Failed to add holiday",
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const showDeleteDialog = (holiday) => {
+    setDeleteDialog({ show: true, holiday });
+  };
+
+  const handleDeleteHoliday = async () => {
+    const { holiday } = deleteDialog;
+    if (!holiday) return;
+
+    setSaving(true);
+    try {
+      await apiClient.delete(`/working-hours/holidays/${holiday.id}`);
+      addToast({
+        title: "Success!",
+        description: "Holiday deleted successfully",
+        variant: "success"
+      });
+      setDeleteDialog({ show: false, holiday: null });
+      await loadSettings(); // Refresh holidays
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: "Failed to delete holiday",
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialog({ show: false, holiday: null });
+  };
+
   if (!hasAdminAccess) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -231,6 +320,19 @@ const Settings = () => {
                 <div className="flex items-center gap-2">
                   <Bell className="h-4 w-4" />
                   Notifications
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('working-hours')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'working-hours'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Working Hours
                 </div>
               </button>
             </nav>
@@ -591,6 +693,502 @@ const Settings = () => {
                 </div>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Working Hours Settings Form */}
+        {activeTab === 'working-hours' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 rounded-t-none">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-5 w-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Working Hours Configuration</h2>
+              </div>
+              <p className="text-gray-600">Configure office hours, break times, and holidays for buzzer alert scheduling.</p>
+            </div>
+
+            <div className="p-6 space-y-8">
+              {/* Working Hours Section */}
+              <div>
+                <h3 className="text-md font-semibold text-gray-900 mb-4">Office Hours</h3>
+                <div className="space-y-3">
+                  {workingHoursSettings.workingHours.map((wh) => {
+                    const dayNames = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                    return (
+                      <div key={wh.dayOfWeek} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <span className="font-medium text-gray-900 w-20">{dayNames[wh.dayOfWeek]}</span>
+                          <Switch
+                            checked={wh.isActive}
+                            onCheckedChange={async (checked) => {
+                              try {
+                                await apiClient.put(`/working-hours/working-hours/${wh.dayOfWeek}`, {
+                                  startHour: wh.startHour,
+                                  endHour: wh.endHour,
+                                  isActive: checked
+                                });
+                                setWorkingHoursSettings(prev => ({
+                                  ...prev,
+                                  workingHours: prev.workingHours.map(h => 
+                                    h.dayOfWeek === wh.dayOfWeek ? { ...h, isActive: checked } : h
+                                  )
+                                }));
+                                addToast({
+                                  title: "Success",
+                                  description: `${dayNames[wh.dayOfWeek]} hours updated`,
+                                  variant: "success"
+                                });
+                              } catch (error) {
+                                addToast({
+                                  title: "Error",
+                                  description: "Failed to update working hours",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                          />
+                        </div>
+                        {wh.isActive && (
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="23"
+                              value={wh.startHour}
+                              onChange={async (e) => {
+                                const newStartHour = parseInt(e.target.value);
+                                try {
+                                  await apiClient.put(`/working-hours/working-hours/${wh.dayOfWeek}`, {
+                                    startHour: newStartHour,
+                                    endHour: wh.endHour,
+                                    isActive: wh.isActive
+                                  });
+                                  setWorkingHoursSettings(prev => ({
+                                    ...prev,
+                                    workingHours: prev.workingHours.map(h => 
+                                      h.dayOfWeek === wh.dayOfWeek ? { ...h, startHour: newStartHour } : h
+                                    )
+                                  }));
+                                } catch (error) {
+                                  addToast({
+                                    title: "Error",
+                                    description: "Failed to update start hour",
+                                    variant: "destructive"
+                                  });
+                                }
+                              }}
+                              className="w-20"
+                            />
+                            <span className="text-gray-500">to</span>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="23"
+                              value={wh.endHour}
+                              onChange={async (e) => {
+                                const newEndHour = parseInt(e.target.value);
+                                try {
+                                  await apiClient.put(`/working-hours/working-hours/${wh.dayOfWeek}`, {
+                                    startHour: wh.startHour,
+                                    endHour: newEndHour,
+                                    isActive: wh.isActive
+                                  });
+                                  setWorkingHoursSettings(prev => ({
+                                    ...prev,
+                                    workingHours: prev.workingHours.map(h => 
+                                      h.dayOfWeek === wh.dayOfWeek ? { ...h, endHour: newEndHour } : h
+                                    )
+                                  }));
+                                } catch (error) {
+                                  addToast({
+                                    title: "Error",
+                                    description: "Failed to update end hour",
+                                    variant: "destructive"
+                                  });
+                                }
+                              }}
+                              className="w-20"
+                            />
+                            <span className="text-gray-500 text-sm text-nowrap">
+                              ({moment().hour(wh.startHour).minute(0).format('h:mm A')} - {moment().hour(wh.endHour).minute(0).format('h:mm A')})
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Break Times Section */}
+              <div>
+                <h3 className="text-md font-semibold text-gray-900 mb-4">Break Times</h3>
+                <div className="space-y-3">
+                  {workingHoursSettings.breakTimes.map((bt) => (
+                    <div key={bt.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <span className="font-medium text-gray-900 w-32">{bt.name}</span>
+                        <Switch
+                          checked={bt.isActive}
+                          onCheckedChange={async (checked) => {
+                            try {
+                              await apiClient.put(`/working-hours/break-times/${bt.id}`, {
+                                ...bt,
+                                isActive: checked
+                              });
+                              setWorkingHoursSettings(prev => ({
+                                ...prev,
+                                breakTimes: prev.breakTimes.map(b => 
+                                  b.id === bt.id ? { ...b, isActive: checked } : b
+                                )
+                              }));
+                              addToast({
+                                title: "Success",
+                                description: `${bt.name} updated`,
+                                variant: "success"
+                              });
+                            } catch (error) {
+                              addToast({
+                                title: "Error",
+                                description: "Failed to update break time",
+                                variant: "destructive"
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      {bt.isActive && (
+                        <div className="flex items-center space-x-2">
+                          <Input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={bt.startHour}
+                            onChange={async (e) => {
+                              const newStartHour = parseInt(e.target.value);
+                              try {
+                                await apiClient.put(`/working-hours/break-times/${bt.id}`, {
+                                  ...bt,
+                                  startHour: newStartHour
+                                });
+                                setWorkingHoursSettings(prev => ({
+                                  ...prev,
+                                  breakTimes: prev.breakTimes.map(b => 
+                                    b.id === bt.id ? { ...b, startHour: newStartHour } : b
+                                  )
+                                }));
+                              } catch (error) {
+                                addToast({
+                                  title: "Error",
+                                  description: "Failed to update break time",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="w-20"
+                          />
+                          <span className="text-gray-500">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={bt.startMinute}
+                            onChange={async (e) => {
+                              const newStartMinute = parseInt(e.target.value);
+                              try {
+                                await apiClient.put(`/working-hours/break-times/${bt.id}`, {
+                                  ...bt,
+                                  startMinute: newStartMinute
+                                });
+                                setWorkingHoursSettings(prev => ({
+                                  ...prev,
+                                  breakTimes: prev.breakTimes.map(b => 
+                                    b.id === bt.id ? { ...b, startMinute: newStartMinute } : b
+                                  )
+                                }));
+                              } catch (error) {
+                                addToast({
+                                  title: "Error",
+                                  description: "Failed to update break time",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="w-20"
+                          />
+                          <span className="text-gray-500">to</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={bt.endHour}
+                            onChange={async (e) => {
+                              const newEndHour = parseInt(e.target.value);
+                              try {
+                                await apiClient.put(`/working-hours/break-times/${bt.id}`, {
+                                  ...bt,
+                                  endHour: newEndHour
+                                });
+                                setWorkingHoursSettings(prev => ({
+                                  ...prev,
+                                  breakTimes: prev.breakTimes.map(b => 
+                                    b.id === bt.id ? { ...b, endHour: newEndHour } : b
+                                  )
+                                }));
+                              } catch (error) {
+                                addToast({
+                                  title: "Error",
+                                  description: "Failed to update break time",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="w-20"
+                          />
+                          <span className="text-gray-500">:</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={bt.endMinute}
+                            onChange={async (e) => {
+                              const newEndMinute = parseInt(e.target.value);
+                              try {
+                                await apiClient.put(`/working-hours/break-times/${bt.id}`, {
+                                  ...bt,
+                                  endMinute: newEndMinute
+                                });
+                                setWorkingHoursSettings(prev => ({
+                                  ...prev,
+                                  breakTimes: prev.breakTimes.map(b => 
+                                    b.id === bt.id ? { ...b, endMinute: newEndMinute } : b
+                                  )
+                                }));
+                              } catch (error) {
+                                addToast({
+                                  title: "Error",
+                                  description: "Failed to update break time",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                            className="w-20"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Holidays Section */}
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-md font-semibold text-gray-900">Office Holidays</h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowHolidayForm(!showHolidayForm)}
+                    disabled={saving}
+                  >
+                    {showHolidayForm ? 'Cancel' : 'Add Holiday'}
+                  </Button>
+                </div>
+
+                {/* Add Holiday Form */}
+                {showHolidayForm && (
+                  <form onSubmit={handleAddHoliday} className="mb-4 p-4 bg-gray-50 rounded-lg space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="holidayName" className="text-sm font-medium text-gray-700">
+                          Holiday Name *
+                        </Label>
+                        <Input
+                          id="holidayName"
+                          type="text"
+                          value={newHoliday.name}
+                          onChange={(e) => setNewHoliday({ ...newHoliday, name: e.target.value })}
+                          placeholder="e.g., Christmas"
+                          required
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="holidayDate" className="text-sm font-medium text-gray-700">
+                          Date *
+                        </Label>
+                        <Input
+                          id="holidayDate"
+                          type="date"
+                          value={newHoliday.date}
+                          onChange={(e) => setNewHoliday({ ...newHoliday, date: e.target.value })}
+                          required
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="holidayDescription" className="text-sm font-medium text-gray-700">
+                        Description (optional)
+                      </Label>
+                      <Input
+                        id="holidayDescription"
+                        type="text"
+                        value={newHoliday.description}
+                        onChange={(e) => setNewHoliday({ ...newHoliday, description: e.target.value })}
+                        placeholder="Optional description"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button type="submit" size="sm" disabled={saving}>
+                        {saving ? 'Adding...' : 'Add Holiday'}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          setShowHolidayForm(false);
+                          setNewHoliday({ name: '', date: '', description: '' });
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                )}
+
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {workingHoursSettings.holidays.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500 border border-gray-200 rounded-lg">
+                      No holidays configured. Click "Add Holiday" to create one.
+                    </div>
+                  ) : (
+                    workingHoursSettings.holidays.map((holiday) => (
+                      <div key={holiday.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-4 flex-1">
+                          <span className="font-medium text-gray-900">{holiday.name}</span>
+                          <span className="text-gray-500 text-sm">
+                            {moment(holiday.date).format('MMM DD, YYYY')}
+                          </span>
+                          {holiday.description && (
+                            <span className="text-gray-400 text-sm">- {holiday.description}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={holiday.isActive}
+                            onCheckedChange={async (checked) => {
+                              try {
+                                await apiClient.put(`/working-hours/holidays/${holiday.id}`, {
+                                  ...holiday,
+                                  isActive: checked
+                                });
+                                setWorkingHoursSettings(prev => ({
+                                  ...prev,
+                                  holidays: prev.holidays.map(h => 
+                                    h.id === holiday.id ? { ...h, isActive: checked } : h
+                                  )
+                                }));
+                                addToast({
+                                  title: "Success",
+                                  description: `${holiday.name} ${checked ? 'activated' : 'deactivated'}`,
+                                  variant: "success"
+                                });
+                              } catch (error) {
+                                addToast({
+                                  title: "Error",
+                                  description: "Failed to update holiday",
+                                  variant: "destructive"
+                                });
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => showDeleteDialog(holiday)}
+                            disabled={saving}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Status Information */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <h4 className="font-medium text-blue-900">How This Works</h4>
+                </div>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <p>• Buzzer alerts will only be sent during active working hours</p>
+                  <p>• Break times automatically suspend alerts even during working hours</p>
+                  <p>• Holidays override working hours - no alerts will be sent on holiday dates</p>
+                  <p>• Changes take effect immediately for all future buzzer alerts</p>
+                </div>
+              </div>
+
+              {/* Refresh Button */}
+              <div className="flex justify-end pt-4 border-t border-gray-200">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={loadSettings}
+                  disabled={loading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh Configuration
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Holiday Confirmation Dialog */}
+        {deleteDialog.show && (
+          <div className="fixed inset-0 bg-black/25 duration-300 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-red-100 rounded-full">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Delete Holiday</h3>
+                </div>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete "<span className="font-medium">{deleteDialog.holiday?.name}</span>"? 
+                  This action cannot be undone.
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={cancelDelete}
+                    disabled={saving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeleteHoliday}
+                    disabled={saving}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {saving ? 'Deleting...' : 'Delete Holiday'}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -18,7 +18,7 @@ export const useSocket = () => {
 };
 
 export const SocketProvider = ({ children }) => {
-  const { token, isAuthenticated } = useAuth();
+  const { token, isAuthenticated, user } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [socket, setSocket] = useState(null);
 
@@ -30,13 +30,23 @@ export const SocketProvider = ({ children }) => {
       if (socketInstance) {
         socketInstance.on('connect', () => {
            setIsConnected(true);
+           
+           // Join notification rooms when connected
+           if (user?.id) {
+             socketInstance.emit('join-notifications', user.id);
+             
+             // Join Macsoft alerts room for buzzer alerts if user is Macsoft team
+             const MACSOFT_ROLES = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+             if (user.role && MACSOFT_ROLES.includes(user.role)) {
+               socketInstance.emit('join-macsoft-alerts', user.role);
+               console.log(`🚨 Joined Macsoft alerts room as ${user.role}`);
+             }
+           }
         });
         
         socketInstance.on('disconnect', () => {
           setIsConnected(false);
         });
-
-        // Note: All notification listeners removed - only conversation functionality remains
       }
     }
   };
@@ -53,7 +63,7 @@ export const SocketProvider = ({ children }) => {
 
   // Connect when user is authenticated and has token
   useEffect(() => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated && token && user) {
       connect();
     } else {
       disconnect();
@@ -65,7 +75,7 @@ export const SocketProvider = ({ children }) => {
         disconnect();
       }
     };
-  }, [isAuthenticated, token]);
+  }, [isAuthenticated, token, user]);
 
   const value = {
     isConnected,

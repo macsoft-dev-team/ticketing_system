@@ -1,0 +1,313 @@
+/* Buzzer Alerts Display Styles */
+.buzzer-alerts-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  max-width: 400px;
+  z-index: 1000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.buzzer-control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.buzzer-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buzzer-indicator {
+  font-size: 16px;
+  animation: pulse 2s infinite;
+}
+
+.buzzer-indicator.active {
+  animation: pulse 1s infinite;
+}
+
+.buzzer-indicator.inactive {
+  opacity: 0.5;
+  animation: none;
+}
+
+.buzzer-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.buzzer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-buzzer-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.btn-buzzer-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.btn-buzzer-toggle.enabled {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.btn-buzzer-toggle.disabled {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.btn-clear-all {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-all:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.buzzer-alerts-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.buzzer-alert-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  padding: 16px;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.buzzer-alert-item:last-child {
+  border-radius: 0 0 8px 8px;
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.alert-ticket-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ticket-code {
+  font-weight: 700;
+  font-size: 16px;
+  color: #1f2937;
+}
+
+.alert-urgency {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  align-self: flex-start;
+}
+
+.alert-urgency:contains("URGENT") {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.alert-urgency:contains("Pending") {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.btn-dismiss-alert {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-dismiss-alert:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.alert-content {
+  margin-bottom: 12px;
+}
+
+.alert-message {
+  color: #374151;
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.alert-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b7280;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alert-time {
+  font-style: italic;
+}
+
+.alert-assigned {
+  background: #f0f9ff;
+  color: #0369a1;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.alert-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-view-ticket,
+.btn-quick-reply {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+}
+
+.btn-view-ticket {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-view-ticket:hover {
+  background: #e5e7eb;
+}
+
+.btn-quick-reply {
+  background: #3b82f6;
+  color: white;
+  border: 1px solid #2563eb;
+}
+
+.btn-quick-reply:hover {
+  background: #2563eb;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Scrollbar Styling */
+.buzzer-alerts-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.buzzer-alerts-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.buzzer-alerts-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.buzzer-alerts-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .buzzer-alerts-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+  
+  .buzzer-control-header {
+    padding: 10px 12px;
+  }
+  
+  .buzzer-label {
+    font-size: 13px;
+  }
+  
+  .btn-buzzer-toggle,
+  .btn-clear-all {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  
+  .buzzer-alert-item {
+    padding: 12px;
+  }
+  
+  .alert-actions {
+    flex-direction: column;
+  }
+  
+  .btn-view-ticket,
+  .btn-quick-reply {
+    flex: none;
+  }
+}

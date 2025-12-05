@@ -128,6 +128,21 @@ export type settings = $Result.DefaultSelection<Prisma.$settingsPayload>
  * 
  */
 export type motorhp = $Result.DefaultSelection<Prisma.$motorhpPayload>
+/**
+ * Model WorkingHours
+ * 
+ */
+export type WorkingHours = $Result.DefaultSelection<Prisma.$WorkingHoursPayload>
+/**
+ * Model BreakTime
+ * 
+ */
+export type BreakTime = $Result.DefaultSelection<Prisma.$BreakTimePayload>
+/**
+ * Model OfficeHoliday
+ * 
+ */
+export type OfficeHoliday = $Result.DefaultSelection<Prisma.$OfficeHolidayPayload>
 
 /**
  * Enums
@@ -606,6 +621,36 @@ export class PrismaClient<
     * ```
     */
   get motorhp(): Prisma.motorhpDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.workingHours`: Exposes CRUD operations for the **WorkingHours** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WorkingHours
+    * const workingHours = await prisma.workingHours.findMany()
+    * ```
+    */
+  get workingHours(): Prisma.WorkingHoursDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.breakTime`: Exposes CRUD operations for the **BreakTime** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BreakTimes
+    * const breakTimes = await prisma.breakTime.findMany()
+    * ```
+    */
+  get breakTime(): Prisma.BreakTimeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.officeHoliday`: Exposes CRUD operations for the **OfficeHoliday** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more OfficeHolidays
+    * const officeHolidays = await prisma.officeHoliday.findMany()
+    * ```
+    */
+  get officeHoliday(): Prisma.OfficeHolidayDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1068,7 +1113,10 @@ export namespace Prisma {
     batch: 'batch',
     batchItem: 'batchItem',
     settings: 'settings',
-    motorhp: 'motorhp'
+    motorhp: 'motorhp',
+    WorkingHours: 'WorkingHours',
+    BreakTime: 'BreakTime',
+    OfficeHoliday: 'OfficeHoliday'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1087,7 +1135,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp"
+      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp" | "workingHours" | "breakTime" | "officeHoliday"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2609,6 +2657,204 @@ export namespace Prisma {
           }
         }
       }
+      WorkingHours: {
+        payload: Prisma.$WorkingHoursPayload<ExtArgs>
+        fields: Prisma.WorkingHoursFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WorkingHoursFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WorkingHoursFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>
+          }
+          findFirst: {
+            args: Prisma.WorkingHoursFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WorkingHoursFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>
+          }
+          findMany: {
+            args: Prisma.WorkingHoursFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>[]
+          }
+          create: {
+            args: Prisma.WorkingHoursCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>
+          }
+          createMany: {
+            args: Prisma.WorkingHoursCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.WorkingHoursDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>
+          }
+          update: {
+            args: Prisma.WorkingHoursUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>
+          }
+          deleteMany: {
+            args: Prisma.WorkingHoursDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WorkingHoursUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.WorkingHoursUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WorkingHoursPayload>
+          }
+          aggregate: {
+            args: Prisma.WorkingHoursAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWorkingHours>
+          }
+          groupBy: {
+            args: Prisma.WorkingHoursGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WorkingHoursGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WorkingHoursCountArgs<ExtArgs>
+            result: $Utils.Optional<WorkingHoursCountAggregateOutputType> | number
+          }
+        }
+      }
+      BreakTime: {
+        payload: Prisma.$BreakTimePayload<ExtArgs>
+        fields: Prisma.BreakTimeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BreakTimeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BreakTimeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>
+          }
+          findFirst: {
+            args: Prisma.BreakTimeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BreakTimeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>
+          }
+          findMany: {
+            args: Prisma.BreakTimeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>[]
+          }
+          create: {
+            args: Prisma.BreakTimeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>
+          }
+          createMany: {
+            args: Prisma.BreakTimeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.BreakTimeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>
+          }
+          update: {
+            args: Prisma.BreakTimeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>
+          }
+          deleteMany: {
+            args: Prisma.BreakTimeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BreakTimeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.BreakTimeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BreakTimePayload>
+          }
+          aggregate: {
+            args: Prisma.BreakTimeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBreakTime>
+          }
+          groupBy: {
+            args: Prisma.BreakTimeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BreakTimeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BreakTimeCountArgs<ExtArgs>
+            result: $Utils.Optional<BreakTimeCountAggregateOutputType> | number
+          }
+        }
+      }
+      OfficeHoliday: {
+        payload: Prisma.$OfficeHolidayPayload<ExtArgs>
+        fields: Prisma.OfficeHolidayFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.OfficeHolidayFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.OfficeHolidayFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>
+          }
+          findFirst: {
+            args: Prisma.OfficeHolidayFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.OfficeHolidayFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>
+          }
+          findMany: {
+            args: Prisma.OfficeHolidayFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>[]
+          }
+          create: {
+            args: Prisma.OfficeHolidayCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>
+          }
+          createMany: {
+            args: Prisma.OfficeHolidayCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.OfficeHolidayDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>
+          }
+          update: {
+            args: Prisma.OfficeHolidayUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>
+          }
+          deleteMany: {
+            args: Prisma.OfficeHolidayDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.OfficeHolidayUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.OfficeHolidayUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OfficeHolidayPayload>
+          }
+          aggregate: {
+            args: Prisma.OfficeHolidayAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOfficeHoliday>
+          }
+          groupBy: {
+            args: Prisma.OfficeHolidayGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OfficeHolidayGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.OfficeHolidayCountArgs<ExtArgs>
+            result: $Utils.Optional<OfficeHolidayCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2728,6 +2974,9 @@ export namespace Prisma {
     batchItem?: batchItemOmit
     settings?: settingsOmit
     motorhp?: motorhpOmit
+    workingHours?: WorkingHoursOmit
+    breakTime?: BreakTimeOmit
+    officeHoliday?: OfficeHolidayOmit
   }
 
   /* Types for Logging */
@@ -28322,6 +28571,2870 @@ export namespace Prisma {
 
 
   /**
+   * Model WorkingHours
+   */
+
+  export type AggregateWorkingHours = {
+    _count: WorkingHoursCountAggregateOutputType | null
+    _avg: WorkingHoursAvgAggregateOutputType | null
+    _sum: WorkingHoursSumAggregateOutputType | null
+    _min: WorkingHoursMinAggregateOutputType | null
+    _max: WorkingHoursMaxAggregateOutputType | null
+  }
+
+  export type WorkingHoursAvgAggregateOutputType = {
+    id: number | null
+    dayOfWeek: number | null
+    startHour: number | null
+    endHour: number | null
+  }
+
+  export type WorkingHoursSumAggregateOutputType = {
+    id: number | null
+    dayOfWeek: number | null
+    startHour: number | null
+    endHour: number | null
+  }
+
+  export type WorkingHoursMinAggregateOutputType = {
+    id: number | null
+    dayOfWeek: number | null
+    startHour: number | null
+    endHour: number | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WorkingHoursMaxAggregateOutputType = {
+    id: number | null
+    dayOfWeek: number | null
+    startHour: number | null
+    endHour: number | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WorkingHoursCountAggregateOutputType = {
+    id: number
+    dayOfWeek: number
+    startHour: number
+    endHour: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type WorkingHoursAvgAggregateInputType = {
+    id?: true
+    dayOfWeek?: true
+    startHour?: true
+    endHour?: true
+  }
+
+  export type WorkingHoursSumAggregateInputType = {
+    id?: true
+    dayOfWeek?: true
+    startHour?: true
+    endHour?: true
+  }
+
+  export type WorkingHoursMinAggregateInputType = {
+    id?: true
+    dayOfWeek?: true
+    startHour?: true
+    endHour?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WorkingHoursMaxAggregateInputType = {
+    id?: true
+    dayOfWeek?: true
+    startHour?: true
+    endHour?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WorkingHoursCountAggregateInputType = {
+    id?: true
+    dayOfWeek?: true
+    startHour?: true
+    endHour?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type WorkingHoursAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WorkingHours to aggregate.
+     */
+    where?: WorkingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WorkingHours to fetch.
+     */
+    orderBy?: WorkingHoursOrderByWithRelationInput | WorkingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WorkingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WorkingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WorkingHours.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned WorkingHours
+    **/
+    _count?: true | WorkingHoursCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: WorkingHoursAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: WorkingHoursSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WorkingHoursMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WorkingHoursMaxAggregateInputType
+  }
+
+  export type GetWorkingHoursAggregateType<T extends WorkingHoursAggregateArgs> = {
+        [P in keyof T & keyof AggregateWorkingHours]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWorkingHours[P]>
+      : GetScalarType<T[P], AggregateWorkingHours[P]>
+  }
+
+
+
+
+  export type WorkingHoursGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WorkingHoursWhereInput
+    orderBy?: WorkingHoursOrderByWithAggregationInput | WorkingHoursOrderByWithAggregationInput[]
+    by: WorkingHoursScalarFieldEnum[] | WorkingHoursScalarFieldEnum
+    having?: WorkingHoursScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WorkingHoursCountAggregateInputType | true
+    _avg?: WorkingHoursAvgAggregateInputType
+    _sum?: WorkingHoursSumAggregateInputType
+    _min?: WorkingHoursMinAggregateInputType
+    _max?: WorkingHoursMaxAggregateInputType
+  }
+
+  export type WorkingHoursGroupByOutputType = {
+    id: number
+    dayOfWeek: number
+    startHour: number
+    endHour: number
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: WorkingHoursCountAggregateOutputType | null
+    _avg: WorkingHoursAvgAggregateOutputType | null
+    _sum: WorkingHoursSumAggregateOutputType | null
+    _min: WorkingHoursMinAggregateOutputType | null
+    _max: WorkingHoursMaxAggregateOutputType | null
+  }
+
+  type GetWorkingHoursGroupByPayload<T extends WorkingHoursGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WorkingHoursGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WorkingHoursGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WorkingHoursGroupByOutputType[P]>
+            : GetScalarType<T[P], WorkingHoursGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WorkingHoursSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dayOfWeek?: boolean
+    startHour?: boolean
+    endHour?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["workingHours"]>
+
+
+
+  export type WorkingHoursSelectScalar = {
+    id?: boolean
+    dayOfWeek?: boolean
+    startHour?: boolean
+    endHour?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type WorkingHoursOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dayOfWeek" | "startHour" | "endHour" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["workingHours"]>
+
+  export type $WorkingHoursPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WorkingHours"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      dayOfWeek: number
+      startHour: number
+      endHour: number
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["workingHours"]>
+    composites: {}
+  }
+
+  type WorkingHoursGetPayload<S extends boolean | null | undefined | WorkingHoursDefaultArgs> = $Result.GetResult<Prisma.$WorkingHoursPayload, S>
+
+  type WorkingHoursCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WorkingHoursFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WorkingHoursCountAggregateInputType | true
+    }
+
+  export interface WorkingHoursDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WorkingHours'], meta: { name: 'WorkingHours' } }
+    /**
+     * Find zero or one WorkingHours that matches the filter.
+     * @param {WorkingHoursFindUniqueArgs} args - Arguments to find a WorkingHours
+     * @example
+     * // Get one WorkingHours
+     * const workingHours = await prisma.workingHours.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WorkingHoursFindUniqueArgs>(args: SelectSubset<T, WorkingHoursFindUniqueArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WorkingHours that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WorkingHoursFindUniqueOrThrowArgs} args - Arguments to find a WorkingHours
+     * @example
+     * // Get one WorkingHours
+     * const workingHours = await prisma.workingHours.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WorkingHoursFindUniqueOrThrowArgs>(args: SelectSubset<T, WorkingHoursFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WorkingHours that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursFindFirstArgs} args - Arguments to find a WorkingHours
+     * @example
+     * // Get one WorkingHours
+     * const workingHours = await prisma.workingHours.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WorkingHoursFindFirstArgs>(args?: SelectSubset<T, WorkingHoursFindFirstArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WorkingHours that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursFindFirstOrThrowArgs} args - Arguments to find a WorkingHours
+     * @example
+     * // Get one WorkingHours
+     * const workingHours = await prisma.workingHours.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WorkingHoursFindFirstOrThrowArgs>(args?: SelectSubset<T, WorkingHoursFindFirstOrThrowArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WorkingHours that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WorkingHours
+     * const workingHours = await prisma.workingHours.findMany()
+     * 
+     * // Get first 10 WorkingHours
+     * const workingHours = await prisma.workingHours.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const workingHoursWithIdOnly = await prisma.workingHours.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WorkingHoursFindManyArgs>(args?: SelectSubset<T, WorkingHoursFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WorkingHours.
+     * @param {WorkingHoursCreateArgs} args - Arguments to create a WorkingHours.
+     * @example
+     * // Create one WorkingHours
+     * const WorkingHours = await prisma.workingHours.create({
+     *   data: {
+     *     // ... data to create a WorkingHours
+     *   }
+     * })
+     * 
+     */
+    create<T extends WorkingHoursCreateArgs>(args: SelectSubset<T, WorkingHoursCreateArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WorkingHours.
+     * @param {WorkingHoursCreateManyArgs} args - Arguments to create many WorkingHours.
+     * @example
+     * // Create many WorkingHours
+     * const workingHours = await prisma.workingHours.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WorkingHoursCreateManyArgs>(args?: SelectSubset<T, WorkingHoursCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a WorkingHours.
+     * @param {WorkingHoursDeleteArgs} args - Arguments to delete one WorkingHours.
+     * @example
+     * // Delete one WorkingHours
+     * const WorkingHours = await prisma.workingHours.delete({
+     *   where: {
+     *     // ... filter to delete one WorkingHours
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WorkingHoursDeleteArgs>(args: SelectSubset<T, WorkingHoursDeleteArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WorkingHours.
+     * @param {WorkingHoursUpdateArgs} args - Arguments to update one WorkingHours.
+     * @example
+     * // Update one WorkingHours
+     * const workingHours = await prisma.workingHours.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WorkingHoursUpdateArgs>(args: SelectSubset<T, WorkingHoursUpdateArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WorkingHours.
+     * @param {WorkingHoursDeleteManyArgs} args - Arguments to filter WorkingHours to delete.
+     * @example
+     * // Delete a few WorkingHours
+     * const { count } = await prisma.workingHours.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WorkingHoursDeleteManyArgs>(args?: SelectSubset<T, WorkingHoursDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WorkingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WorkingHours
+     * const workingHours = await prisma.workingHours.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WorkingHoursUpdateManyArgs>(args: SelectSubset<T, WorkingHoursUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one WorkingHours.
+     * @param {WorkingHoursUpsertArgs} args - Arguments to update or create a WorkingHours.
+     * @example
+     * // Update or create a WorkingHours
+     * const workingHours = await prisma.workingHours.upsert({
+     *   create: {
+     *     // ... data to create a WorkingHours
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WorkingHours we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WorkingHoursUpsertArgs>(args: SelectSubset<T, WorkingHoursUpsertArgs<ExtArgs>>): Prisma__WorkingHoursClient<$Result.GetResult<Prisma.$WorkingHoursPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WorkingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursCountArgs} args - Arguments to filter WorkingHours to count.
+     * @example
+     * // Count the number of WorkingHours
+     * const count = await prisma.workingHours.count({
+     *   where: {
+     *     // ... the filter for the WorkingHours we want to count
+     *   }
+     * })
+    **/
+    count<T extends WorkingHoursCountArgs>(
+      args?: Subset<T, WorkingHoursCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WorkingHoursCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WorkingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WorkingHoursAggregateArgs>(args: Subset<T, WorkingHoursAggregateArgs>): Prisma.PrismaPromise<GetWorkingHoursAggregateType<T>>
+
+    /**
+     * Group by WorkingHours.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WorkingHoursGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WorkingHoursGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WorkingHoursGroupByArgs['orderBy'] }
+        : { orderBy?: WorkingHoursGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WorkingHoursGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWorkingHoursGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WorkingHours model
+   */
+  readonly fields: WorkingHoursFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WorkingHours.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WorkingHoursClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WorkingHours model
+   */
+  interface WorkingHoursFieldRefs {
+    readonly id: FieldRef<"WorkingHours", 'Int'>
+    readonly dayOfWeek: FieldRef<"WorkingHours", 'Int'>
+    readonly startHour: FieldRef<"WorkingHours", 'Int'>
+    readonly endHour: FieldRef<"WorkingHours", 'Int'>
+    readonly isActive: FieldRef<"WorkingHours", 'Boolean'>
+    readonly createdAt: FieldRef<"WorkingHours", 'DateTime'>
+    readonly updatedAt: FieldRef<"WorkingHours", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * WorkingHours findUnique
+   */
+  export type WorkingHoursFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * Filter, which WorkingHours to fetch.
+     */
+    where: WorkingHoursWhereUniqueInput
+  }
+
+  /**
+   * WorkingHours findUniqueOrThrow
+   */
+  export type WorkingHoursFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * Filter, which WorkingHours to fetch.
+     */
+    where: WorkingHoursWhereUniqueInput
+  }
+
+  /**
+   * WorkingHours findFirst
+   */
+  export type WorkingHoursFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * Filter, which WorkingHours to fetch.
+     */
+    where?: WorkingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WorkingHours to fetch.
+     */
+    orderBy?: WorkingHoursOrderByWithRelationInput | WorkingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WorkingHours.
+     */
+    cursor?: WorkingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WorkingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WorkingHours.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WorkingHours.
+     */
+    distinct?: WorkingHoursScalarFieldEnum | WorkingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * WorkingHours findFirstOrThrow
+   */
+  export type WorkingHoursFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * Filter, which WorkingHours to fetch.
+     */
+    where?: WorkingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WorkingHours to fetch.
+     */
+    orderBy?: WorkingHoursOrderByWithRelationInput | WorkingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WorkingHours.
+     */
+    cursor?: WorkingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WorkingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WorkingHours.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WorkingHours.
+     */
+    distinct?: WorkingHoursScalarFieldEnum | WorkingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * WorkingHours findMany
+   */
+  export type WorkingHoursFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * Filter, which WorkingHours to fetch.
+     */
+    where?: WorkingHoursWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WorkingHours to fetch.
+     */
+    orderBy?: WorkingHoursOrderByWithRelationInput | WorkingHoursOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing WorkingHours.
+     */
+    cursor?: WorkingHoursWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WorkingHours from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WorkingHours.
+     */
+    skip?: number
+    distinct?: WorkingHoursScalarFieldEnum | WorkingHoursScalarFieldEnum[]
+  }
+
+  /**
+   * WorkingHours create
+   */
+  export type WorkingHoursCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * The data needed to create a WorkingHours.
+     */
+    data: XOR<WorkingHoursCreateInput, WorkingHoursUncheckedCreateInput>
+  }
+
+  /**
+   * WorkingHours createMany
+   */
+  export type WorkingHoursCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WorkingHours.
+     */
+    data: WorkingHoursCreateManyInput | WorkingHoursCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WorkingHours update
+   */
+  export type WorkingHoursUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * The data needed to update a WorkingHours.
+     */
+    data: XOR<WorkingHoursUpdateInput, WorkingHoursUncheckedUpdateInput>
+    /**
+     * Choose, which WorkingHours to update.
+     */
+    where: WorkingHoursWhereUniqueInput
+  }
+
+  /**
+   * WorkingHours updateMany
+   */
+  export type WorkingHoursUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WorkingHours.
+     */
+    data: XOR<WorkingHoursUpdateManyMutationInput, WorkingHoursUncheckedUpdateManyInput>
+    /**
+     * Filter which WorkingHours to update
+     */
+    where?: WorkingHoursWhereInput
+    /**
+     * Limit how many WorkingHours to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WorkingHours upsert
+   */
+  export type WorkingHoursUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * The filter to search for the WorkingHours to update in case it exists.
+     */
+    where: WorkingHoursWhereUniqueInput
+    /**
+     * In case the WorkingHours found by the `where` argument doesn't exist, create a new WorkingHours with this data.
+     */
+    create: XOR<WorkingHoursCreateInput, WorkingHoursUncheckedCreateInput>
+    /**
+     * In case the WorkingHours was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WorkingHoursUpdateInput, WorkingHoursUncheckedUpdateInput>
+  }
+
+  /**
+   * WorkingHours delete
+   */
+  export type WorkingHoursDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+    /**
+     * Filter which WorkingHours to delete.
+     */
+    where: WorkingHoursWhereUniqueInput
+  }
+
+  /**
+   * WorkingHours deleteMany
+   */
+  export type WorkingHoursDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WorkingHours to delete
+     */
+    where?: WorkingHoursWhereInput
+    /**
+     * Limit how many WorkingHours to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WorkingHours without action
+   */
+  export type WorkingHoursDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WorkingHours
+     */
+    select?: WorkingHoursSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WorkingHours
+     */
+    omit?: WorkingHoursOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BreakTime
+   */
+
+  export type AggregateBreakTime = {
+    _count: BreakTimeCountAggregateOutputType | null
+    _avg: BreakTimeAvgAggregateOutputType | null
+    _sum: BreakTimeSumAggregateOutputType | null
+    _min: BreakTimeMinAggregateOutputType | null
+    _max: BreakTimeMaxAggregateOutputType | null
+  }
+
+  export type BreakTimeAvgAggregateOutputType = {
+    id: number | null
+    startHour: number | null
+    startMinute: number | null
+    endHour: number | null
+    endMinute: number | null
+  }
+
+  export type BreakTimeSumAggregateOutputType = {
+    id: number | null
+    startHour: number | null
+    startMinute: number | null
+    endHour: number | null
+    endMinute: number | null
+  }
+
+  export type BreakTimeMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    startHour: number | null
+    startMinute: number | null
+    endHour: number | null
+    endMinute: number | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BreakTimeMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    startHour: number | null
+    startMinute: number | null
+    endHour: number | null
+    endMinute: number | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BreakTimeCountAggregateOutputType = {
+    id: number
+    name: number
+    startHour: number
+    startMinute: number
+    endHour: number
+    endMinute: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BreakTimeAvgAggregateInputType = {
+    id?: true
+    startHour?: true
+    startMinute?: true
+    endHour?: true
+    endMinute?: true
+  }
+
+  export type BreakTimeSumAggregateInputType = {
+    id?: true
+    startHour?: true
+    startMinute?: true
+    endHour?: true
+    endMinute?: true
+  }
+
+  export type BreakTimeMinAggregateInputType = {
+    id?: true
+    name?: true
+    startHour?: true
+    startMinute?: true
+    endHour?: true
+    endMinute?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BreakTimeMaxAggregateInputType = {
+    id?: true
+    name?: true
+    startHour?: true
+    startMinute?: true
+    endHour?: true
+    endMinute?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BreakTimeCountAggregateInputType = {
+    id?: true
+    name?: true
+    startHour?: true
+    startMinute?: true
+    endHour?: true
+    endMinute?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BreakTimeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BreakTime to aggregate.
+     */
+    where?: BreakTimeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BreakTimes to fetch.
+     */
+    orderBy?: BreakTimeOrderByWithRelationInput | BreakTimeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BreakTimeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BreakTimes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BreakTimes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BreakTimes
+    **/
+    _count?: true | BreakTimeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BreakTimeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BreakTimeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BreakTimeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BreakTimeMaxAggregateInputType
+  }
+
+  export type GetBreakTimeAggregateType<T extends BreakTimeAggregateArgs> = {
+        [P in keyof T & keyof AggregateBreakTime]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBreakTime[P]>
+      : GetScalarType<T[P], AggregateBreakTime[P]>
+  }
+
+
+
+
+  export type BreakTimeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BreakTimeWhereInput
+    orderBy?: BreakTimeOrderByWithAggregationInput | BreakTimeOrderByWithAggregationInput[]
+    by: BreakTimeScalarFieldEnum[] | BreakTimeScalarFieldEnum
+    having?: BreakTimeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BreakTimeCountAggregateInputType | true
+    _avg?: BreakTimeAvgAggregateInputType
+    _sum?: BreakTimeSumAggregateInputType
+    _min?: BreakTimeMinAggregateInputType
+    _max?: BreakTimeMaxAggregateInputType
+  }
+
+  export type BreakTimeGroupByOutputType = {
+    id: number
+    name: string
+    startHour: number
+    startMinute: number
+    endHour: number
+    endMinute: number
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: BreakTimeCountAggregateOutputType | null
+    _avg: BreakTimeAvgAggregateOutputType | null
+    _sum: BreakTimeSumAggregateOutputType | null
+    _min: BreakTimeMinAggregateOutputType | null
+    _max: BreakTimeMaxAggregateOutputType | null
+  }
+
+  type GetBreakTimeGroupByPayload<T extends BreakTimeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BreakTimeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BreakTimeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BreakTimeGroupByOutputType[P]>
+            : GetScalarType<T[P], BreakTimeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BreakTimeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    startHour?: boolean
+    startMinute?: boolean
+    endHour?: boolean
+    endMinute?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["breakTime"]>
+
+
+
+  export type BreakTimeSelectScalar = {
+    id?: boolean
+    name?: boolean
+    startHour?: boolean
+    startMinute?: boolean
+    endHour?: boolean
+    endMinute?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BreakTimeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "startHour" | "startMinute" | "endHour" | "endMinute" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["breakTime"]>
+
+  export type $BreakTimePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BreakTime"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      startHour: number
+      startMinute: number
+      endHour: number
+      endMinute: number
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["breakTime"]>
+    composites: {}
+  }
+
+  type BreakTimeGetPayload<S extends boolean | null | undefined | BreakTimeDefaultArgs> = $Result.GetResult<Prisma.$BreakTimePayload, S>
+
+  type BreakTimeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BreakTimeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BreakTimeCountAggregateInputType | true
+    }
+
+  export interface BreakTimeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BreakTime'], meta: { name: 'BreakTime' } }
+    /**
+     * Find zero or one BreakTime that matches the filter.
+     * @param {BreakTimeFindUniqueArgs} args - Arguments to find a BreakTime
+     * @example
+     * // Get one BreakTime
+     * const breakTime = await prisma.breakTime.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BreakTimeFindUniqueArgs>(args: SelectSubset<T, BreakTimeFindUniqueArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BreakTime that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BreakTimeFindUniqueOrThrowArgs} args - Arguments to find a BreakTime
+     * @example
+     * // Get one BreakTime
+     * const breakTime = await prisma.breakTime.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BreakTimeFindUniqueOrThrowArgs>(args: SelectSubset<T, BreakTimeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BreakTime that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeFindFirstArgs} args - Arguments to find a BreakTime
+     * @example
+     * // Get one BreakTime
+     * const breakTime = await prisma.breakTime.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BreakTimeFindFirstArgs>(args?: SelectSubset<T, BreakTimeFindFirstArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BreakTime that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeFindFirstOrThrowArgs} args - Arguments to find a BreakTime
+     * @example
+     * // Get one BreakTime
+     * const breakTime = await prisma.breakTime.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BreakTimeFindFirstOrThrowArgs>(args?: SelectSubset<T, BreakTimeFindFirstOrThrowArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BreakTimes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BreakTimes
+     * const breakTimes = await prisma.breakTime.findMany()
+     * 
+     * // Get first 10 BreakTimes
+     * const breakTimes = await prisma.breakTime.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const breakTimeWithIdOnly = await prisma.breakTime.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BreakTimeFindManyArgs>(args?: SelectSubset<T, BreakTimeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BreakTime.
+     * @param {BreakTimeCreateArgs} args - Arguments to create a BreakTime.
+     * @example
+     * // Create one BreakTime
+     * const BreakTime = await prisma.breakTime.create({
+     *   data: {
+     *     // ... data to create a BreakTime
+     *   }
+     * })
+     * 
+     */
+    create<T extends BreakTimeCreateArgs>(args: SelectSubset<T, BreakTimeCreateArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BreakTimes.
+     * @param {BreakTimeCreateManyArgs} args - Arguments to create many BreakTimes.
+     * @example
+     * // Create many BreakTimes
+     * const breakTime = await prisma.breakTime.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BreakTimeCreateManyArgs>(args?: SelectSubset<T, BreakTimeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a BreakTime.
+     * @param {BreakTimeDeleteArgs} args - Arguments to delete one BreakTime.
+     * @example
+     * // Delete one BreakTime
+     * const BreakTime = await prisma.breakTime.delete({
+     *   where: {
+     *     // ... filter to delete one BreakTime
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BreakTimeDeleteArgs>(args: SelectSubset<T, BreakTimeDeleteArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BreakTime.
+     * @param {BreakTimeUpdateArgs} args - Arguments to update one BreakTime.
+     * @example
+     * // Update one BreakTime
+     * const breakTime = await prisma.breakTime.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BreakTimeUpdateArgs>(args: SelectSubset<T, BreakTimeUpdateArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BreakTimes.
+     * @param {BreakTimeDeleteManyArgs} args - Arguments to filter BreakTimes to delete.
+     * @example
+     * // Delete a few BreakTimes
+     * const { count } = await prisma.breakTime.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BreakTimeDeleteManyArgs>(args?: SelectSubset<T, BreakTimeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BreakTimes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BreakTimes
+     * const breakTime = await prisma.breakTime.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BreakTimeUpdateManyArgs>(args: SelectSubset<T, BreakTimeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one BreakTime.
+     * @param {BreakTimeUpsertArgs} args - Arguments to update or create a BreakTime.
+     * @example
+     * // Update or create a BreakTime
+     * const breakTime = await prisma.breakTime.upsert({
+     *   create: {
+     *     // ... data to create a BreakTime
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BreakTime we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BreakTimeUpsertArgs>(args: SelectSubset<T, BreakTimeUpsertArgs<ExtArgs>>): Prisma__BreakTimeClient<$Result.GetResult<Prisma.$BreakTimePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BreakTimes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeCountArgs} args - Arguments to filter BreakTimes to count.
+     * @example
+     * // Count the number of BreakTimes
+     * const count = await prisma.breakTime.count({
+     *   where: {
+     *     // ... the filter for the BreakTimes we want to count
+     *   }
+     * })
+    **/
+    count<T extends BreakTimeCountArgs>(
+      args?: Subset<T, BreakTimeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BreakTimeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BreakTime.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BreakTimeAggregateArgs>(args: Subset<T, BreakTimeAggregateArgs>): Prisma.PrismaPromise<GetBreakTimeAggregateType<T>>
+
+    /**
+     * Group by BreakTime.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BreakTimeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BreakTimeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BreakTimeGroupByArgs['orderBy'] }
+        : { orderBy?: BreakTimeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BreakTimeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBreakTimeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BreakTime model
+   */
+  readonly fields: BreakTimeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BreakTime.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BreakTimeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BreakTime model
+   */
+  interface BreakTimeFieldRefs {
+    readonly id: FieldRef<"BreakTime", 'Int'>
+    readonly name: FieldRef<"BreakTime", 'String'>
+    readonly startHour: FieldRef<"BreakTime", 'Int'>
+    readonly startMinute: FieldRef<"BreakTime", 'Int'>
+    readonly endHour: FieldRef<"BreakTime", 'Int'>
+    readonly endMinute: FieldRef<"BreakTime", 'Int'>
+    readonly isActive: FieldRef<"BreakTime", 'Boolean'>
+    readonly createdAt: FieldRef<"BreakTime", 'DateTime'>
+    readonly updatedAt: FieldRef<"BreakTime", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BreakTime findUnique
+   */
+  export type BreakTimeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * Filter, which BreakTime to fetch.
+     */
+    where: BreakTimeWhereUniqueInput
+  }
+
+  /**
+   * BreakTime findUniqueOrThrow
+   */
+  export type BreakTimeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * Filter, which BreakTime to fetch.
+     */
+    where: BreakTimeWhereUniqueInput
+  }
+
+  /**
+   * BreakTime findFirst
+   */
+  export type BreakTimeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * Filter, which BreakTime to fetch.
+     */
+    where?: BreakTimeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BreakTimes to fetch.
+     */
+    orderBy?: BreakTimeOrderByWithRelationInput | BreakTimeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BreakTimes.
+     */
+    cursor?: BreakTimeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BreakTimes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BreakTimes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BreakTimes.
+     */
+    distinct?: BreakTimeScalarFieldEnum | BreakTimeScalarFieldEnum[]
+  }
+
+  /**
+   * BreakTime findFirstOrThrow
+   */
+  export type BreakTimeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * Filter, which BreakTime to fetch.
+     */
+    where?: BreakTimeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BreakTimes to fetch.
+     */
+    orderBy?: BreakTimeOrderByWithRelationInput | BreakTimeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BreakTimes.
+     */
+    cursor?: BreakTimeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BreakTimes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BreakTimes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BreakTimes.
+     */
+    distinct?: BreakTimeScalarFieldEnum | BreakTimeScalarFieldEnum[]
+  }
+
+  /**
+   * BreakTime findMany
+   */
+  export type BreakTimeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * Filter, which BreakTimes to fetch.
+     */
+    where?: BreakTimeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BreakTimes to fetch.
+     */
+    orderBy?: BreakTimeOrderByWithRelationInput | BreakTimeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BreakTimes.
+     */
+    cursor?: BreakTimeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BreakTimes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BreakTimes.
+     */
+    skip?: number
+    distinct?: BreakTimeScalarFieldEnum | BreakTimeScalarFieldEnum[]
+  }
+
+  /**
+   * BreakTime create
+   */
+  export type BreakTimeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * The data needed to create a BreakTime.
+     */
+    data: XOR<BreakTimeCreateInput, BreakTimeUncheckedCreateInput>
+  }
+
+  /**
+   * BreakTime createMany
+   */
+  export type BreakTimeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BreakTimes.
+     */
+    data: BreakTimeCreateManyInput | BreakTimeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BreakTime update
+   */
+  export type BreakTimeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * The data needed to update a BreakTime.
+     */
+    data: XOR<BreakTimeUpdateInput, BreakTimeUncheckedUpdateInput>
+    /**
+     * Choose, which BreakTime to update.
+     */
+    where: BreakTimeWhereUniqueInput
+  }
+
+  /**
+   * BreakTime updateMany
+   */
+  export type BreakTimeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BreakTimes.
+     */
+    data: XOR<BreakTimeUpdateManyMutationInput, BreakTimeUncheckedUpdateManyInput>
+    /**
+     * Filter which BreakTimes to update
+     */
+    where?: BreakTimeWhereInput
+    /**
+     * Limit how many BreakTimes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BreakTime upsert
+   */
+  export type BreakTimeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * The filter to search for the BreakTime to update in case it exists.
+     */
+    where: BreakTimeWhereUniqueInput
+    /**
+     * In case the BreakTime found by the `where` argument doesn't exist, create a new BreakTime with this data.
+     */
+    create: XOR<BreakTimeCreateInput, BreakTimeUncheckedCreateInput>
+    /**
+     * In case the BreakTime was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BreakTimeUpdateInput, BreakTimeUncheckedUpdateInput>
+  }
+
+  /**
+   * BreakTime delete
+   */
+  export type BreakTimeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+    /**
+     * Filter which BreakTime to delete.
+     */
+    where: BreakTimeWhereUniqueInput
+  }
+
+  /**
+   * BreakTime deleteMany
+   */
+  export type BreakTimeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BreakTimes to delete
+     */
+    where?: BreakTimeWhereInput
+    /**
+     * Limit how many BreakTimes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BreakTime without action
+   */
+  export type BreakTimeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BreakTime
+     */
+    select?: BreakTimeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BreakTime
+     */
+    omit?: BreakTimeOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model OfficeHoliday
+   */
+
+  export type AggregateOfficeHoliday = {
+    _count: OfficeHolidayCountAggregateOutputType | null
+    _avg: OfficeHolidayAvgAggregateOutputType | null
+    _sum: OfficeHolidaySumAggregateOutputType | null
+    _min: OfficeHolidayMinAggregateOutputType | null
+    _max: OfficeHolidayMaxAggregateOutputType | null
+  }
+
+  export type OfficeHolidayAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type OfficeHolidaySumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type OfficeHolidayMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    date: Date | null
+    description: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OfficeHolidayMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    date: Date | null
+    description: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type OfficeHolidayCountAggregateOutputType = {
+    id: number
+    name: number
+    date: number
+    description: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type OfficeHolidayAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type OfficeHolidaySumAggregateInputType = {
+    id?: true
+  }
+
+  export type OfficeHolidayMinAggregateInputType = {
+    id?: true
+    name?: true
+    date?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OfficeHolidayMaxAggregateInputType = {
+    id?: true
+    name?: true
+    date?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type OfficeHolidayCountAggregateInputType = {
+    id?: true
+    name?: true
+    date?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type OfficeHolidayAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OfficeHoliday to aggregate.
+     */
+    where?: OfficeHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OfficeHolidays to fetch.
+     */
+    orderBy?: OfficeHolidayOrderByWithRelationInput | OfficeHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: OfficeHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OfficeHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OfficeHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned OfficeHolidays
+    **/
+    _count?: true | OfficeHolidayCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OfficeHolidayAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OfficeHolidaySumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: OfficeHolidayMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: OfficeHolidayMaxAggregateInputType
+  }
+
+  export type GetOfficeHolidayAggregateType<T extends OfficeHolidayAggregateArgs> = {
+        [P in keyof T & keyof AggregateOfficeHoliday]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateOfficeHoliday[P]>
+      : GetScalarType<T[P], AggregateOfficeHoliday[P]>
+  }
+
+
+
+
+  export type OfficeHolidayGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OfficeHolidayWhereInput
+    orderBy?: OfficeHolidayOrderByWithAggregationInput | OfficeHolidayOrderByWithAggregationInput[]
+    by: OfficeHolidayScalarFieldEnum[] | OfficeHolidayScalarFieldEnum
+    having?: OfficeHolidayScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: OfficeHolidayCountAggregateInputType | true
+    _avg?: OfficeHolidayAvgAggregateInputType
+    _sum?: OfficeHolidaySumAggregateInputType
+    _min?: OfficeHolidayMinAggregateInputType
+    _max?: OfficeHolidayMaxAggregateInputType
+  }
+
+  export type OfficeHolidayGroupByOutputType = {
+    id: number
+    name: string
+    date: Date
+    description: string | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: OfficeHolidayCountAggregateOutputType | null
+    _avg: OfficeHolidayAvgAggregateOutputType | null
+    _sum: OfficeHolidaySumAggregateOutputType | null
+    _min: OfficeHolidayMinAggregateOutputType | null
+    _max: OfficeHolidayMaxAggregateOutputType | null
+  }
+
+  type GetOfficeHolidayGroupByPayload<T extends OfficeHolidayGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<OfficeHolidayGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof OfficeHolidayGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], OfficeHolidayGroupByOutputType[P]>
+            : GetScalarType<T[P], OfficeHolidayGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type OfficeHolidaySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    date?: boolean
+    description?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["officeHoliday"]>
+
+
+
+  export type OfficeHolidaySelectScalar = {
+    id?: boolean
+    name?: boolean
+    date?: boolean
+    description?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type OfficeHolidayOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "date" | "description" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["officeHoliday"]>
+
+  export type $OfficeHolidayPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OfficeHoliday"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      date: Date
+      description: string | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["officeHoliday"]>
+    composites: {}
+  }
+
+  type OfficeHolidayGetPayload<S extends boolean | null | undefined | OfficeHolidayDefaultArgs> = $Result.GetResult<Prisma.$OfficeHolidayPayload, S>
+
+  type OfficeHolidayCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OfficeHolidayFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OfficeHolidayCountAggregateInputType | true
+    }
+
+  export interface OfficeHolidayDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OfficeHoliday'], meta: { name: 'OfficeHoliday' } }
+    /**
+     * Find zero or one OfficeHoliday that matches the filter.
+     * @param {OfficeHolidayFindUniqueArgs} args - Arguments to find a OfficeHoliday
+     * @example
+     * // Get one OfficeHoliday
+     * const officeHoliday = await prisma.officeHoliday.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends OfficeHolidayFindUniqueArgs>(args: SelectSubset<T, OfficeHolidayFindUniqueArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one OfficeHoliday that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {OfficeHolidayFindUniqueOrThrowArgs} args - Arguments to find a OfficeHoliday
+     * @example
+     * // Get one OfficeHoliday
+     * const officeHoliday = await prisma.officeHoliday.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends OfficeHolidayFindUniqueOrThrowArgs>(args: SelectSubset<T, OfficeHolidayFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OfficeHoliday that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayFindFirstArgs} args - Arguments to find a OfficeHoliday
+     * @example
+     * // Get one OfficeHoliday
+     * const officeHoliday = await prisma.officeHoliday.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends OfficeHolidayFindFirstArgs>(args?: SelectSubset<T, OfficeHolidayFindFirstArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first OfficeHoliday that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayFindFirstOrThrowArgs} args - Arguments to find a OfficeHoliday
+     * @example
+     * // Get one OfficeHoliday
+     * const officeHoliday = await prisma.officeHoliday.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends OfficeHolidayFindFirstOrThrowArgs>(args?: SelectSubset<T, OfficeHolidayFindFirstOrThrowArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more OfficeHolidays that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all OfficeHolidays
+     * const officeHolidays = await prisma.officeHoliday.findMany()
+     * 
+     * // Get first 10 OfficeHolidays
+     * const officeHolidays = await prisma.officeHoliday.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const officeHolidayWithIdOnly = await prisma.officeHoliday.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends OfficeHolidayFindManyArgs>(args?: SelectSubset<T, OfficeHolidayFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a OfficeHoliday.
+     * @param {OfficeHolidayCreateArgs} args - Arguments to create a OfficeHoliday.
+     * @example
+     * // Create one OfficeHoliday
+     * const OfficeHoliday = await prisma.officeHoliday.create({
+     *   data: {
+     *     // ... data to create a OfficeHoliday
+     *   }
+     * })
+     * 
+     */
+    create<T extends OfficeHolidayCreateArgs>(args: SelectSubset<T, OfficeHolidayCreateArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many OfficeHolidays.
+     * @param {OfficeHolidayCreateManyArgs} args - Arguments to create many OfficeHolidays.
+     * @example
+     * // Create many OfficeHolidays
+     * const officeHoliday = await prisma.officeHoliday.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends OfficeHolidayCreateManyArgs>(args?: SelectSubset<T, OfficeHolidayCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a OfficeHoliday.
+     * @param {OfficeHolidayDeleteArgs} args - Arguments to delete one OfficeHoliday.
+     * @example
+     * // Delete one OfficeHoliday
+     * const OfficeHoliday = await prisma.officeHoliday.delete({
+     *   where: {
+     *     // ... filter to delete one OfficeHoliday
+     *   }
+     * })
+     * 
+     */
+    delete<T extends OfficeHolidayDeleteArgs>(args: SelectSubset<T, OfficeHolidayDeleteArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one OfficeHoliday.
+     * @param {OfficeHolidayUpdateArgs} args - Arguments to update one OfficeHoliday.
+     * @example
+     * // Update one OfficeHoliday
+     * const officeHoliday = await prisma.officeHoliday.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends OfficeHolidayUpdateArgs>(args: SelectSubset<T, OfficeHolidayUpdateArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more OfficeHolidays.
+     * @param {OfficeHolidayDeleteManyArgs} args - Arguments to filter OfficeHolidays to delete.
+     * @example
+     * // Delete a few OfficeHolidays
+     * const { count } = await prisma.officeHoliday.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends OfficeHolidayDeleteManyArgs>(args?: SelectSubset<T, OfficeHolidayDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more OfficeHolidays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many OfficeHolidays
+     * const officeHoliday = await prisma.officeHoliday.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends OfficeHolidayUpdateManyArgs>(args: SelectSubset<T, OfficeHolidayUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one OfficeHoliday.
+     * @param {OfficeHolidayUpsertArgs} args - Arguments to update or create a OfficeHoliday.
+     * @example
+     * // Update or create a OfficeHoliday
+     * const officeHoliday = await prisma.officeHoliday.upsert({
+     *   create: {
+     *     // ... data to create a OfficeHoliday
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the OfficeHoliday we want to update
+     *   }
+     * })
+     */
+    upsert<T extends OfficeHolidayUpsertArgs>(args: SelectSubset<T, OfficeHolidayUpsertArgs<ExtArgs>>): Prisma__OfficeHolidayClient<$Result.GetResult<Prisma.$OfficeHolidayPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of OfficeHolidays.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayCountArgs} args - Arguments to filter OfficeHolidays to count.
+     * @example
+     * // Count the number of OfficeHolidays
+     * const count = await prisma.officeHoliday.count({
+     *   where: {
+     *     // ... the filter for the OfficeHolidays we want to count
+     *   }
+     * })
+    **/
+    count<T extends OfficeHolidayCountArgs>(
+      args?: Subset<T, OfficeHolidayCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], OfficeHolidayCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a OfficeHoliday.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends OfficeHolidayAggregateArgs>(args: Subset<T, OfficeHolidayAggregateArgs>): Prisma.PrismaPromise<GetOfficeHolidayAggregateType<T>>
+
+    /**
+     * Group by OfficeHoliday.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {OfficeHolidayGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends OfficeHolidayGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: OfficeHolidayGroupByArgs['orderBy'] }
+        : { orderBy?: OfficeHolidayGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, OfficeHolidayGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOfficeHolidayGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the OfficeHoliday model
+   */
+  readonly fields: OfficeHolidayFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for OfficeHoliday.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__OfficeHolidayClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the OfficeHoliday model
+   */
+  interface OfficeHolidayFieldRefs {
+    readonly id: FieldRef<"OfficeHoliday", 'Int'>
+    readonly name: FieldRef<"OfficeHoliday", 'String'>
+    readonly date: FieldRef<"OfficeHoliday", 'DateTime'>
+    readonly description: FieldRef<"OfficeHoliday", 'String'>
+    readonly isActive: FieldRef<"OfficeHoliday", 'Boolean'>
+    readonly createdAt: FieldRef<"OfficeHoliday", 'DateTime'>
+    readonly updatedAt: FieldRef<"OfficeHoliday", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * OfficeHoliday findUnique
+   */
+  export type OfficeHolidayFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which OfficeHoliday to fetch.
+     */
+    where: OfficeHolidayWhereUniqueInput
+  }
+
+  /**
+   * OfficeHoliday findUniqueOrThrow
+   */
+  export type OfficeHolidayFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which OfficeHoliday to fetch.
+     */
+    where: OfficeHolidayWhereUniqueInput
+  }
+
+  /**
+   * OfficeHoliday findFirst
+   */
+  export type OfficeHolidayFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which OfficeHoliday to fetch.
+     */
+    where?: OfficeHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OfficeHolidays to fetch.
+     */
+    orderBy?: OfficeHolidayOrderByWithRelationInput | OfficeHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OfficeHolidays.
+     */
+    cursor?: OfficeHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OfficeHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OfficeHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OfficeHolidays.
+     */
+    distinct?: OfficeHolidayScalarFieldEnum | OfficeHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * OfficeHoliday findFirstOrThrow
+   */
+  export type OfficeHolidayFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which OfficeHoliday to fetch.
+     */
+    where?: OfficeHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OfficeHolidays to fetch.
+     */
+    orderBy?: OfficeHolidayOrderByWithRelationInput | OfficeHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for OfficeHolidays.
+     */
+    cursor?: OfficeHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OfficeHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OfficeHolidays.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OfficeHolidays.
+     */
+    distinct?: OfficeHolidayScalarFieldEnum | OfficeHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * OfficeHoliday findMany
+   */
+  export type OfficeHolidayFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * Filter, which OfficeHolidays to fetch.
+     */
+    where?: OfficeHolidayWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of OfficeHolidays to fetch.
+     */
+    orderBy?: OfficeHolidayOrderByWithRelationInput | OfficeHolidayOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing OfficeHolidays.
+     */
+    cursor?: OfficeHolidayWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` OfficeHolidays from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` OfficeHolidays.
+     */
+    skip?: number
+    distinct?: OfficeHolidayScalarFieldEnum | OfficeHolidayScalarFieldEnum[]
+  }
+
+  /**
+   * OfficeHoliday create
+   */
+  export type OfficeHolidayCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * The data needed to create a OfficeHoliday.
+     */
+    data: XOR<OfficeHolidayCreateInput, OfficeHolidayUncheckedCreateInput>
+  }
+
+  /**
+   * OfficeHoliday createMany
+   */
+  export type OfficeHolidayCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many OfficeHolidays.
+     */
+    data: OfficeHolidayCreateManyInput | OfficeHolidayCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * OfficeHoliday update
+   */
+  export type OfficeHolidayUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * The data needed to update a OfficeHoliday.
+     */
+    data: XOR<OfficeHolidayUpdateInput, OfficeHolidayUncheckedUpdateInput>
+    /**
+     * Choose, which OfficeHoliday to update.
+     */
+    where: OfficeHolidayWhereUniqueInput
+  }
+
+  /**
+   * OfficeHoliday updateMany
+   */
+  export type OfficeHolidayUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update OfficeHolidays.
+     */
+    data: XOR<OfficeHolidayUpdateManyMutationInput, OfficeHolidayUncheckedUpdateManyInput>
+    /**
+     * Filter which OfficeHolidays to update
+     */
+    where?: OfficeHolidayWhereInput
+    /**
+     * Limit how many OfficeHolidays to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * OfficeHoliday upsert
+   */
+  export type OfficeHolidayUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * The filter to search for the OfficeHoliday to update in case it exists.
+     */
+    where: OfficeHolidayWhereUniqueInput
+    /**
+     * In case the OfficeHoliday found by the `where` argument doesn't exist, create a new OfficeHoliday with this data.
+     */
+    create: XOR<OfficeHolidayCreateInput, OfficeHolidayUncheckedCreateInput>
+    /**
+     * In case the OfficeHoliday was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<OfficeHolidayUpdateInput, OfficeHolidayUncheckedUpdateInput>
+  }
+
+  /**
+   * OfficeHoliday delete
+   */
+  export type OfficeHolidayDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+    /**
+     * Filter which OfficeHoliday to delete.
+     */
+    where: OfficeHolidayWhereUniqueInput
+  }
+
+  /**
+   * OfficeHoliday deleteMany
+   */
+  export type OfficeHolidayDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which OfficeHolidays to delete
+     */
+    where?: OfficeHolidayWhereInput
+    /**
+     * Limit how many OfficeHolidays to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * OfficeHoliday without action
+   */
+  export type OfficeHolidayDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OfficeHoliday
+     */
+    select?: OfficeHolidaySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OfficeHoliday
+     */
+    omit?: OfficeHolidayOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -28672,6 +31785,47 @@ export namespace Prisma {
   export type MotorhpScalarFieldEnum = (typeof MotorhpScalarFieldEnum)[keyof typeof MotorhpScalarFieldEnum]
 
 
+  export const WorkingHoursScalarFieldEnum: {
+    id: 'id',
+    dayOfWeek: 'dayOfWeek',
+    startHour: 'startHour',
+    endHour: 'endHour',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type WorkingHoursScalarFieldEnum = (typeof WorkingHoursScalarFieldEnum)[keyof typeof WorkingHoursScalarFieldEnum]
+
+
+  export const BreakTimeScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    startHour: 'startHour',
+    startMinute: 'startMinute',
+    endHour: 'endHour',
+    endMinute: 'endMinute',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BreakTimeScalarFieldEnum = (typeof BreakTimeScalarFieldEnum)[keyof typeof BreakTimeScalarFieldEnum]
+
+
+  export const OfficeHolidayScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    date: 'date',
+    description: 'description',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type OfficeHolidayScalarFieldEnum = (typeof OfficeHolidayScalarFieldEnum)[keyof typeof OfficeHolidayScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -28875,6 +32029,21 @@ export namespace Prisma {
   };
 
   export type motorhpOrderByRelevanceFieldEnum = (typeof motorhpOrderByRelevanceFieldEnum)[keyof typeof motorhpOrderByRelevanceFieldEnum]
+
+
+  export const BreakTimeOrderByRelevanceFieldEnum: {
+    name: 'name'
+  };
+
+  export type BreakTimeOrderByRelevanceFieldEnum = (typeof BreakTimeOrderByRelevanceFieldEnum)[keyof typeof BreakTimeOrderByRelevanceFieldEnum]
+
+
+  export const OfficeHolidayOrderByRelevanceFieldEnum: {
+    name: 'name',
+    description: 'description'
+  };
+
+  export type OfficeHolidayOrderByRelevanceFieldEnum = (typeof OfficeHolidayOrderByRelevanceFieldEnum)[keyof typeof OfficeHolidayOrderByRelevanceFieldEnum]
 
 
   /**
@@ -30907,6 +34076,210 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"motorhp"> | Date | string
   }
 
+  export type WorkingHoursWhereInput = {
+    AND?: WorkingHoursWhereInput | WorkingHoursWhereInput[]
+    OR?: WorkingHoursWhereInput[]
+    NOT?: WorkingHoursWhereInput | WorkingHoursWhereInput[]
+    id?: IntFilter<"WorkingHours"> | number
+    dayOfWeek?: IntFilter<"WorkingHours"> | number
+    startHour?: IntFilter<"WorkingHours"> | number
+    endHour?: IntFilter<"WorkingHours"> | number
+    isActive?: BoolFilter<"WorkingHours"> | boolean
+    createdAt?: DateTimeFilter<"WorkingHours"> | Date | string
+    updatedAt?: DateTimeFilter<"WorkingHours"> | Date | string
+  }
+
+  export type WorkingHoursOrderByWithRelationInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WorkingHoursWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    dayOfWeek?: number
+    AND?: WorkingHoursWhereInput | WorkingHoursWhereInput[]
+    OR?: WorkingHoursWhereInput[]
+    NOT?: WorkingHoursWhereInput | WorkingHoursWhereInput[]
+    startHour?: IntFilter<"WorkingHours"> | number
+    endHour?: IntFilter<"WorkingHours"> | number
+    isActive?: BoolFilter<"WorkingHours"> | boolean
+    createdAt?: DateTimeFilter<"WorkingHours"> | Date | string
+    updatedAt?: DateTimeFilter<"WorkingHours"> | Date | string
+  }, "id" | "dayOfWeek">
+
+  export type WorkingHoursOrderByWithAggregationInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: WorkingHoursCountOrderByAggregateInput
+    _avg?: WorkingHoursAvgOrderByAggregateInput
+    _max?: WorkingHoursMaxOrderByAggregateInput
+    _min?: WorkingHoursMinOrderByAggregateInput
+    _sum?: WorkingHoursSumOrderByAggregateInput
+  }
+
+  export type WorkingHoursScalarWhereWithAggregatesInput = {
+    AND?: WorkingHoursScalarWhereWithAggregatesInput | WorkingHoursScalarWhereWithAggregatesInput[]
+    OR?: WorkingHoursScalarWhereWithAggregatesInput[]
+    NOT?: WorkingHoursScalarWhereWithAggregatesInput | WorkingHoursScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"WorkingHours"> | number
+    dayOfWeek?: IntWithAggregatesFilter<"WorkingHours"> | number
+    startHour?: IntWithAggregatesFilter<"WorkingHours"> | number
+    endHour?: IntWithAggregatesFilter<"WorkingHours"> | number
+    isActive?: BoolWithAggregatesFilter<"WorkingHours"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"WorkingHours"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"WorkingHours"> | Date | string
+  }
+
+  export type BreakTimeWhereInput = {
+    AND?: BreakTimeWhereInput | BreakTimeWhereInput[]
+    OR?: BreakTimeWhereInput[]
+    NOT?: BreakTimeWhereInput | BreakTimeWhereInput[]
+    id?: IntFilter<"BreakTime"> | number
+    name?: StringFilter<"BreakTime"> | string
+    startHour?: IntFilter<"BreakTime"> | number
+    startMinute?: IntFilter<"BreakTime"> | number
+    endHour?: IntFilter<"BreakTime"> | number
+    endMinute?: IntFilter<"BreakTime"> | number
+    isActive?: BoolFilter<"BreakTime"> | boolean
+    createdAt?: DateTimeFilter<"BreakTime"> | Date | string
+    updatedAt?: DateTimeFilter<"BreakTime"> | Date | string
+  }
+
+  export type BreakTimeOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: BreakTimeOrderByRelevanceInput
+  }
+
+  export type BreakTimeWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    name?: string
+    AND?: BreakTimeWhereInput | BreakTimeWhereInput[]
+    OR?: BreakTimeWhereInput[]
+    NOT?: BreakTimeWhereInput | BreakTimeWhereInput[]
+    startHour?: IntFilter<"BreakTime"> | number
+    startMinute?: IntFilter<"BreakTime"> | number
+    endHour?: IntFilter<"BreakTime"> | number
+    endMinute?: IntFilter<"BreakTime"> | number
+    isActive?: BoolFilter<"BreakTime"> | boolean
+    createdAt?: DateTimeFilter<"BreakTime"> | Date | string
+    updatedAt?: DateTimeFilter<"BreakTime"> | Date | string
+  }, "id" | "name">
+
+  export type BreakTimeOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BreakTimeCountOrderByAggregateInput
+    _avg?: BreakTimeAvgOrderByAggregateInput
+    _max?: BreakTimeMaxOrderByAggregateInput
+    _min?: BreakTimeMinOrderByAggregateInput
+    _sum?: BreakTimeSumOrderByAggregateInput
+  }
+
+  export type BreakTimeScalarWhereWithAggregatesInput = {
+    AND?: BreakTimeScalarWhereWithAggregatesInput | BreakTimeScalarWhereWithAggregatesInput[]
+    OR?: BreakTimeScalarWhereWithAggregatesInput[]
+    NOT?: BreakTimeScalarWhereWithAggregatesInput | BreakTimeScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"BreakTime"> | number
+    name?: StringWithAggregatesFilter<"BreakTime"> | string
+    startHour?: IntWithAggregatesFilter<"BreakTime"> | number
+    startMinute?: IntWithAggregatesFilter<"BreakTime"> | number
+    endHour?: IntWithAggregatesFilter<"BreakTime"> | number
+    endMinute?: IntWithAggregatesFilter<"BreakTime"> | number
+    isActive?: BoolWithAggregatesFilter<"BreakTime"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"BreakTime"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BreakTime"> | Date | string
+  }
+
+  export type OfficeHolidayWhereInput = {
+    AND?: OfficeHolidayWhereInput | OfficeHolidayWhereInput[]
+    OR?: OfficeHolidayWhereInput[]
+    NOT?: OfficeHolidayWhereInput | OfficeHolidayWhereInput[]
+    id?: IntFilter<"OfficeHoliday"> | number
+    name?: StringFilter<"OfficeHoliday"> | string
+    date?: DateTimeFilter<"OfficeHoliday"> | Date | string
+    description?: StringNullableFilter<"OfficeHoliday"> | string | null
+    isActive?: BoolFilter<"OfficeHoliday"> | boolean
+    createdAt?: DateTimeFilter<"OfficeHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"OfficeHoliday"> | Date | string
+  }
+
+  export type OfficeHolidayOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    date?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: OfficeHolidayOrderByRelevanceInput
+  }
+
+  export type OfficeHolidayWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    date?: Date | string
+    AND?: OfficeHolidayWhereInput | OfficeHolidayWhereInput[]
+    OR?: OfficeHolidayWhereInput[]
+    NOT?: OfficeHolidayWhereInput | OfficeHolidayWhereInput[]
+    name?: StringFilter<"OfficeHoliday"> | string
+    description?: StringNullableFilter<"OfficeHoliday"> | string | null
+    isActive?: BoolFilter<"OfficeHoliday"> | boolean
+    createdAt?: DateTimeFilter<"OfficeHoliday"> | Date | string
+    updatedAt?: DateTimeFilter<"OfficeHoliday"> | Date | string
+  }, "id" | "date">
+
+  export type OfficeHolidayOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    date?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: OfficeHolidayCountOrderByAggregateInput
+    _avg?: OfficeHolidayAvgOrderByAggregateInput
+    _max?: OfficeHolidayMaxOrderByAggregateInput
+    _min?: OfficeHolidayMinOrderByAggregateInput
+    _sum?: OfficeHolidaySumOrderByAggregateInput
+  }
+
+  export type OfficeHolidayScalarWhereWithAggregatesInput = {
+    AND?: OfficeHolidayScalarWhereWithAggregatesInput | OfficeHolidayScalarWhereWithAggregatesInput[]
+    OR?: OfficeHolidayScalarWhereWithAggregatesInput[]
+    NOT?: OfficeHolidayScalarWhereWithAggregatesInput | OfficeHolidayScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"OfficeHoliday"> | number
+    name?: StringWithAggregatesFilter<"OfficeHoliday"> | string
+    date?: DateTimeWithAggregatesFilter<"OfficeHoliday"> | Date | string
+    description?: StringNullableWithAggregatesFilter<"OfficeHoliday"> | string | null
+    isActive?: BoolWithAggregatesFilter<"OfficeHoliday"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"OfficeHoliday"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"OfficeHoliday"> | Date | string
+  }
+
   export type StateCreateInput = {
     name: string
     stateCode?: string | null
@@ -32842,6 +36215,221 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type WorkingHoursCreateInput = {
+    dayOfWeek: number
+    startHour: number
+    endHour: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WorkingHoursUncheckedCreateInput = {
+    id?: number
+    dayOfWeek: number
+    startHour: number
+    endHour: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WorkingHoursUpdateInput = {
+    dayOfWeek?: IntFieldUpdateOperationsInput | number
+    startHour?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WorkingHoursUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    dayOfWeek?: IntFieldUpdateOperationsInput | number
+    startHour?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WorkingHoursCreateManyInput = {
+    id?: number
+    dayOfWeek: number
+    startHour: number
+    endHour: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WorkingHoursUpdateManyMutationInput = {
+    dayOfWeek?: IntFieldUpdateOperationsInput | number
+    startHour?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WorkingHoursUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    dayOfWeek?: IntFieldUpdateOperationsInput | number
+    startHour?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BreakTimeCreateInput = {
+    name: string
+    startHour: number
+    startMinute: number
+    endHour: number
+    endMinute: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BreakTimeUncheckedCreateInput = {
+    id?: number
+    name: string
+    startHour: number
+    startMinute: number
+    endHour: number
+    endMinute: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BreakTimeUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    startHour?: IntFieldUpdateOperationsInput | number
+    startMinute?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    endMinute?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BreakTimeUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    startHour?: IntFieldUpdateOperationsInput | number
+    startMinute?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    endMinute?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BreakTimeCreateManyInput = {
+    id?: number
+    name: string
+    startHour: number
+    startMinute: number
+    endHour: number
+    endMinute: number
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BreakTimeUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    startHour?: IntFieldUpdateOperationsInput | number
+    startMinute?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    endMinute?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BreakTimeUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    startHour?: IntFieldUpdateOperationsInput | number
+    startMinute?: IntFieldUpdateOperationsInput | number
+    endHour?: IntFieldUpdateOperationsInput | number
+    endMinute?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OfficeHolidayCreateInput = {
+    name: string
+    date: Date | string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OfficeHolidayUncheckedCreateInput = {
+    id?: number
+    name: string
+    date: Date | string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OfficeHolidayUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OfficeHolidayUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OfficeHolidayCreateManyInput = {
+    id?: number
+    name: string
+    date: Date | string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type OfficeHolidayUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OfficeHolidayUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -34644,6 +38232,152 @@ export namespace Prisma {
     id?: SortOrder
     value?: SortOrder
     sortOrder?: SortOrder
+  }
+
+  export type WorkingHoursCountOrderByAggregateInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WorkingHoursAvgOrderByAggregateInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+  }
+
+  export type WorkingHoursMaxOrderByAggregateInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WorkingHoursMinOrderByAggregateInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WorkingHoursSumOrderByAggregateInput = {
+    id?: SortOrder
+    dayOfWeek?: SortOrder
+    startHour?: SortOrder
+    endHour?: SortOrder
+  }
+
+  export type BreakTimeOrderByRelevanceInput = {
+    fields: BreakTimeOrderByRelevanceFieldEnum | BreakTimeOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type BreakTimeCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BreakTimeAvgOrderByAggregateInput = {
+    id?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+  }
+
+  export type BreakTimeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BreakTimeMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BreakTimeSumOrderByAggregateInput = {
+    id?: SortOrder
+    startHour?: SortOrder
+    startMinute?: SortOrder
+    endHour?: SortOrder
+    endMinute?: SortOrder
+  }
+
+  export type OfficeHolidayOrderByRelevanceInput = {
+    fields: OfficeHolidayOrderByRelevanceFieldEnum | OfficeHolidayOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type OfficeHolidayCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    date?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OfficeHolidayAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type OfficeHolidayMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    date?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OfficeHolidayMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    date?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type OfficeHolidaySumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type UserCreateNestedManyWithoutStateInput = {
