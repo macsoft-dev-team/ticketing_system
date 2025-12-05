@@ -13,16 +13,16 @@ const MACSOFT_ROLES = [
  */
 const isWithinWorkingHours = async () => {
   try {
-    // Get current time in IST timezone
+    // Get current time in IST timezone (UTC + 5:30)
     const nowUTC = new Date();
-    const nowIST = new Date(nowUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000));
     
     const dayOfWeek = nowIST.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     const hour = nowIST.getHours();
     const minutes = nowIST.getMinutes();
     const today = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate()); // Today at midnight in IST
     
-    console.log(`🕐 Current IST time: ${nowIST.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: true})} (UTC: ${nowUTC.toISOString()})`);
+    console.log(`🕐 Current IST time: ${nowIST.toLocaleString('en-IN', {hour12: true})} (UTC: ${nowUTC.toISOString()})`);
     console.log(`📅 Checking working hours for ${getDayName(dayOfWeek)} at ${hour}:${minutes.toString().padStart(2, '0')}`);
     
     // Convert day of week (0=Sunday, 1=Monday...) to our format (1=Monday, 7=Sunday)
@@ -79,14 +79,14 @@ const isWithinWorkingHours = async () => {
       }
     }
     
-    console.log(`✅ Within working hours - IST ${nowIST.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: true})} (${getDayName(dayOfWeek)}, ${hour}:${minutes.toString().padStart(2, '0')})`);
+    console.log(`✅ Within working hours - IST ${nowIST.toLocaleString('en-IN', {hour12: true})} (${getDayName(dayOfWeek)}, ${hour}:${minutes.toString().padStart(2, '0')})`);
     return true;
     
   } catch (error) {
     console.error('Error checking working hours:', error);
     // Fallback to basic check if database fails (using IST)
     const nowUTC = new Date();
-    const nowIST = new Date(nowUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000));
     const dayOfWeek = nowIST.getDay();
     const hour = nowIST.getHours();
     
