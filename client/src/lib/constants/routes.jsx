@@ -27,6 +27,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Login from '../../pages/login/login';
 import Signup from '../../pages/signup/signup';
 import ForgotPassword from '../../pages/forgot-password/ForgotPassword';
+import OrganizationSetup from '../../pages/organization-setup/OrganizationSetup';
 import NotFound from '../../pages/NotFound';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/layout/layout';
@@ -316,6 +317,7 @@ export const switchRoutes = (role) =>
     { path: '/login', element: <Login /> },
     { path: '/signup', element: <Signup /> },
     { path: '/forgot-password', element: <ForgotPassword /> },
+    { path: '/organization-setup', element: <OrganizationSetup /> },
     {
       path: '/',
       errorElement: <NotFound />,

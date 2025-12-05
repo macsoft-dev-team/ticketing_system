@@ -25,6 +25,14 @@ const ProtectedRoute = ({ children, requiredPermission, requiredRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Check if user needs organization setup (skip for organization-setup page itself and MACSOFT roles)
+  const macsoftRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+  const needsOrganization = !user.orgCode && !user.organisation && !macsoftRoles.includes(user.role);
+  
+  if (location.pathname !== '/organization-setup' && needsOrganization) {
+    return <Navigate to="/organization-setup" replace />;
+  }
+
   // Check role-based access
   if (requiredRoles && !canAccess(requiredRoles)) {
     return (

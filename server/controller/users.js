@@ -269,6 +269,62 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const updateOrganization = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { orgCode } = req.body;
+
+        if (!orgCode) {
+            return res.status(400).json({
+                message: "Organization code is required",
+                error: "Organization code is required"
+            });
+        }
+
+        // Verify organization exists and is active
+        const organization = await userService.validateOrganization(orgCode);
+        if (!organization) {
+            return res.status(400).json({
+                message: "Invalid organization code",
+                error: "Invalid organization code"
+            });
+        }
+
+        // Update user's organization
+        const updatedUser = await userService.updateOrganization(userId, orgCode);
+
+        // Transform response
+        const transformedUser = {
+            ...updatedUser,
+            status: updatedUser.isActive ? 'ACTIVE' : 'INACTIVE',
+            organisation: updatedUser.organisation?.name || 'N/A',
+            state: updatedUser.State?.name || null,
+            primaryState: updatedUser.State?.stateCode || null,
+            multipleStates: updatedUser.states?.map(state => state.stateCode) || [],
+        };
+
+        res.status(200).json({
+            message: "Organization updated successfully",
+            user: transformedUser
+        });
+    } catch (error) {
+        if (error.message === "User not found") {
+            res.status(404).json({ message: error.message });
+        } else if (error.message.includes("Organization not found") || 
+                   error.message.includes("required")) {
+            res.status(400).json({ 
+                message: error.message,
+                error: error.message 
+            });
+        } else {
+            res.status(500).json({ 
+                message: "Failed to update organization",
+                error: error.message 
+            });
+        }
+    }
+};
+
 module.exports = {
   getAll,
   getCurrentUser,
@@ -276,5 +332,6 @@ module.exports = {
   create,
   update,
   updateProfile,
+  updateOrganization,
   deleteUser,
 };

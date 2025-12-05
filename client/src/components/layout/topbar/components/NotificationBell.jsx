@@ -289,7 +289,7 @@ const NotificationBell = () => {
         case 'system_alert':
         case 'system':
           // Navigate to dashboard for system alerts
-          navigate('/dashboard');
+          navigate('/');
           break;
 
         default:

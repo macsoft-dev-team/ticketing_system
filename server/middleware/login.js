@@ -10,6 +10,12 @@ exports.login = async (req, res) => {
     // Find the user by phone number
     const user = await prisma.user.findUnique({
       where: { phone },
+      include: {
+        organisation: true,
+        serviceCenter: true,
+        State: true,
+        states: true
+      }
     });
 
     if (!user) {
@@ -54,10 +60,15 @@ exports.login = async (req, res) => {
 
     const token = await generateToken({ ...user, password: undefined });
     
+    // Check if user has organization (exclude MACSOFT roles)
+    const macsoftRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+    const needsOrganization = !user.orgCode && !user.organisation && !macsoftRoles.includes(user.role);
+    
     return res.status(200).json({
       message: "Login successful",
       user: { ...user, password: undefined }, // Exclude password from the response
       token, // Include the token in the response
+      needsOrganization, // Flag to indicate if organization setup is needed
     });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });

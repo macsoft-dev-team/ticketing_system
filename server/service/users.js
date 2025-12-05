@@ -511,6 +511,52 @@ const updateProfile = async (userId, profileData) => {
   }
 };
 
+const validateOrganization = async (orgCode) => {
+  try {
+    const organization = await prisma.organisation.findUnique({
+      where: { orgCode: orgCode.toString() }
+    });
+
+    return organization;
+  } catch (error) {
+    console.error('Error validating organization:', error);
+    return null;
+  }
+};
+
+const updateOrganization = async (userId, orgCode) => {
+  try {
+    // Verify user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: parseInt(userId) }
+    });
+
+    if (!existingUser) {
+      throw new Error('User not found');
+    }
+
+    // Update user's organization
+    const updatedUser = await prisma.user.update({
+      where: { id: parseInt(userId) },
+      data: {
+        orgCode: orgCode.toString(),
+      },
+      include: {
+        organisation: true,
+        State: true,
+        states: true,
+      },
+    });
+
+    // Remove password from response
+    const { password, ...userResponse } = updatedUser;
+    return userResponse;
+  } catch (error) {
+    console.error('Error in updateOrganization service:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   getAll,
   getCurrentUser,
@@ -518,5 +564,7 @@ module.exports = {
   create,
   update,
   updateProfile,
+  updateOrganization,
+  validateOrganization,
   deleteUser,
 };

@@ -22,7 +22,15 @@ export default function Login() {
     // Navigate after successful login
     React.useEffect(() => {
         if (isAuthenticated && user) {
-            navigate(from, { replace: true });
+            // Check if user needs organization setup (exclude MACSOFT roles)
+            const macsoftRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+            const needsOrganization = !user.orgCode && !user.organisation && !macsoftRoles.includes(user.role);
+            
+            if (needsOrganization) {
+                navigate('/organization-setup', { replace: true });
+            } else {
+                navigate(from, { replace: true });
+            }
         }
     }, [isAuthenticated, user, navigate, from]);
 
