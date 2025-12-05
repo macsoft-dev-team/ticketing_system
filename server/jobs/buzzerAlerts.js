@@ -9,14 +9,21 @@ const MACSOFT_ROLES = [
 /**
  * Check if current time is within working hours using database configuration
  * Excludes weekends, office holidays, and break times from database
+ * Converts UTC to IST timezone
  */
 const isWithinWorkingHours = async () => {
   try {
-    const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const hour = now.getHours();
-    const minutes = now.getMinutes();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Today at midnight
+    // Get current time in IST timezone
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    
+    const dayOfWeek = nowIST.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const hour = nowIST.getHours();
+    const minutes = nowIST.getMinutes();
+    const today = new Date(nowIST.getFullYear(), nowIST.getMonth(), nowIST.getDate()); // Today at midnight in IST
+    
+    console.log(`🕐 Current IST time: ${nowIST.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: true})} (UTC: ${nowUTC.toISOString()})`);
+    console.log(`📅 Checking working hours for ${getDayName(dayOfWeek)} at ${hour}:${minutes.toString().padStart(2, '0')}`);
     
     // Convert day of week (0=Sunday, 1=Monday...) to our format (1=Monday, 7=Sunday)
     const dbDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek;
@@ -33,16 +40,19 @@ const isWithinWorkingHours = async () => {
     
     // Check if within working hours
     if (hour < workingHours.startHour || hour >= workingHours.endHour) {
-      console.log(`🚫 Not sending buzzer alert - Outside working hours (${hour}:${minutes.toString().padStart(2, '0')}) - Working hours: ${workingHours.startHour}:00-${workingHours.endHour}:00`);
+      console.log(`🚫 Not sending buzzer alert - Outside working hours (IST ${hour}:${minutes.toString().padStart(2, '0')}) - Working hours: ${workingHours.startHour}:00-${workingHours.endHour}:00`);
       return false;
     }
     
-    // Check for office holidays
+    // Check for office holidays (convert IST date to UTC for database query)
+    const todayUTC = new Date(today.getTime() - (5.5 * 60 * 60 * 1000)); // Convert IST to UTC
+    const tomorrowUTC = new Date(todayUTC.getTime() + 24 * 60 * 60 * 1000);
+    
     const holidayToday = await prisma.officeHoliday.findFirst({
       where: {
         date: {
-          gte: today,
-          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000) // Tomorrow
+          gte: todayUTC,
+          lt: tomorrowUTC
         },
         isActive: true
       }
@@ -64,25 +74,26 @@ const isWithinWorkingHours = async () => {
       const currentTime = hour * 100 + minutes;
       
       if (currentTime >= breakStart && currentTime <= breakEnd) {
-        console.log(`🚫 Not sending buzzer alert - ${breakTime.name} (${breakTime.startHour}:${breakTime.startMinute.toString().padStart(2, '0')}-${breakTime.endHour}:${breakTime.endMinute.toString().padStart(2, '0')})`);
+        console.log(`🚫 Not sending buzzer alert - ${breakTime.name} (IST ${breakTime.startHour}:${breakTime.startMinute.toString().padStart(2, '0')}-${breakTime.endHour}:${breakTime.endMinute.toString().padStart(2, '0')})`);
         return false;
       }
     }
     
-    console.log(`✅ Within working hours - ${now.toLocaleString()} (${getDayName(dayOfWeek)}, ${hour}:${minutes.toString().padStart(2, '0')})`);
+    console.log(`✅ Within working hours - IST ${nowIST.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata', hour12: true})} (${getDayName(dayOfWeek)}, ${hour}:${minutes.toString().padStart(2, '0')})`);
     return true;
     
   } catch (error) {
     console.error('Error checking working hours:', error);
-    // Fallback to basic check if database fails
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const hour = now.getHours();
+    // Fallback to basic check if database fails (using IST)
+    const nowUTC = new Date();
+    const nowIST = new Date(nowUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const dayOfWeek = nowIST.getDay();
+    const hour = nowIST.getHours();
     
     if (dayOfWeek === 0 || dayOfWeek === 6) return false; // Weekend
-    if (hour < 9 || hour >= 18) return false; // Outside 9-6
+    if (hour < 9 || hour >= 18) return false; // Outside 9-6 IST
     
-    console.log('⚠️ Using fallback working hours check');
+    console.log(`⚠️ Using fallback working hours check - IST ${hour}:${nowIST.getMinutes().toString().padStart(2, '0')}`);
     return true;
   }
 };
