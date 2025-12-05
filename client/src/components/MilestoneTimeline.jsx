@@ -363,12 +363,25 @@ const MILESTONE_CONFIG = {
         order: 1,
     },
     REQUEST_CLEARED_AT_FIELD: {
-        label: 'Request Cleared at Field',
-        description: 'Fault cleared on-site by field engineer',
-        photoRequired: true,
-        minPhotos: 1,
+        label: 'Cleared at Field',
+        description: 'Fault cleared on-site by field engineer. Add notes to document the resolution and upload photos if available.',
+        photoRequired: false, // Will be dynamically set based on user role
+        minPhotos: 0, // Will be dynamically set based on user role
+        allowNotes: true,
+        notesRequired: true,
         order: 2,
         isFinal: true,
+        // Dynamic photo requirements based on role
+        getPhotoRequirements: (userRole) => {
+            const isFieldEngineer = userRole === 'CUSTOMER_FIELD_ENGINEER';
+            return {
+                photoRequired: isFieldEngineer,
+                minPhotos: isFieldEngineer ? 1 : 0,
+                description: isFieldEngineer 
+                    ? 'Fault cleared on-site by field engineer. Add notes to document the resolution and upload photos (required for field engineers).'
+                    : 'Fault cleared on-site. Add notes to document the resolution and upload photos if available.'
+            };
+        }
     },
     SENT_TO_SERVICE_CENTER: {
         label: 'Submit to Service Center',
@@ -511,6 +524,11 @@ const MilestoneCard = ({
     const handleTransition = async () => {
         if (config.photoRequired && photos.length === 0) {
             alert(`This stage requires at least ${config.minPhotos || 1} photo(s)`);
+            return;
+        }
+        
+        if (config.notesRequired && !notes.trim()) {
+            alert('Please add notes describing how the issue was resolved');
             return;
         }
 
@@ -801,7 +819,7 @@ const MilestoneCard = ({
     );
 };
 
-export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMilestoneUpdate, onAction, ticketStatus }) => {
+export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMilestoneUpdate, onAction, onUpdateNotes, ticketStatus }) => {
     const [milestones, setMilestones] = useState(propMilestones || []);
     const [availableTransitions, setAvailableTransitions] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -1060,16 +1078,37 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
         // Check if photos are required and validate
         const targetConfig = MILESTONE_CONFIG[selectedTargetStage];
-        if (targetConfig?.photoRequired) {
-            const minPhotos = targetConfig.minPhotos || 1;
+        let photoRequired = targetConfig?.photoRequired;
+        let minPhotos = targetConfig?.minPhotos || 1;
+        
+        // Handle dynamic photo requirements for REQUEST_CLEARED_AT_FIELD
+        if (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && targetConfig?.getPhotoRequirements) {
+            const dynamicReqs = targetConfig.getPhotoRequirements(user?.role);
+            photoRequired = dynamicReqs.photoRequired;
+            minPhotos = dynamicReqs.minPhotos || 0;
+        }
+        
+        if (photoRequired) {
             if (transitionPhotos.length < minPhotos) {
                 addToast({
                     title: 'Photos Required',
-                    description: `Please upload at least ${minPhotos} photo(s) for ${targetConfig.label}`,
+                    description: selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && user?.role === 'CUSTOMER_FIELD_ENGINEER'
+                        ? `Field engineers must upload at least ${minPhotos} photo(s) to document the field resolution`
+                        : `Please upload at least ${minPhotos} photo(s) for ${targetConfig.label}`,
                     variant: 'error'
                 });
                 return;
             }
+        }
+
+        // Check if notes are required and validate
+        if (targetConfig?.notesRequired && !transitionNotes.trim()) {
+            addToast({
+                title: 'Notes Required',
+                description: 'Please add notes describing how the issue was resolved at field',
+                variant: 'error'
+            });
+            return;
         }
 
         try {
@@ -1182,6 +1221,12 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     };
 
     const handleUpdateNotes = async (milestoneId, notes) => {
+        // Use prop-passed onUpdateNotes if available, otherwise use default implementation
+        if (onUpdateNotes) {
+            await onUpdateNotes(milestoneId, notes);
+            return;
+        }
+
         try {
             const baseUrl = API_URL;
             await axios.put(
@@ -1569,19 +1614,27 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                         <p className="text-sm text-blue-700">
                                             <strong>Action:</strong> {MILESTONE_CONFIG[selectedTargetStage].description}
                                         </p>
-                                        {MILESTONE_CONFIG[selectedTargetStage].photoRequired && (
+                                        {(MILESTONE_CONFIG[selectedTargetStage].photoRequired || 
+                                         (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements?.(user?.role)?.photoRequired)) && (
                                             <p className="text-xs text-blue-600 mt-1">
-                                                📷 This milestone will require photo documentation
+                                                📷 {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && user?.role === 'CUSTOMER_FIELD_ENGINEER' 
+                                                    ? 'Photos are required for field engineers to document the resolution'
+                                                    : 'This milestone will require photo documentation'
+                                                }
                                             </p>
                                         )}
                                     </div>
                                 )}
 
                                 {/* Photo Upload Section */}
-                                {selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.photoRequired && (
+                                {selectedTargetStage && (MILESTONE_CONFIG[selectedTargetStage]?.photoRequired || 
+                                 (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements?.(user?.role)?.photoRequired)) && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Photos Required (Min: {MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1})
+                                            {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements
+                                                ? `Photos ${MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.photoRequired ? 'Required' : 'Optional'} (Min: ${MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.minPhotos || 0})`
+                                                : `Photos Required (Min: ${MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1})`
+                                            }
                                         </label>
 
                                         {/* Photo Requirements Info */}
@@ -1644,6 +1697,44 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                             </div>
                                         )}
                                     </div>
+                                )}
+
+                                {/* Notes Section - always show for REQUEST_CLEARED_AT_FIELD, optionally for others */}
+                                {(selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' || transitionNotes) && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' 
+                                                ? 'Resolution Notes (Required)' 
+                                                : 'Notes (Optional)'
+                                            }
+                                        </label>
+                                        <textarea
+                                            value={transitionNotes}
+                                            onChange={(e) => setTransitionNotes(e.target.value)}
+                                            placeholder={selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' 
+                                                ? 'Describe how the issue was resolved at field, actions taken, parts replaced, etc.'
+                                                : 'Add any additional notes for this milestone...'
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            rows={4}
+                                        />
+                                        {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && (
+                                            <p className="text-xs text-blue-600 mt-1">
+                                                ℹ️ Notes are required to document the field resolution
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Add Notes button for other stages */}
+                                {selectedTargetStage !== 'REQUEST_CLEARED_AT_FIELD' && !transitionNotes && (
+                                    <button
+                                        onClick={() => setTransitionNotes(' ')} // Set a space to trigger the textarea display
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+                                    >
+                                        <FileText className="w-4 h-4" />
+                                        Add Notes (Optional)
+                                    </button>
                                 )}
 
                                 <div className="flex items-center justify-end gap-2">
@@ -1820,7 +1911,10 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                         ? `Required photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
                         : 'Select photos to upload for this milestone'
                 }
-                minPhotos={selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1}
+                minPhotos={selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements
+                    ? MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.minPhotos || 0
+                    : selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1
+                }
                 uploading={uploadingPhotos}
                 requireLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER'}
                 requiredLabels={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') ? MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos : undefined}

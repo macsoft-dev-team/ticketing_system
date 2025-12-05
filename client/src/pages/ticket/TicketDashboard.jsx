@@ -228,7 +228,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
     >
       <span className="text-2xl">{getIcon(attachment.type)}</span>
       <div className="flex-1">
-        <h4 className="font-medium text-gray-900 truncate">{attachment.name}</h4>
+        <h4 className="font-medium text-gray-900 truncate sm:max-w-60">{attachment.name}</h4>
         <div className="flex items-center gap-2">
           <p className="text-sm text-gray-600">{attachment.size}</p>
           {attachment.mimetype && (
@@ -438,6 +438,41 @@ export default function TicketDashboard() {
       });
     }
   }, [ticketData.ticketCode, token, addToast, fetchTicketById, ticketId]);
+
+  const handleUpdateNotes = useCallback(async (milestoneId, notes) => {
+    try {
+      const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+      const response = await fetch(`${baseApiUrl}/tickets/${ticketId}/milestones/${milestoneId}/notes`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ notes })
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.message || 'Failed to update notes');
+      }
+
+      addToast({
+        title: 'Notes Updated',
+        description: 'Milestone notes have been updated successfully',
+        variant: 'success'
+      });
+
+      // Refresh ticket data to show updated notes
+      await fetchTicketById(ticketId);
+    } catch (error) {
+      addToast({
+        title: 'Update Failed',
+        description: error.message || 'Failed to update notes. Please try again.',
+        variant: 'error',
+        duration: 7000
+      });
+    }
+  }, [ticketId, token, addToast, fetchTicketById]);
 
   const handleMilestoneAction = useCallback(async (actionData) => {
     const { action, targetStage, currentStage } = actionData;
@@ -985,8 +1020,8 @@ export default function TicketDashboard() {
 
     const stageInfo = {
       REQUEST_CLEARED_AT_FIELD: {
-        title: 'Upload Field Clearance Photos',
-        description: 'Add photos confirming the issue has been resolved at field',
+        title: 'Field Clearance Photos (Optional)',
+        description: 'Add photos if available to document that the issue has been resolved at field. Photos help provide better documentation but are not mandatory.',
       },
       SUBMITTED_TO_SERVICE_CENTER: {
         title: 'Upload Submission Photos',
@@ -1006,10 +1041,15 @@ export default function TicketDashboard() {
       },
     };
 
-    return stageInfo[currentMilestone.stage] || {
+    const info = stageInfo[currentMilestone.stage] || {
       title: 'Upload Milestone Photos',
       description: `Add photos for ${currentMilestone.stage.replace(/_/g, ' ')}`,
     };
+    
+    // Set minimum photos requirement - 0 for field clearance, 1 for others
+    info.minPhotos = currentMilestone.stage === 'REQUEST_CLEARED_AT_FIELD' ? 0 : 1;
+    
+    return info;
   }, [currentMilestone]);
 
   useEffect(() => {
@@ -1406,6 +1446,7 @@ export default function TicketDashboard() {
               onMilestoneUpdate={() => fetchTicketById(ticketId)}
               currentMilestone={currentMilestone}
               onAction={handleMilestoneAction}
+              onUpdateNotes={handleUpdateNotes}
               ticketStatus={ticketData?.status}
             />
           </div>
@@ -1817,7 +1858,7 @@ export default function TicketDashboard() {
         onUpload={handlePhotoUpload}
         title={photoModalInfo.title}
         description={photoModalInfo.description}
-        minPhotos={1}
+        minPhotos={photoModalInfo.minPhotos || 1}
         uploading={uploadingPhotos}
       />
 
