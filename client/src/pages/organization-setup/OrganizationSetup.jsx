@@ -146,7 +146,7 @@ export default function OrganizationSetup() {
             >
                 {/* Header */}
                 <motion.div
-                    className="text-center flex flex-col items-center justify-center mb-8"
+                    className="text-start flex flex-col items-center justify-start mb-8"
                     variants={itemVariants}
                 >
                     <motion.div
@@ -157,7 +157,7 @@ export default function OrganizationSetup() {
                         <Building2 className="w-8 h-8 text-blue-600" />
                     </motion.div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Setup Organization</h1>
-                    <p className="text-gray-600">Please select your organization to complete your profile</p>
+                    <p className="text-gray-600">Please confirm your organization once again to complete your profile</p>
                 </motion.div>
 
                 {/* Organization Setup Form */}
