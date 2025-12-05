@@ -8,11 +8,12 @@ import { API_ENDPOINTS } from '../../lib/constants/api';
 
 export default function OrganizationSetup() {
     const navigate = useNavigate();
-    const { user, setUser } = useAuth();
+    const { user, setUser, logout } = useAuth();
     const [selectedOrganization, setSelectedOrganization] = useState('');
     const [organizations, setOrganizations] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingOrgs, setIsLoadingOrgs] = useState(true);
+    const [isCompleting, setIsCompleting] = useState(false);
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState(false);
 
@@ -35,13 +36,15 @@ export default function OrganizationSetup() {
         fetchOrganizations();
     }, []);
 
-    // Redirect if user already has organization or is MACSOFT role
+    // Redirect if user already has organization or is MACSOFT role (but not during completion process)
     useEffect(() => {
+        if (isCompleting) return; // Don't redirect during setup completion
+        
         const macsoftRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
         if (user?.orgCode || user?.organisation || macsoftRoles.includes(user?.role)) {
             navigate('/', { replace: true });
         }
-    }, [user, navigate]);
+    }, [user, navigate, isCompleting]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -68,13 +71,16 @@ export default function OrganizationSetup() {
             });
 
             if (response.data.user) {
-                // Update user in context and session
-                setUser(response.data.user);
+                setIsCompleting(true); // Prevent redirect useEffect from running
                 setSuccess(true);
                 
-                // Navigate to dashboard after success
+                // Navigate to login after success for fresh authentication
                 setTimeout(() => {
-                    navigate('/dashboard', { replace: true });
+                    // Clear auth state before navigation
+                    logout();
+                    
+                    // Force navigation to login
+                    window.location.href = '/login';
                 }, 1500);
             }
         } catch (error) {
@@ -129,7 +135,7 @@ export default function OrganizationSetup() {
                             <Check className="w-8 h-8 text-green-600" />
                         </div>
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">Organization Set!</h1>
-                        <p className="text-gray-600">Your organization has been successfully configured. Redirecting you to dashboard...</p>
+                        <p className="text-gray-600">Your organization has been successfully configured. Redirecting you to login...</p>
                     </div>
                 </motion.div>
             </div>
