@@ -101,6 +101,11 @@ export default function TicketCard({
 
     // Helper function to check if we should show new message indicator
     const shouldShowNewMessageIndicator = () => {
+        // Don't show message indicator for closed tickets
+        if (ticket.status === TICKET_STATUS.CLOSED || ticket.status === TICKET_STATUS.RESOLVED) {
+            return false;
+        }
+        
         if (!hasMessages || unreadCount === 0) return false;
         
         const lastMessage = getLastMessage();
@@ -213,7 +218,7 @@ export default function TicketCard({
                 </div>
 
                 {/* Title and Description */}
-                <div className="flex-1 mb-4">
+                <div className="flex-1 flex flex-col justify-between mb-4">
                     <motion.h4
                         className="text-base font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug"
                         whileHover={{ color: "#3b82f6" }}
@@ -235,6 +240,18 @@ export default function TicketCard({
                                     {milestone.stage.replace(/_/g, ' ')}{/*  by <span className='text-yellow-500'>{milestone.changer?.name || ''}</span> */}
                                 </span>
                             ))}
+                        </div>
+                    )}
+                    
+                    {/* Show "Ticket closed" for closed/resolved tickets */}
+                    {(ticket.status === TICKET_STATUS.CLOSED || ticket.status === TICKET_STATUS.RESOLVED) && (
+                        <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center gap-2">
+                                <MessageSquare className="w-4 h-4 text-gray-600" />
+                                <span className="text-xs font-medium text-gray-800">
+                                    Ticket closed
+                                </span>
+                            </div>
                         </div>
                     )}
                     

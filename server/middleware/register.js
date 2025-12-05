@@ -6,7 +6,7 @@ const {
 } = require("../lib/notificationUtils");
 
 exports.register = async (req, res) => {
-  const { name, phone, password, stateId, projectCode } = req.body;
+  const { name, phone, password, stateId, projectCode, orgCode } = req.body;
   const io = req.io;
   try {
     // Check if user already exists
@@ -36,6 +36,7 @@ exports.register = async (req, res) => {
         role: "CUSTOMER_FIELD_ENGINEER", // Default role
         stateId: stateId ? parseInt(stateId) : null,
         projectCode: projectCode || null,
+        orgCode: orgCode || null,
       },
     });
     if (newUser) {
