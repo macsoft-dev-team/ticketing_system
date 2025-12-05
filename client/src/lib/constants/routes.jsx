@@ -258,6 +258,8 @@ const ROLE_ITEMS = {
   ],
 
   CUSTOMER_SERVICE_HEAD: [
+    BASE_ITEMS.dashboard,
+
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
@@ -270,6 +272,8 @@ const ROLE_ITEMS = {
   ],
 
   SERVICE_CENTER_TECHNICIAN: [
+    BASE_ITEMS.dashboard,
+
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
@@ -281,6 +285,8 @@ const ROLE_ITEMS = {
   ],
 
   CUSTOMER_FIELD_ENGINEER: [
+    BASE_ITEMS.dashboard,
+
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,

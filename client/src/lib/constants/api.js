@@ -26,5 +26,6 @@ export const API_ENDPOINTS = {
   projectWA: `${API_URL}/projectsWA`,
   organisationsWA: `${API_URL}/organisationsWA`,
   motorhp: `${API_URL}/motorhp`,
+  settings: `${API_URL}/settings`,
   LMS_BASE_URL: import.meta.env.VITE_LMS_BASE_URL,
 };

@@ -31,6 +31,7 @@ const motorhp = require("./motorhp");
 const districts = require("./districts");
 const jobs = require("./jobs");
 const workingHours = require("./workingHours");
+const dashboard = require("./dashboard");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -57,6 +58,7 @@ router.use("/inbound-activities", authenticate, inboundActivity);
 router.use("/motorhp", authenticate, motorhp);
 router.use("/jobs", authenticate, jobs);
 router.use("/working-hours", authenticate, workingHours);
+router.use("/dashboard", authenticate, dashboard);
 
 // without authentication
 router.use("/states", states);

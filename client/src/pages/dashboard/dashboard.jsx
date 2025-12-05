@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { motion, MotionConfig } from 'motion/react';
 import { 
   Ticket, 
   Clock, 
@@ -14,39 +14,262 @@ import {
   ArrowRight,
   Plus,
   RefreshCw,
+  AlertTriangle ,
   Search,
-  MoreHorizontal
+  MoreHorizontal,
+  Building,
+  Package,
+  Wrench,
+  ClipboardList,
+  MapPin,
+  FileText
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
 import useAuth from '../../lib/hooks/useAuth';
 import useTickets from '../../lib/hooks/useTickets';
+import useDashboardAnalytics from '../../lib/hooks/useDashboardAnalytics';
+import RoleBasedComponent from '../../components/RoleBasedComponent';
 import { TICKET_STATUS, TICKET_PRIORITY } from '../../lib/constants';
 
-// Mock data for demonstration
-const mockData = {
-  ticketStats: [
-    { name: 'Jan', open: 65, inProgress: 28, closed: 95 },
-    { name: 'Feb', open: 78, inProgress: 35, closed: 88 },
-    { name: 'Mar', open: 52, inProgress: 42, closed: 102 },
-    { name: 'Apr', open: 89, inProgress: 31, closed: 76 },
-    { name: 'May', open: 67, inProgress: 48, closed: 94 },
-    { name: 'Jun', open: 45, inProgress: 29, closed: 118 },
-  ],
-  categoryData: [
-    { name: 'Hardware', value: 35, color: '#3B82F6' },
-    { name: 'Software', value: 25, color: '#10B981' },
-    { name: 'Maintenance', value: 20, color: '#F59E0B' },
-    { name: 'Installation', value: 12, color: '#EF4444' },
-    { name: 'Other', value: 8, color: '#8B5CF6' },
-  ],
-  recentActivities: [
-    { id: 1, type: 'ticket_created', ticket: 'TKT-2025-001', user: 'John Doe', time: '2 minutes ago' },
-    { id: 2, type: 'ticket_resolved', ticket: 'TKT-2025-002', user: 'Jane Smith', time: '15 minutes ago' },
-    { id: 3, type: 'ticket_assigned', ticket: 'TKT-2025-003', user: 'Tech Team A', time: '1 hour ago' },
-    { id: 4, type: 'ticket_updated', ticket: 'TKT-2025-004', user: 'Mike Johnson', time: '2 hours ago' },
-    { id: 5, type: 'ticket_created', ticket: 'TKT-2025-005', user: 'Sarah Wilson', time: '3 hours ago' },
-  ]
+// Role-based dashboard configuration
+const getRoleDashboardConfig = (role) => {
+  const configs = {
+    MACSOFT_ADMIN: {
+      title: 'Admin Dashboard',
+      description: 'Complete system overview and management',
+      showServiceCenterStats: true,
+      showInventoryStats: true,
+      showUserManagement: true,
+      showSystemHealth: true,
+      primaryMetrics: ['total', 'open', 'inProgress', 'closed', 'highPriority', 'serviceCenters', 'users', 'inventory']
+    },
+    MACSOFT_HEAD: {
+      title: 'Management Dashboard', 
+      description: 'Global oversight and approvals - All tickets across all states',
+      showServiceCenterStats: true,
+      showApprovalsPending: true,
+      showGlobalOverview: true,
+      primaryMetrics: ['total', 'open', 'inProgress', 'closed', 'pendingApprovals', 'activeServiceCenters', 'activeUsers', 'pendingFieldClearances']
+    },
+    MACSOFT_SUPPORT: {
+      title: 'Support Dashboard',
+      description: 'Technical support and center assignment',
+      showAssignmentQueue: true,
+      showServiceCenterStats: true,
+      showSpareRequests: true,
+      primaryMetrics: ['total', 'open', 'inProgress', 'unassigned', 'spareRequests']
+    },
+    CUSTOMER_SERVICE_HEAD: {
+      title: 'Service Center Dashboard',
+      description: 'Your service center operations',
+      showCenterWorkload: true,
+      showTechnicianPerformance: true,
+      primaryMetrics: ['assigned', 'inProgress', 'completed', 'technicians']
+    },
+    SERVICE_CENTER_TECHNICIAN: {
+      title: 'Technician Dashboard',
+      description: 'Your assigned work and progress',
+      showMyWork: true,
+      showRepairQueue: true,
+      primaryMetrics: ['myTickets', 'inDiagnosis', 'inRepair', 'completed']
+    },
+    CUSTOMER_FIELD_ENGINEER: {
+      title: 'Field Engineer Dashboard',
+      description: 'Your field tickets and progress', 
+      showMyTickets: true,
+      showFieldWork: true,
+      primaryMetrics: ['myTotal', 'myOpen', 'myInProgress', 'myClosed']
+    }
+  };
+  return configs[role] || configs.CUSTOMER_FIELD_ENGINEER;
+};
+
+// Role-based quick actions
+const getRoleQuickActions = (role, navigate) => {
+  const actions = {
+    MACSOFT_ADMIN: [
+      {
+        icon: Plus,
+        title: 'Create Ticket',
+        description: 'Submit a new support ticket',
+        color: 'bg-blue-500',
+        onClick: () => navigate('/tickets/new')
+      },
+      {
+        icon: Users,
+        title: 'Manage Users',
+        description: 'Add, edit, or remove users',
+        color: 'bg-green-500',
+        onClick: () => navigate('/users')
+      },
+      {
+        icon: Building,
+        title: 'Service Centers',
+        description: 'Manage service center operations',
+        color: 'bg-purple-500',
+        onClick: () => navigate('/service-center')
+      },
+      {
+        icon: Settings,
+        title: 'System Settings',
+        description: 'Configure system parameters',
+        color: 'bg-orange-500',
+        onClick: () => navigate('/settings')
+      }
+    ],
+    MACSOFT_HEAD: [
+      {
+        icon: ClipboardList,
+        title: 'Spare Approvals',
+        description: 'Review and approve spare requests',
+        color: 'bg-red-500',
+        onClick: () => navigate('/spare-request-approval')
+      },
+      {
+        icon: Building,
+        title: 'Service Centers',
+        description: 'Monitor service center performance',
+        color: 'bg-purple-500',
+        onClick: () => navigate('/service-center')
+      },
+      {
+        icon: BarChart3,
+        title: 'Reports',
+        description: 'View system reports and analytics',
+        color: 'bg-blue-500',
+        onClick: () => navigate('/tickets')
+      },
+      {
+        icon: Users,
+        title: 'Team Management',
+        description: 'Manage team and assignments',
+        color: 'bg-green-500',
+        onClick: () => navigate('/users')
+      }
+    ],
+    MACSOFT_SUPPORT: [
+      {
+        icon: Plus,
+        title: 'Create Ticket',
+        description: 'Submit a new support ticket',
+        color: 'bg-blue-500',
+        onClick: () => navigate('/tickets/new')
+      },
+      {
+        icon: Building,
+        title: 'Assign Centers',
+        description: 'Assign tickets to service centers',
+        color: 'bg-green-500',
+        onClick: () => navigate('/service-center')
+      },
+      {
+        icon: Package,
+        title: 'Spare Requests',
+        description: 'Manage spare part requests',
+        color: 'bg-orange-500',
+        onClick: () => navigate('/spare-request-approvals')
+      },
+      {
+        icon: Search,
+        title: 'Search Tickets',
+        description: 'Find and manage tickets',
+        color: 'bg-purple-500',
+        onClick: () => navigate('/tickets')
+      }
+    ],
+    CUSTOMER_SERVICE_HEAD: [
+      {
+        icon: Ticket,
+        title: 'Center Tickets',
+        description: 'View tickets assigned to your center',
+        color: 'bg-blue-500',
+        onClick: () => navigate('/tickets')
+      },
+      {
+        icon: Users,
+        title: 'Technicians',
+        description: 'Manage center technicians',
+        color: 'bg-green-500',
+        onClick: () => navigate('/users?role=SERVICE_CENTER_TECHNICIAN')
+      },
+      {
+        icon: Wrench,
+        title: 'Receive Controller',
+        description: 'Receive controllers at service center',
+        color: 'bg-purple-500',
+        onClick: () => navigate('/receive-controller')
+      },
+      {
+        icon: Package,
+        title: 'Inventory',
+        description: 'Manage spare parts inventory',
+        color: 'bg-orange-500',
+        onClick: () => navigate('/inventory')
+      }
+    ],
+    SERVICE_CENTER_TECHNICIAN: [
+      {
+        icon: Wrench,
+        title: 'Receive Controller',
+        description: 'Receive controllers for repair',
+        color: 'bg-blue-500',
+        onClick: () => navigate('/receive-controller')
+      },
+      {
+        icon: Ticket,
+        title: 'My Work',
+        description: 'View assigned tickets',
+        color: 'bg-green-500',
+        onClick: () => navigate('/tickets')
+      },
+      {
+        icon: Package,
+        title: 'Request Spares',
+        description: 'Request spare parts',
+        color: 'bg-orange-500',
+        onClick: () => navigate('/spare-requests')
+      },
+      {
+        icon: FileText,
+        title: 'Delivery',
+        description: 'Deliver repaired controllers',
+        color: 'bg-purple-500',
+        onClick: () => navigate('/deliver')
+      }
+    ],
+    CUSTOMER_FIELD_ENGINEER: [
+      {
+        icon: Plus,
+        title: 'Create Ticket',
+        description: 'Report a new field issue',
+        color: 'bg-blue-500',
+        onClick: () => navigate('/tickets/new')
+      },
+      {
+        icon: Ticket,
+        title: 'My Tickets',
+        description: 'View your submitted tickets',
+        color: 'bg-green-500',
+        onClick: () => navigate('/tickets')
+      },
+      {
+        icon: MapPin,
+        title: 'Field Status',
+        description: 'Update field clearance status',
+        color: 'bg-orange-500',
+        onClick: () => navigate('/tickets')
+      },
+      {
+        icon: Search,
+        title: 'Track Status',
+        description: 'Track ticket progress',
+        color: 'bg-purple-500',
+        onClick: () => navigate('/tickets')
+      }
+    ]
+  };
+  return actions[role] || actions.CUSTOMER_FIELD_ENGINEER;
 };
 
 const MetricCard = ({ icon: Icon, title, value, change, trend, color, onClick }) => (
@@ -56,10 +279,10 @@ const MetricCard = ({ icon: Icon, title, value, change, trend, color, onClick })
     whileHover={{ 
       y: -4, 
       scale: 1.01,
-      boxShadow: '0 12px 24px rgba(0,0,0,0.08)',
-      borderColor: 'rgba(59, 130, 246, 0.3)'
+      boxShadow: '0 12px 24px rgba(0,0,0,0.08)'
     }}
     whileTap={{ scale: 0.98 }}
+    transition={{ type: "spring", damping: 20, stiffness: 300 }}
     className="relative bg-white rounded-xl p-4 cursor-pointer border border-gray-200 hover:border-blue-200 transition-all duration-300 overflow-hidden group"
     onClick={onClick}
   >
@@ -193,59 +416,133 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { tickets, fetchTickets, loading } = useTickets();
+  const { 
+    totalTickets,
+    openTickets,
+    inProgressTickets,
+    closedTickets,
+    resolvedTickets,
+    highPriorityTickets,
+    unassignedTickets,
+    systemHealth, 
+    workloadMetrics,
+    recentActivities,
+    chartData,
+    getRoleMetrics, 
+    getChartData,
+    loading: analyticsLoading,
+    error: analyticsError,
+    refresh: refreshAnalytics 
+  } = useDashboardAnalytics();
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchTickets();
-  }, []);
+  // Get role-based configuration
+  const dashboardConfig = useMemo(() => getRoleDashboardConfig(user?.role), [user?.role]);
+  const quickActions = useMemo(() => getRoleQuickActions(user?.role, navigate), [user?.role, navigate]);
 
-  // Calculate dashboard metrics
-  const totalTickets = tickets.length;
-  const openTickets = tickets.filter(t => t.status === TICKET_STATUS.OPEN).length;
-  const inProgressTickets = tickets.filter(t => t.status === TICKET_STATUS.IN_PROGRESS).length;
-  const closedTickets = tickets.filter(t => t.status === TICKET_STATUS.CLOSED).length;
-  const highPriorityTickets = tickets.filter(t => t.priority === TICKET_PRIORITY.HIGH).length;
+  useEffect(() => {
+    // Fetch tickets with role-based filtering
+    fetchTickets({
+      skip: 0,
+      take: 100,
+      filter: {}
+    });
+  }, [user?.role]);
+
+  // Get role-based dashboard metrics from server
+  const metrics = useMemo(() => {
+    const serverMetrics = getRoleMetrics();
+    
+    return {
+      ...serverMetrics,
+      // Server data
+      total: totalTickets || 0,
+      open: openTickets || 0,
+      inProgress: inProgressTickets || 0,
+      closed: closedTickets || 0,
+      resolved: resolvedTickets || 0,
+      highPriority: highPriorityTickets || 0,
+      unassigned: unassignedTickets || 0,
+      unassignedCount: unassignedTickets || 0,
+      // Workload metrics from server
+      inDiagnosis: workloadMetrics?.inDiagnosis || 0,
+      inRepair: workloadMetrics?.inRepair || 0,
+      readyForDispatch: workloadMetrics?.readyForDispatch || 0,
+      receivedAtCenter: workloadMetrics?.receivedAtCenter || 0,
+      // System health from server  
+      serviceCenters: systemHealth?.totalServiceCenters || 5,
+      users: systemHealth?.totalUsers || 25,
+      organisations: systemHealth?.totalOrganisations || 0,
+      products: systemHealth?.totalProducts || 0,
+      // Field engineer specific (same as totals for field engineers)
+      myTotal: totalTickets || 0,
+      myOpen: openTickets || 0,
+      myInProgress: inProgressTickets || 0,
+      myClosed: closedTickets || 0,
+      // Service center specific
+      assigned: totalTickets || 0,
+      centerInProgress: inProgressTickets || 0,
+      centerCompleted: closedTickets || 0,
+      // Placeholder values for features not yet implemented
+      inventory: 150,
+      pendingApprovals: 8,
+      spareRequests: 12,
+      technicians: 8
+    };
+  }, [totalTickets, openTickets, inProgressTickets, closedTickets, resolvedTickets, highPriorityTickets, unassignedTickets, systemHealth, workloadMetrics, getRoleMetrics]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchTickets();
-    setTimeout(() => setRefreshing(false), 1000);
+    try {
+      await Promise.all([
+        fetchTickets({
+          skip: 0,
+          take: 100,
+          filter: {}
+        }),
+        refreshAnalytics()
+      ]);
+    } finally {
+      setTimeout(() => setRefreshing(false), 1000);
+    }
   };
 
-  const quickActions = [
-    {
-      icon: Plus,
-      title: 'Create Ticket',
-      description: 'Submit a new support ticket for technical assistance',
-      color: 'bg-blue-500',
-      onClick: () => navigate('/tickets/new')
-    },
-    {
-      icon: Search,
-      title: 'Search Tickets',
-      description: 'Find and manage existing tickets in the system',
-      color: 'bg-green-500',
-      onClick: () => navigate('/tickets')
-    },
-    {
-      icon: Users,
-      title: 'Manage Users',
-      description: 'Add, edit, or remove users from the system',
-      color: 'bg-purple-500',
-      onClick: () => navigate('/users')
-    },
-    {
-      icon: Settings,
-      title: 'System Settings',
-      description: 'Configure system preferences and parameters',
-      color: 'bg-orange-500',
-      onClick: () => navigate('/settings')
-    }
-  ];
+  // Show loading state
+  if (loading && analyticsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if analytics failed but allow partial loading
+  if (analyticsError && !totalTickets && !loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Dashboard Error</h2>
+          <p className="text-gray-600 mb-4">{analyticsError}</p>
+          <button
+            onClick={refreshAnalytics}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+          >
+            <RefreshCw className="w-4 h-4 inline mr-2" />
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <MotionConfig transition={{ type: "spring", damping: 20, stiffness: 300 }}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -254,11 +551,11 @@ export default function Dashboard() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {user?.name || 'User'}! 👋
+              <h1 className="text-3xl sm:tracking-wider text-gray-900">
+                {dashboardConfig.title} - Welcome back, {user?.name || 'User'}! 👋
               </h1>
               <p className="text-gray-600 mt-1">
-                Here's what's happening with your ticket system today.
+                {dashboardConfig.description}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -285,89 +582,277 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* Metrics Grid */}
+        {/* Role-based Metrics Grid */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8"
         >
-          <MetricCard
-            icon={Ticket}
-            title="Total Tickets"
-            value={totalTickets}
-            change={8}
-            trend="up"
-            color="bg-blue-500"
-            onClick={() => navigate('/tickets')}
-          />
-          <MetricCard
-            icon={AlertCircle}
-            title="Open Tickets"
-            value={openTickets}
-            change={12}
-            trend="up"
-            color="bg-red-500"
-            onClick={() => navigate('/tickets?status=open')}
-          />
-          <MetricCard
-            icon={Clock}
-            title="In Progress"
-            value={inProgressTickets}
-            change={5}
-            trend="down"
-            color="bg-orange-500"
-            onClick={() => navigate('/tickets?status=in-progress')}
-          />
-          <MetricCard
-            icon={CheckCircle}
-            title="Resolved"
-            value={closedTickets}
-            change={15}
-            trend="up"
-            color="bg-green-500"
-            onClick={() => navigate('/tickets?status=closed')}
-          />
-          <MetricCard
-            icon={TrendingUp}
-            title="High Priority"
-            value={highPriorityTickets}
-            change={3}
-            trend="up"
-            color="bg-purple-500"
-            onClick={() => navigate('/tickets?priority=high')}
-          />
+          {/* Universal Metrics */}
+          {dashboardConfig.primaryMetrics.includes('total') && (
+            <MetricCard
+              icon={Ticket}
+              title="Total Tickets"
+              value={metrics.total}
+              change={8}
+              trend="up"
+              color="bg-blue-500"
+              onClick={() => navigate('/tickets')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('open') && (
+            <MetricCard
+              icon={AlertCircle}
+              title="Open Tickets"
+              value={metrics.open}
+              change={12}
+              trend="up"
+              color="bg-red-500"
+              onClick={() => navigate('/tickets?status=open')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('inProgress') && (
+            <MetricCard
+              icon={Clock}
+              title="In Progress"
+              value={metrics.inProgress}
+              change={5}
+              trend="down"
+              color="bg-orange-500"
+              onClick={() => navigate('/tickets?status=in-progress')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('closed') && (
+            <MetricCard
+              icon={CheckCircle}
+              title="Resolved"
+              value={metrics.closed}
+              change={15}
+              trend="up"
+              color="bg-green-500"
+              onClick={() => navigate('/tickets?status=closed')}
+            />
+          )}
+          
+          {/* Role-specific Metrics */}
+          
+          {/* Field Engineer Specific */}
+          {dashboardConfig.primaryMetrics.includes('myTotal') && (
+            <MetricCard
+              icon={Ticket}
+              title="My Tickets"
+              value={metrics.myTotal}
+              change={5}
+              trend="up"
+              color="bg-blue-500"
+              onClick={() => navigate('/tickets')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('myOpen') && (
+            <MetricCard
+              icon={AlertCircle}
+              title="My Open"
+              value={metrics.myOpen}
+              change={3}
+              trend="up"
+              color="bg-red-500"
+              onClick={() => navigate('/tickets?status=open')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('myInProgress') && (
+            <MetricCard
+              icon={Clock}
+              title="My Progress"
+              value={metrics.myInProgress}
+              change={2}
+              trend="up"
+              color="bg-orange-500"
+              onClick={() => navigate('/tickets?status=in-progress')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('myClosed') && (
+            <MetricCard
+              icon={CheckCircle}
+              title="My Completed"
+              value={metrics.myClosed}
+              change={8}
+              trend="up"
+              color="bg-green-500"
+              onClick={() => navigate('/tickets?status=closed')}
+            />
+          )}
+          
+          {/* Service Center Specific */}
+          {dashboardConfig.primaryMetrics.includes('assigned') && (
+            <MetricCard
+              icon={Building}
+              title="Assigned"
+              value={metrics.assigned}
+              change={4}
+              trend="up"
+              color="bg-purple-500"
+              onClick={() => navigate('/tickets')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('technicians') && (
+            <MetricCard
+              icon={Users}
+              title="Technicians"
+              value={metrics.technicians}
+              change={1}
+              trend="up"
+              color="bg-indigo-500"
+              onClick={() => navigate('/users?role=SERVICE_CENTER_TECHNICIAN')}
+            />
+          )}
+          
+          {/* Technician Specific */}
+          {dashboardConfig.primaryMetrics.includes('inDiagnosis') && (
+            <MetricCard
+              icon={Activity}
+              title="In Diagnosis"
+              value={metrics.inDiagnosis}
+              change={2}
+              trend="up"
+              color="bg-yellow-500"
+              onClick={() => navigate('/tickets')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('inRepair') && (
+            <MetricCard
+              icon={Wrench}
+              title="In Repair"
+              value={metrics.inRepair}
+              change={3}
+              trend="down"
+              color="bg-blue-600"
+              onClick={() => navigate('/tickets')}
+            />
+          )}
+          
+          {/* Admin/Management Specific */}
+          {dashboardConfig.primaryMetrics.includes('serviceCenters') && (
+            <MetricCard
+              icon={Building}
+              title="Service Centers"
+              value={metrics.serviceCenters}
+              change={0}
+              trend="up"
+              color="bg-purple-500"
+              onClick={() => navigate('/service-center')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('users') && (
+            <MetricCard
+              icon={Users}
+              title="Users"
+              value={metrics.users}
+              change={5}
+              trend="up"
+              color="bg-green-600"
+              onClick={() => navigate('/users')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('unassigned') && (
+            <MetricCard
+              icon={AlertTriangle}
+              title="Unassigned"
+              value={metrics.unassignedCount || metrics.unassigned || 0}
+              change={-2}
+              trend="down"
+              color="bg-red-600"
+              onClick={() => navigate('/service-center')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('spareRequests') && (
+            <MetricCard
+              icon={Package}
+              title="Spare Requests"
+              value={metrics.spareRequests}
+              change={4}
+              trend="up"
+              color="bg-orange-600"
+              onClick={() => navigate('/spare-requests')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('pendingApprovals') && (
+            <MetricCard
+              icon={ClipboardList}
+              title="Pending Approvals"
+              value={metrics.pendingApprovals}
+              change={2}
+              trend="up"
+              color="bg-red-500"
+              onClick={() => navigate('/spare-request-approval')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('activeServiceCenters') && (
+            <MetricCard
+              icon={Building}
+              title="Active Centers"
+              value={metrics.activeServiceCenters}
+              change={1}
+              trend="up"
+              color="bg-blue-600"
+              onClick={() => navigate('/service-center')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('activeUsers') && (
+            <MetricCard
+              icon={Users}
+              title="Active Users"
+              value={metrics.activeUsers}
+              change={3}
+              trend="up"
+              color="bg-green-600"
+              onClick={() => navigate('/users')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('pendingFieldClearances') && (
+            <MetricCard
+              icon={MapPin}
+              title="Field Clearances"
+              value={metrics.pendingFieldClearances}
+              change={-1}
+              trend="down"
+              color="bg-orange-500"
+              onClick={() => navigate('/tickets?stage=REQUEST_CLEARED_AT_FIELD')}
+            />
+          )}
+          
+          {dashboardConfig.primaryMetrics.includes('inventory') && (
+            <MetricCard
+              icon={Package}
+              title="Inventory Items"
+              value={metrics.inventory}
+              change={12}
+              trend="up"
+              color="bg-teal-500"
+              onClick={() => navigate('/inventory')}
+            />
+          )}
         </motion.div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Ticket Trends Chart */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white p-6 rounded-xl border border-gray-200"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Ticket Trends</h3>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                <MoreHorizontal className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={mockData.ticketStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="open" fill="#EF4444" name="Open" />
-                <Bar dataKey="inProgress" fill="#F59E0B" name="In Progress" />
-                <Bar dataKey="closed" fill="#10B981" name="Closed" />
-              </BarChart>
-            </ResponsiveContainer>
-          </motion.div>
-
-          {/* Category Distribution */}
+        {/* Role-based Charts and Quick Actions Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+     
+          {/* Quick Actions */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -375,51 +860,252 @@ export default function Dashboard() {
             className="bg-white p-6 rounded-xl border border-gray-200"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Ticket Categories</h3>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
-                <MoreHorizontal className="w-5 h-5 text-gray-500" />
-              </button>
+              <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
             </div>
-            <div className="flex flex-col lg:flex-row items-center gap-6">
-              <ResponsiveContainer width="100%" height={250}>
-                <RechartsPieChart>
-                  <Pie
-                    dataKey="value"
-                    data={mockData.categoryData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {mockData.categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-              <div className="space-y-3">
-                {mockData.categoryData.map((item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 + index * 0.1 }}
-                    className="flex items-center gap-2"
-                  >
-                    <div 
-                      className="w-4 h-4 rounded-full" 
-                      style={{ backgroundColor: item.color }}
-                    />
-                    <span className="text-sm text-gray-600">{item.name}</span>
-                    <span className="text-sm font-medium text-gray-900">{item.value}%</span>
-                  </motion.div>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 gap-4">
+              {quickActions.slice(0, 4).map((action, index) => (
+                <motion.button
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={action.onClick}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left"
+                >
+                  <div className={`p-2 rounded-lg ${action.color}`}>
+                    <action.icon className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-gray-900">{action.title}</h4>
+                    <p className="text-xs text-gray-600">{action.description}</p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </motion.button>
+              ))}
             </div>
           </motion.div>
-        </div>        
+        
+          {/* Recent Activity for admins and managers */}
+          <RoleBasedComponent 
+            allowedRoles={['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_SERVICE_HEAD']}
+            fallback={null}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-white p-6 rounded-xl border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                  <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <div className="space-y-4">
+                {(recentActivities || []).map((activity, index) => (
+                  <motion.div
+                    key={activity.id || index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 + index * 0.1 }}
+                    className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 cursor-pointer"
+                    onClick={() => activity.ticket && navigate(`/tickets/${activity.ticket}`)}
+                  >
+                    <div className={`p-2 rounded-full ${
+                      activity.status === 'OPEN' ? 'bg-red-100 text-red-600' : 
+                      activity.status === 'IN_PROGRESS' ? 'bg-orange-100 text-orange-600' :
+                      'bg-green-100 text-green-600'
+                    }`}>
+                      <Ticket className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900">
+                        <span className="font-medium">{activity.ticket}</span> {activity.type === 'ticket_updated' ? 'updated by' : 'created by'} <span className="font-medium">{activity.user}</span>
+                      </p>
+                      <p className="text-xs text-gray-500">{activity.time}</p>
+                    </div>
+                  </motion.div>
+                ))}
+                {(!recentActivities || recentActivities.length === 0) && (
+                  <div className="text-center py-4">
+                    <p className="text-gray-500 text-sm">No recent activities</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </RoleBasedComponent>
+
+          {/* System Health for Admins */}
+          <RoleBasedComponent 
+            allowedRoles={['MACSOFT_ADMIN']}
+            fallback={null}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-white p-6 rounded-xl border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">System Health</h3>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-xs text-gray-600">Healthy</span>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Users</span>
+                  <span className="text-sm font-medium text-blue-600">{metrics.users}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Tickets</span>
+                  <span className="text-sm font-medium text-blue-600">{metrics.total}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Service Centers</span>
+                  <span className="text-sm font-medium text-blue-600">{metrics.serviceCenters}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Organisations</span>
+                  <span className="text-sm font-medium text-green-600">{metrics.organisations}</span>
+                </div>
+              </div>
+            </motion.div>
+          </RoleBasedComponent>
+
+          {/* My Workload for Service Center roles */}
+          <RoleBasedComponent 
+            allowedRoles={['SERVICE_CENTER_TECHNICIAN', 'CUSTOMER_SERVICE_HEAD']}
+            fallback={null}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-white p-6 rounded-xl border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">My Workload</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Controllers to Receive</span>
+                  <span className="text-sm font-medium text-blue-600">{Math.floor(metrics.assigned * 0.3)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">In Diagnosis</span>
+                  <span className="text-sm font-medium text-yellow-600">{metrics.inDiagnosis}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">In Repair</span>
+                  <span className="text-sm font-medium text-orange-600">{metrics.inRepair}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Ready for Dispatch</span>
+                  <span className="text-sm font-medium text-green-600">{Math.floor(metrics.assigned * 0.2)}</span>
+                </div>
+              </div>
+            </motion.div>
+          </RoleBasedComponent>
+   {/* Personal Tickets Chart for Field Engineers */}
+          {user?.role === 'CUSTOMER_FIELD_ENGINEER' && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white p-6 col-span-2 rounded-xl border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">My Tickets Status</h3>
+                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                  <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={[
+                  { name: 'My Tickets', open: metrics.myOpen || 0, inProgress: metrics.myInProgress || 0, closed: metrics.myClosed || 0 }
+                ]}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="open" fill="#EF4444" name="Open" />
+                  <Bar dataKey="inProgress" fill="#F59E0B" name="In Progress" />
+                  <Bar dataKey="closed" fill="#10B981" name="Closed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </motion.div>
+          )}
+
+          {/* Field Work Status for Field Engineers */}
+          <RoleBasedComponent 
+            allowedRoles={['CUSTOMER_FIELD_ENGINEER']}
+            fallback={null}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-white p-6 rounded-xl border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Field Work Status</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Active Field Visits</span>
+                  <span className="text-sm font-medium text-blue-600">{metrics.myOpen}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Awaiting Service Center</span>
+                  <span className="text-sm font-medium text-orange-600">{Math.floor(metrics.myInProgress * 0.6)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Pending Clearance</span>
+                  <span className="text-sm font-medium text-yellow-600">{Math.floor(metrics.myInProgress * 0.4)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">This Month Completed</span>
+                  <span className="text-sm font-medium text-green-600">{metrics.myClosed}</span>
+                </div>
+              </div>
+            </motion.div>
+          </RoleBasedComponent>
+               {/* Ticket Status Overview Chart - Show for most roles except basic field engineer */}
+          {user?.role !== 'CUSTOMER_FIELD_ENGINEER' && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white col-span-2 p-6 rounded-xl border border-gray-200"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Ticket Status Overview</h3>
+                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                  <MoreHorizontal className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData || getChartData()}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="open" fill="#EF4444" name="Open" />
+                  <Bar dataKey="inProgress" fill="#F59E0B" name="In Progress" />
+                  <Bar dataKey="closed" fill="#10B981" name="Closed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </motion.div>
+          )}
+                
+        </div>
       </div>
     </div>
+    </MotionConfig>
   );
 }
