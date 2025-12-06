@@ -1127,7 +1127,10 @@ const SocketTestPanel = () => {
     sendTestNotification,
     sendTestBuzzer,
     sendTestTicketMessage,
-    sendTestTicketCreation
+    sendTestTicketCreation,
+    sendTestMilestoneCreation,
+    sendTestMilestoneTransition,
+    sendTestMilestoneUpdate
   } = useSocketActivities();
 
   return (
@@ -1227,6 +1230,34 @@ const SocketTestPanel = () => {
               className="w-full px-3 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600"
             >
               Test New Ticket
+            </button>
+            <button
+              onClick={() => sendTestMilestoneCreation({
+                ticketCode: 'TKT-2025-001',
+                stage: 'UNDER_INVESTIGATION'
+              })}
+              className="w-full px-3 py-1 text-xs bg-indigo-500 text-white rounded hover:bg-indigo-600"
+            >
+              Test Milestone Created
+            </button>
+            <button
+              onClick={() => sendTestMilestoneTransition({
+                ticketCode: 'TKT-2025-001',
+                fromStage: 'UNDER_INVESTIGATION',
+                toStage: 'PARTS_ORDERED'
+              })}
+              className="w-full px-3 py-1 text-xs bg-pink-500 text-white rounded hover:bg-pink-600"
+            >
+              Test Milestone Transition
+            </button>
+            <button
+              onClick={() => sendTestMilestoneUpdate({
+                ticketCode: 'TKT-2025-001',
+                notes: `Updated notes at ${new Date().toLocaleTimeString()}`
+              })}
+              className="w-full px-3 py-1 text-xs bg-teal-500 text-white rounded hover:bg-teal-600"
+            >
+              Test Milestone Update
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 // src/lib/sound/SoundManager.jsx
 import React, { createContext, useContext, useRef, useCallback, useEffect, useState } from "react";
-
+    
 /**
  * SoundManager
  * - Preloads configured sounds
@@ -28,6 +28,7 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
     const audiosRef = useRef({});
     const [muted, setMuted] = useState(false);
     const volumeRef = useRef(defaultVolume);
+    const recentSoundsRef = useRef(new Map()); // Track recent sounds to prevent duplicates
 
     // Preload audio objects
     useEffect(() => {
@@ -49,12 +50,42 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
     }, [preload]);
 
     const play = useCallback((key) => {
-        if (muted) return;
+        // Get call stack to identify caller
+        const stack = new Error().stack;
+        const caller = stack.split('\n')[2]?.trim() || 'unknown caller';
+        
+        console.log(`🎵 [SOUNDMANAGER] PLAY REQUESTED: "${key}" by ${caller}`);
+        
+        if (muted) {
+            console.log(`🔇 [SOUNDMANAGER] MUTED - not playing "${key}"`);
+            return;
+        }
+
+        // Prevent duplicate sounds within 500ms window
+        const now = Date.now();
+        const lastPlayTime = recentSoundsRef.current.get(key);
+        if (lastPlayTime && (now - lastPlayTime) < 500) {
+            console.log(`🚫 [SOUNDMANAGER] DUPLICATE BLOCKED: "${key}" (played ${now - lastPlayTime}ms ago)`);
+            return;
+        }
+        
+        // Update the last play time and clean up old entries
+        recentSoundsRef.current.set(key, now);
+        
+        // Clean up entries older than 5 seconds to prevent memory leaks
+        for (const [soundKey, timestamp] of recentSoundsRef.current.entries()) {
+            if (now - timestamp > 5000) {
+                recentSoundsRef.current.delete(soundKey);
+            }
+        }
+        
         const entry = SOUND_MAP[key];
         if (!entry) {
             console.warn(`[SoundManager] No sound configured for key: "${key}"`);
             return;
         }
+        
+        console.log(`🔊 [SOUNDMANAGER] PLAYING SOUND: "${key}" (${entry.label})`);
 
         // Try to reuse preloaded Audio object, otherwise create one.
         let audio = audiosRef.current[key];
@@ -81,7 +112,10 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
         }
 
         audio.volume = volumeRef.current;
-        audio.play().catch((err) => {
+        audio.play().then(() => {
+            console.log(`✅ [SOUNDMANAGER] Successfully played: "${key}"`);
+        }).catch((err) => {
+            console.warn(`❌ [SOUNDMANAGER] Failed to play "${key}":`, err);
             // Common reason: autoplay restrictions. Do nothing.
             // You can optionally store a flag to attempt later after user interaction.
         });

@@ -173,6 +173,31 @@ const transitionMilestone = async (req, res) => {
       io
     );
 
+    // Emit socket event for milestone transition
+    if (io && updatedMilestone.ticket) {
+      const milestoneTransitionData = {
+        type: 'milestone-transitioned',
+        ticketId: parseInt(ticketId),
+        ticketCode: updatedMilestone.ticket.ticketCode,
+        milestone: updatedMilestone,
+        fromStage: data.fromStage || 'previous',
+        toStage: targetStage,
+        isTicketClosed: updatedMilestone.config?.isFinal || false,
+        updatedBy: {
+          id: userId,
+          name: updatedMilestone.changer?.name || 'Unknown User'
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      // Emit to all rooms (admin, servicecenter, customer)
+      io.to('admin').emit('milestone-transitioned', milestoneTransitionData);
+      io.to('servicecenter').emit('milestone-transitioned', milestoneTransitionData);
+      io.to('customer').emit('milestone-transitioned', milestoneTransitionData);
+      
+      console.log(`🏁 Milestone transitioned via socket for ticket: ${updatedMilestone.ticket.ticketCode} -> ${targetStage}`);
+    }
+
     const isTicketClosed = updatedMilestone.config?.isFinal;
     const responseMessage =
       isTicketClosed && targetStage === "REQUEST_CLEARED_AT_FIELD"
@@ -199,12 +224,35 @@ const updateMilestoneNotes = async (req, res) => {
     const { milestoneId } = req.params;
     const { notes } = req.body;
     const { id: userId } = req.user;
+    const io = req.io;
 
     const updatedMilestone = await milestoneService.updateMilestoneNotes(
       parseInt(milestoneId),
       notes,
       userId
     );
+
+    // Emit socket event for milestone notes update
+    if (io && updatedMilestone.ticket) {
+      const milestoneUpdateData = {
+        type: 'milestone-notes-updated',
+        ticketId: updatedMilestone.ticketId,
+        ticketCode: updatedMilestone.ticket.ticketCode,
+        milestone: updatedMilestone,
+        updatedBy: {
+          id: userId,
+          name: updatedMilestone.changer?.name || 'Unknown User'
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      // Emit to all rooms (admin, servicecenter, customer)
+      io.to('admin').emit('milestone-updated', milestoneUpdateData);
+      io.to('servicecenter').emit('milestone-updated', milestoneUpdateData);
+      io.to('customer').emit('milestone-updated', milestoneUpdateData);
+      
+      console.log(`🏁 Milestone notes updated via socket for ticket: ${updatedMilestone.ticket.ticketCode}`);
+    }
 
     res.status(200).json({
       message: "Milestone notes updated successfully",
@@ -222,6 +270,7 @@ const addPhotosToCurrentMilestone = async (req, res) => {
   try {
     const { ticketId } = req.params;
     const { id: userId } = req.user;
+    const io = req.io;
     const files = req.files; // Uploaded photos
 
     if (!files || files.length === 0) {
@@ -243,6 +292,29 @@ const addPhotosToCurrentMilestone = async (req, res) => {
       attachments
     );
 
+    // Emit socket event for milestone photos added
+    if (io && updatedMilestone.ticket) {
+      const milestoneUpdateData = {
+        type: 'milestone-photos-added',
+        ticketId: parseInt(ticketId),
+        ticketCode: updatedMilestone.ticket.ticketCode,
+        milestone: updatedMilestone,
+        photosAdded: attachments.length,
+        updatedBy: {
+          id: userId,
+          name: updatedMilestone.changer?.name || 'Unknown User'
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      // Emit to all rooms (admin, servicecenter, customer)
+      io.to('admin').emit('milestone-updated', milestoneUpdateData);
+      io.to('servicecenter').emit('milestone-updated', milestoneUpdateData);
+      io.to('customer').emit('milestone-updated', milestoneUpdateData);
+      
+      console.log(`🏁 Milestone photos added via socket for ticket: ${updatedMilestone.ticket.ticketCode}`);
+    }
+
     res.status(200).json({
       message: "Photos added to milestone successfully",
       milestone: updatedMilestone,
@@ -260,6 +332,7 @@ const updateMilestone = async (req, res) => {
     const { milestoneId } = req.params;
     const milestoneData = req.body;
     const { id: userId } = req.user;
+    const io = req.io;
 
     const updatedMilestone = await milestoneService.updateMilestone(
       parseInt(milestoneId),
@@ -271,6 +344,29 @@ const updateMilestone = async (req, res) => {
       userId,
       milestoneData
     );
+
+    // Emit socket event for milestone update
+    if (io && newMilestoneData.ticket) {
+      const milestoneUpdateData = {
+        type: 'milestone-updated',
+        ticketId: updatedMilestone.ticketId,
+        ticketCode: newMilestoneData.ticket.ticketCode,
+        milestone: newMilestoneData,
+        updatedBy: {
+          id: userId,
+          name: newMilestoneData.changer?.name || 'Unknown User'
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      // Emit to all rooms (admin, servicecenter, customer)
+      io.to('admin').emit('milestone-updated', milestoneUpdateData);
+      io.to('servicecenter').emit('milestone-updated', milestoneUpdateData);
+      io.to('customer').emit('milestone-updated', milestoneUpdateData);
+      
+      console.log(`🏁 Milestone updated via socket for ticket: ${newMilestoneData.ticket.ticketCode}`);
+    }
+
     res.status(200).json({
       message: "Milestone updated successfully",
       milestone: newMilestoneData,
@@ -301,6 +397,28 @@ const createMilestone = async (req, res) => {
     };
 
     const newMilestone = await milestoneService.createMilestone(_milestoneData, io);
+
+    // Emit socket event for milestone creation
+    if (io && newMilestone.ticket) {
+      const milestoneCreateData = {
+        type: 'milestone-created',
+        ticketId: parseInt(ticketId),
+        ticketCode: newMilestone.ticket.ticketCode,
+        milestone: newMilestone,
+        createdBy: {
+          id: userId,
+          name: newMilestone.changer?.name || 'Unknown User'
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      // Emit to all rooms (admin, servicecenter, customer)
+      io.to('admin').emit('milestone-created', milestoneCreateData);
+      io.to('servicecenter').emit('milestone-created', milestoneCreateData);
+      io.to('customer').emit('milestone-created', milestoneCreateData);
+      
+      console.log(`🏁 New milestone created via socket for ticket: ${newMilestone.ticket.ticketCode}`);
+    }
 
     res.status(201).json({
       message: "Milestone created successfully",

@@ -39,6 +39,7 @@ import { SpareRequestForm } from '../../components/ui/spareRequestForm';
 import { useToast } from '../../components/ui/toast';
 import useTickets from '../../lib/hooks/useTickets';
 import { useAuth } from '../../lib/hooks/useAuth';
+import { useSocket } from '../../lib/contexts/SocketContext';
 import useConversation from '../../lib/hooks/useConversation';
 import { 
   approveSpareRequestItem,
@@ -284,6 +285,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
 export default function TicketDashboard() {
   const { ticket, fetchTicketById, updateMilestone, loading, error } = useTickets();
   const { user, token } = useAuth();
+  const { setCurrentTicketId } = useSocket();
   const { addToast } = useToast();
   const { ticketId } = useParams();
   const navigate = useNavigate();
@@ -346,6 +348,24 @@ export default function TicketDashboard() {
   const [inventoryDetails, setInventoryDetails] = useState(null);
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [loadingInventoryDetails, setLoadingInventoryDetails] = useState(false);
+
+  // Set current ticket ID for socket context (prevents sounds/toasts when user is in this ticket)
+  useEffect(() => {
+    if (ticketId) {
+      const parsedTicketId = parseInt(ticketId);
+      console.log(`🎯 [TICKET-DASHBOARD] Setting current ticket ID to: ${parsedTicketId}`);
+      setCurrentTicketId(parsedTicketId);
+      // Also set on window object for immediate access by socket handlers
+      window.currentTicketId = parsedTicketId;
+      console.log('🎯 [TICKET-DASHBOARD] Set window.currentTicketId to:', window.currentTicketId);
+      return () => {
+        console.log(`🎯 [TICKET-DASHBOARD] Clearing current ticket ID`);
+        setCurrentTicketId(null); // Clear when leaving ticket
+        window.currentTicketId = null;
+        console.log('🎯 [TICKET-DASHBOARD] Cleared window.currentTicketId');
+      };
+    }
+  }, [ticketId, setCurrentTicketId]);
 
   // Auto-close timer simulation - only trigger when last message changes
   useEffect(() => {

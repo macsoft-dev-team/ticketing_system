@@ -5,6 +5,7 @@ import DocumentModal from './DocumentModal';
 import MediaCapture from './MediaCapture';
 import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
 import { useToast } from '../../lib/hooks/use-toast';
+import { useSoundManager } from '../../lib/hooks/SoundManager';
 
 const TicketClosedView = ({ onViewChat }) => {
   return (
@@ -217,6 +218,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   const [maxAudioDuration, setMaxAudioDuration] = useState(300);
   const fileInputRef = useRef(null);
   const { toast } = useToast();
+  const { play, muted } = useSoundManager();
   
   // Load media upload configuration on component mount
 /*   useEffect(() => {
@@ -241,6 +243,16 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
   const handleSend = () => {
     if (message.trim() || attachments.length > 0) {
+      console.log('📤 [CHAT] User sending message - playing outbound sound');
+      
+      // Play outbound sound immediately when user sends message
+      if (!muted) {
+        console.log('🔊 [CHAT] Playing outbound_chime');
+        play('outbound_chime');
+      } else {
+        console.log('🔇 [CHAT] Muted - not playing outbound sound');
+      }
+      
       onSendMessage(message.trim(), attachments);
       setMessage('');
       setAttachments([]);

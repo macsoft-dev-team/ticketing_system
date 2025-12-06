@@ -42,8 +42,23 @@ const createSocket = () => {
 
   // Set up notification listeners
   socket.on('notification', (notificationData) => {
-    console.log('📢 Received notification:', notificationData);
+    console.log('📢 [SOCKET_JS] Received notification:', notificationData);
     
+    // Check if this is a message notification for current ticket - suppress toast but allow sound
+    const currentTicketId = window.currentTicketId;
+    if (notificationData.type === 'message' && notificationData.ticketId && currentTicketId) {
+      // Handle both string and number comparisons
+      const notifTicketId = parseInt(notificationData.ticketId);
+      const currTicketId = parseInt(currentTicketId);
+      if (notifTicketId === currTicketId) {
+        console.log(`🔕 [SOCKET_JS] User in same ticket ${currTicketId} - modifying notification to suppress toast only`);
+        // Modify notification to suppress toast but allow sound
+        notificationData.suppressToast = true;
+        notificationData.allowSound = true;
+      }
+    }
+    
+    console.log('📨 [SOCKET_JS] Dispatching socketNotification event');
     // Dispatch custom event for components to listen to
     window.dispatchEvent(new CustomEvent('socketNotification', {
       detail: notificationData
@@ -60,8 +75,23 @@ const createSocket = () => {
   });
 
   socket.on('conversation', (messageData) => {
-    console.log('💬 Received conversation message:', messageData);
+    console.log('💬 [SOCKET_JS] Received conversation message:', messageData);
     
+    // Check if this is a message for current ticket - allow sound but suppress toast
+    const currentTicketId = window.currentTicketId;
+    if (messageData.ticketId && currentTicketId) {
+      // Handle both string and number comparisons
+      const msgTicketId = parseInt(messageData.ticketId);
+      const currTicketId = parseInt(currentTicketId);
+      if (msgTicketId === currTicketId) {
+        console.log(`🔕 [SOCKET_JS] User in same ticket ${currTicketId} - allowing conversation event with toast suppression`);
+        // Modify message to suppress toast but allow sound
+        messageData.suppressToast = true;
+        messageData.allowSound = true;
+      }
+    }
+    
+    console.log('📨 [SOCKET_JS] Dispatching socketConversation event');
     // Dispatch custom event for conversation updates
     window.dispatchEvent(new CustomEvent('socketConversation', {
       detail: messageData
@@ -77,10 +107,43 @@ const createSocket = () => {
     }));
   });
 
+  socket.on('milestone-created', (milestoneData) => {
+    console.log('🎯 Received milestone creation:', milestoneData);
+    
+    // Dispatch custom event for milestone creation
+    window.dispatchEvent(new CustomEvent('socketMilestoneCreated', {
+      detail: milestoneData
+    }));
+  });
+
+  socket.on('milestone-transitioned', (milestoneData) => {
+    console.log('🎯 Received milestone transition:', milestoneData);
+    
+    // Dispatch custom event for milestone transitions
+    window.dispatchEvent(new CustomEvent('socketMilestoneTransitioned', {
+      detail: milestoneData
+    }));
+  });
+
   // Listen for ticket message events (for updating last message in ticket cards)
   socket.on('ticket-message', (messageData) => {
-    console.log('🎫 Received ticket message update:', messageData);
+    console.log('🎫 [SOCKET_JS] Received ticket message update:', messageData);
     
+    // Check if this is a message for current ticket - allow sound but suppress toast
+    const currentTicketId = window.currentTicketId;
+    if (messageData.ticketId && currentTicketId) {
+      // Handle both string and number comparisons
+      const msgTicketId = parseInt(messageData.ticketId);
+      const currTicketId = parseInt(currentTicketId);
+      if (msgTicketId === currTicketId) {
+        console.log(`🔕 [SOCKET_JS] User in same ticket ${currTicketId} - allowing ticket-message event with toast suppression`);
+        // Modify message to suppress toast but allow sound
+        messageData.suppressToast = true;
+        messageData.allowSound = true;
+      }
+    }
+    
+    console.log('📨 [SOCKET_JS] Dispatching socketTicketMessage event');
     // Dispatch custom event for ticket message updates
     window.dispatchEvent(new CustomEvent('socketTicketMessage', {
       detail: messageData

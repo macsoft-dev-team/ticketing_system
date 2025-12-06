@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "./useAuth";
 import { useSocket } from "../contexts/SocketContext";
+import { useSoundManager } from "./SoundManager";
 import moment from "moment";
 
 export const useConversation = (ticketId) => {
   const { user, token } = useAuth();
   const { socket, isConnected } = useSocket();
+  const { play, muted } = useSoundManager();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -154,6 +156,10 @@ export const useConversation = (ticketId) => {
         }
 
         const newMessage = await response.json();
+        
+        // Note: Outbound sound is handled by the chat component to avoid conflicts
+        // with socket notifications and prevent double sounds
+        
          // The real-time update will add the message to the UI
         // But we can add optimistic update here if needed
       } catch (err) {

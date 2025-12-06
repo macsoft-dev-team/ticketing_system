@@ -6,6 +6,7 @@ import useAuth from '../../../../lib/hooks/useAuth';
 import { useSocketActivities } from '../../../../lib/hooks/useSocketActivities';
 import { useSoundManager } from '../../../../lib/hooks/SoundManager';
 import { useToast } from '../../../ui/toast';
+import { useSocket } from '../../../../lib/contexts/SocketContext';
 
 const NotificationBell = () => {
   const { user, token } = useAuth();
@@ -28,6 +29,9 @@ const NotificationBell = () => {
   
   // Toast notifications for visual feedback
   const { addToast } = useToast();
+  
+  // Socket context for current ticket tracking
+  const { currentTicketId } = useSocket();
 
   // Transform socket notifications to match UI format
   const [notifications, setNotifications] = useState([]);
@@ -64,19 +68,35 @@ const NotificationBell = () => {
       
       newNotifications.forEach(notification => {
         if (!notification.seen) {
-          console.log('🔔 New notification received:', notification.title);
+          console.log('🔔 [TOPBAR_NOTIFICATION_BELL] New notification received:', notification.title, 'ticketId:', notification.ticketId);
+          console.log('🎯 [TOPBAR_NOTIFICATION_BELL] Current ticket ID:', currentTicketId);
           
-          // Play notification sound
-          play('inbound_notification');
+          // Check if notification is related to current ticket (handle both string and number types)
+          const notifTicketId = parseInt(notification.ticketId);
+          const currTicketId = parseInt(currentTicketId);
+          const metaTicketId = notification.metadata?.ticketId ? parseInt(notification.metadata.ticketId) : null;
+          const isCurrentTicketNotification = currentTicketId && 
+            (notifTicketId === currTicketId || 
+             (metaTicketId && metaTicketId === currTicketId));
           
-          // Show toast notification
-          addToast({
-            id: `notification-${notification.id}`,
-            title: notification.title || 'New Notification',
-            description: notification.message || notification.description || '',
-            variant: 'default',
-            duration: 5000,
-          });
+          if (isCurrentTicketNotification) {
+            console.log(`🔇 [TOPBAR_NOTIFICATION_BELL] User in same ticket - suppressing both sound and toast (SocketContext handles sound)`);
+            // Suppress both sound and toast for same ticket (SocketContext handles sound)
+            // But don't show toast for same ticket
+          } else {
+            console.log('🔇 [TOPBAR_NOTIFICATION_BELL] Suppressing sound for different ticket (SocketContext handles sound), showing toast only');
+            // Suppress sound for different tickets too (SocketContext handles all message sounds)
+            // play('message_tone'); // Disabled - SocketContext handles this
+            
+            // Show toast notification for different tickets
+            addToast({
+              id: `notification-${notification.id}`,
+              title: notification.title || 'New Notification',
+              description: notification.message || notification.description || '',
+              variant: 'default',
+              duration: 5000,
+            });
+          }
         }
       });
     }

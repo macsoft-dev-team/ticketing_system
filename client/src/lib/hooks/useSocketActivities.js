@@ -148,6 +148,124 @@ export const useSocketActivities = () => {
     console.log('🎫 Sent test ticket creation:', testTicket);
   }, []);
 
+  // Send test milestone creation
+  const sendTestMilestoneCreation = useCallback((milestoneData = {}) => {
+    const testMilestone = {
+      type: 'milestone-created',
+      ticketId: milestoneData.ticketId || 1,
+      ticketCode: milestoneData.ticketCode || 'TKT-2025-001',
+      milestone: {
+        id: Date.now(),
+        stage: milestoneData.stage || 'UNDER_INVESTIGATION',
+        status: 'IN_PROGRESS',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        changer: {
+          id: 999,
+          name: 'Test User',
+          role: 'TEST_ROLE'
+        },
+        config: {
+          label: 'Under Investigation',
+          description: 'Test milestone creation'
+        },
+        ...milestoneData.milestone
+      },
+      createdBy: {
+        id: 999,
+        name: 'Test User'
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    // Emit the custom event for testing
+    window.dispatchEvent(new CustomEvent('socketMilestoneCreated', {
+      detail: testMilestone
+    }));
+    
+    console.log('🎯 Sent test milestone creation:', testMilestone);
+  }, []);
+
+  // Send test milestone transition
+  const sendTestMilestoneTransition = useCallback((transitionData = {}) => {
+    const testTransition = {
+      type: 'milestone-transitioned',
+      ticketId: transitionData.ticketId || 1,
+      ticketCode: transitionData.ticketCode || 'TKT-2025-001',
+      milestone: {
+        id: Date.now(),
+        stage: transitionData.toStage || 'PARTS_ORDERED',
+        status: 'IN_PROGRESS',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        changer: {
+          id: 999,
+          name: 'Test User',
+          role: 'TEST_ROLE'
+        },
+        config: {
+          label: 'Parts Ordered',
+          description: 'Test milestone transition'
+        },
+        ...transitionData.milestone
+      },
+      fromStage: transitionData.fromStage || 'UNDER_INVESTIGATION',
+      toStage: transitionData.toStage || 'PARTS_ORDERED',
+      isTicketClosed: false,
+      updatedBy: {
+        id: 999,
+        name: 'Test User'
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    // Emit the custom event for testing
+    window.dispatchEvent(new CustomEvent('socketMilestoneTransitioned', {
+      detail: testTransition
+    }));
+    
+    console.log('🎯 Sent test milestone transition:', testTransition);
+  }, []);
+
+  // Send test milestone update
+  const sendTestMilestoneUpdate = useCallback((updateData = {}) => {
+    const testUpdate = {
+      type: 'milestone-updated',
+      ticketId: updateData.ticketId || 1,
+      ticketCode: updateData.ticketCode || 'TKT-2025-001',
+      milestone: {
+        id: Date.now(),
+        stage: updateData.stage || 'UNDER_INVESTIGATION',
+        status: 'IN_PROGRESS',
+        notes: updateData.notes || 'Test milestone update notes',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        changer: {
+          id: 999,
+          name: 'Test User',
+          role: 'TEST_ROLE'
+        },
+        config: {
+          label: 'Under Investigation',
+          description: 'Test milestone update'
+        },
+        ...updateData.milestone
+      },
+      updatedBy: {
+        id: 999,
+        name: 'Test User'
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    // Emit the custom event for testing
+    window.dispatchEvent(new CustomEvent('socketMilestone', {
+      detail: testUpdate
+    }));
+    
+    console.log('🎯 Sent test milestone update:', testUpdate);
+  }, []);
+
   return {
     // Connection status
     isConnected,
@@ -178,6 +296,9 @@ export const useSocketActivities = () => {
     sendTestBuzzer,
     sendTestTicketMessage,
     sendTestTicketCreation,
+    sendTestMilestoneCreation,
+    sendTestMilestoneTransition,
+    sendTestMilestoneUpdate,
     
     // Raw socket access if needed
     socket

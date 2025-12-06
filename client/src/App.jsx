@@ -87,15 +87,15 @@ function App() {
 
   return (
     <ToastProvider>
-      <SocketProvider>
         <SoundProvider defaultVolume={0.45}>
+      <SocketProvider>
           <BuzzerAlertsProvider>
             <div className="App">
               <RouterProvider router={router} />
             </div>
           </BuzzerAlertsProvider>
-        </SoundProvider>
       </SocketProvider>
+        </SoundProvider>
     </ToastProvider>
   );
 }
