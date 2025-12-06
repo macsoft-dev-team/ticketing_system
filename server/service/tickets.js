@@ -13,6 +13,34 @@ const { getStageConfig } = require("../lib/milestoneConfig");
 const fs = require("fs");
 const path = require("path");
 
+// RBAC Socket emission helper
+const emitTicketEventWithRBAC = (io, eventName, ticketData, eventData = null) => {
+  if (!io || !ticketData) return;
+  
+  const dataToEmit = eventData || ticketData;
+  
+  // Always emit to MACSOFT roles (global access)
+  io.to('role-MACSOFT_ADMIN').emit(eventName, dataToEmit);
+  io.to('role-MACSOFT_HEAD').emit(eventName, dataToEmit);
+  io.to('role-MACSOFT_SUPPORT').emit(eventName, dataToEmit);
+  
+  // Emit to ticket creator (if they are a field engineer)
+  if (ticketData.createdBy) {
+    io.to(`notifications-${ticketData.createdBy}`).emit(eventName, dataToEmit);
+  }
+  
+  // Emit to assigned service center
+  if (ticketData.assignedServiceCenter) {
+    io.to(`center-${ticketData.assignedServiceCenter}`).emit(eventName, dataToEmit);
+  }
+  
+  // Emit to Customer Service Heads based on ticket's state/location
+  // Note: This could be enhanced with state-based targeting
+  io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
+  
+  console.log(`🎫 [RBAC SOCKET] Emitted ${eventName} for ticket ${ticketData.ticketCode || ticketData.id} to authorized roles`);
+};
+
 const getTickets = async (skip, take, filter, userId, role) => {
   try {
     // Base params (includes + ordering)
@@ -702,16 +730,18 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     );
 
     if (io) {
-      io.emit("ticket", completeTicket);
-      io.emit("conversation", conversation);
+      // Use RBAC-aware emission
+      emitTicketEventWithRBAC(io, "ticket", completeTicket);
+      emitTicketEventWithRBAC(io, "conversation", completeTicket, conversation);
       
       // Emit new ticket creation for real-time updates in ticket lists
-      io.emit("ticket-created", {
+      const newTicketData = {
         ...completeTicket,
         isNewTicket: true,
         createdAt: completeTicket.createdAt
-      });
-      console.log(`🎫 Emitted ticket-created for ticket ${completeTicket.ticketCode}`);
+      };
+      emitTicketEventWithRBAC(io, "ticket-created", completeTicket, newTicketData);
+      console.log(`🎫 Emitted RBAC ticket-created for ticket ${completeTicket.ticketCode}`);
     }
     return completeTicket;
   } catch (error) {
@@ -865,8 +895,9 @@ const updateTicket = async (
     );
 
     if (io) {
-      io.emit("ticket", updatedTicket);
-      io.emit("conversation", conversation); 
+      // Use RBAC-aware emission
+      emitTicketEventWithRBAC(io, "ticket", updatedTicket);
+      emitTicketEventWithRBAC(io, "conversation", updatedTicket, conversation); 
     }
     return updatedTicket;
   } catch (error) {
@@ -950,7 +981,8 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
     await saveAndBroadcastNotification(prisma, io, notificationData);
 
     if (io) {
-      io.emit("ticket", updatedTicket);
+      // Use RBAC-aware emission
+      emitTicketEventWithRBAC(io, "ticket", updatedTicket);
     }
     return updatedTicket;
   } catch (error) {
@@ -1037,10 +1069,12 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
     await saveAndBroadcastNotification(prisma, io, notificationData);
 
     if (io) {
-      io.emit("ticketDeleted", {
+      // Use RBAC-aware emission
+      const deleteEventData = {
         ticketId: ticketId,
         ticketCode: ticketToDelete.ticketCode,
-      });
+      };
+      emitTicketEventWithRBAC(io, "ticketDeleted", ticketToDelete, deleteEventData);
     }
 
     return deletedTicket;

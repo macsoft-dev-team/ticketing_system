@@ -31,6 +31,99 @@ export const SocketProvider = ({ children }) => {
   const [currentTicketId, setCurrentTicketId] = useState(null); // Track current ticket being viewed
   const processedMessagesRef = useRef(new Set()); // Track processed messages to prevent duplicate sounds
 
+  // RBAC helper function to check if user has access to ticket-related events
+  const hasAccessToTicket = useCallback((ticketData) => {
+    if (!user || !ticketData) return false;
+
+    const userRole = user.role;
+    const userId = user.id;
+
+    // MACSOFT roles have global access
+    if (['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole)) {
+      return true;
+    }
+
+    // CUSTOMER_FIELD_ENGINEER: Only tickets created by them
+    if (userRole === 'CUSTOMER_FIELD_ENGINEER') {
+      return ticketData.createdBy === userId || ticketData.createdByUserId === userId;
+    }
+
+    // SERVICE_CENTER_TECHNICIAN: Only tickets assigned to their service center
+    if (userRole === 'SERVICE_CENTER_TECHNICIAN') {
+      const userCenterCode = user.centerCode;
+      return userCenterCode && ticketData.assignedServiceCenter === userCenterCode;
+    }
+
+    // CUSTOMER_SERVICE_HEAD: Tickets where creator's state is in CSH's allowed states
+    if (userRole === 'CUSTOMER_SERVICE_HEAD') {
+      // Note: This would require additional user state data to implement fully
+      // For now, we'll allow access (could be enhanced with state checking)
+      return true;
+    }
+
+    console.warn(`🔒 [SOCKET RBAC] Unknown role: ${userRole}, denying access`);
+    return false;
+  }, [user]);
+
+  // RBAC helper for notification events
+  const hasAccessToNotification = useCallback((notificationData) => {
+    // If it's a ticket-related notification, check ticket access
+    if (notificationData.ticketId) {
+      return hasAccessToTicket(notificationData);
+    }
+    
+    // For non-ticket notifications, allow based on role hierarchy
+    if (!user) return false;
+    
+    const userRole = user.role;
+    
+    // MACSOFT roles get all notifications
+    if (['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole)) {
+      return true;
+    }
+    
+    // Other roles get notifications based on their scope
+    return true; // Allow for now, can be refined based on notification type
+  }, [user, hasAccessToTicket]);
+
+  // RBAC helper for milestone events
+  const hasAccessToMilestone = useCallback((milestoneData) => {
+    if (!user || !milestoneData) return false;
+
+    const userRole = user.role;
+    const userId = user.id;
+
+    // MACSOFT roles have global access
+    if (['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole)) {
+      return true;
+    }
+
+    // For ticket-related milestones, use ticket access logic
+    if (milestoneData.ticketId) {
+      return hasAccessToTicket(milestoneData);
+    }
+
+    // For project milestones or other milestone types
+    // CUSTOMER_FIELD_ENGINEER: Only milestones for their created tickets/projects
+    if (userRole === 'CUSTOMER_FIELD_ENGINEER') {
+      return milestoneData.createdBy === userId || milestoneData.userId === userId;
+    }
+
+    // SERVICE_CENTER_TECHNICIAN: Only milestones for their service center
+    if (userRole === 'SERVICE_CENTER_TECHNICIAN') {
+      const userCenterCode = user.centerCode;
+      return userCenterCode && milestoneData.centerCode === userCenterCode;
+    }
+
+    // CUSTOMER_SERVICE_HEAD: Allow access based on state/region
+    if (userRole === 'CUSTOMER_SERVICE_HEAD') {
+      return true; // Allow access, could be refined with state checking
+    }
+
+    console.warn(`🔒 [SOCKET RBAC] Unknown role for milestone: ${userRole}, denying access`);
+    return false;
+  }, [user, hasAccessToTicket]);
+
   // Centralized function to handle message sound logic
   const playMessageSound = useCallback((messageData, eventType) => {
     console.log(`🎵 [SOCKET] playMessageSound called for ${eventType}:`, {
@@ -116,6 +209,15 @@ export const SocketProvider = ({ children }) => {
 
     const handleNotification = (event) => {
       const notificationData = event.detail;
+      
+      // RBAC: Check if user has access to this notification
+      if (!hasAccessToNotification(notificationData)) {
+        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to notification:`, notificationData);
+        return; // Don't process notification user doesn't have access to
+      }
+      
+      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to notification:`, notificationData);
+      
       // Check if notification is for current ticket
       const isCurrentTicketNotification = currentTicketId && notificationData.ticketId === currentTicketId;
 
@@ -133,6 +235,14 @@ export const SocketProvider = ({ children }) => {
 
     const handleBuzzerAlert = (event) => {
       const alertData = event.detail;
+      
+      // RBAC: Check if user has access to this buzzer alert
+      if (!hasAccessToTicket(alertData)) {
+        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to buzzer alert:`, alertData);
+        return; // Don't process alert user doesn't have access to
+      }
+      
+      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to buzzer alert:`, alertData);
 
       // Check if alert is for current ticket
       const isCurrentTicketAlert = currentTicketId && alertData.ticketId === currentTicketId;
@@ -151,6 +261,14 @@ export const SocketProvider = ({ children }) => {
 
     const handleConversation = (event) => {
       const messageData = event.detail;
+      
+      // RBAC: Check if user has access to this conversation
+      if (!hasAccessToTicket(messageData)) {
+        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to conversation:`, messageData);
+        return; // Don't process conversation user doesn't have access to
+      }
+      
+      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to conversation:`, messageData);
 
       // Use centralized sound logic
       const soundPlayed = playMessageSound(messageData, 'conversation');
@@ -170,6 +288,14 @@ export const SocketProvider = ({ children }) => {
 
     const handleMilestone = (event) => {
       const milestoneData = event.detail;
+      
+      // RBAC: Check if user has access to this milestone
+      if (!hasAccessToMilestone(milestoneData)) {
+        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to milestone:`, milestoneData);
+        return; // Don't process milestone user doesn't have access to
+      }
+      
+      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to milestone:`, milestoneData);
 
       // Play sound based on milestone type
       if (!muted) {
@@ -190,6 +316,14 @@ export const SocketProvider = ({ children }) => {
 
     const handleTicketMessageUpdate = (event) => {
       const messageData = event.detail;
+      
+      // RBAC: Check if user has access to this ticket message
+      if (!hasAccessToTicket(messageData)) {
+        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to ticket message:`, messageData);
+        return; // Don't process message user doesn't have access to
+      }
+      
+      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to ticket message:`, messageData);
 
       // Use centralized sound logic
       const soundPlayed = playMessageSound(messageData, 'ticket-message');
@@ -209,6 +343,14 @@ export const SocketProvider = ({ children }) => {
 
     const handleTicketCreated = (event) => {
       const ticketData = event.detail;
+      
+      // RBAC: Check if user has access to this newly created ticket
+      if (!hasAccessToTicket(ticketData)) {
+        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to new ticket:`, ticketData);
+        return; // Don't process ticket user doesn't have access to
+      }
+      
+      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to new ticket:`, ticketData);
 
       // Play sound for new ticket creation
       if (!muted) {

@@ -6,6 +6,37 @@ const {
   NOTIFICATION_TYPES,
 } = require("../lib/notificationUtils");
 
+// RBAC Socket emission helper for conversation events
+const emitConversationEventWithRBAC = (io, eventName, ticketData, eventData) => {
+  if (!io || !ticketData) return;
+  
+  const dataToEmit = eventData;
+  
+  // Always emit to MACSOFT roles (global access)
+  io.to('role-MACSOFT_ADMIN').emit(eventName, dataToEmit);
+  io.to('role-MACSOFT_HEAD').emit(eventName, dataToEmit);
+  io.to('role-MACSOFT_SUPPORT').emit(eventName, dataToEmit);
+  
+  // Emit to ticket creator (if they are a field engineer)
+  if (ticketData.createdBy) {
+    io.to(`notifications-${ticketData.createdBy}`).emit(eventName, dataToEmit);
+  }
+  
+  // Emit to assigned service center
+  if (ticketData.assignedServiceCenter) {
+    io.to(`center-${ticketData.assignedServiceCenter}`).emit(eventName, dataToEmit);
+  }
+  
+  // Emit to Customer Service Heads
+  io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
+  
+  // Also emit to conversation room for real-time chat
+  const conversationRoom = `conversation-${ticketData.id}`;
+  io.to(conversationRoom).emit(eventName, dataToEmit);
+  
+  console.log(`💬 [RBAC SOCKET] Emitted ${eventName} for ticket ${ticketData.ticketCode || ticketData.id} to authorized roles`);
+};
+
 const getConversations = async (ticketId) => {
   try {
     const conversations = await prisma.message.findMany({
@@ -166,12 +197,24 @@ const createConversation = async (conversation, userId, io, files = []) => {
       targetUserIds
     );
     if (io) {
-      // Emit to conversation room for this specific ticket
-      const conversationRoom = `conversation-${ticketId}`;
-      io.to(conversationRoom).emit("conversation", newMessage);
-
-      // Also emit to all clients as fallback
-      io.emit("conversation", newMessage);
+      // Get ticket data for RBAC emission
+      const ticketData = await prisma.ticket.findUnique({
+        where: { id: ticketId },
+        select: { 
+          id: true, 
+          ticketCode: true, 
+          createdBy: true, 
+          assignedServiceCenter: true 
+        }
+      });
+      
+      // Use RBAC-aware emission
+      if (ticketData) {
+        emitConversationEventWithRBAC(io, "conversation", ticketData, newMessage);
+      } else {
+        // Fallback if ticket not found
+        io.emit("conversation", newMessage);
+      }
 
       // Emit ticket message update for ticket cards
       const ticketMessageData = {
@@ -192,9 +235,14 @@ const createConversation = async (conversation, userId, io, files = []) => {
         }
       };
       
-      // Broadcast to all users to update ticket cards
-      io.emit("ticket-message", ticketMessageData);
-      console.log(`🎫 Emitted ticket-message update for ticket ${ticketId}`);
+      // Broadcast to authorized users to update ticket cards using RBAC
+      if (ticketData) {
+        emitConversationEventWithRBAC(io, "ticket-message", ticketData, ticketMessageData);
+      } else {
+        // Fallback if ticket not found
+        io.emit("ticket-message", ticketMessageData);
+      }
+      console.log(`🎫 Emitted RBAC ticket-message update for ticket ${ticketId}`);
     }
     return newMessage;
   } catch (error) {

@@ -9,6 +9,33 @@ const {
 const spareRequestService = require("./spareRequests");
 const { saveAndBroadcastNotification, createMilestoneNotification } = require("../lib/notificationUtils");
 
+// RBAC Socket emission helper for milestone events
+const emitMilestoneEventWithRBAC = (io, eventName, ticketData, eventData) => {
+  if (!io || !ticketData) return;
+  
+  const dataToEmit = eventData;
+  
+  // Always emit to MACSOFT roles (global access)
+  io.to('role-MACSOFT_ADMIN').emit(eventName, dataToEmit);
+  io.to('role-MACSOFT_HEAD').emit(eventName, dataToEmit);
+  io.to('role-MACSOFT_SUPPORT').emit(eventName, dataToEmit);
+  
+  // Emit to ticket creator (if they are a field engineer)
+  if (ticketData.createdBy) {
+    io.to(`notifications-${ticketData.createdBy}`).emit(eventName, dataToEmit);
+  }
+  
+  // Emit to assigned service center
+  if (ticketData.assignedServiceCenter) {
+    io.to(`center-${ticketData.assignedServiceCenter}`).emit(eventName, dataToEmit);
+  }
+  
+  // Emit to Customer Service Heads
+  io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
+  
+  console.log(`🏗️ [RBAC SOCKET] Emitted ${eventName} for ticket ${ticketData.ticketCode || ticketData.id} to authorized roles`);
+};
+
 const createMilestone = async (milestoneData, io) => {
   try {
     const milestone = await prisma.ticketMilestone.create({
@@ -424,16 +451,18 @@ const transitionMilestone = async (
         updateData.spareApprovalResult = spareApprovalResult;
       }
 
-      io.emit("milestone-updated", updateData);
+      // Use RBAC-aware emission
+      emitMilestoneEventWithRBAC(io, "milestone-updated", ticket, updateData);
 
       // Also emit spare request update for real-time UI updates
       if (targetStage === "SPARE_APPROVED" && spareApprovalResult) {
-        io.emit("spare-requests-bulk-approved", {
+        const spareEventData = {
           ticketCode: ticket.ticketCode,
           approvedBy: userId,
           timestamp: new Date().toISOString(),
           approvalResult: spareApprovalResult,
-        });
+        };
+        emitMilestoneEventWithRBAC(io, "spare-requests-bulk-approved", ticket, spareEventData);
       }
     }
 
