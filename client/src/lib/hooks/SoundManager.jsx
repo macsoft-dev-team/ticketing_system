@@ -1,6 +1,6 @@
 // src/lib/sound/SoundManager.jsx
 import React, { createContext, useContext, useRef, useCallback, useEffect, useState } from "react";
-    
+
 /**
  * SoundManager
  * - Preloads configured sounds
@@ -53,9 +53,7 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
         // Get call stack to identify caller
         const stack = new Error().stack;
         const caller = stack.split('\n')[2]?.trim() || 'unknown caller';
-        
-        console.log(`🎵 [SOUNDMANAGER] PLAY REQUESTED: "${key}" by ${caller}`);
-        
+         
         if (muted) {
             console.log(`🔇 [SOUNDMANAGER] MUTED - not playing "${key}"`);
             return;

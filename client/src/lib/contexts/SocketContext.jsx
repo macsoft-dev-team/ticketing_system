@@ -71,17 +71,17 @@ export const SocketProvider = ({ children }) => {
     if (notificationData.ticketId) {
       return hasAccessToTicket(notificationData);
     }
-    
+
     // For non-ticket notifications, allow based on role hierarchy
     if (!user) return false;
-    
+
     const userRole = user.role;
-    
+
     // MACSOFT roles get all notifications
     if (['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole)) {
       return true;
     }
-    
+
     // Other roles get notifications based on their scope
     return true; // Allow for now, can be refined based on notification type
   }, [user, hasAccessToTicket]);
@@ -126,32 +126,21 @@ export const SocketProvider = ({ children }) => {
 
   // Centralized function to handle message sound logic
   const playMessageSound = useCallback((messageData, eventType) => {
-    console.log(`🎵 [SOCKET] playMessageSound called for ${eventType}:`, {
-      ticketId: messageData.ticketId,
-      id: messageData.id,
-      createdAt: messageData.createdAt,
-      senderId: messageData.senderId
-    });
-
     // Create unique message identifier
     const messageKey = `${messageData.ticketId}-${messageData.id}-${messageData.createdAt}`;
-    console.log(`🔑 [SOCKET] Message key: ${messageKey}`);
 
     // Check if this message has already been processed for sound
     if (processedMessagesRef.current.has(messageKey)) {
-      console.log(`🔄 [SOCKET] DUPLICATE ${eventType} message - already processed, skipping sound (key: ${messageKey})`);
       return false; // Indicate sound was not played
     }
 
     // Mark message as processed for sound
     processedMessagesRef.current.add(messageKey);
-    console.log(`✅ [SOCKET] Marked message as processed: ${messageKey} (total processed: ${processedMessagesRef.current.size})`);
 
     // Clean up old message keys (keep only last 100)
     if (processedMessagesRef.current.size > 100) {
       const keysArray = Array.from(processedMessagesRef.current);
       keysArray.slice(0, 50).forEach(key => processedMessagesRef.current.delete(key));
-      console.log(`🧹 [SOCKET] Cleaned up processed messages, now have: ${processedMessagesRef.current.size}`);
     }
 
     // Determine which sound to play based on user location
@@ -163,23 +152,16 @@ export const SocketProvider = ({ children }) => {
     // Only play sound for messages from other users
     if (!muted && !isSentByCurrentUser) {
       if (isInSameTicket) {
-        console.log(`🔊 [SOCKET] Playing inbound_chime for receiver in same ticket (${eventType})`);
         play('inbound_chime');
       } else {
-        console.log(`🔊 [SOCKET] Playing message_tone for receiver outside chat (${eventType})`);
         play('message_tone');
       }
       return true; // Indicate sound was played
     } else {
-      console.log(`🔇 [SOCKET] Not playing sound - muted or sent by current user (${eventType})`);
       return false; // Indicate sound was not played
     }
   }, [currentTicketId, user, muted, play]);
 
-  // Debug currentTicketId changes
-  useEffect(() => {
-    console.log(`🎯 [SOCKET] Current ticket ID changed to: ${currentTicketId}`);
-  }, [currentTicketId]);
 
   const connect = () => {
     if (token && user && !isConnected) {
@@ -209,15 +191,12 @@ export const SocketProvider = ({ children }) => {
 
     const handleNotification = (event) => {
       const notificationData = event.detail;
-      
+
       // RBAC: Check if user has access to this notification
       if (!hasAccessToNotification(notificationData)) {
-        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to notification:`, notificationData);
         return; // Don't process notification user doesn't have access to
       }
-      
-      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to notification:`, notificationData);
-      
+
       // Check if notification is for current ticket
       const isCurrentTicketNotification = currentTicketId && notificationData.ticketId === currentTicketId;
 
@@ -235,14 +214,11 @@ export const SocketProvider = ({ children }) => {
 
     const handleBuzzerAlert = (event) => {
       const alertData = event.detail;
-      
+
       // RBAC: Check if user has access to this buzzer alert
       if (!hasAccessToTicket(alertData)) {
-        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to buzzer alert:`, alertData);
         return; // Don't process alert user doesn't have access to
       }
-      
-      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to buzzer alert:`, alertData);
 
       // Check if alert is for current ticket
       const isCurrentTicketAlert = currentTicketId && alertData.ticketId === currentTicketId;
@@ -261,14 +237,11 @@ export const SocketProvider = ({ children }) => {
 
     const handleConversation = (event) => {
       const messageData = event.detail;
-      
+
       // RBAC: Check if user has access to this conversation
       if (!hasAccessToTicket(messageData)) {
-        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to conversation:`, messageData);
         return; // Don't process conversation user doesn't have access to
       }
-      
-      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to conversation:`, messageData);
 
       // Use centralized sound logic
       const soundPlayed = playMessageSound(messageData, 'conversation');
@@ -288,14 +261,12 @@ export const SocketProvider = ({ children }) => {
 
     const handleMilestone = (event) => {
       const milestoneData = event.detail;
-      
+
       // RBAC: Check if user has access to this milestone
       if (!hasAccessToMilestone(milestoneData)) {
-        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to milestone:`, milestoneData);
         return; // Don't process milestone user doesn't have access to
       }
-      
-      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to milestone:`, milestoneData);
+
 
       // Play sound based on milestone type
       if (!muted) {
@@ -316,20 +287,15 @@ export const SocketProvider = ({ children }) => {
 
     const handleTicketMessageUpdate = (event) => {
       const messageData = event.detail;
-      
+
       // RBAC: Check if user has access to this ticket message
       if (!hasAccessToTicket(messageData)) {
-        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to ticket message:`, messageData);
         return; // Don't process message user doesn't have access to
       }
-      
-      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to ticket message:`, messageData);
 
       // Use centralized sound logic
       const soundPlayed = playMessageSound(messageData, 'ticket-message');
       const isSentByCurrentUser = user && messageData.senderId === user.id;
-
-      // Note: Outbound sound is now played in useConversation hook on send
 
       // Dispatch to components that need ticket message updates (for ticket cards)
       window.dispatchEvent(new CustomEvent('ticketMessageUpdate', {
@@ -343,14 +309,6 @@ export const SocketProvider = ({ children }) => {
 
     const handleTicketCreated = (event) => {
       const ticketData = event.detail;
-      
-      // RBAC: Check if user has access to this newly created ticket
-      if (!hasAccessToTicket(ticketData)) {
-        console.log(`🔒 [SOCKET RBAC] User ${user?.id} (${user?.role}) denied access to new ticket:`, ticketData);
-        return; // Don't process ticket user doesn't have access to
-      }
-      
-      console.log(`✅ [SOCKET RBAC] User ${user?.id} (${user?.role}) has access to new ticket:`, ticketData);
 
       // Play sound for new ticket creation
       if (!muted) {

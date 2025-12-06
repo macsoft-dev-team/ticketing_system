@@ -91,26 +91,12 @@ const NotificationBell = () => {
         });
 
         notificationSocket.on('notification', (notificationData) => {
-          console.log('🔔 [NOTIFICATION_BELL] Received notification:', notificationData);
-          
+           
           // Handle array of notifications (from conversation service)
           if (Array.isArray(notificationData)) {
             notificationData.forEach(item => {
               // Check if this is a message notification for current ticket - suppress if user is in same chat
-              const currentTicketId = window.currentTicketId;
-              if (item.notification?.type === 'message' && item.notification?.ticketId && currentTicketId) {
-                // Handle both string and number comparisons
-                const itemTicketId = parseInt(item.notification.ticketId);
-                const currTicketId = parseInt(currentTicketId);
-                if (itemTicketId === currTicketId) {
-                  console.log(`🔕 [NOTIFICATION_BELL] User in same ticket ${currTicketId} - suppressing toast but allowing sound`);
-                  
-                  // Suppress both sound and toast/notification list (sound handled by SocketContext)
-                  console.log('🔇 [NOTIFICATION_BELL] Suppressing sound and toast for same ticket message (SocketContext handles sound)');
-                  return; // Skip adding to notification list (suppress toast)
-                }
-              }
-
+  
               const newNotification = {
                 id: item.id || Date.now(),
                 title: item.notification?.title || 'New Message',
@@ -122,13 +108,11 @@ const NotificationBell = () => {
                 ticketCode: item.notification?.ticket?.ticketCode,
               };
 
-              console.log('📨 [NOTIFICATION_BELL] Adding notification to list');
-              setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
+               setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
               setUnreadCount(prev => prev + 1);
 
               // Play notification sound ONLY if not suppressed
-              console.log('🔊 [NOTIFICATION_BELL] Playing notification sound');
-              try {
+               try {
                 const audio = new Audio('/sounds/notification-sound-269266.mp3');
                 audio.volume = 0.3;
                 audio.play().catch(console.error);
@@ -144,11 +128,7 @@ const NotificationBell = () => {
               const notifTicketId = parseInt(notificationData.ticketId);
               const currTicketId = parseInt(currentTicketId);
               if (notifTicketId === currTicketId) {
-                console.log(`🔕 [NOTIFICATION_BELL] User in same ticket ${currTicketId} - suppressing toast but allowing sound`);
-                
-                // Suppress both sound and toast/notification list (sound handled by SocketContext)
-                console.log('🔇 [NOTIFICATION_BELL] Suppressing sound and toast for same ticket message (SocketContext handles sound)');
-                return; // Skip adding to notification list (suppress toast)
+                 return; // Skip adding to notification list (suppress toast)
               }
             }
 
@@ -164,13 +144,11 @@ const NotificationBell = () => {
               ticketCode: notificationData.ticketCode,
             };
 
-            console.log('📨 [NOTIFICATION_BELL] Adding single notification to list');
-            setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
+             setNotifications(prev => [newNotification, ...prev.slice(0, 19)]);
             setUnreadCount(prev => prev + 1);
 
             // Play notification sound ONLY if not suppressed
-            console.log('🔊 [NOTIFICATION_BELL] Playing single notification sound');
-            try {
+             try {
               const audio = new Audio('/sounds/notification-sound-269266.mp3');
               audio.volume = 0.3;
               audio.play().catch(console.error);

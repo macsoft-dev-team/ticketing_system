@@ -26,10 +26,10 @@ const NotificationBell = () => {
 
   // Sound manager for notification sounds
   const { play } = useSoundManager();
-  
+
   // Toast notifications for visual feedback
   const { addToast } = useToast();
-  
+
   // Socket context for current ticket tracking
   const { currentTicketId } = useSocket();
 
@@ -61,33 +61,26 @@ const NotificationBell = () => {
   // Detect new notifications and show toast + play sound
   useEffect(() => {
     const currentCount = socketNotifications.length;
-    
+
     // Check if we have new notifications
     if (currentCount > lastNotificationCount && lastNotificationCount > 0) {
       const newNotifications = socketNotifications.slice(0, currentCount - lastNotificationCount);
-      
+
       newNotifications.forEach(notification => {
         if (!notification.seen) {
-          console.log('🔔 [TOPBAR_NOTIFICATION_BELL] New notification received:', notification.title, 'ticketId:', notification.ticketId);
-          console.log('🎯 [TOPBAR_NOTIFICATION_BELL] Current ticket ID:', currentTicketId);
-          
           // Check if notification is related to current ticket (handle both string and number types)
           const notifTicketId = parseInt(notification.ticketId);
           const currTicketId = parseInt(currentTicketId);
           const metaTicketId = notification.metadata?.ticketId ? parseInt(notification.metadata.ticketId) : null;
-          const isCurrentTicketNotification = currentTicketId && 
-            (notifTicketId === currTicketId || 
-             (metaTicketId && metaTicketId === currTicketId));
-          
+          const isCurrentTicketNotification = currentTicketId &&
+            (notifTicketId === currTicketId ||
+              (metaTicketId && metaTicketId === currTicketId));
+
           if (isCurrentTicketNotification) {
-            console.log(`🔇 [TOPBAR_NOTIFICATION_BELL] User in same ticket - suppressing both sound and toast (SocketContext handles sound)`);
             // Suppress both sound and toast for same ticket (SocketContext handles sound)
             // But don't show toast for same ticket
           } else {
-            console.log('🔇 [TOPBAR_NOTIFICATION_BELL] Suppressing sound for different ticket (SocketContext handles sound), showing toast only');
-            // Suppress sound for different tickets too (SocketContext handles all message sounds)
-            // play('message_tone'); // Disabled - SocketContext handles this
-            
+
             // Show toast notification for different tickets
             addToast({
               id: `notification-${notification.id}`,
@@ -100,7 +93,7 @@ const NotificationBell = () => {
         }
       });
     }
-    
+
     setLastNotificationCount(currentCount);
   }, [socketNotifications, lastNotificationCount, play, addToast]);
 
@@ -108,10 +101,6 @@ const NotificationBell = () => {
   useEffect(() => {
     if (unreadCount > 0 && notifications.length > 0) {
       const latestNotification = notifications[0];
-      if (latestNotification && latestNotification.unread) {
-        console.log('🔔 Unread notification detected:', latestNotification.title);
-        // Sound is already played in the above effect, so we just log here
-      }
     }
   }, [unreadCount, notifications]);
 
@@ -160,7 +149,7 @@ const NotificationBell = () => {
 
     fetchNotifications();
   }, [token, socketNotifications]);
-  
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -266,8 +255,6 @@ const NotificationBell = () => {
           console.warn('Could not mark notifications as read on server:', error);
         }
       }
-
-      console.log('✅ Marked all notifications as read');
     } catch (error) {
       console.error('Error marking notifications as read:', error);
     }
@@ -278,7 +265,7 @@ const NotificationBell = () => {
     // Mark as read if unread using socket system
     if (notification.unread) {
       markNotificationAsRead(notification.id);
-      
+
       // Also try to mark as read on server if possible
       if (token) {
         try {
@@ -294,8 +281,6 @@ const NotificationBell = () => {
           console.warn('Could not mark notification as read on server:', error);
         }
       }
-      
-      console.log('✅ Marked notification as read:', notification.title);
     }
 
     // Navigate to the appropriate page based on notification type and data
@@ -438,7 +423,7 @@ const NotificationBell = () => {
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-              <div 
+              <div
                 className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
                 title={isConnected ? 'Real-time connected' : 'Disconnected - using cached data'}
               />
@@ -474,9 +459,8 @@ const NotificationBell = () => {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      notification.unread ? 'bg-blue-50' : ''
-                    }`}
+                    className={`p-3 hover:bg-gray-50 cursor-pointer transition-colors ${notification.unread ? 'bg-blue-50' : ''
+                      }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start space-x-3">

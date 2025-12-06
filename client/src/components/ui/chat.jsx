@@ -45,7 +45,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   const getIcon = (attachment) => {
     const mimeType = attachment.fileType || attachment.type || '';
     const fileName = attachment.fileName || attachment.name || '';
-    
+
     if (mimeType.startsWith('image/') || attachment.type === 'image') {
       return '🖼️';
     } else if (mimeType.startsWith('video/') || attachment.type === 'video' || /\.(mp4|mov|avi|webm)$/i.test(fileName)) {
@@ -120,8 +120,8 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
     <motion.div
       whileHover={{ scale: 1.02 }}
       className={`flex items-center gap-2 p-2 rounded-lg transition-colors mb-1 ${isOwnMessage
-          ? 'bg-blue-400'
-          : 'bg-gray-200'
+        ? 'bg-blue-400'
+        : 'bg-gray-200'
         }`}
     >
       <span className="text-sm">{getIcon(attachment)}</span>
@@ -137,7 +137,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
         <button
           onClick={handlePreview}
           className={`p-1 rounded transition-colors ${isOwnMessage
-              ? 'text-white hover:text-blue-100'
+            ? 'text-white hover:text-blue-100'
             : 'text-gray-600 hover:text-gray-800 cursor-pointer '
             }`}
           title="Preview"
@@ -148,9 +148,9 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
           onClick={handleDownload}
           disabled={isDownloading}
           className={`p-1 rounded transition-colors ${isDownloading
-              ? 'opacity-50 cursor-not-allowed'
-              : isOwnMessage
-                ? 'text-white hover:text-blue-100'
+            ? 'opacity-50 cursor-not-allowed'
+            : isOwnMessage
+              ? 'text-white hover:text-blue-100'
               : 'text-gray-600 hover:text-gray-800 cursor-pointer '
             }`}
           title={isDownloading ? 'Downloading...' : 'Download'}
@@ -162,7 +162,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
               className="w-3 h-3 border border-current border-t-transparent rounded-full"
             />
           ) : (
-              <Download className="w-3 h-3" />
+            <Download className="w-3 h-3" />
           )}
         </button>
       </div>
@@ -183,8 +183,8 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
       </div>
       <div className={`flex flex-col max-w-[75%] sm:max-w-[70%] ${isOwnMessage ? 'items-end' : ''}`}>
         <div className={`px-3 sm:px-4 py-2 rounded-2xl ${isOwnMessage
-            ? 'bg-blue-500 text-white rounded-br-md'
-            : 'bg-gray-100 text-gray-900 rounded-bl-md'
+          ? 'bg-blue-500 text-white rounded-br-md'
+          : 'bg-gray-100 text-gray-900 rounded-bl-md'
           }`}>
           {message && <p className="text-xs sm:text-sm">{message}</p>}
           {attachments && attachments.length > 0 && (
@@ -219,40 +219,33 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   const fileInputRef = useRef(null);
   const { toast } = useToast();
   const { play, muted } = useSoundManager();
-  
+
   // Load media upload configuration on component mount
-/*   useEffect(() => {
-    const loadMediaConfig = async () => {
-      try {
-        const enabled = await isMediaUploadEnabled();
-        const videoDuration = await getMaxVideoDuration();
-        const audioDuration = await getMaxAudioDuration();
-        
-        setMediaUploadEnabled(enabled);
-        setMaxVideoDuration(videoDuration);
-        setMaxAudioDuration(audioDuration);
-      } catch (error) {
-        console.warn('Failed to load media config:', error);
-        // Fallback to environment variables
-        setMediaUploadEnabled(import.meta.env.VITE_ENABLE_MEDIA_UPLOAD === 'true');
-      }
-    };
-    
-    loadMediaConfig();
-  }, []); */
+  /*   useEffect(() => {
+      const loadMediaConfig = async () => {
+        try {
+          const enabled = await isMediaUploadEnabled();
+          const videoDuration = await getMaxVideoDuration();
+          const audioDuration = await getMaxAudioDuration();
+          
+          setMediaUploadEnabled(enabled);
+          setMaxVideoDuration(videoDuration);
+          setMaxAudioDuration(audioDuration);
+        } catch (error) {
+          console.warn('Failed to load media config:', error);
+          // Fallback to environment variables
+          setMediaUploadEnabled(import.meta.env.VITE_ENABLE_MEDIA_UPLOAD === 'true');
+        }
+      };
+      
+      loadMediaConfig();
+    }, []); */
 
   const handleSend = () => {
     if (message.trim() || attachments.length > 0) {
-      console.log('📤 [CHAT] User sending message - playing outbound sound');
-      
-      // Play outbound sound immediately when user sends message
       if (!muted) {
-        console.log('🔊 [CHAT] Playing outbound_chime');
         play('outbound_chime');
-      } else {
-        console.log('🔇 [CHAT] Muted - not playing outbound sound');
       }
-      
       onSendMessage(message.trim(), attachments);
       setMessage('');
       setAttachments([]);
@@ -268,7 +261,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    
+
     // Check if any files are media files when media upload is disabled
     if (!mediaUploadEnabled) {
       const mediaFiles = files.filter(file => {
@@ -276,26 +269,26 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(file.name);
         return isVideo || isAudio;
       });
-      
+
       if (mediaFiles.length > 0) {
         toast({
           title: "Video/Voice Upload Not Enabled",
           description: `${mediaFiles.length === 1 ? 'This file type is' : 'These file types are'} not supported. Video and audio upload features are disabled. Please contact your administrator.`,
           variant: "destructive"
         });
-        
+
         // Filter out media files
         const allowedFiles = files.filter(file => {
           const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|webm)$/i.test(file.name);
           const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(file.name);
           return !isVideo && !isAudio;
         });
-        
+
         setAttachments(prev => [...prev, ...allowedFiles]);
         return;
       }
     }
-    
+
     setAttachments(prev => [...prev, ...files]);
   };
 
@@ -391,7 +384,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             onChange={handleFileSelect}
             multiple
             className="hidden"
-            accept={mediaUploadEnabled 
+            accept={mediaUploadEnabled
               ? "image/*,.pdf,.doc,.docx,.txt,.mp4,.mov,.avi,.webm,.mp3,.wav,.ogg,.m4a"
               : "image/*,.pdf,.doc,.docx,.txt"
             }
@@ -503,7 +496,7 @@ export const ChatWindow = ({
   useEffect(() => {
     if (!onMarkMessagesAsSeen || !currentUserId || !messages.length) return;
 
-    const unreadMessages = messages.filter(message => 
+    const unreadMessages = messages.filter(message =>
       message.senderId !== currentUserId && // Don't mark own messages
       !message.seenBy?.some(seen => seen.userId === currentUserId) // Not already seen
     );
@@ -537,7 +530,7 @@ export const ChatWindow = ({
             <h3 className="text-sm sm:text-base font-semibold text-gray-900">
               {ticketStatus === 'closed' && showChatHistory ? 'Chat History' : <div>
                 Conversation
-                </div>}
+              </div>}
             </h3>
             {ticketStatus === 'closed' && showChatHistory && (
               <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
@@ -576,7 +569,7 @@ export const ChatWindow = ({
           </div>
         </div>
 
-       {/*  {autoCloseTimer && (
+        {/*  {autoCloseTimer && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -638,7 +631,7 @@ export const ChatWindow = ({
               exit={{ opacity: 0, y: 10 }}
               className="flex gap-3 mb-4"
             >
-            {/*   <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-sm">
+              {/*   <div className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-sm">
                  T
               </div> */}
               <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">

@@ -6,9 +6,9 @@ import { useSoundManager } from '../hooks/SoundManager';
 const BuzzerAlertsContext = createContext({
   isEnabled: true,
   alerts: [],
-  toggleBuzzer: () => {},
-  dismissAlert: () => {},
-  clearAllAlerts: () => {}
+  toggleBuzzer: () => { },
+  dismissAlert: () => { },
+  clearAllAlerts: () => { }
 });
 
 export const useBuzzerAlerts = () => {
@@ -31,30 +31,20 @@ export const BuzzerAlertsProvider = ({ children }) => {
 
   // Play buzzer sound using SoundManager
   const playBuzzer = () => {
-    if (!isEnabled) {
-      console.log('🔇 Buzzer disabled, skipping sound');
-      return;
-    }
-
     try {
-      console.log('🔔 Playing buzzer alert sound...');
-      
       // Get current volume and boost to maximum for buzzer alerts
       const originalVolume = getVolume();
-      console.log(`🔊 Original volume: ${originalVolume}, setting to 100% for buzzer alert`);
-      
+
       setVolume(1.0); // Set to maximum volume (100%)
-      
+
       // Play the critical notification sound at full volume
       play('notify_critical');
-      console.log('✅ Buzzer sound play() called successfully at full volume');
-      
+
       // Restore original volume after 5 seconds
       setTimeout(() => {
-        console.log(`🔊 Restoring original volume: ${originalVolume}`);
         setVolume(originalVolume);
       }, 5000);
-      
+
     } catch (error) {
       console.warn('❌ Could not play buzzer sound:', error);
     }
@@ -82,21 +72,18 @@ export const BuzzerAlertsProvider = ({ children }) => {
 
   // Handle new buzzer alert
   const handleBuzzerAlert = (alertData) => {
-    console.log('🔔 Buzzer Alert Received:', alertData);
-
-    // Only process alerts for specific Macsoft roles (exclude MACSOFT_ADMIN)
+     // Only process alerts for specific Macsoft roles (exclude MACSOFT_ADMIN)
     const allowedRoles = ['MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
     if (!user || !allowedRoles.includes(user.role)) {
-      console.log(`🚫 Buzzer alert ignored for role: ${user?.role || 'undefined'}`);
-      return;
+       return;
     }
 
     // Check if alert already exists
     const existingAlert = alerts.find(alert => alert.ticketId === alertData.ticketId);
     if (existingAlert) {
       // Update existing alert with latest data
-      setAlerts(prev => prev.map(alert => 
-        alert.ticketId === alertData.ticketId 
+      setAlerts(prev => prev.map(alert =>
+        alert.ticketId === alertData.ticketId
           ? { ...alertData, id: alert.id, receivedAt: alert.receivedAt }
           : alert
       ));
@@ -132,7 +119,7 @@ export const BuzzerAlertsProvider = ({ children }) => {
     const newEnabled = !isEnabled;
     setIsEnabled(newEnabled);
     localStorage.setItem('buzzerEnabled', newEnabled.toString());
-    
+
     if (buzzerIntervalRef.current) {
       clearInterval(buzzerIntervalRef.current);
       buzzerIntervalRef.current = null;
