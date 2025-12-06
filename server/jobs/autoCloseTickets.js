@@ -29,15 +29,29 @@ const autoCloseTickets = async () => {
   try {
     console.log('Starting auto-close ticket job...');
     
-    // Get current timestamp and 48 hours ago
-    const now = new Date();
-    const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
+    // Get current timestamp in UTC (as stored in database)
+    const nowUTC = new Date();
     
-    // Find open/in-progress tickets that have messages
+    // Calculate 48 hours ago in UTC (since database stores UTC)
+    const fortyEightHoursAgoUTC = new Date(nowUTC.getTime() - (48 * 60 * 60 * 1000));
+    
+    // For logging purposes, show IST times
+    const istNow = new Date(nowUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const fortyEightHoursAgoIST = new Date(fortyEightHoursAgoUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    
+    console.log(`Current UTC time: ${nowUTC.toISOString()}`);
+    console.log(`Current IST time: ${istNow.toLocaleString()}`);
+    console.log(`48 hours ago UTC: ${fortyEightHoursAgoUTC.toISOString()}`);
+    console.log(`48 hours ago IST: ${fortyEightHoursAgoIST.toLocaleString()}`);
+    
+    // Find open/in-progress tickets that were created more than 48 hours ago and have messages
     const candidateTickets = await prisma.ticket.findMany({
       where: {
         status: {
-          in: ['OPEN', 'IN_PROGRESS']
+          in: ['OPEN']
+        },
+        createdAt: {
+          lt: fortyEightHoursAgoUTC // Only tickets created more than 48 hours ago
         },
         messages: {
           some: {} // Has at least one message
@@ -82,10 +96,11 @@ const autoCloseTickets = async () => {
       
       if (!isLastMessageFromMacsoft) continue;
       
-      // Check if the last message is older than 48 hours
-      const isOlderThan48Hours = lastMessage.createdAt < fortyEightHoursAgo;
+      // For logging, show ticket creation time and last message time in IST
+      const ticketCreatedIST = new Date(ticket.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+      const messageTimeIST = new Date(lastMessage.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
       
-      if (!isOlderThan48Hours) continue;
+      console.log(`Checking ticket ${ticket.ticketCode}: Created at ${ticketCreatedIST.toLocaleString()} IST, Last message at ${messageTimeIST.toLocaleString()} IST, 48h cutoff: ${fortyEightHoursAgoIST.toLocaleString()} IST`);
       
       // Check if there are any customer messages after the last Macsoft message
       const hasCustomerResponseAfterMacsoft = ticket.messages.some(message => {
@@ -118,7 +133,7 @@ const autoCloseTickets = async () => {
             in: ['SPARE_REQUESTED', 'SPARE_APPROVED', 'PARTIALY_SPARE_APPROVED']
           },
           status: {
-            in: ['PENDING', 'IN_PROGRESS'] // Active milestones
+            in: ['PENDING'] // Active milestones
           }
         }
       });
@@ -204,7 +219,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
           startedAt: new Date(),
           completedAt: new Date(),
           changedBy: 1, // System user ID
-          notes: `Automatically closed due to no customer response within 48 hours of last Macsoft reply on ${lastMessage.createdAt.toLocaleString()}.`
+          notes: `Automatically closed due to no customer response within 48 hours of last Macsoft reply on ${new Date(lastMessage.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"})).toLocaleString()} IST.`
         }
       });
       
@@ -214,10 +229,11 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
     }
     
     // Create a system message indicating auto-closure
+    const lastMessageIST = new Date(lastMessage.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
     const systemMessage = await prisma.message.create({
       data: {
-        content: `Ticket automatically closed due to no customer response within 48 hours of last Macsoft reply on ${lastMessage.createdAt.toLocaleString()}.`,
-        senderId: 19, // System user ID
+        content: `Ticket automatically closed due to no customer response within 48 hours of last Macsoft reply on ${lastMessageIST.toLocaleString()} IST.`,
+        senderId: 1, // System user ID (changed from 19 to 1 for consistency)
         ticketId: ticket.id
       }
     });
@@ -333,18 +349,18 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
  */
 const getCandidateTicketsForClosure = async () => {
   try {
-    const now = new Date();
-    const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
+    const nowUTC = new Date();
+    const fortyEightHoursAgoUTC = new Date(nowUTC.getTime() - (48 * 60 * 60 * 1000));
     
     const candidates = await prisma.ticket.findMany({
       where: {
         status: {
-          in: ['OPEN', 'IN_PROGRESS']
+          in: ['OPEN']
         },
         messages: {
           some: {
             createdAt: {
-              lt: fortyEightHoursAgo
+              lt: fortyEightHoursAgoUTC
             },
             sender: {
               role: {

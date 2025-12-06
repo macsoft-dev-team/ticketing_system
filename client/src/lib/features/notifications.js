@@ -140,6 +140,22 @@ export const markAllAsRead = createAsyncThunk(
   }
 );
 
+export const markTicketNotificationsAsSeen = createAsyncThunk(
+  "notifications/markTicketNotificationsAsSeen",
+  async (ticketId, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `${API_ENDPOINTS.notifications}/ticket/${ticketId}/mark-seen`,
+        {},
+        { withCredentials: true }
+      );
+      return { ticketId, ...response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 export const notificationsSlice = createSlice({
   name: "notifications",
   initialState: notificationsState,
@@ -330,6 +346,25 @@ export const notificationsSlice = createSlice({
       .addCase(markAllAsRead.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to mark all notifications as read";
+      })
+      .addCase(markTicketNotificationsAsSeen.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(markTicketNotificationsAsSeen.fulfilled, (state, action) => {
+        const { ticketId, data } = action.payload;
+        // Mark ticket-related notifications as seen
+        state.notifications.forEach(notification => {
+          if (notification.notification?.ticketId === parseInt(ticketId) && !notification.seen) {
+            notification.seen = true;
+            notification.seenAt = new Date().toISOString();
+          }
+        });
+        // Update unread count
+        const newUnreadCount = state.notifications.filter(n => !n.seen).length;
+        state.unreadCount = newUnreadCount;
+      })
+      .addCase(markTicketNotificationsAsSeen.rejected, (state, action) => {
+        state.error = action.payload || "Failed to mark ticket notifications as seen";
       });
   },
 });

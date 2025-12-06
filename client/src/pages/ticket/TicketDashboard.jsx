@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import moment from 'moment';
 import MilestoneTimeline from '../../components/MilestoneTimeline';
 import PhotoUploadModal from '../../components/PhotoUploadModal';
@@ -47,6 +48,7 @@ import {
   getProductInventoryDetails,
   getProductTransactionHistory
 } from '../../lib/api/spareApproval';
+import { markTicketNotificationsAsSeen } from '../../lib/features/notifications';
 
 // Helper function to format file size
 const formatFileSize = (bytes) => {
@@ -283,9 +285,10 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
 };
 
 export default function TicketDashboard() {
+  const dispatch = useDispatch();
   const { ticket, fetchTicketById, updateMilestone, loading, error } = useTickets();
   const { user, token } = useAuth();
-  const { setCurrentTicketId } = useSocket();
+  const { setCurrentTicketId, markTicketNotificationsAsRead } = useSocket();
   const { addToast } = useToast();
   const { ticketId } = useParams();
   const navigate = useNavigate();
@@ -366,6 +369,30 @@ export default function TicketDashboard() {
       };
     }
   }, [ticketId, setCurrentTicketId]);
+
+  // Mark ticket-related notifications as seen when entering the ticket dashboard
+  useEffect(() => {
+    if (ticketId && user?.id) {
+      console.log(`🔔 [TICKET-DASHBOARD] Marking notifications as seen for ticket: ${ticketId}`);
+      
+      // Update socket context state immediately for instant UI feedback
+      markTicketNotificationsAsRead(ticketId);
+      
+      // Then update database and Redux store
+      dispatch(markTicketNotificationsAsSeen(ticketId))
+        .unwrap()
+        .then((result) => {
+          if (result.data.count > 0) {
+            console.log(`🔔 [TICKET-DASHBOARD] Marked ${result.data.count} notifications as seen for ticket ${ticketId}`);
+          }
+        })
+        .catch((error) => {
+          console.error('🔔 [TICKET-DASHBOARD] Error marking notifications as seen:', error);
+          // On error, you might want to revert the socket context state if needed
+          // For now, we'll log the error and let the next refresh fix any inconsistency
+        });
+    }
+  }, [ticketId, user?.id, dispatch, markTicketNotificationsAsRead]);
 
   // Auto-close timer simulation - only trigger when last message changes
   useEffect(() => {

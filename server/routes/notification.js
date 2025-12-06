@@ -7,5 +7,6 @@ router.get("/", authenticate, notificationController.getNotifications);
 router.get("/counts", authenticate, notificationController.getNotificationCounts);
 router.put("/:id", authenticate, notificationController.updateNotification);
 router.patch("/:id/read", authenticate, notificationController.markNotificationAsRead);
+router.patch("/ticket/:ticketId/mark-seen", authenticate, notificationController.markTicketNotificationsAsSeen);
 
 module.exports = router;

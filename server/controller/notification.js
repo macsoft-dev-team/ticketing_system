@@ -83,9 +83,30 @@ const markNotificationAsRead = async (req, res) => {
     }
 }
 
+const markTicketNotificationsAsSeen = async (req, res) => {
+    const { ticketId } = req.params;
+    const userId = req.user.id;
+    
+    try {
+        const result = await notificationService.markTicketNotificationsAsSeen(parseInt(ticketId), userId);
+        res.status(200).json({
+            success: true,
+            data: result,
+            message: result.message
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            message: error.message || "Internal server error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+}
+
 module.exports = {
     getNotifications,
     updateNotification,
     getNotificationCounts,
     markNotificationAsRead,
+    markTicketNotificationsAsSeen,
 };

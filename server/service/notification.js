@@ -219,9 +219,50 @@ const markNotificationAsRead = async (notificationId, userId) => {
   }
 };
 
+const markTicketNotificationsAsSeen = async (ticketId, userId) => {
+  try {
+    // Find all unseen notifications for this ticket and user
+    const recipients = await prisma.notificationRecipient.findMany({
+      where: {
+        userId: userId,
+        seen: false,
+        notification: {
+          ticketId: ticketId,
+        },
+      },
+    });
+
+    if (recipients.length === 0) {
+      return { count: 0, message: 'No unseen notifications found for this ticket' };
+    }
+
+    // Mark all as seen
+    const recipientIds = recipients.map(r => r.id);
+    const result = await prisma.notificationRecipient.updateMany({
+      where: {
+        id: {
+          in: recipientIds,
+        },
+      },
+      data: {
+        seen: true,
+        seenAt: new Date(),
+      },
+    });
+
+    return { 
+      count: result.count, 
+      message: `Marked ${result.count} notifications as seen for ticket ${ticketId}` 
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getNotifications,
   updateNotification,
   getNotificationCounts,
   markNotificationAsRead,
+  markTicketNotificationsAsSeen,
 };

@@ -11,7 +11,11 @@ const SocketContext = createContext({
   joinConversation: () => { },
   leaveConversation: () => { },
   notifications: [],
-  buzzerAlerts: []
+  buzzerAlerts: [],
+  markNotificationAsRead: () => { },
+  markTicketNotificationsAsRead: () => { },
+  clearNotifications: () => { },
+  clearBuzzerAlerts: () => { }
 });
 
 export const useSocket = () => {
@@ -395,6 +399,17 @@ export const SocketProvider = ({ children }) => {
     );
   };
 
+  // Helper function to mark all ticket notifications as read
+  const markTicketNotificationsAsRead = (ticketId) => {
+    setNotifications(prev =>
+      prev.map(notif =>
+        notif.ticketId === parseInt(ticketId)
+          ? { ...notif, seen: true }
+          : notif
+      )
+    );
+  };
+
   // Helper function to clear buzzer alerts
   const clearBuzzerAlerts = () => {
     setBuzzerAlerts([]);
@@ -411,6 +426,7 @@ export const SocketProvider = ({ children }) => {
     buzzerAlerts,
     clearNotifications,
     markNotificationAsRead,
+    markTicketNotificationsAsRead,
     clearBuzzerAlerts,
     unreadNotifications: notifications.filter(n => !n.seen).length,
     activeAlerts: buzzerAlerts.length,
