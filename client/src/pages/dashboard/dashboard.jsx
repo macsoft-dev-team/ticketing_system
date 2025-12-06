@@ -1105,10 +1105,10 @@ export default function Dashboard() {
           )}
 
           {/* Socket Activities Test Panel - Only for development/testing */}
-          {user?.role === 'MACSOFT_ADMIN' && (
+        {/*   {user?.role === 'MACSOFT_ADMIN' && (
             <SocketTestPanel />
           )}
-                
+             */}    
         </div>
       </div>
     </div>
