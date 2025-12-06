@@ -172,6 +172,29 @@ const createConversation = async (conversation, userId, io, files = []) => {
 
       // Also emit to all clients as fallback
       io.emit("conversation", newMessage);
+
+      // Emit ticket message update for ticket cards
+      const ticketMessageData = {
+        ticketId: ticketId,
+        id: newMessage.id,
+        content: newMessage.content,
+        createdAt: newMessage.createdAt,
+        senderId: newMessage.senderId,
+        sender: newMessage.sender,
+        attachments: newMessage.attachments || [],
+        seenBy: newMessage.seenBy || [],
+        // Additional ticket-level data
+        ticketUpdates: {
+          lastMessageAt: newMessage.createdAt,
+          lastMessageBy: newMessage.sender?.name || 'Unknown',
+          hasNewMessage: true,
+          lastActivity: newMessage.createdAt
+        }
+      };
+      
+      // Broadcast to all users to update ticket cards
+      io.emit("ticket-message", ticketMessageData);
+      console.log(`🎫 Emitted ticket-message update for ticket ${ticketId}`);
     }
     return newMessage;
   } catch (error) {

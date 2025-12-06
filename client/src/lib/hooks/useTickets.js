@@ -10,6 +10,8 @@ import {
   updateMilestone as updateMilestoneAction,
   setCurrentPage,
   searchTickets,
+  updateTicketLastMessage,
+  addNewTicketFromSocket,
 } from "../features/tickets";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -75,6 +77,25 @@ function useTickets() {
     return dispatch(searchTickets(keyword));
   };
 
+  const updateLastMessage = (ticketId, messageData, ticketUpdates = {}) => {
+    dispatch(updateTicketLastMessage({ ticketId, messageData, ticketUpdates }));
+  };
+
+  const updateTicketWithMessage = (ticketId, messageData, additionalUpdates = {}) => {
+    // Enhanced function to update both message and ticket data
+    const ticketUpdates = {
+      lastActivity: new Date().toISOString(),
+      hasUnreadMessages: messageData.senderId !== undefined, // Simplified check
+      ...additionalUpdates
+    };
+    
+    dispatch(updateTicketLastMessage({ ticketId, messageData, ticketUpdates }));
+  };
+
+  const addNewTicket = (ticketData) => {
+    dispatch(addNewTicketFromSocket(ticketData));
+  };
+
   return {
     tickets,
     currentPage,
@@ -101,6 +122,9 @@ function useTickets() {
     updateMilestone,
     setCurrentPage: setCurrentPageNumber,
     searchTickets: searchTicketsAPI,
+    updateLastMessage,
+    updateTicketWithMessage,
+    addNewTicket,
   };
 }
 export default useTickets;

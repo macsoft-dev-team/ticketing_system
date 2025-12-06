@@ -14,13 +14,13 @@ const Layout = () => {
     };
 
     // Auto refresh page every 5 minutes to prevent stale data
-   useEffect(() => {
+/*    useEffect(() => {
         const interval = setInterval(() => {
             window.location.reload();
         }, 5 * 60 * 1000); // 5 minutes
         return () => clearInterval(interval);
     }, []);
-
+ */
 
     return (
         <div className="flex h-screen bg-gray-50">

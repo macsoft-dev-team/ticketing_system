@@ -175,6 +175,21 @@ export default function TicketCard({
                 </motion.div>
             )}
 
+            {/* New ticket indicator */}
+            {ticket.isNewTicket && (
+                <motion.div
+                    initial={{ scale: 0, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: "spring", damping: 15 }}
+                    className="absolute -top-1 -left-1 z-20"
+                >
+                    <div className="bg-green-500 text-white text-xs ps-3 tracking-wide  px-2 pt-1 pb-0.5 rounded-br-md rounded-tl-xl font-medium shadow-sm ">
+                        <span className='animate-pulse'>New</span> 
+                    </div>
+                </motion.div>
+            )}
+
             {/* Content */}
             <div className="relative z-10 h-full flex flex-col p-5">
                 {/* Header */}
@@ -326,6 +341,9 @@ export default function TicketCard({
                         <div className="flex items-center gap-2 text-slate-400 text-xs">
                             <Clock className="w-3 h-3" />
                             <span>Updated {moment(ticket.updatedAt).fromNow()}</span>
+                            {ticket.hasNewActivity && (
+                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Recent activity" />
+                            )}
                         </div>
 
                         <AnimatePresence>

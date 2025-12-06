@@ -1,12 +1,56 @@
-// Notification broadcasting utility
-const broadcastNotification = (io, notificationData) => {
-  // If targetUserId is specified, send to specific user's notification room
-  if (notificationData.targetUserId) {
-    const userRoom = `notifications-${notificationData.targetUserId}`;
+// Enhanced notification broadcasting utility with role-based and permission-based targeting
+const broadcastNotification = (io, notificationData, targetOptions = {}) => {
+  const {
+    targetUserId,
+    targetRole,
+    targetStateCode,
+    targetCenterCode,
+    excludeUserId,
+    broadcastType = 'specific' // 'specific', 'role', 'state', 'center', 'global'
+  } = targetOptions;
+
+  // If specific user is targeted
+  if (targetUserId) {
+    const userRoom = `notifications-${targetUserId}`;
     io.to(userRoom).emit("notification", notificationData);
+    console.log(`📢 Notification sent to user ${targetUserId}`);
+    return;
+  }
+
+  // Role-based broadcasting
+  if (targetRole) {
+    const roleRoom = `role-${targetRole}`;
+    io.to(roleRoom).emit("notification", notificationData);
+    console.log(`📢 Notification sent to role ${targetRole}`);
+    return;
+  }
+
+  // State-based broadcasting (for Customer Service Heads)
+  if (targetStateCode) {
+    const stateRoom = `state-${targetStateCode}`;
+    io.to(stateRoom).emit("notification", notificationData);
+    console.log(`📢 Notification sent to state ${targetStateCode}`);
+    return;
+  }
+
+  // Service center-based broadcasting
+  if (targetCenterCode) {
+    const centerRoom = `center-${targetCenterCode}`;
+    io.to(centerRoom).emit("notification", notificationData);
+    console.log(`📢 Notification sent to center ${targetCenterCode}`);
+    return;
+  }
+
+  // Global broadcast (with optional exclusion)
+  if (excludeUserId) {
+    // Send to all rooms except the excluded user
+    const excludeRoom = `notifications-${excludeUserId}`;
+    io.except(excludeRoom).emit("notification", notificationData);
+    console.log(`📢 Global notification sent (excluding user ${excludeUserId})`);
   } else {
     // Broadcast to all connected clients
     io.emit("notification", notificationData);
+    console.log(`📢 Global notification sent to all users`);
   }
 };
 
@@ -422,15 +466,81 @@ const saveAndBroadcastNotification = async (
       );
     }
 
-    // Broadcast via socket
+    // Smart socket broadcasting based on notification context
     if (io && recipients.length > 0) {
-      io.emit("notification", recipients);
+      // Determine smart broadcasting strategy based on notification type and data
+      const smartBroadcastOptions = getSmartBroadcastOptions(notificationData, targetUserIds);
+      
+      if (smartBroadcastOptions.individual) {
+        // Send individual notifications to each recipient
+        recipients.forEach(recipient => {
+          const recipientNotification = {
+            ...notification,
+            recipientId: recipient.userId,
+            seen: recipient.seen
+          };
+          broadcastNotification(io, recipientNotification, {
+            targetUserId: recipient.userId
+          });
+        });
+      } else if (smartBroadcastOptions.room) {
+        // Send to specific room
+        broadcastNotification(io, notification, smartBroadcastOptions.room);
+      } else {
+        // Fallback to broadcasting to all recipients
+        const enrichedNotification = {
+          ...notification,
+          recipients: recipients.map(r => ({ userId: r.userId, seen: r.seen }))
+        };
+        io.emit("notification", enrichedNotification);
+      }
+      
+      console.log(`📢 Notification "${notification.title}" sent to ${recipients.length} recipients`);
     }
 
     return { notification, recipients };
   } catch (error) {
     throw error;
   }
+};
+
+// Helper function to determine optimal broadcasting strategy
+const getSmartBroadcastOptions = (notificationData, targetUserIds) => {
+  // For ticket-related notifications
+  if (notificationData.ticketId) {
+    // If specific users are targeted, send individual notifications
+    if (targetUserIds && targetUserIds.length > 0) {
+      return { individual: true };
+    }
+    
+    // For ticket creation, target relevant roles
+    if (notificationData.type === 'ticket_created') {
+      return {
+        room: {
+          broadcastType: 'role',
+          targetRole: 'MACSOFT_SUPPORT' // or determine based on ticket priority
+        }
+      };
+    }
+    
+    // For milestone updates, target ticket stakeholders
+    if (notificationData.type?.includes('milestone')) {
+      return { individual: true };
+    }
+  }
+  
+  // For user registration, target admin roles
+  if (notificationData.type === 'user_registered') {
+    return {
+      room: {
+        broadcastType: 'role',
+        targetRole: 'MACSOFT_ADMIN'
+      }
+    };
+  }
+  
+  // Default to individual notifications
+  return { individual: true };
 };
 
 module.exports = {

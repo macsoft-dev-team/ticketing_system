@@ -3,20 +3,102 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, Ticket, MessageCircle, Users2, Combine, User, X } from 'lucide-react';
 import { Badge } from '../../../ui/badge';
 import useAuth from '../../../../lib/hooks/useAuth';
+import { useSocketActivities } from '../../../../lib/hooks/useSocketActivities';
+import { useSoundManager } from '../../../../lib/hooks/SoundManager';
+import { useToast } from '../../../ui/toast';
 
 const NotificationBell = () => {
   const { user, token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Fetch notifications on component mount
+  // Use socket activities for real-time notifications
+  const {
+    isConnected,
+    notifications: socketNotifications,
+    unreadNotifications,
+    markNotificationAsRead,
+    clearNotifications
+  } = useSocketActivities();
+
+  // Sound manager for notification sounds
+  const { play } = useSoundManager();
+  
+  // Toast notifications for visual feedback
+  const { addToast } = useToast();
+
+  // Transform socket notifications to match UI format
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [lastNotificationCount, setLastNotificationCount] = useState(0);
+
+  // Update local state when socket notifications change
+  useEffect(() => {
+    if (socketNotifications && socketNotifications.length > 0) {
+      const transformedNotifications = socketNotifications.slice(0, 20).map(item => ({
+        id: item.id || Date.now() + Math.random(),
+        title: item.title || 'Notification',
+        message: item.message || item.description || '',
+        type: getNotificationType(item.type),
+        time: formatRelativeTime(item.timestamp || item.createdAt),
+        unread: !item.seen,
+        ticketId: item.ticketId,
+        ticketCode: item.ticketCode,
+        rawData: item
+      }));
+
+      setNotifications(transformedNotifications);
+      setUnreadCount(unreadNotifications || transformedNotifications.filter(n => n.unread).length);
+    }
+  }, [socketNotifications, unreadNotifications]);
+
+  // Detect new notifications and show toast + play sound
+  useEffect(() => {
+    const currentCount = socketNotifications.length;
+    
+    // Check if we have new notifications
+    if (currentCount > lastNotificationCount && lastNotificationCount > 0) {
+      const newNotifications = socketNotifications.slice(0, currentCount - lastNotificationCount);
+      
+      newNotifications.forEach(notification => {
+        if (!notification.seen) {
+          console.log('🔔 New notification received:', notification.title);
+          
+          // Play notification sound
+          play('inbound_notification');
+          
+          // Show toast notification
+          addToast({
+            id: `notification-${notification.id}`,
+            title: notification.title || 'New Notification',
+            description: notification.message || notification.description || '',
+            variant: 'default',
+            duration: 5000,
+          });
+        }
+      });
+    }
+    
+    setLastNotificationCount(currentCount);
+  }, [socketNotifications, lastNotificationCount, play, addToast]);
+
+  // Also detect unread count changes for sound
+  useEffect(() => {
+    if (unreadCount > 0 && notifications.length > 0) {
+      const latestNotification = notifications[0];
+      if (latestNotification && latestNotification.unread) {
+        console.log('🔔 Unread notification detected:', latestNotification.title);
+        // Sound is already played in the above effect, so we just log here
+      }
+    }
+  }, [unreadCount, notifications]);
+
+  // Fetch initial notifications from API (fallback)
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (!token) return;
+      if (!token || socketNotifications.length > 0) return; // Skip if we have socket notifications
 
       setLoading(true);
       try {
@@ -31,12 +113,10 @@ const NotificationBell = () => {
 
         if (response.ok) {
           const responseData = await response.json();
- 
-          // Handle the new API response format {success: true, data: [...], count: 70}
           const notificationsArray = responseData.success ? responseData.data : responseData;
 
-          if (Array.isArray(notificationsArray)) {
-            const transformedNotifications = notificationsArray.map(item => ({
+          if (Array.isArray(notificationsArray) && socketNotifications.length === 0) {
+            const transformedNotifications = notificationsArray.slice(0, 20).map(item => ({
               id: item.id,
               title: item.notification?.title || 'Notification',
               message: item.notification?.description || item.notification?.content || '',
@@ -49,18 +129,17 @@ const NotificationBell = () => {
 
             setNotifications(transformedNotifications);
             setUnreadCount(transformedNotifications.filter(n => n.unread).length);
-           } else {
-           }
-        } else {
-         }
+          }
+        }
       } catch (error) {
-       } finally {
+        console.error('Error fetching notifications:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchNotifications();
-  }, [token]);
+  }, [token, socketNotifications]);
   
 
   // Close dropdown when clicking outside
@@ -143,23 +222,32 @@ const NotificationBell = () => {
     try {
       const unreadNotifications = notifications.filter(n => n.unread);
 
-      // Mark notifications as read on server
-      await Promise.all(
-        unreadNotifications.map(async (notification) => {
-          const baseUrl = import.meta.env.VITE_API_URL;
-          return fetch(`${baseUrl}/notifications/${notification.id}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-        })
-      );
+      // Mark notifications as read using socket system
+      unreadNotifications.forEach(notification => {
+        markNotificationAsRead(notification.id);
+      });
 
-      // Update local state
-      setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
-      setUnreadCount(0);
+      // Also try to mark as read on server if possible
+      if (token) {
+        try {
+          await Promise.all(
+            unreadNotifications.map(async (notification) => {
+              const baseUrl = import.meta.env.VITE_API_URL;
+              return fetch(`${baseUrl}/notifications/${notification.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+              });
+            })
+          );
+        } catch (error) {
+          console.warn('Could not mark notifications as read on server:', error);
+        }
+      }
+
+      console.log('✅ Marked all notifications as read');
     } catch (error) {
       console.error('Error marking notifications as read:', error);
     }
@@ -167,25 +255,27 @@ const NotificationBell = () => {
   };
 
   const handleNotificationClick = async (notification) => {
-    // Mark as read if unread
+    // Mark as read if unread using socket system
     if (notification.unread) {
-      try {
-        const baseUrl = import.meta.env.VITE_API_URL;
-        await fetch(`${baseUrl}/notifications/${notification.id}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        setNotifications(prev => prev.map(n =>
-          n.id === notification.id ? { ...n, unread: false } : n
-        ));
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
+      markNotificationAsRead(notification.id);
+      
+      // Also try to mark as read on server if possible
+      if (token) {
+        try {
+          const baseUrl = import.meta.env.VITE_API_URL;
+          await fetch(`${baseUrl}/notifications/${notification.id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+        } catch (error) {
+          console.warn('Could not mark notification as read on server:', error);
+        }
       }
+      
+      console.log('✅ Marked notification as read:', notification.title);
     }
 
     // Navigate to the appropriate page based on notification type and data
@@ -326,7 +416,13 @@ const NotificationBell = () => {
         <div className="absolute -right-14 sm:right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+            <div className="flex items-center space-x-2">
+              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <div 
+                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+                title={isConnected ? 'Real-time connected' : 'Disconnected - using cached data'}
+              />
+            </div>
             <div className="flex items-center space-x-2">
               {unreadCount > 0 && (
                 <button

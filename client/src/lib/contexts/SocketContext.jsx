@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import socketService from '../services/socketService';
+import socket, { connectSocket, disconnectSocket, joinConversation, leaveConversation } from '../socket/socket';
 
 const SocketContext = createContext({
   isConnected: false,
   socket: null,
   connect: () => {},
-  disconnect: () => {}
+  disconnect: () => {},
+  joinConversation: () => {},
+  leaveConversation: () => {},
+  notifications: [],
+  buzzerAlerts: []
 });
 
 export const useSocket = () => {
@@ -20,52 +24,136 @@ export const useSocket = () => {
 export const SocketProvider = ({ children }) => {
   const { token, isAuthenticated, user } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
-  const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [buzzerAlerts, setBuzzerAlerts] = useState([]);
 
   const connect = () => {
-    if (token && !socket) {
-       const socketInstance = socketService.connect(token);
-      setSocket(socketInstance);
-      
-      if (socketInstance) {
-        socketInstance.on('connect', () => {
-           setIsConnected(true);
-           
-           // Join notification rooms when connected
-           if (user?.id) {
-             socketInstance.emit('join-notifications', user.id);
-             
-             // Join Macsoft alerts room for buzzer alerts if user is Macsoft team
-             const MACSOFT_ROLES = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
-             if (user.role && MACSOFT_ROLES.includes(user.role)) {
-               socketInstance.emit('join-macsoft-alerts', user.role);
-               console.log(`🚨 Joined Macsoft alerts room as ${user.role}`);
-             }
-           }
-        });
-        
-        socketInstance.on('disconnect', () => {
-          setIsConnected(false);
-        });
-      }
+    if (token && user && !isConnected) {
+      connectSocket();
     }
   };
 
   const disconnect = () => {
-    if (socket) {
-      socketService.disconnect();
-      setSocket(null);
-      setIsConnected(false);
+    if (isConnected) {
+      disconnectSocket();
     }
   };
 
-  // All notification-related functions removed - conversations only
+  // Set up socket event listeners
+  useEffect(() => {
+    const handleConnect = () => {
+      console.log(`🔌 Socket connected for user: ${user?.name} (${user?.role})`);
+      setIsConnected(true);
+    };
+
+    const handleDisconnect = (reason) => {
+      console.log(`🔌 Socket disconnected: ${reason}`);
+      setIsConnected(false);
+    };
+
+    const handleError = (error) => {
+      console.error('❌ Socket error:', error);
+      setIsConnected(false);
+    };
+
+    const handleNotification = (event) => {
+      const notificationData = event.detail;
+      console.log('📢 Received notification via custom event:', notificationData);
+      
+      setNotifications(prev => {
+        // Add new notification and keep only last 50
+        const updated = [notificationData, ...prev].slice(0, 50);
+        return updated;
+      });
+    };
+
+    const handleBuzzerAlert = (event) => {
+      const alertData = event.detail;
+      console.log('🚨 Received buzzer alert via custom event:', alertData);
+      
+      setBuzzerAlerts(prev => {
+        // Add new alert and keep only last 20
+        const updated = [alertData, ...prev].slice(0, 20);
+        return updated;
+      });
+    };
+
+    const handleConversation = (event) => {
+      const messageData = event.detail;
+      console.log('💬 Received conversation message via custom event:', messageData);
+      
+      // Dispatch to components that need conversation updates
+      window.dispatchEvent(new CustomEvent('conversationUpdate', {
+        detail: messageData
+      }));
+    };
+
+    const handleMilestone = (event) => {
+      const milestoneData = event.detail;
+      console.log('🎯 Received milestone update via custom event:', milestoneData);
+      
+      // Dispatch to components that need milestone updates
+      window.dispatchEvent(new CustomEvent('milestoneUpdate', {
+        detail: milestoneData
+      }));
+    };
+
+    const handleTicketMessageUpdate = (event) => {
+      const messageData = event.detail;
+      console.log('🎫 Received ticket message update via custom event:', messageData);
+      
+      // Dispatch to components that need ticket message updates (for ticket cards)
+      window.dispatchEvent(new CustomEvent('ticketMessageUpdate', {
+        detail: messageData
+      }));
+    };
+
+    const handleTicketCreated = (event) => {
+      const ticketData = event.detail;
+      console.log('🎫 Received new ticket creation via custom event:', ticketData);
+      
+      // Dispatch to components that need new ticket updates
+      window.dispatchEvent(new CustomEvent('ticketCreated', {
+        detail: ticketData
+      }));
+    };
+
+    // Socket direct event listeners
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('error', handleError);
+
+    // Custom event listeners for socket events
+    window.addEventListener('socketNotification', handleNotification);
+    window.addEventListener('socketBuzzerAlert', handleBuzzerAlert);
+    window.addEventListener('socketConversation', handleConversation);
+    window.addEventListener('socketMilestone', handleMilestone);
+    window.addEventListener('socketTicketMessage', handleTicketMessageUpdate);
+    window.addEventListener('socketTicketCreated', handleTicketCreated);
+
+    return () => {
+      // Cleanup socket listeners
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('error', handleError);
+
+      // Cleanup custom event listeners
+      window.removeEventListener('socketNotification', handleNotification);
+      window.removeEventListener('socketBuzzerAlert', handleBuzzerAlert);
+      window.removeEventListener('socketConversation', handleConversation);
+      window.removeEventListener('socketMilestone', handleMilestone);
+      window.removeEventListener('socketTicketMessage', handleTicketMessageUpdate);
+      window.removeEventListener('socketTicketCreated', handleTicketCreated);
+    };
+  }, [user]);
 
   // Connect when user is authenticated and has token
   useEffect(() => {
     if (isAuthenticated && token && user) {
+      console.log(`🔐 Authenticated user ${user.name} ready for socket connection`);
       connect();
     } else {
+      console.log('🔐 Not authenticated, disconnecting socket');
       disconnect();
     }
 
@@ -77,11 +165,41 @@ export const SocketProvider = ({ children }) => {
     };
   }, [isAuthenticated, token, user]);
 
+  // Helper function to clear notifications
+  const clearNotifications = () => {
+    setNotifications([]);
+  };
+
+  // Helper function to mark notification as read
+  const markNotificationAsRead = (notificationId) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === notificationId 
+          ? { ...notif, seen: true }
+          : notif
+      )
+    );
+  };
+
+  // Helper function to clear buzzer alerts
+  const clearBuzzerAlerts = () => {
+    setBuzzerAlerts([]);
+  };
+
   const value = {
     isConnected,
     socket,
     connect,
-    disconnect
+    disconnect,
+    joinConversation,
+    leaveConversation,
+    notifications,
+    buzzerAlerts,
+    clearNotifications,
+    markNotificationAsRead,
+    clearBuzzerAlerts,
+    unreadNotifications: notifications.filter(n => !n.seen).length,
+    activeAlerts: buzzerAlerts.length
   };
 
   return (

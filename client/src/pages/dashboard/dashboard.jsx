@@ -31,6 +31,7 @@ import useTickets from '../../lib/hooks/useTickets';
 import useDashboardAnalytics from '../../lib/hooks/useDashboardAnalytics';
 import RoleBasedComponent from '../../components/RoleBasedComponent';
 import { TICKET_STATUS, TICKET_PRIORITY } from '../../lib/constants';
+import { useSocketActivities } from '../../lib/hooks/useSocketActivities';
 
 // Role-based dashboard configuration
 const getRoleDashboardConfig = (role) => {
@@ -1102,6 +1103,11 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </motion.div>
           )}
+
+          {/* Socket Activities Test Panel - Only for development/testing */}
+          {user?.role === 'MACSOFT_ADMIN' && (
+            <SocketTestPanel />
+          )}
                 
         </div>
       </div>
@@ -1109,3 +1115,127 @@ export default function Dashboard() {
     </MotionConfig>
   );
 }
+
+// Socket Test Panel Component for debugging
+const SocketTestPanel = () => {
+  const {
+    isConnected,
+    notifications,
+    buzzerAlerts,
+    unreadNotifications,
+    activeAlerts,
+    sendTestNotification,
+    sendTestBuzzer,
+    sendTestTicketMessage,
+    sendTestTicketCreation
+  } = useSocketActivities();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8 }}
+      className="col-span-full bg-yellow-50 border border-yellow-200 p-6 rounded-xl"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-yellow-800">Socket Activities Test Panel</h3>
+        <div className="flex items-center space-x-2">
+          <div 
+            className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+            title={isConnected ? 'Connected' : 'Disconnected'}
+          />
+          <span className="text-sm text-yellow-700">
+            {isConnected ? 'Connected' : 'Disconnected'}
+          </span>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="bg-white p-4 rounded-lg border">
+          <h4 className="font-medium text-gray-900 mb-2">Real-time Stats</h4>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span>Notifications:</span>
+              <span className="font-medium">{notifications.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Unread:</span>
+              <span className="font-medium text-red-600">{unreadNotifications}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Buzzer Alerts:</span>
+              <span className="font-medium text-orange-600">{activeAlerts}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg border">
+          <h4 className="font-medium text-gray-900 mb-2">Latest Notifications</h4>
+          <div className="space-y-1 text-xs max-h-20 overflow-y-auto">
+            {notifications.slice(0, 3).map((notif, index) => (
+              <div key={index} className="text-gray-600 truncate">
+                {notif.title}
+              </div>
+            ))}
+            {notifications.length === 0 && (
+              <div className="text-gray-400 italic">No notifications yet</div>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg border">
+          <h4 className="font-medium text-gray-900 mb-2">Test Actions</h4>
+          <div className="space-y-2">
+            <button
+              onClick={() => sendTestNotification({ 
+                title: 'Test Notification', 
+                message: `Test at ${new Date().toLocaleTimeString()}` 
+              })}
+              className="w-full px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Send Test Notification
+            </button>
+            <button
+              onClick={() => sendTestBuzzer({ 
+                title: 'Test Buzzer Alert', 
+                message: `Buzzer test at ${new Date().toLocaleTimeString()}` 
+              })}
+              className="w-full px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Send Test Buzzer
+            </button>
+            <button
+              onClick={() => sendTestTicketMessage(1, { 
+                content: `Test message at ${new Date().toLocaleTimeString()}`,
+                senderName: 'Test User',
+                ticketUpdates: {
+                  hasNewActivity: true,
+                  lastActivity: new Date().toISOString(),
+                  lastMessageBy: 'Test User'
+                }
+              })}
+              className="w-full px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Test Ticket Update
+            </button>
+            <button
+              onClick={() => sendTestTicketCreation({ 
+                title: `New Test Ticket ${new Date().toLocaleTimeString()}`,
+                customerName: 'John Doe',
+                description: 'Test ticket created via socket'
+              })}
+              className="w-full px-3 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600"
+            >
+              Test New Ticket
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="text-xs text-yellow-600">
+        💡 This panel is only visible to MACSOFT_ADMIN users for testing socket activities. 
+        Real-time notifications should appear in the notification bell and buzzer alerts will show as popups.
+      </div>
+    </motion.div>
+  );
+};

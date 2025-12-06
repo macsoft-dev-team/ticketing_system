@@ -704,6 +704,14 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     if (io) {
       io.emit("ticket", completeTicket);
       io.emit("conversation", conversation);
+      
+      // Emit new ticket creation for real-time updates in ticket lists
+      io.emit("ticket-created", {
+        ...completeTicket,
+        isNewTicket: true,
+        createdAt: completeTicket.createdAt
+      });
+      console.log(`🎫 Emitted ticket-created for ticket ${completeTicket.ticketCode}`);
     }
     return completeTicket;
   } catch (error) {

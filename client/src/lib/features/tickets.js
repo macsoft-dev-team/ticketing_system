@@ -369,6 +369,72 @@ const ticketSlice = createSlice({
         state.tickets[ticketIndex].updatedAt = new Date().toISOString();
       }
     },
+    updateTicketLastMessage: (state, action) => {
+      const { ticketId, messageData, ticketUpdates = {} } = action.payload;
+      const ticketIndex = state.tickets.findIndex((ticket) => ticket.id === ticketId);
+      if (ticketIndex !== -1) {
+        // Initialize messages array if it doesn't exist
+        if (!state.tickets[ticketIndex].messages) {
+          state.tickets[ticketIndex].messages = [];
+        }
+        
+        // Check if message already exists
+        const existingMessageIndex = state.tickets[ticketIndex].messages.findIndex(
+          (msg) => msg.id === messageData.id
+        );
+        
+        if (existingMessageIndex !== -1) {
+          // Update existing message
+          state.tickets[ticketIndex].messages[existingMessageIndex] = messageData;
+        } else {
+          // Add new message
+          state.tickets[ticketIndex].messages.push(messageData);
+        }
+        
+        // Sort messages by createdAt to ensure proper order
+        state.tickets[ticketIndex].messages.sort((a, b) => 
+          new Date(a.createdAt) - new Date(b.createdAt)
+        );
+        
+        // Update ticket-level properties
+        state.tickets[ticketIndex].updatedAt = messageData.createdAt;
+        
+        // Apply any additional ticket updates
+        Object.assign(state.tickets[ticketIndex], ticketUpdates);
+        
+        // Move ticket to top of list if it's not already (for better UX)
+        if (ticketIndex > 0) {
+          const updatedTicket = state.tickets[ticketIndex];
+          state.tickets.splice(ticketIndex, 1);
+          state.tickets.unshift(updatedTicket);
+        }
+      }
+    },
+    addNewTicketFromSocket: (state, action) => {
+      const newTicket = action.payload;
+      // Check if ticket already exists to avoid duplicates
+      const existingIndex = state.tickets.findIndex((ticket) => ticket.id === newTicket.id);
+      
+      if (existingIndex === -1) {
+        // Add new ticket to the beginning of the list
+        state.tickets.unshift({
+          ...newTicket,
+          isNewTicket: true, // Flag for highlighting
+          addedAt: new Date().toISOString()
+        });
+        
+        // Update status count if available
+        if (state.statusCount && newTicket.status) {
+          const statusKey = newTicket.status.toUpperCase();
+          if (state.statusCount[statusKey] !== undefined) {
+            state.statusCount[statusKey]++;
+          }
+          if (state.statusCount.ALL !== undefined) {
+            state.statusCount.ALL++;
+          }
+        }
+      }
+    },
     setFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
     },
@@ -531,6 +597,8 @@ export const {
   updateTicket,
   deleteTicket,
   updateTicketStatus,
+  updateTicketLastMessage,
+  addNewTicketFromSocket,
   setFilters,
   setSorting,
   clearError,

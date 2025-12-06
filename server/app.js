@@ -58,86 +58,128 @@ app.use(
 
 app.use("/api", appRouter);
 
-// Socket.IO authentication middleware - More flexible for development
+// Socket.IO authentication middleware with proper JWT verification
+const jwt = require('jsonwebtoken');
+const { prisma } = require("./lib/clients");
+
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
- 
 
-    // Allow connection without token for development/testing
-    // In production, you should enforce token validation
     if (!token) {
-      // console.log("⚠️ No token provided - allowing connection for development");
-      socket.userId = "anonymous-user";
-      return next();
+      console.log("⚠️ No token provided for socket connection");
+      return next(new Error("Authentication error: No token provided"));
     }
 
-    // Here you could verify the JWT token if needed
-    // For now, we'll just check if token exists
-    // // console.log("✅ Socket authentication successful");
-    socket.userId = "authenticated-user"; // You can set actual user ID after JWT verification
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Fetch user from database to get current role and permissions
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        centerCode: true,
+        State: { select: { id: true, name: true, stateCode: true } },
+        states: { select: { id: true, name: true, stateCode: true } },
+      }
+    });
+
+    if (!user) {
+      console.log("❌ User not found for token:", decoded.id);
+      return next(new Error("Authentication error: User not found"));
+    }
+
+    // Set user information on socket
+    socket.userId = user.id;
+    socket.userName = user.name;
+    socket.userRole = user.role;
+    socket.centerCode = user.centerCode;
+    socket.userState = user.State;
+    socket.assignedStates = user.states || [];
+
+    console.log(`✅ Socket authenticated - User: ${user.name} (${user.role})`);
     next();
   } catch (error) {
-    // console.log("❌ Socket authentication error:", error.message);
-    // Allow connection even if there's an auth error for development
-    socket.userId = "fallback-user";
-    next();
+    console.log("❌ Socket authentication error:", error.message);
+    next(new Error("Authentication error: Invalid token"));
   }
 });
 
 io.on("connection", (socket) => {
-  // console.log("✅ Socket.IO client connected:", socket.id);
-  // console.log("👤 Authenticated user:", socket.userId);
+  console.log(`✅ Socket connected - User: ${socket.userName} (${socket.userRole}) [${socket.id}]`);
 
-  // Listen for all events for debugging
-  socket.onAny((event, ...args) => {
-    // console.log(`📨 Received Socket.IO event: ${event}`, args);
-  });
+  // Automatically join user-specific notification room
+  const userNotificationRoom = `notifications-${socket.userId}`;
+  socket.join(userNotificationRoom);
+  console.log(`🔔 User ${socket.userName} joined notification room: ${userNotificationRoom}`);
 
-  // Handle conversation events
-  socket.on("join-conversation", (ticketId) => {
-    const room = `conversation-${ticketId}`;
-    socket.join(room);
-    // console.log(`👥 Socket ${socket.id} joined conversation room: ${room}`);
+  // Automatically join role-based rooms
+  const roleRoom = `role-${socket.userRole}`;
+  socket.join(roleRoom);
+  console.log(`👥 User ${socket.userName} joined role room: ${roleRoom}`);
+
+  // Join service center specific room for service center roles
+  if ((socket.userRole === 'SERVICE_CENTER_TECHNICIAN' || socket.userRole === 'SERVICE_CENTER_HEAD') && socket.centerCode) {
+    const centerRoom = `center-${socket.centerCode}`;
+    socket.join(centerRoom);
+    console.log(`🏢 User ${socket.userName} joined center room: ${centerRoom}`);
+  }
+
+  // Join state-based rooms for Customer Service Heads
+  if (socket.userRole === 'CUSTOMER_SERVICE_HEAD') {
+    // Join primary state room
+    if (socket.userState) {
+      const primaryStateRoom = `state-${socket.userState.stateCode}`;
+      socket.join(primaryStateRoom);
+      console.log(`🗺️ CSH ${socket.userName} joined primary state room: ${primaryStateRoom}`);
+    }
+    
+    // Join assigned states rooms
+    socket.assignedStates.forEach(state => {
+      const stateRoom = `state-${state.stateCode}`;
+      socket.join(stateRoom);
+      console.log(`🗺️ CSH ${socket.userName} joined assigned state room: ${stateRoom}`);
+    });
+  }
+
+  // Join Macsoft alerts room for buzzer alerts
+  const MACSOFT_ROLES = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+  if (MACSOFT_ROLES.includes(socket.userRole)) {
+    socket.join('macsoft_alerts');
+    console.log(`🚨 User ${socket.userName} joined Macsoft alerts room`);
+  }
+
+  // Handle conversation events with permission checks
+  socket.on("join-conversation", async (ticketId) => {
+    try {
+      // Check if user has permission to access this ticket conversation
+      const hasAccess = await checkTicketAccess(socket.userId, socket.userRole, ticketId, socket);
+      if (hasAccess) {
+        const room = `conversation-${ticketId}`;
+        socket.join(room);
+        console.log(`💬 User ${socket.userName} joined conversation: ${room}`);
+      } else {
+        socket.emit('error', { message: 'Access denied to this conversation' });
+      }
+    } catch (error) {
+      socket.emit('error', { message: 'Error joining conversation' });
+    }
   });
 
   socket.on("leave-conversation", (ticketId) => {
     const room = `conversation-${ticketId}`;
     socket.leave(room);
-    // console.log(`👋 Socket ${socket.id} left conversation room: ${room}`);
-  });
-
-  // Handle notification events
-  socket.on("join-notifications", (userId) => {
-    const room = `notifications-${userId}`;
-    socket.join(room);
-    // console.log(`🔔 Socket ${socket.id} joined notifications room: ${room}`);
-  });
-
-  socket.on("leave-notifications", (userId) => {
-    const room = `notifications-${userId}`;
-    socket.leave(room);
-    // console.log(`🔕 Socket ${socket.id} left notifications room: ${room}`);
-  });
-
-  // Handle Macsoft alerts room (for buzzer alerts)
-  socket.on("join-macsoft-alerts", (userRole) => {
-    if (['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole)) {
-      socket.join('macsoft_alerts');
-      // console.log(`🚨 Socket ${socket.id} joined Macsoft alerts room`);
-    }
-  });
-
-  socket.on("leave-macsoft-alerts", () => {
-    socket.leave('macsoft_alerts');
-    // console.log(`🚨 Socket ${socket.id} left Macsoft alerts room`);
+    console.log(`👋 User ${socket.userName} left conversation: ${room}`);
   });
 
   // Test notification event
   socket.on("send-test-notification", (data) => {
-    // console.log(`📧 Sending test notification:`, data);
-    // Broadcast to all connected clients for now
-    io.emit("notification", {
+    console.log(`📧 User ${socket.userName} sending test notification:`, data);
+    // Send to user's own notification room
+    io.to(`notifications-${socket.userId}`).emit("notification", {
       id: Date.now(),
       type: data.type || "test",
       title: data.title || "Test Notification",
@@ -149,7 +191,12 @@ io.on("connection", (socket) => {
 
   // Test buzzer alert event  
   socket.on("send-test-buzzer", (data) => {
-    console.log(`🧪 Sending test buzzer alert:`, data);
+    if (!MACSOFT_ROLES.includes(socket.userRole)) {
+      socket.emit('error', { message: 'Access denied: Only Macsoft roles can send buzzer alerts' });
+      return;
+    }
+    
+    console.log(`🧪 User ${socket.userName} sending test buzzer alert:`, data);
     const testBuzzerAlert = {
       type: 'CUSTOMER_RESPONSE_PENDING',
       timestamp: new Date().toISOString(),
@@ -159,25 +206,57 @@ io.on("connection", (socket) => {
       ticketId: 999,
       ticketCode: 'TKT-2025-TEST',
       hoursWaiting: 1,
-      assignedTo: 'Test User',
+      assignedTo: socket.userName,
       conversationId: 999,
       customerName: 'Test Customer'
     };
     
     // Send to macsoft_alerts room
     io.to('macsoft_alerts').emit('buzzer_alert', testBuzzerAlert);
-    console.log(`✅ Test buzzer alert sent to macsoft_alerts room`);
+    console.log(`✅ Test buzzer alert sent to macsoft_alerts room by ${socket.userName}`);
   });
 
   socket.on("disconnect", (reason) => {
-   /*  console.log(
-      "❌ Socket.IO client disconnected:",
-      socket.id,
-      "Reason:",
-      reason
-    ); */
+    console.log(`❌ User ${socket.userName} disconnected [${socket.id}] - Reason: ${reason}`);
   });
 });
+
+// Helper function to check if user has access to a specific ticket
+const checkTicketAccess = async (userId, userRole, ticketId, socket) => {
+  try {
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: parseInt(ticketId) },
+      include: {
+        createdByUser: {
+          select: { stateId: true }
+        }
+      }
+    });
+
+    if (!ticket) return false;
+
+    // Apply same RBAC logic as in ticket service
+    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
+      return ticket.createdBy === userId;
+    } else if (userRole === "SERVICE_CENTER_TECHNICIAN") {
+      return ticket.assignedServiceCenter === socket.centerCode;
+    } else if (userRole === "CUSTOMER_SERVICE_HEAD") {
+      // Check if ticket creator's state is in CSH's allowed states
+      const allowedStateIds = new Set();
+      if (socket.userState?.id) allowedStateIds.add(socket.userState.id);
+      socket.assignedStates.forEach(state => {
+        if (state?.id) allowedStateIds.add(state.id);
+      });
+      return allowedStateIds.has(ticket.createdByUser?.stateId);
+    } else {
+      // MACSOFT roles have global access
+      return ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole);
+    }
+  } catch (error) {
+    console.error('Error checking ticket access:', error);
+    return false;
+  }
+};
 
 const PORT = process.env.PORT || 4055;
 

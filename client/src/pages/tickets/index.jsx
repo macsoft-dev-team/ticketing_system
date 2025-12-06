@@ -4,9 +4,11 @@ import Header from "./components/header";
 import TicketCard from "./components/ticketCard";
 import { motion } from "motion/react";
 import { useEffect } from "react";
+import { useSocket } from "../../lib/contexts/SocketContext";
 
 export default function Tickets() {
-    const { tickets, filters, totalPages, currentPage, setTickets, fetchTickets } = useTickets();
+    const { tickets, filters, totalPages, currentPage, setTickets, fetchTickets, updateLastMessage, updateTicketWithMessage, addNewTicket } = useTickets();
+    const { isConnected } = useSocket();
     const handleStatusChange = (ticketId, newStatus) => {
         setTickets(prev => prev.map(ticket =>
             ticket.id === ticketId
@@ -37,12 +39,62 @@ export default function Tickets() {
     useEffect(() => {
         fetchTickets({ skip: currentPage, take: 8, filter: filters });
     }, [filters, totalPages, currentPage]);
+
+    // Socket event listener for real-time ticket message updates
+    useEffect(() => {
+        const handleTicketMessageUpdate = (event) => {
+            const messageData = event.detail;
+            console.log('📩 Updating ticket card with new message:', messageData);
+            
+            // Update the ticket's last message and ticket data in Redux store
+            if (messageData.ticketId) {
+                // Use server-provided ticket updates if available, or generate client-side
+                const ticketUpdates = messageData.ticketUpdates || {
+                    lastActivity: messageData.createdAt,
+                    messageCount: (tickets.find(t => t.id === messageData.ticketId)?.messages?.length || 0) + 1,
+                    hasNewActivity: true,
+                    updatedAt: messageData.createdAt
+                };
+                
+                updateTicketWithMessage(messageData.ticketId, messageData, ticketUpdates);
+            }
+        };
+
+        const handleNewTicketCreated = (event) => {
+            const ticketData = event.detail;
+            console.log('🎫 New ticket created:', ticketData);
+            
+            // Add new ticket to the list
+            addNewTicket(ticketData);
+        };
+
+        // Listen for ticket message updates
+        window.addEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
+        
+        // Listen for new ticket creation
+        window.addEventListener('ticketCreated', handleNewTicketCreated);
+
+        return () => {
+            window.removeEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
+            window.removeEventListener('ticketCreated', handleNewTicketCreated);
+        };
+    }, [updateTicketWithMessage, addNewTicket, tickets]);
      const handlePageChange = (newPage) => {
         fetchTickets({ skip: newPage, take: 8, filter: filters });
     }
     return (
         <section className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
             <Header />
+            
+            {/* Socket Connection Status */}
+            {isConnected && (
+                <div className="px-5 py-1">
+                    <div className="flex items-center gap-2 text-xs text-green-600">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                        <span>Real-time updates active</span>
+                    </div>
+                </div>
+            )}
             <motion.section
                 initial="hidden"
                 animate="visible"
