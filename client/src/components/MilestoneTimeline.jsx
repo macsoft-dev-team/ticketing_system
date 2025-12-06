@@ -492,7 +492,8 @@ const MilestoneCard = ({
     token,
     addToast,
     user,
-    allMilestones
+    allMilestones,
+    ticketStatus
 }) => {
     const [showDetails, setShowDetails] = useState(isActive);
     const [showTransitionForm, setShowTransitionForm] = useState(false);
@@ -657,8 +658,8 @@ const MilestoneCard = ({
 
                             {/* Action buttons */}
                             <div className="flex flex-wrap gap-2 mt-4">
-                                {/* Dynamic Milestone Action Button - Shows only for active milestone */}
-                                {isActive && !isBlocked && (
+                                {/* Dynamic Milestone Action Button - Shows only for active milestone and when ticket is not closed */}
+                                {isActive && !isBlocked && ticketStatus !== 'closed' && (
                                     <MilestoneActionButton
                                         currentMilestone={milestone}
                                         onAction={handleMilestoneAction || defaultMilestoneAction}
@@ -1574,6 +1575,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                             addToast={addToast}
                             user={user}
                             allMilestones={milestones}
+                            ticketStatus={ticketStatus}
                         />
                     );
                 })}
