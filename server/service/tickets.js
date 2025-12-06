@@ -283,8 +283,60 @@ const getTickets = async (skip, take, filter, userId, role) => {
 
 const getTicketById = async (ticketId, userId, userRole = null) => {
   try {
-    const ticket = await prisma.ticket.findUnique({
-      where: { id: ticketId },
+    // Fetch the calling user (we need centerCode + primary State + assigned states)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        centerCode: true,
+        State: { select: { id: true, name: true, stateCode: true } }, // primary state
+        states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
+      },
+    });
+
+    // Build allowed states set from Customer Service Head: primary state + states array
+    const allowedStateNames = new Set();
+    const allowedStateIds = new Set();
+
+    if (user?.State?.name) allowedStateNames.add(user.State.name);
+    if (user?.State?.id) allowedStateIds.add(user.State.id);
+    (user?.states || []).forEach((s) => {
+      if (s?.name) allowedStateNames.add(s.name);
+      if (s?.id) allowedStateIds.add(s.id);
+    });
+
+    const allowedStateNamesArr = Array.from(allowedStateNames);
+    const allowedStateIdsArr = Array.from(allowedStateIds);
+
+    // Build where clause based on role
+    let where = { id: ticketId };
+
+    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
+      // Only tickets created by this user
+      where.createdBy = userId;
+    } else if (userRole === "SERVICE_CENTER_TECHNICIAN") {
+      // Only tickets assigned to technician's service center
+      if (user?.centerCode) {
+        where.assignedServiceCenter = user.centerCode;
+      } else {
+        // No center => no access
+        where.id = -1;
+      }
+    } else if (userRole === "CUSTOMER_SERVICE_HEAD") {
+      // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
+      // is in the CSH's allowed state IDs (primary + assigned states).
+      if (allowedStateIdsArr.length) {
+        where.AND = [
+          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
+        ];
+      } else {
+        // head has no allowed states => no access
+        where.id = -1;
+      }
+    }
+    // For MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT -> no additional filters (global access)
+
+    const ticket = await prisma.ticket.findFirst({
+      where,
       include: {
         createdByUser: true,
         updatedByUser: true,
@@ -336,38 +388,8 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
     });
 
     if (!ticket) {
-      throw new Error("Ticket not found");
+      throw new Error("Ticket not found or access denied");
     }
-
-    // Check access permissions based on user role
-    if (userRole === "FIELD_ENGINEER") {
-      // Field engineers can only see their own tickets
-      if (ticket.createdBy !== userId) {
-        throw new Error("Access denied: You can only view tickets you created");
-      }
-    } else if (
-      userRole === "SERVICE_CENTER_HEAD" ||
-      userRole === "SERVICE_CENTER_TECHNICIAN"
-    ) {
-      // Service center users can only see tickets assigned to their service center
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { centerCode: true },
-      });
-
-      if (!user?.centerCode) {
-        throw new Error(
-          "Access denied: No service center assigned to your account"
-        );
-      }
-
-      if (ticket.assignedServiceCenter !== user.centerCode) {
-        throw new Error(
-          "Access denied: This ticket is not assigned to your service center"
-        );
-      }
-    }
-    // For other roles (MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT), no restrictions
 
     return ticket;
   } catch (error) {
@@ -1021,23 +1043,75 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
 
 const searchByControllerNumber = async (controllerNo, userId, userRole) => {
   try {
-    // Find ticket by controller number
-    const ticket = await prisma.ticket.findFirst({
-      where: {
-        controllerNo: {
-          contains: controllerNo,
-        },
-        ticketMilestones: {
-          some: {
-            stage: {
-              in: ["SENT_TO_SERVICE_CENTER"],
-            },
-            status: {
-              in: ["IN_PROGRESS"],
-            },
+    // Fetch the calling user (we need centerCode + primary State + assigned states)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        centerCode: true,
+        State: { select: { id: true, name: true, stateCode: true } }, // primary state
+        states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
+      },
+    });
+
+    // Build allowed states set from Customer Service Head: primary state + states array
+    const allowedStateNames = new Set();
+    const allowedStateIds = new Set();
+
+    if (user?.State?.name) allowedStateNames.add(user.State.name);
+    if (user?.State?.id) allowedStateIds.add(user.State.id);
+    (user?.states || []).forEach((s) => {
+      if (s?.name) allowedStateNames.add(s.name);
+      if (s?.id) allowedStateIds.add(s.id);
+    });
+
+    const allowedStateNamesArr = Array.from(allowedStateNames);
+    const allowedStateIdsArr = Array.from(allowedStateIds);
+
+    // Build where clause
+    let where = {
+      controllerNo: {
+        contains: controllerNo,
+      },
+      ticketMilestones: {
+        some: {
+          stage: {
+            in: ["SENT_TO_SERVICE_CENTER"],
+          },
+          status: {
+            in: ["IN_PROGRESS"],
           },
         },
       },
+    };
+
+    // Apply role-based filtering
+    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
+      // Only tickets created by this user
+      where.createdBy = userId;
+    } else if (userRole === "SERVICE_CENTER_TECHNICIAN") {
+      // Only tickets assigned to technician's service center
+      if (user?.centerCode) {
+        where.assignedServiceCenter = user.centerCode;
+      } else {
+        // No center => no tickets
+        where.id = -1;
+      }
+    } else if (userRole === "CUSTOMER_SERVICE_HEAD") {
+      // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
+      // is in the CSH's allowed state IDs (primary + assigned states).
+      if (allowedStateIdsArr.length) {
+        where.AND = [
+          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
+        ];
+      } else {
+        // head has no allowed states => no tickets
+        where.id = -1;
+      }
+    }
+    // For MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT -> no additional filters (global access)
+
+    const ticket = await prisma.ticket.findFirst({
+      where,
       include: {
         createdByUser: true,
         updatedByUser: true,
@@ -1068,35 +1142,7 @@ const searchByControllerNumber = async (controllerNo, userId, userRole) => {
       },
     });
 
-    if (!ticket) {
-      return null;
-    }
-
-    // Check role-based access
-    if (userRole === "CUSTOMER_FIELD_ENGINEER" && ticket.createdBy !== userId) {
-      throw new Error("Access denied: You can only view your own tickets");
-    }
-
-    if (
-      userRole === "CUSTOMER_SERVICE_HEAD" ||
-      userRole === "SERVICE_CENTER_TECHNICIAN"
-    ) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { serviceCenterCode: true },
-      });
-
-      if (
-        !user?.serviceCenterCode ||
-        ticket.assignedServiceCenter !== user.serviceCenterCode
-      ) {
-        throw new Error(
-          "Access denied: This ticket is not assigned to your service center"
-        );
-      }
-    }
-
-    return ticket;
+    return ticket; // Will return null if not found or access denied
   } catch (error) {
     throw error;
   }
@@ -1104,7 +1150,31 @@ const searchByControllerNumber = async (controllerNo, userId, userRole) => {
 
 const searchTickets = async (keyword, userId, userRole) => {
   try {
-    // Build where clause based on role
+    // Fetch the calling user (we need centerCode + primary State + assigned states)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        centerCode: true,
+        State: { select: { id: true, name: true, stateCode: true } }, // primary state
+        states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
+      },
+    });
+
+    // Build allowed states set from Customer Service Head: primary state + states array
+    const allowedStateNames = new Set();
+    const allowedStateIds = new Set();
+
+    if (user?.State?.name) allowedStateNames.add(user.State.name);
+    if (user?.State?.id) allowedStateIds.add(user.State.id);
+    (user?.states || []).forEach((s) => {
+      if (s?.name) allowedStateNames.add(s.name);
+      if (s?.id) allowedStateIds.add(s.id);
+    });
+
+    const allowedStateNamesArr = Array.from(allowedStateNames);
+    const allowedStateIdsArr = Array.from(allowedStateIds);
+
+    // Build where clause with search terms
     let where = {
       OR: [
         { ticketCode: { contains: keyword } },
@@ -1117,34 +1187,45 @@ const searchTickets = async (keyword, userId, userRole) => {
         { district: { contains: keyword } },
         { village: { contains: keyword } },
         { block: { contains: keyword } }
-      ]
-    };
-
-    // Add role-based filtering
-    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
-      where.createdBy = userId;
-    } else if (userRole === "CUSTOMER_SERVICE_HEAD" || userRole === "SERVICE_CENTER_TECHNICIAN") {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { serviceCenterCode: true },
-      });
-
-      if (user?.serviceCenterCode) {
-        where.assignedServiceCenter = user.serviceCenterCode;
-      }
-    }
-
-    // For receive controller, we want tickets that are ready to be received
-    where.ticketMilestones = {
-      some: {
-        stage: {
-          in: ["SENT_TO_SERVICE_CENTER"],
-        },
-        status: {
-          in: ["IN_PROGRESS"],
+      ],
+      // For receive controller, we want tickets that are ready to be received
+      ticketMilestones: {
+        some: {
+          stage: {
+            in: ["SENT_TO_SERVICE_CENTER"],
+          },
+          status: {
+            in: ["IN_PROGRESS"],
+          },
         },
       },
     };
+
+    // Apply role-based filtering
+    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
+      // Only tickets created by this user
+      where.createdBy = userId;
+    } else if (userRole === "SERVICE_CENTER_TECHNICIAN") {
+      // Only tickets assigned to technician's service center
+      if (user?.centerCode) {
+        where.assignedServiceCenter = user.centerCode;
+      } else {
+        // No center => no tickets
+        where.id = -1;
+      }
+    } else if (userRole === "CUSTOMER_SERVICE_HEAD") {
+      // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
+      // is in the CSH's allowed state IDs (primary + assigned states).
+      if (allowedStateIdsArr.length) {
+        where.AND = [
+          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
+        ];
+      } else {
+        // head has no allowed states => no tickets
+        where.id = -1;
+      }
+    }
+    // For MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT -> no additional filters (global access)
 
     const tickets = await prisma.ticket.findMany({
       where,
