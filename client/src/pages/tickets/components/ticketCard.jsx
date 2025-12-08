@@ -350,8 +350,11 @@ export default function TicketCard({
     const closureInfo = getClosureInfo();
 
     // Check if this ticket has a buzzer alert
-    const hasBuzzerAlert = localTicket.hasBuzzerAlert;
-    const buzzerAlertData = localTicket.buzzerAlertData;
+    // Only show visual effects for MACSOFT_HEAD and MACSOFT_SUPPORT
+    const allowedBuzzerRoles = ['MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+    const shouldShowBuzzerEffects = user && allowedBuzzerRoles.includes(user.role);
+    const hasBuzzerAlert = shouldShowBuzzerEffects && localTicket.hasBuzzerAlert;
+    const buzzerAlertData = shouldShowBuzzerEffects ? localTicket.buzzerAlertData : null;
 
     return (
         <motion.div

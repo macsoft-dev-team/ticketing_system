@@ -211,7 +211,7 @@ const createConversation = async (conversation, userId, io, files = []) => {
       });
       console.log(`🔕 Turned off buzzer alert for ticket ${newMessage.ticket?.ticketCode} - Macsoft user responded`);
       
-      // Emit socket event to clear buzzer alert (only to MACSOFT_HEAD and MACSOFT_SUPPORT, not ADMIN)
+      // Emit socket event to clear buzzer alert
       if (io) {
         io.to('role-MACSOFT_HEAD').emit('buzzer_alert_cleared', { ticketId, ticketCode: newMessage.ticket?.ticketCode });
         io.to('role-MACSOFT_SUPPORT').emit('buzzer_alert_cleared', { ticketId, ticketCode: newMessage.ticket?.ticketCode });

@@ -28,22 +28,40 @@ export const BuzzerAlertsProvider = ({ children }) => {
   );
   const [alerts, setAlerts] = useState([]);
   const buzzerIntervalRef = useRef(null);
+  const soundIntervalRef = useRef(null);
 
-  // Play buzzer sound using SoundManager
+  // Play buzzer sound repeatedly using SoundManager
   const playBuzzer = () => {
     try {
+      // Clear any existing interval
+      if (soundIntervalRef.current) {
+        clearInterval(soundIntervalRef.current);
+      }
+
       // Get current volume and boost to maximum for buzzer alerts
       const originalVolume = getVolume();
-
       setVolume(1.0); // Set to maximum volume (100%)
 
-      // Play the critical notification sound at full volume
+      // Play the critical notification sound immediately
       play('notify_critical');
+      console.log('🔊 Playing buzzer alert sound (1/3)');
 
-      // Restore original volume after 5 seconds
-      setTimeout(() => {
-        setVolume(originalVolume);
-      }, 5000);
+      // Play sound 2 more times with 2 second intervals (total 3 times)
+      let playCount = 1;
+      soundIntervalRef.current = setInterval(() => {
+        playCount++;
+        play('notify_critical');
+        console.log(`🔊 Playing buzzer alert sound (${playCount}/3)`);
+        
+        if (playCount >= 3) {
+          clearInterval(soundIntervalRef.current);
+          soundIntervalRef.current = null;
+          // Restore original volume after all sounds played
+          setTimeout(() => {
+            setVolume(originalVolume);
+          }, 1000);
+        }
+      }, 2000);
 
     } catch (error) {
       console.warn('❌ Could not play buzzer sound:', error);
@@ -72,10 +90,10 @@ export const BuzzerAlertsProvider = ({ children }) => {
 
   // Handle new buzzer alert
   const handleBuzzerAlert = (alertData) => {
-     // Only process alerts for specific Macsoft roles (exclude MACSOFT_ADMIN)
+    // Only process alerts for specific Macsoft roles
     const allowedRoles = ['MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
     if (!user || !allowedRoles.includes(user.role)) {
-       return;
+      return;
     }
 
     // Check if alert already exists
@@ -138,9 +156,18 @@ export const BuzzerAlertsProvider = ({ children }) => {
 
   // Request notification permission on mount
   useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission();
     }
+
+    // Cleanup sound interval on unmount
+    return () => {
+      if (soundIntervalRef.current) {
+        clearInterval(soundIntervalRef.current);
+        soundIntervalRef.current = null;
+        console.log('🧹 Cleaned up buzzer sound interval on unmount');
+      }
+    };
   }, []);
 
   const value = {

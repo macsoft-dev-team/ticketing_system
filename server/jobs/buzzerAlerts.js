@@ -1,8 +1,8 @@
 const { prisma } = require("../lib/clients");
 
-// Define Macsoft roles (internal users) - includes MACSOFT_ADMIN for testing
+// Define Macsoft roles who should receive buzzer alerts
 const MACSOFT_ROLES = [
-   'MACSOFT_HEAD', 
+  'MACSOFT_HEAD', 
   'MACSOFT_SUPPORT'
 ];
 
