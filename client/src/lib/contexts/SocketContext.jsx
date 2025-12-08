@@ -384,12 +384,12 @@ export const SocketProvider = ({ children }) => {
   }, [isAuthenticated, token, user]);
 
   // Helper function to clear notifications
-  const clearNotifications = () => {
+  const clearNotifications = useCallback(() => {
     setNotifications([]);
-  };
+  }, []);
 
   // Helper function to mark notification as read
-  const markNotificationAsRead = (notificationId) => {
+  const markNotificationAsRead = useCallback((notificationId) => {
     setNotifications(prev =>
       prev.map(notif =>
         notif.id === notificationId
@@ -397,10 +397,10 @@ export const SocketProvider = ({ children }) => {
           : notif
       )
     );
-  };
+  }, []);
 
   // Helper function to mark all ticket notifications as read
-  const markTicketNotificationsAsRead = (ticketId) => {
+  const markTicketNotificationsAsRead = useCallback((ticketId) => {
     setNotifications(prev =>
       prev.map(notif =>
         notif.ticketId === parseInt(ticketId)
@@ -408,12 +408,12 @@ export const SocketProvider = ({ children }) => {
           : notif
       )
     );
-  };
+  }, []);
 
   // Helper function to clear buzzer alerts
-  const clearBuzzerAlerts = () => {
+  const clearBuzzerAlerts = useCallback(() => {
     setBuzzerAlerts([]);
-  };
+  }, []);
 
   const value = {
     isConnected,

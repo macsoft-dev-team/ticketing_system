@@ -1,4 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
+import { useCallback, useMemo } from 'react';
 
 import {
   setUser,
@@ -18,8 +19,8 @@ export const useAuth = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
-  return {
-    ...auth,
+  // Memoize action functions
+  const actions = useMemo(() => ({
     login: (phone, password) => dispatch(login({ phone, password })),
     register: (name, phone, password) => dispatch(register({ name, phone, password })),
     checkAuth: () => dispatch(checkAuth()),
@@ -36,6 +37,10 @@ export const useAuth = () => {
       dispatch(logout());
       return Promise.resolve();
     },
+  }), [dispatch]);
+
+  // Memoize helper functions
+  const helpers = useMemo(() => ({
     hasPermission: (permission) => auth.permissions.includes(permission),
     hasRole: (role) => auth.user?.role === role,
     canAccess: (requiredRoles) => {
@@ -45,7 +50,14 @@ export const useAuth = () => {
       }
       return auth.user.role === requiredRoles;
     },
-  };
+  }), [auth.permissions, auth.user?.role]);
+
+  // Memoize the complete return object
+  return useMemo(() => ({
+    ...auth,
+    ...actions,
+    ...helpers,
+  }), [auth, actions, helpers]);
 };
 
 export default useAuth;

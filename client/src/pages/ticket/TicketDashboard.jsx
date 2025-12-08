@@ -10,7 +10,7 @@ import DocumentModal from '../../components/ui/DocumentModal';
 import {
   ArrowLeft,
   Calendar,
-  User, 
+  User,
   Phone,
   FileText,
   Download,
@@ -42,7 +42,7 @@ import useTickets from '../../lib/hooks/useTickets';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useSocket } from '../../lib/contexts/SocketContext';
 import useConversation from '../../lib/hooks/useConversation';
-import { 
+import {
   approveSpareRequestItem,
   rejectSpareRequestItem,
   getProductInventoryDetails,
@@ -148,7 +148,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
 
       // Try multiple download strategies
       const downloadStrategies = [];
-      
+
       // Strategy 1: Use API endpoint if we have an ID and token
       if (attachment.id && token) {
         downloadStrategies.push({
@@ -157,7 +157,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
           name: 'API with auth'
         });
       }
-      
+
       // Strategy 2: Direct file access
       if (attachment.url) {
         const fileUrl = attachment.url.startsWith('/uploads/') ? attachment.url : `/uploads/${attachment.url}`;
@@ -167,7 +167,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
           name: 'Direct file'
         });
       }
-      
+
       // Try each strategy until one works
       let successful = false;
       for (const strategy of downloadStrategies) {
@@ -187,7 +187,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
             link.click();
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
-            
+
             if (addToast) addToast({
               title: `Downloaded ${attachment.name}`,
               description: 'File saved to your downloads folder',
@@ -200,7 +200,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
           console.warn(`${strategy.name} failed:`, error);
         }
       }
-      
+
       if (!successful) {
         throw new Error('All download strategies failed');
       }
@@ -255,7 +255,7 @@ const AttachmentItem = ({ attachment, showPreview = false, token, addToast, onPr
             className="p-2 cursor-pointer text-gray-500 hover:text-blue-600 transition-colors"
             title="Preview"
           >
-              <Eye  size={16} />
+            <Eye size={16} />
           </motion.button>
         )}
         <motion.button
@@ -314,10 +314,10 @@ export default function TicketDashboard() {
       if (!messageIds || (Array.isArray(messageIds) && messageIds.length === 0)) {
         return;
       }
-      
+
       // Mark messages as seen
       const result = await originalMarkMessagesAsSeen(messageIds);
-      
+
       // Only refresh ticket data if messages were actually marked as seen
       if (result && result.markedCount > 0) {
         await fetchTicketById(ticketId);
@@ -356,16 +356,12 @@ export default function TicketDashboard() {
   useEffect(() => {
     if (ticketId) {
       const parsedTicketId = parseInt(ticketId);
-      console.log(`🎯 [TICKET-DASHBOARD] Setting current ticket ID to: ${parsedTicketId}`);
       setCurrentTicketId(parsedTicketId);
       // Also set on window object for immediate access by socket handlers
       window.currentTicketId = parsedTicketId;
-      console.log('🎯 [TICKET-DASHBOARD] Set window.currentTicketId to:', window.currentTicketId);
       return () => {
-        console.log(`🎯 [TICKET-DASHBOARD] Clearing current ticket ID`);
         setCurrentTicketId(null); // Clear when leaving ticket
         window.currentTicketId = null;
-        console.log('🎯 [TICKET-DASHBOARD] Cleared window.currentTicketId');
       };
     }
   }, [ticketId, setCurrentTicketId]);
@@ -373,31 +369,20 @@ export default function TicketDashboard() {
   // Mark ticket-related notifications as seen when entering the ticket dashboard
   useEffect(() => {
     if (ticketId && user?.id) {
-      console.log(`🔔 [TICKET-DASHBOARD] Marking notifications as seen for ticket: ${ticketId}`);
-      
+
       // Update socket context state immediately for instant UI feedback
       markTicketNotificationsAsRead(ticketId);
-      
+
       // Then update database and Redux store
       dispatch(markTicketNotificationsAsSeen(ticketId))
-        .unwrap()
-        .then((result) => {
-          if (result.data.count > 0) {
-            console.log(`🔔 [TICKET-DASHBOARD] Marked ${result.data.count} notifications as seen for ticket ${ticketId}`);
-          }
-        })
-        .catch((error) => {
-          console.error('🔔 [TICKET-DASHBOARD] Error marking notifications as seen:', error);
-          // On error, you might want to revert the socket context state if needed
-          // For now, we'll log the error and let the next refresh fix any inconsistency
-        });
+
     }
-  }, [ticketId, user?.id, dispatch, markTicketNotificationsAsRead]);
+  }, [ticketId, user?.id]);
 
   // Auto-close timer simulation - only trigger when last message changes
   useEffect(() => {
     if (messages.length === 0) return;
-    
+
     const lastMessage = messages[messages.length - 1];
     if (lastMessage?.isOwnMessage) {
       setAutoCloseTimer(600); // 10 minutes in seconds
@@ -432,7 +417,7 @@ export default function TicketDashboard() {
   }, [sendConversationMessage, addToast, ticketId, user, token]);
 
   const handleSpareRequestSubmit = useCallback(async (formData) => {
-     try {
+    try {
       const spareItems = formData.products.map(product => {
         return {
           productId: parseInt(product.productId, 10),
@@ -539,7 +524,7 @@ export default function TicketDashboard() {
         if (!targetStage) {
           throw new Error('No target stage specified for transition');
         }
-        
+
         if (currentStage && targetStage === currentStage) {
           throw new Error(`Cannot transition from ${currentStage} to ${targetStage} - same stage`);
         }
@@ -585,16 +570,16 @@ export default function TicketDashboard() {
         }
       }
     } catch (error) {
-      
+
       // Provide more specific error messages
       let errorMessage = error.message || 'An error occurred';
-      
+
       if (error.message?.includes('Invalid transition')) {
         errorMessage = 'This milestone transition is not allowed. Please check the current status.';
       } else if (error.message?.includes('same stage')) {
         errorMessage = 'Milestone is already at the target stage.';
       }
-      
+
       addToast({
         title: 'Action Failed',
         description: errorMessage,
@@ -733,17 +718,17 @@ export default function TicketDashboard() {
     const updateButtonVisibility = () => {
       const isSmallScreen = window.innerWidth < 1024;
       const isChatActive = activeTab === 'chat';
-           
+
       // For now, show button whenever chat is active on small screen (remove scroll requirement for testing)
       setShowScrollToTop(isChatActive && isSmallScreen);
     };
 
     window.addEventListener('scroll', updateButtonVisibility);
     window.addEventListener('resize', updateButtonVisibility);
-    
+
     // Initial check and whenever activeTab changes
     updateButtonVisibility();
-    
+
     return () => {
       window.removeEventListener('scroll', updateButtonVisibility);
       window.removeEventListener('resize', updateButtonVisibility);
@@ -752,33 +737,31 @@ export default function TicketDashboard() {
 
   // Scroll to top function
   const scrollToTop = () => {
-    console.log('Scroll to top clicked!');
-    
+
     // Try multiple scroll strategies
     // 1. Scroll main window
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-    
+
     // 2. Also scroll document body
     document.body.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
-    
+
     // 3. Find and scroll any potential chat containers
     const chatContainers = document.querySelectorAll('[class*="chat"], [class*="conversation"], .overflow-y-auto, .overflow-auto');
     chatContainers.forEach(container => {
       if (container.scrollTop > 0) {
-        console.log('Scrolling container:', container);
         container.scrollTo({
           top: 0,
           behavior: 'smooth'
         });
       }
     });
-    
+
     // 4. Try scrolling document element as well
     document.documentElement.scrollTo({
       top: 0,
@@ -789,7 +772,7 @@ export default function TicketDashboard() {
   // Fetch spare requests for this ticket
   const fetchSpareRequests = useCallback(async (ticketCode = ticketData.ticketCode) => {
     if (!ticketCode) return;
-    
+
     try {
       setLoadingSpareRequests(true);
       const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
@@ -806,7 +789,7 @@ export default function TicketDashboard() {
       }
 
       const result = await response.json();
-      
+
       // Transform spare requests to match the format expected by the approval component
       const transformedRequests = [];
       if (result.success && result.data) {
@@ -830,7 +813,7 @@ export default function TicketDashboard() {
           });
         });
       }
-      
+
       setSpareRequests(transformedRequests);
     } catch (error) {
       addToast({
@@ -847,18 +830,18 @@ export default function TicketDashboard() {
   const handleSpareApprove = async (itemId) => {
     try {
       setSpareActionLoading(prev => ({ ...prev, [itemId]: 'approving' }));
-      
+
       await approveSpareRequestItem(itemId);
-      
+
       addToast({
         title: 'Success',
         description: 'Spare request approved successfully',
         variant: 'success'
       });
-      
+
       // Refresh spare requests and ticket data
       await Promise.all([fetchSpareRequests(ticketData.ticketCode), fetchTicketById(ticketId)]);
-      
+
     } catch (error) {
       addToast({
         title: 'Error',
@@ -885,22 +868,22 @@ export default function TicketDashboard() {
   const confirmSpareReject = async () => {
     try {
       setSpareActionLoading(prev => ({ ...prev, [rejectingSpareItem]: 'rejecting' }));
-      
+
       await rejectSpareRequestItem(rejectingSpareItem, spareRejectReason);
-      
+
       addToast({
         title: 'Success',
         description: 'Spare request rejected successfully',
         variant: 'success'
       });
-      
+
       setShowSpareRejectModal(false);
       setRejectingSpareItem(null);
       setSpareRejectReason('');
-      
+
       // Refresh spare requests and ticket data
       await Promise.all([fetchSpareRequests(ticketData.ticketCode), fetchTicketById(ticketId)]);
-      
+
     } catch (error) {
       addToast({
         title: 'Error',
@@ -922,17 +905,17 @@ export default function TicketDashboard() {
     setSelectedSpareItem(item);
     setShowSpareDetailModal(true);
     setLoadingInventoryDetails(true);
-    
+
     try {
       const [inventoryResponse, transactionResponse] = await Promise.all([
         getProductInventoryDetails(item.productId),
         getProductTransactionHistory(item.productId, 5)
       ]);
-      
+
       if (inventoryResponse.success) {
         setInventoryDetails(inventoryResponse.data);
       }
-      
+
       if (transactionResponse.success) {
         setTransactionHistory(transactionResponse.data);
       }
@@ -1084,10 +1067,10 @@ export default function TicketDashboard() {
       title: 'Upload Milestone Photos',
       description: `Add photos for ${currentMilestone.stage.replace(/_/g, ' ')}`,
     };
-    
+
     // Set minimum photos requirement - 0 for field clearance, 1 for others
     info.minPhotos = currentMilestone.stage === 'REQUEST_CLEARED_AT_FIELD' ? 0 : 1;
-    
+
     return info;
   }, [currentMilestone]);
 
@@ -1276,7 +1259,7 @@ export default function TicketDashboard() {
                     </p>
                   </div>
                 </div>
-               {/*  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {/*  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-gray-600">Complaint Type</p>
                     <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
@@ -1322,7 +1305,7 @@ export default function TicketDashboard() {
                 Farmer/Customer Details
               </h2>
               <div className="space-y-3">
-                 <div>
+                <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Farmer Name</p>
                   <p className="text-sm sm:text-base font-semibold text-gray-900">{ticketData?.farmerName || 'N/A'}</p>
                 </div>
@@ -1512,15 +1495,14 @@ export default function TicketDashboard() {
                   <button
                     onClick={handleBulkApproveSpareRequests}
                     disabled={!allSpareRequestsResolved}
-                    className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
-                      allSpareRequestsResolved 
-                        ? allSpareRequestsRejected
-                          ? 'bg-red-600 hover:bg-red-700'
-                          : 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-gray-400 cursor-not-allowed'
-                    } disabled:opacity-50`}
+                    className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${allSpareRequestsResolved
+                      ? allSpareRequestsRejected
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-gray-400 cursor-not-allowed'
+                      } disabled:opacity-50`}
                     title={
-                      !allSpareRequestsResolved 
+                      !allSpareRequestsResolved
                         ? 'All spare requests must be resolved first'
                         : allSpareRequestsRejected
                           ? 'Close ticket - all spares rejected'
@@ -1558,7 +1540,7 @@ export default function TicketDashboard() {
                 {spareRequests.map((item) => {
                   const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
                   const StockIcon = stockStatus.icon;
-                  
+
                   return (
                     <motion.div
                       key={item.itemId}
@@ -1567,12 +1549,11 @@ export default function TicketDashboard() {
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center space-x-1">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
                             item.status === 'approved' ? 'bg-green-100 text-green-800' :
-                            item.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                              item.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                            }`}>
                             {item.status}
                           </span>
                         </div>
@@ -1581,7 +1562,7 @@ export default function TicketDashboard() {
                           {stockStatus.status === 'sufficient' ? 'Available' : 'Low Stock'}
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex items-start space-x-2">
                           <Package className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -1590,15 +1571,14 @@ export default function TicketDashboard() {
                             <p className="text-xs text-gray-500">{item.productCode}</p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-gray-600">
                             Requested: <span className="font-medium text-blue-600">{item.requestedQuantity}</span>
                           </span>
                           <span className="text-gray-600">
-                            Available: <span className={`font-medium ${
-                              item.availableQuantity >= item.requestedQuantity ? 'text-green-600' : 'text-red-600'
-                            }`}>{item.availableQuantity}</span>
+                            Available: <span className={`font-medium ${item.availableQuantity >= item.requestedQuantity ? 'text-green-600' : 'text-red-600'
+                              }`}>{item.availableQuantity}</span>
                           </span>
                         </div>
 
@@ -1617,15 +1597,14 @@ export default function TicketDashboard() {
                               <Eye className="h-3 w-3 mr-1" />
                               View
                             </button>
-                            
+
                             <button
                               onClick={() => handleSpareApprove(item.itemId)}
                               disabled={!item.canApprove || spareActionLoading[item.itemId] === 'approving'}
-                              className={`flex-1 inline-flex items-center justify-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
-                                item.canApprove 
-                                  ? 'bg-green-600 hover:bg-green-700' 
-                                  : 'bg-gray-400 cursor-not-allowed'
-                              } disabled:opacity-50`}
+                              className={`flex-1 inline-flex items-center justify-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${item.canApprove
+                                ? 'bg-green-600 hover:bg-green-700'
+                                : 'bg-gray-400 cursor-not-allowed'
+                                } disabled:opacity-50`}
                             >
                               {spareActionLoading[item.itemId] === 'approving' ? (
                                 <Loader2 className="h-3 w-3 mr-1 animate-spin" />
@@ -1634,7 +1613,7 @@ export default function TicketDashboard() {
                               )}
                               Approve
                             </button>
-                            
+
                             <button
                               onClick={() => handleSpareReject(item.itemId)}
                               disabled={spareActionLoading[item.itemId] === 'rejecting'}
@@ -1682,15 +1661,14 @@ export default function TicketDashboard() {
                   <button
                     onClick={handleBulkApproveSpareRequests}
                     disabled={!allSpareRequestsResolved}
-                    className={`inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${
-                      allSpareRequestsResolved 
-                        ? allSpareRequestsRejected
-                          ? 'bg-red-600 hover:bg-red-700'
-                          : 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-gray-400 cursor-not-allowed'
-                    } disabled:opacity-50`}
+                    className={`inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white ${allSpareRequestsResolved
+                      ? allSpareRequestsRejected
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-gray-400 cursor-not-allowed'
+                      } disabled:opacity-50`}
                     title={
-                      !allSpareRequestsResolved 
+                      !allSpareRequestsResolved
                         ? 'All spare requests must be resolved first'
                         : allSpareRequestsRejected
                           ? 'Close ticket - all spares rejected'
@@ -1728,7 +1706,7 @@ export default function TicketDashboard() {
                 {spareRequests.map((item) => {
                   const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
                   const StockIcon = stockStatus.icon;
-                  
+
                   return (
                     <motion.div
                       key={item.itemId}
@@ -1739,12 +1717,11 @@ export default function TicketDashboard() {
                         <div className="flex items-center space-x-2">
                           <Hash className="h-4 w-4 text-gray-400" />
                           <span className="text-sm font-semibold text-gray-900">{item.ticketCode}</span>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
                             item.status === 'approved' ? 'bg-green-100 text-green-800' :
-                            item.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                              item.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                'bg-gray-100 text-gray-800'
+                            }`}>
                             {item.status}
                           </span>
                         </div>
@@ -1753,7 +1730,7 @@ export default function TicketDashboard() {
                           {stockStatus.status === 'sufficient' ? 'Available' : 'Low Stock'}
                         </div>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <div className="flex items-start space-x-2">
                           <Package className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -1762,7 +1739,7 @@ export default function TicketDashboard() {
                             <p className="text-xs text-gray-500">{item.productCode}</p>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <p className="text-xs text-gray-500 mb-1">Requested</p>
@@ -1772,11 +1749,10 @@ export default function TicketDashboard() {
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 mb-1">Available</p>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              item.availableQuantity >= item.requestedQuantity 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.availableQuantity >= item.requestedQuantity
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                              }`}>
                               {item.availableQuantity}
                             </span>
                           </div>
@@ -1799,15 +1775,14 @@ export default function TicketDashboard() {
                               <Eye className="h-3 w-3 mr-1" />
                               View Details
                             </button>
-                            
+
                             <button
                               onClick={() => handleSpareApprove(item.itemId)}
                               disabled={!item.canApprove || spareActionLoading[item.itemId] === 'approving'}
-                              className={`flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white ${
-                                item.canApprove 
-                                  ? 'bg-green-600 hover:bg-green-700' 
-                                  : 'bg-gray-400 cursor-not-allowed'
-                              } disabled:opacity-50`}
+                              className={`flex-1 inline-flex items-center justify-center px-3 py-2 border border-transparent text-xs font-medium rounded-md shadow-sm text-white ${item.canApprove
+                                ? 'bg-green-600 hover:bg-green-700'
+                                : 'bg-gray-400 cursor-not-allowed'
+                                } disabled:opacity-50`}
                             >
                               {spareActionLoading[item.itemId] === 'approving' ? (
                                 <Loader2 className="h-3 w-3 mr-1 animate-spin" />
@@ -1816,7 +1791,7 @@ export default function TicketDashboard() {
                               )}
                               Approve
                             </button>
-                            
+
                             <button
                               onClick={() => handleSpareReject(item.itemId)}
                               disabled={spareActionLoading[item.itemId] === 'rejecting'}
@@ -2046,7 +2021,7 @@ export default function TicketDashboard() {
                   <Truck className="h-4 w-4 mr-2" />
                   Inventory Status
                 </h4>
-                
+
                 {loadingInventoryDetails ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -2056,9 +2031,8 @@ export default function TicketDashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-600">Stock Status</span>
-                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedSpareItem.canApprove ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
+                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${selectedSpareItem.canApprove ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
                         {selectedSpareItem.canApprove ? (
                           <>
                             <CheckCircle className="h-4 w-4 mr-1" />
@@ -2072,7 +2046,7 @@ export default function TicketDashboard() {
                         )}
                       </div>
                     </div>
-                    
+
                     {inventoryDetails && (
                       <div className="border-t border-green-200 pt-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -2124,7 +2098,7 @@ export default function TicketDashboard() {
                     <div>
                       <h5 className="text-sm font-medium text-red-800">Insufficient Stock</h5>
                       <p className="text-sm text-red-700 mt-1">
-                        Cannot approve this request as there is insufficient stock available. 
+                        Cannot approve this request as there is insufficient stock available.
                         Available: {selectedSpareItem.availableQuantity}, Required: {selectedSpareItem.requestedQuantity}
                       </p>
                     </div>
@@ -2140,7 +2114,7 @@ export default function TicketDashboard() {
                     <div>
                       <h5 className="text-sm font-medium text-blue-800">Ready for Approval</h5>
                       <p className="text-sm text-blue-700 mt-1">
-                        <strong>Impact:</strong> Approving this request will deduct {selectedSpareItem.requestedQuantity} units from inventory, 
+                        <strong>Impact:</strong> Approving this request will deduct {selectedSpareItem.requestedQuantity} units from inventory,
                         updating the stock from {selectedSpareItem.availableQuantity} to {selectedSpareItem.availableQuantity - selectedSpareItem.requestedQuantity} units.
                       </p>
                     </div>
@@ -2163,7 +2137,7 @@ export default function TicketDashboard() {
                 >
                   Cancel
                 </button>
-                
+
                 <button
                   onClick={() => {
                     setShowSpareDetailModal(false);
@@ -2174,18 +2148,17 @@ export default function TicketDashboard() {
                   <XCircle className="h-4 w-4 mr-1 inline" />
                   Reject
                 </button>
-                
+
                 <button
                   onClick={() => {
                     setShowSpareDetailModal(false);
                     handleSpareApprove(selectedSpareItem.itemId);
                   }}
                   disabled={!selectedSpareItem.canApprove || spareActionLoading[selectedSpareItem.itemId] === 'approving'}
-                  className={`px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${
-                    selectedSpareItem.canApprove 
-                      ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500' 
-                      : 'bg-gray-400 cursor-not-allowed'
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50`}
+                  className={`px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${selectedSpareItem.canApprove
+                    ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                    : 'bg-gray-400 cursor-not-allowed'
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50`}
                 >
                   {spareActionLoading[selectedSpareItem.itemId] === 'approving' ? (
                     <>

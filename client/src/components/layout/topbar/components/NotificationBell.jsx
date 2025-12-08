@@ -36,7 +36,7 @@ const NotificationBell = () => {
   // Transform socket notifications to match UI format
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [lastNotificationCount, setLastNotificationCount] = useState(0);
+  const lastNotificationCountRef = useRef(0);
 
   // Update local state when socket notifications change
   useEffect(() => {
@@ -61,10 +61,11 @@ const NotificationBell = () => {
   // Detect new notifications and show toast + play sound
   useEffect(() => {
     const currentCount = socketNotifications.length;
+    const lastCount = lastNotificationCountRef.current;
 
     // Check if we have new notifications
-    if (currentCount > lastNotificationCount && lastNotificationCount > 0) {
-      const newNotifications = socketNotifications.slice(0, currentCount - lastNotificationCount);
+    if (currentCount > lastCount && lastCount > 0) {
+      const newNotifications = socketNotifications.slice(0, currentCount - lastCount);
 
       newNotifications.forEach(notification => {
         if (!notification.seen) {
@@ -94,8 +95,8 @@ const NotificationBell = () => {
       });
     }
 
-    setLastNotificationCount(currentCount);
-  }, [socketNotifications, lastNotificationCount, play, addToast]);
+    lastNotificationCountRef.current = currentCount;
+  }, [socketNotifications, currentTicketId]);
 
   // Also detect unread count changes for sound
   useEffect(() => {
