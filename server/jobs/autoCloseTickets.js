@@ -5,7 +5,6 @@ const {
   createNotification,
   NOTIFICATION_TYPES,
 } = require("../lib/notificationUtils");
-const { transitionMilestone } = require("../service/milestones");
 
 // Define Macsoft roles (internal users)
 const MACSOFT_ROLES = [
@@ -44,14 +43,11 @@ const autoCloseTickets = async () => {
     console.log(`48 hours ago UTC: ${fortyEightHoursAgoUTC.toISOString()}`);
     console.log(`48 hours ago IST: ${fortyEightHoursAgoIST.toLocaleString()}`);
     
-    // Find open/in-progress tickets that were created more than 48 hours ago and have messages
+    // Find open tickets that have messages (no age restriction on ticket itself)
     const candidateTickets = await prisma.ticket.findMany({
       where: {
         status: {
           in: ['OPEN']
-        },
-        createdAt: {
-          lt: fortyEightHoursAgoUTC // Only tickets created more than 48 hours ago
         },
         messages: {
           some: {} // Has at least one message
@@ -95,6 +91,13 @@ const autoCloseTickets = async () => {
       const isLastMessageFromMacsoft = MACSOFT_ROLES.includes(lastMessage.sender.role);
       
       if (!isLastMessageFromMacsoft) continue;
+      
+      // Check if 48 hours have passed since the last Macsoft message
+      const lastMacsoftMessageTime = lastMessage.createdAt;
+      if (lastMacsoftMessageTime >= fortyEightHoursAgoUTC) {
+        // Less than 48 hours since last Macsoft message, skip this ticket
+        continue;
+      }
       
       // For logging, show ticket creation time and last message time in IST
       const ticketCreatedIST = new Date(ticket.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));

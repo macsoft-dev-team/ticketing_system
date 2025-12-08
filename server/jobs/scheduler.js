@@ -19,21 +19,21 @@ class JobScheduler {
 
     console.log('Starting job scheduler...');
     
-    // Schedule auto-close tickets job to run every 2 hours
-    const autoCloseJob = cron.schedule('0 */2 * * *', async () => {
-      console.log('Running scheduled auto-close tickets job...');
-      try {
-        await autoCloseTickets();
-      } catch (error) {
-        console.error('Auto-close tickets job failed:', error);
-      }
-    }, {
-      scheduled: false,
-      name: 'autoCloseTickets'
-    });
+    // // Schedule auto-close tickets job to run every 2 hours
+    // const autoCloseJob = cron.schedule('0 */2 * * *', async () => {
+    //   console.log('Running scheduled auto-close tickets job...');
+    //   try {
+    //     await autoCloseTickets();
+    //   } catch (error) {
+    //     console.error('Auto-close tickets job failed:', error);
+    //   }
+    // }, {
+    //   scheduled: false,
+    //   name: 'autoCloseTickets'
+    // });
     
-    this.jobs.set('autoCloseTickets', autoCloseJob);
-    autoCloseJob.start();
+    // this.jobs.set('autoCloseTickets', autoCloseJob);
+    // autoCloseJob.start();
     
     // Schedule buzzer alerts job to run every 30 seconds
     const buzzerAlertsJob = cron.schedule('*/30 * * * * *', async () => {
@@ -51,43 +51,43 @@ class JobScheduler {
     this.jobs.set('buzzerAlerts', buzzerAlertsJob);
     buzzerAlertsJob.start();
     
-    // Schedule a monitoring job to log candidates every 6 hours (optional)
-    const monitoringJob = cron.schedule('0 */6 * * *', async () => {
-      console.log('Running ticket closure monitoring job...');
-      try {
-        const candidates = await getCandidateTicketsForClosure();
-        console.log(`Found ${candidates.length} tickets that may be closed in the next run:`, 
-          candidates.map(t => ({ 
-            code: t.ticketCode, 
-            lastMessageAt: t.messages[0]?.createdAt 
-          }))
-        );
+    // // Schedule a monitoring job to log candidates every 6 hours (optional)
+    // const monitoringJob = cron.schedule('0 */6 * * *', async () => {
+    //   console.log('Running ticket closure monitoring job...');
+    //   try {
+    //     const candidates = await getCandidateTicketsForClosure();
+    //     console.log(`Found ${candidates.length} tickets that may be closed in the next run:`, 
+    //       candidates.map(t => ({ 
+    //         code: t.ticketCode, 
+    //         lastMessageAt: t.messages[0]?.createdAt 
+    //       }))
+    //     );
         
-        // Also log buzzer candidates
-        const buzzerCandidates = await getCandidateTicketsForBuzzer();
-        console.log(`Found ${buzzerCandidates.length} tickets needing Macsoft response:`, 
-          buzzerCandidates.map(t => ({ 
-            code: t.ticketCode, 
-            lastMessageAt: t.messages[0]?.createdAt,
-            lastMessageFrom: t.messages[0]?.sender.name 
-          }))
-        );
-      } catch (error) {
-        console.error('Monitoring job failed:', error);
-      }
-    }, {
-      scheduled: false,
-      name: 'monitorCandidates'
-    });
+    //     // Also log buzzer candidates
+    //     const buzzerCandidates = await getCandidateTicketsForBuzzer();
+    //     console.log(`Found ${buzzerCandidates.length} tickets needing Macsoft response:`, 
+    //       buzzerCandidates.map(t => ({ 
+    //         code: t.ticketCode, 
+    //         lastMessageAt: t.messages[0]?.createdAt,
+    //         lastMessageFrom: t.messages[0]?.sender.name 
+    //       }))
+    //     );
+    //   } catch (error) {
+    //     console.error('Monitoring job failed:', error);
+    //   }
+    // }, {
+    //   scheduled: false,
+    //   name: 'monitorCandidates'
+    // });
     
-    this.jobs.set('monitorCandidates', monitoringJob);
-    monitoringJob.start();
+    // this.jobs.set('monitorCandidates', monitoringJob);
+    // monitoringJob.start();
     
     this.isStarted = true;
     console.log('Job scheduler started successfully');
-    console.log('- Auto-close tickets job: Every 2 hours');
+    // console.log('- Auto-close tickets job: Every 2 hours');
     console.log('- Buzzer alerts job: Every 30 seconds');
-    console.log('- Monitoring job: Every 6 hours');
+    // console.log('- Monitoring job: Every 6 hours');
   }
 
   /**
