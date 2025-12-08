@@ -142,8 +142,8 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      "/api": "http://localhost:4055",
+      "/api": "http://localhost:3057",
     },
-    allowedHosts: ["localhost", "aphyllous-unseducibly-solange.ngrok-free.dev"],
+    allowedHosts: ["localhost"],
   },
 });

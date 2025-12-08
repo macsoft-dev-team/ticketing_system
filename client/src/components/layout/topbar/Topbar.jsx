@@ -1,4 +1,4 @@
-import { NotificationBell, UserMenu, LogoSection } from './components';
+import { NotificationBell, MessageBox, UserMenu, LogoSection } from './components';
 import BuzzerAlerts from '../../BuzzerAlerts';
 
 const Topbar = () => {
@@ -16,6 +16,9 @@ const Topbar = () => {
         
         {/* Notifications */}
         <NotificationBell />
+
+        {/* Message Box */}
+        <MessageBox />
         
       {/*   User Menu */}
         <UserMenu />

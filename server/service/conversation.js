@@ -343,6 +343,372 @@ const getUnreadMessageCount = async (ticketId, userId) => {
   }
 };
 
+// Constants for role management
+const MACSOFT_ROLES = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"];
+
+/**
+ * Get unreplied messages for a user based on their role and audience perspective
+ * @param {number} currentUserId - The ID of the current user
+ * @param {string} currentUserRole - The role of the current user
+ * @param {string} audience - Either "MACSOFT" or "CUSTOMER" - determines which team's unreplied messages to fetch
+ * @returns {Promise<Array>} Array of unreplied message objects with ticket and sender details
+ */
+const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audience) => {
+  try {
+    // Validate audience parameter
+    if (!["MACSOFT", "CUSTOMER"].includes(audience)) {
+      throw new Error('audience must be either "MACSOFT" or "CUSTOMER"');
+    }
+
+    // Step 1: Fetch current user for RBAC filtering
+    const user = await prisma.user.findUnique({
+      where: { id: currentUserId },
+      select: {
+        centerCode: true,
+        State: { select: { id: true } },
+        states: { select: { id: true } },
+        role: true,
+      },
+    });
+
+    // Build allowed state IDs for CUSTOMER_SERVICE_HEAD
+    const allowedStateIds = new Set();
+    if (user?.State?.id) allowedStateIds.add(user.State.id);
+    (user?.states || []).forEach((s) => s?.id && allowedStateIds.add(s.id));
+    const allowedStateIdsArr = [...allowedStateIds];
+
+    // Step 2: Build base ticket filter - exclude closed tickets and specific milestone stages
+    const baseTicketWhere = {
+      status: { not: "CLOSED" },
+      ticketMilestones: {
+        none: {
+          stage: {
+            in: [
+              "REQUEST_CLEARED_AT_FIELD",
+              "DELIVERED_TO_FIELD",
+              "TICKET_CLOSED",
+            ],
+          },
+        },
+      },
+    };
+
+    // Step 3: Apply RBAC filtering based on user role
+    if (currentUserRole === "CUSTOMER_FIELD_ENGINEER") {
+      // Field engineers only see tickets they created
+      baseTicketWhere.createdBy = currentUserId;
+    } else if (currentUserRole === "SERVICE_CENTER_TECHNICIAN") {
+      // Technicians only see tickets assigned to their service center
+      if (user?.centerCode) {
+        baseTicketWhere.assignedServiceCenter = user.centerCode;
+      } else {
+        // No center code = no tickets
+        baseTicketWhere.id = -1;
+      }
+    } else if (currentUserRole === "CUSTOMER_SERVICE_HEAD") {
+      // Service heads see tickets where creator's state is in their allowed states
+      if (allowedStateIdsArr.length > 0) {
+        baseTicketWhere.AND = [
+          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
+        ];
+      } else {
+        // No allowed states = no tickets
+        baseTicketWhere.id = -1;
+      }
+    }
+    // MACSOFT_* roles have global access - no additional filtering needed
+
+    // Step 4: Determine which sender roles to look for based on audience
+    let targetSenderRoles;
+    let replierRoles;
+    
+    if (audience === "MACSOFT") {
+      // MACSOFT audience: Find non-MACSOFT messages that MACSOFT hasn't replied to
+      targetSenderRoles = { notIn: MACSOFT_ROLES };
+      replierRoles = MACSOFT_ROLES;
+    } else {
+      // CUSTOMER audience: Find MACSOFT messages that CUSTOMER hasn't replied to
+      targetSenderRoles = { in: MACSOFT_ROLES };
+      replierRoles = ["CUSTOMER_FIELD_ENGINEER", "SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"];
+    }
+
+    // Step 5: Get latest message per ticket from the target sender group
+    // Use groupBy to efficiently find the most recent message timestamp per ticket
+    const latestTargetMessages = await prisma.message.groupBy({
+      by: ["ticketId"],
+      where: {
+        sender: { role: targetSenderRoles },
+        ticket: baseTicketWhere,
+      },
+      _max: { createdAt: true },
+    });
+
+    // Create a map of ticketId -> latest target message timestamp
+    const latestTargetTimestamps = new Map(
+      latestTargetMessages.map((m) => [
+        m.ticketId,
+        m._max.createdAt?.getTime() || 0,
+      ])
+    );
+
+    // If no messages found, return empty array
+    if (latestTargetTimestamps.size === 0) {
+      return [];
+    }
+
+    // Step 6: Get latest reply message per ticket from the replier group (if any)
+    const latestReplies = await prisma.message.groupBy({
+      by: ["ticketId"],
+      where: {
+        sender: { role: { in: replierRoles } },
+        ticketId: { in: [...latestTargetTimestamps.keys()] },
+      },
+      _max: { createdAt: true },
+    });
+
+    // Create a map of ticketId -> latest reply timestamp
+    const latestReplyTimestamps = new Map(
+      latestReplies.map((m) => [
+        m.ticketId,
+        m._max.createdAt?.getTime() || 0,
+      ])
+    );
+
+    // Step 7: Filter tickets where target message is after latest reply (or no reply exists)
+    const unrepliedTicketIds = [...latestTargetTimestamps.keys()].filter((ticketId) => {
+      const targetTime = latestTargetTimestamps.get(ticketId) || 0;
+      const replyTime = latestReplyTimestamps.get(ticketId) || 0;
+      // Include ticket if no reply exists OR target message is newer than reply
+      return targetTime > replyTime;
+    });
+
+    if (unrepliedTicketIds.length === 0) {
+      return [];
+    }
+
+    // Step 8: Fetch the actual message records for these unreplied tickets
+    const unrepliedMessages = await prisma.message.findMany({
+      where: {
+        ticketId: { in: unrepliedTicketIds },
+        sender: { role: targetSenderRoles },
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
+        },
+        ticket: {
+          select: {
+            id: true,
+            ticketCode: true,
+            description: true,
+            status: true,
+            createdBy: true,
+            assignedServiceCenter: true,
+          },
+        },
+        attachments: {
+          select: {
+            id: true,
+            fileName: true,
+            fileType: true,
+            fileUrl: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Step 9: Filter to keep only the latest message per ticket and check if unseen by current user
+    const ticketMessageMap = new Map();
+    
+    for (const message of unrepliedMessages) {
+      const ticketId = message.ticketId;
+      const messageTime = new Date(message.createdAt).getTime();
+      const latestTargetTime = latestTargetTimestamps.get(ticketId) || 0;
+      
+      // Only keep if this is the latest target message for this ticket
+      if (messageTime === latestTargetTime) {
+        if (!ticketMessageMap.has(ticketId) || 
+            messageTime > new Date(ticketMessageMap.get(ticketId).createdAt).getTime()) {
+          ticketMessageMap.set(ticketId, message);
+        }
+      }
+    }
+
+    const messageIdsToCheck = [...ticketMessageMap.values()].map(m => m.id);
+
+    // Step 10: Check which messages are unseen by current user
+    const seenMessages = await prisma.messageSeen.findMany({
+      where: {
+        messageId: { in: messageIdsToCheck },
+        userId: currentUserId,
+      },
+      select: { messageId: true },
+    });
+
+    const seenMessageIds = new Set(seenMessages.map((s) => s.messageId));
+
+    // Step 11: Filter to only include messages unseen by current user
+    const finalUnrepliedMessages = [...ticketMessageMap.values()]
+      .filter((message) => !seenMessageIds.has(message.id))
+      .map((message) => ({
+        messageId: message.id,
+        ticketId: message.ticket.id,
+        ticketCode: message.ticket.ticketCode,
+        content: message.content,
+        createdAt: message.createdAt.toISOString(),
+        senderId: message.sender.id,
+        senderName: message.sender.name,
+        senderRole: message.sender.role,
+        hasAttachments: message.attachments.length > 0,
+        unreadByUser: true, // By definition, these are all unread
+      }))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    return finalUnrepliedMessages;
+  } catch (error) {
+    console.error("Error in getUnrepliedMessagesForUser:", error);
+    throw error;
+  }
+};
+
+// getTicketsNotRepliedByMacsoft.js - Legacy function for backward compatibility
+const getTicketsNotRepliedByMacsoft = async (userId, userRole) => {
+  try {
+    // Fetch user for RBAC
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        centerCode: true,
+        State: { select: { id: true } },
+        states: { select: { id: true } },
+        role: true,
+      },
+    });
+
+    // Allowed states for CUSTOMER_SERVICE_HEAD
+    const allowedStateIds = new Set();
+    if (user?.State?.id) allowedStateIds.add(user.State.id);
+    (user?.states || []).forEach((s) => s?.id && allowedStateIds.add(s.id));
+
+    const where = {
+      status: { not: "CLOSED" },
+
+      messages: {
+        some: {}, // must have messages
+      },
+
+      ticketMilestones: {
+        none: {
+          stage: {
+            in: [
+              "REQUEST_CLEARED_AT_FIELD",
+              "DELIVERED_TO_FIELD",
+              "TICKET_CLOSED",
+            ],
+          },
+        },
+      },
+    };
+
+    // RBAC
+    if (userRole === "CUSTOMER_FIELD_ENGINEER") {
+      where.createdBy = userId;
+    } else if (userRole === "SERVICE_CENTER_TECHNICIAN") {
+      where.assignedServiceCenter = user?.centerCode ?? "__NO_CENTER__";
+    } else if (userRole === "CUSTOMER_SERVICE_HEAD") {
+      const ids = [...allowedStateIds];
+      if (!ids.length) where.id = -1;
+      else where.AND = [{ createdByUser: { stateId: { in: ids } } }];
+    }
+
+    // STEP 1: Get last NON-macsoft message for each ticket
+    const lastNonMacsoftMessages = await prisma.message.groupBy({
+      by: ["ticketId"],
+      where: {
+        sender: { role: { notIn: MACSOFT_ROLES } },
+      },
+      _max: { createdAt: true },
+    });
+
+    // Map ticketId -> timestamp
+    const lastNonMap = new Map(
+      lastNonMacsoftMessages.map((m) => [
+        m.ticketId,
+        m._max.createdAt ? m._max.createdAt.getTime() : null,
+      ])
+    );
+
+    // Restrict tickets only to ones that actually have non-Macsoft messages
+    where.id = { in: [...lastNonMap.keys()] };
+
+    // STEP 2: Fetch full ticket info for those
+    const tickets = await prisma.ticket.findMany({
+      where,
+      select: {
+        id: true,
+        ticketCode: true,
+        messages: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            senderId: true,
+            sender: { select: { name: true, role: true } },
+            attachments: { select: { id: true } },
+          },
+        },
+      },
+    });
+
+    // STEP 3: Extract messageIds for the latest NON-macsoft messages
+    const lastMessageIds = await prisma.message.findMany({
+      where: {
+        ticketId: { in: tickets.map((t) => t.id) },
+        sender: { role: { notIn: MACSOFT_ROLES } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 1,
+      select: { id: true, ticketId: true },
+    });
+
+    const lastMsgMap = new Map(lastMessageIds.map((m) => [m.ticketId, m.id]));
+
+    // STEP 4: Fetch MessageSeen for Macsoft team members
+    const seen = await prisma.messageSeen.findMany({
+      where: {
+        messageId: { in: [...lastMsgMap.values()] },
+        user: { role: { in: MACSOFT_ROLES } },
+      },
+      select: { messageId: true },
+    });
+
+    const seenSet = new Set(seen.map((s) => s.messageId));
+
+    // STEP 5: FILTER — only include tickets where last non-macsoft message is UNSEEN
+    const final = tickets.filter((t) => {
+      const lastMsgId = lastMsgMap.get(t.id);
+      return !seenSet.has(lastMsgId);
+    });
+
+    // Sort by last message time
+    return final.sort((a, b) => {
+      const ta = new Date(a.messages[0]?.createdAt).getTime();
+      const tb = new Date(b.messages[0]?.createdAt).getTime();
+      return tb - ta;
+    });
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 module.exports = {
   getConversations,
   createConversation,
@@ -350,4 +716,6 @@ module.exports = {
   markMessageAsSeen,
   markMessagesAsSeen,
   getUnreadMessageCount,
+  getUnrepliedTickets : getTicketsNotRepliedByMacsoft,
+  getUnrepliedMessagesForUser, // New function for flexible unreplied messages
 };

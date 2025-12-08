@@ -124,6 +124,23 @@ const getUnreadCount = async (req, res) => {
   }
 };
 
+// Get tickets where user was the last to reply
+const getUnrepliedTickets = async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+  
+  try {
+    const result = await conversationService.getUnrepliedTickets(userId, userRole);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error getting unreplied tickets:", error);
+    res.status(500).json({ 
+      success: false,
+      message: "Internal server error" 
+    });
+  }
+};
+
 module.exports = {
   getConversations,
   createConversation,
@@ -131,4 +148,5 @@ module.exports = {
   markMessageAsSeen,
   markMessagesAsSeen,
   getUnreadCount,
+  getUnrepliedTickets,
 };
