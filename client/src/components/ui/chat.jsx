@@ -170,7 +170,31 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   );
 };
 
-export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, name, attachments = [], onPreviewAttachment }) => {
+export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, name, attachments = [], onPreviewAttachment, date }) => {
+  const formatDateTime = (timestamp, date) => {
+    if (!timestamp) return '';
+    
+    // If date is provided, use it
+    if (date) {
+      return `${date} ${timestamp}`;
+    }
+    
+    // Otherwise try to format the timestamp
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // If timestamp contains date info, parse it
+    const dateMatch = timestamp.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+    if (dateMatch) {
+      return timestamp;
+    }
+    
+    // If timestamp is just time, add today's date
+    const msgDate = today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return `${msgDate} ${timestamp}`;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -201,7 +225,7 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
           )}
         </div>
         <span className="text-[10px] sm:text-xs text-gray-500 mt-1 px-2">
-          {timestamp} {name ? `• ${name}` : ''}
+          {formatDateTime(timestamp, date)} {name ? `• ${name}` : ''}
         </span>
       </div>
     </motion.div>
@@ -614,6 +638,7 @@ export const ChatWindow = ({
               message={msg.message}
               isOwnMessage={msg.isOwnMessage}
               timestamp={msg.timestamp}
+              date={msg.date}
               avatar={msg.avatar}
               name={msg.senderName}
               attachments={msg.attachments}
