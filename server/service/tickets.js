@@ -88,7 +88,10 @@ const getTickets = async (skip, take, filter, userId, role) => {
           orderBy: { order: "asc" },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: [
+        { isBuzzerOn: "desc" }, // Buzzer alert tickets first
+        { createdAt: "desc" }    // Then by creation date
+      ],
     };
 
     // Pagination: treat `skip` as 1-based page number (same semantics as before)

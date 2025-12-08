@@ -42,7 +42,7 @@ const BuzzerAlertsDisplay = () => {
           {alerts.length > 1 && (
             <button 
               onClick={clearAllAlerts}
-              className="btn-clear-all"
+              className="btn-clear-all mx-2"
               title="Clear All Alerts"
             >
               Clear All ({alerts.length})

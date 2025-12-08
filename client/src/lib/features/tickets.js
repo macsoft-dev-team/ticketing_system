@@ -451,6 +451,43 @@ const ticketSlice = createSlice({
     },
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
+    },
+    markTicketWithBuzzerAlert: (state, action) => {
+      console.log('🔴 [REDUX] markTicketWithBuzzerAlert called with:', action.payload);
+      const { ticketId, alertData } = action.payload;
+      console.log('🔴 [REDUX] Looking for ticket ID:', ticketId);
+      console.log('🔴 [REDUX] Current tickets in state:', state.tickets.map(t => ({ id: t.id, code: t.ticketCode })));
+      
+      const ticketIndex = state.tickets.findIndex((ticket) => ticket.id === ticketId);
+      console.log('🔴 [REDUX] Ticket found at index:', ticketIndex);
+      
+      if (ticketIndex !== -1) {
+        // Mark ticket with buzzer alert
+        state.tickets[ticketIndex].hasBuzzerAlert = true;
+        state.tickets[ticketIndex].buzzerAlertData = alertData;
+        state.tickets[ticketIndex].buzzerAlertTime = new Date().toISOString();
+        console.log('🔴 [REDUX] Ticket marked with buzzer alert:', state.tickets[ticketIndex].ticketCode);
+        
+        // Move ticket to top of list
+        if (ticketIndex > 0) {
+          const alertedTicket = state.tickets[ticketIndex];
+          state.tickets.splice(ticketIndex, 1);
+          state.tickets.unshift(alertedTicket);
+          console.log('🔴 [REDUX] Ticket moved to top of list');
+        }
+      } else {
+        console.warn('🔴 [REDUX] Ticket not found in current list!');
+      }
+    },
+    clearTicketBuzzerAlert: (state, action) => {
+      const ticketId = action.payload;
+      const ticketIndex = state.tickets.findIndex((ticket) => ticket.id === ticketId);
+      
+      if (ticketIndex !== -1) {
+        state.tickets[ticketIndex].hasBuzzerAlert = false;
+        state.tickets[ticketIndex].buzzerAlertData = null;
+        state.tickets[ticketIndex].buzzerAlertTime = null;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -473,9 +510,23 @@ const ticketSlice = createSlice({
       })
       .addCase(fetchTickets.fulfilled, (state, action) => {
         state.loading = false;
-        state.tickets = Array.isArray(action.payload.tickets)
+        const tickets = Array.isArray(action.payload.tickets)
           ? action.payload.tickets
           : action.payload.tickets || [];
+        
+        // Apply buzzer alert status from server (isBuzzerOn field)
+        state.tickets = tickets.map(ticket => ({
+          ...ticket,
+          hasBuzzerAlert: ticket.isBuzzerOn || false,
+          buzzerAlertData: ticket.isBuzzerOn ? {
+            type: 'CUSTOMER_RESPONSE_PENDING',
+            urgency: 'HIGH',
+            ticketCode: ticket.ticketCode,
+            ticketId: ticket.id
+          } : null,
+          buzzerAlertTime: ticket.isBuzzerOn ? new Date().toISOString() : null
+        }));
+        
         state.totalPages = action.payload.totalPages || 0;
         state.currentPage = action.payload.currentPage || 0;
         state.error = null;
@@ -604,6 +655,8 @@ export const {
   clearError,
   clearDeviceDetails,
   setCurrentPage,
+  markTicketWithBuzzerAlert,
+  clearTicketBuzzerAlert,
 } = ticketSlice.actions;
 
 export default ticketSlice.reducer;

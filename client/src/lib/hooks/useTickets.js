@@ -12,6 +12,8 @@ import {
   searchTickets,
   updateTicketLastMessage,
   addNewTicketFromSocket,
+  markTicketWithBuzzerAlert,
+  clearTicketBuzzerAlert,
 } from "../features/tickets";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -96,6 +98,14 @@ function useTickets() {
     dispatch(addNewTicketFromSocket(ticketData));
   };
 
+  const markBuzzerAlert = (ticketId, alertData) => {
+    dispatch(markTicketWithBuzzerAlert({ ticketId, alertData }));
+  };
+
+  const clearBuzzerAlert = (ticketId) => {
+    dispatch(clearTicketBuzzerAlert(ticketId));
+  };
+
   return {
     tickets,
     currentPage,
@@ -125,6 +135,8 @@ function useTickets() {
     updateLastMessage,
     updateTicketWithMessage,
     addNewTicket,
+    markBuzzerAlert,
+    clearBuzzerAlert,
   };
 }
 export default useTickets;

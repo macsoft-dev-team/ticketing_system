@@ -196,6 +196,29 @@ const createConversation = async (conversation, userId, io, files = []) => {
       notificationData,
       targetUserIds
     );
+    
+    // If sender is a MACSOFT user, turn off buzzer alert for this ticket
+    const senderUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
+    });
+    
+    const MACSOFT_ROLES = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+    if (senderUser && MACSOFT_ROLES.includes(senderUser.role)) {
+      await prisma.ticket.update({
+        where: { id: ticketId },
+        data: { isBuzzerOn: false }
+      });
+      console.log(`🔕 Turned off buzzer alert for ticket ${newMessage.ticket?.ticketCode} - Macsoft user responded`);
+      
+      // Emit socket event to clear buzzer alert (only to MACSOFT_HEAD and MACSOFT_SUPPORT, not ADMIN)
+      if (io) {
+        io.to('role-MACSOFT_HEAD').emit('buzzer_alert_cleared', { ticketId, ticketCode: newMessage.ticket?.ticketCode });
+        io.to('role-MACSOFT_SUPPORT').emit('buzzer_alert_cleared', { ticketId, ticketCode: newMessage.ticket?.ticketCode });
+        console.log(`📤 Emitted buzzer_alert_cleared event for ticket ${newMessage.ticket?.ticketCode}`);
+      }
+    }
+    
     if (io) {
       // Get ticket data for RBAC emission
       const ticketData = await prisma.ticket.findUnique({

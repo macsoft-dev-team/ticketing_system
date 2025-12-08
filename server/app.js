@@ -261,13 +261,13 @@ const checkTicketAccess = async (userId, userRole, ticketId, socket) => {
 const PORT = process.env.PORT || 4055;
 
 httpServer.listen(PORT, () => {
-/*   console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
   
   // Start the job scheduler after server starts
   setTimeout(() => {
     console.log('Starting background job scheduler...');
     jobScheduler.start(io); // Pass io object for buzzer alerts
   }, 3000); // Wait 3 seconds for database connections to be ready
- */});
+});
 
 module.exports = app;

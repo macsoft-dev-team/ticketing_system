@@ -66,12 +66,31 @@ const createSocket = () => {
   });
 
   socket.on('buzzer_alert', (alertData) => {
-    console.log('🚨 Received buzzer alert:', alertData);
+    console.log('🚨 [SOCKET.JS] Received buzzer alert:', alertData);
+    console.log('🚨 [SOCKET.JS] Alert details:', {
+      ticketCode: alertData.ticketCode,
+      ticketId: alertData.ticketId,
+      type: alertData.type,
+      urgency: alertData.urgency
+    });
     
     // Dispatch custom event for buzzer alerts
-    window.dispatchEvent(new CustomEvent('socketBuzzerAlert', {
+    const customEvent = new CustomEvent('socketBuzzerAlert', {
       detail: alertData
+    });
+    console.log('🚨 [SOCKET.JS] Dispatching socketBuzzerAlert event to window');
+    window.dispatchEvent(customEvent);
+    console.log('🚨 [SOCKET.JS] Event dispatched successfully');
+  });
+
+  socket.on('buzzer_alert_cleared', (data) => {
+    console.log('🔕 [SOCKET.JS] Received buzzer alert cleared:', data);
+    
+    // Dispatch custom event to clear buzzer alert
+    window.dispatchEvent(new CustomEvent('socketBuzzerAlertCleared', {
+      detail: data
     }));
+    console.log('🔕 [SOCKET.JS] Buzzer alert cleared event dispatched');
   });
 
   socket.on('conversation', (messageData) => {

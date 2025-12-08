@@ -66,6 +66,18 @@ const Settings = () => {
     monthlyReports: false
   });
 
+  // Buzzer Alert Settings
+  const [buzzerAlertSettings, setBuzzerAlertSettings] = useState({
+    minHours: 3,
+    minMinutes: 0,
+    minSeconds: 0,
+    maxHours: 5,
+    maxMinutes: 0,
+    maxSeconds: 0,
+    isActive: true,
+    description: ''
+  });
+
   // Check if user has admin access
   const hasAdminAccess = user?.role === 'MACSOFT_ADMIN';
 
@@ -107,6 +119,16 @@ const Settings = () => {
         breakTimes: breakTimesRes.data.data,
         holidays: holidaysRes.data.data
       });
+
+      // Load buzzer alert settings
+      try {
+        const buzzerConfigRes = await apiClient.get('/buzzer-config');
+        if (buzzerConfigRes.data.success) {
+          setBuzzerAlertSettings(buzzerConfigRes.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to load buzzer config:', error);
+      }
 
     } catch (error) {
       addToast({
@@ -183,6 +205,61 @@ const Settings = () => {
       addToast({
         title: "Error",
         description: "Failed to save notification preferences",
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveBuzzerAlertSettings = async () => {
+    setSaving(true);
+    try {
+      // Validation
+      const minTotalSeconds = buzzerAlertSettings.minHours * 3600 + buzzerAlertSettings.minMinutes * 60 + buzzerAlertSettings.minSeconds;
+      const maxTotalSeconds = buzzerAlertSettings.maxHours * 3600 + buzzerAlertSettings.maxMinutes * 60 + buzzerAlertSettings.maxSeconds;
+      
+      if (minTotalSeconds >= maxTotalSeconds) {
+        addToast({
+          title: "Validation Error",
+          description: "Minimum time must be less than maximum time",
+          variant: "destructive"
+        });
+        setSaving(false);
+        return;
+      }
+
+      if (minTotalSeconds === 0) {
+        addToast({
+          title: "Validation Error",
+          description: "Minimum time must be at least 1 second",
+          variant: "destructive"
+        });
+        setSaving(false);
+        return;
+      }
+
+      if (buzzerAlertSettings.minHours > 48 || buzzerAlertSettings.maxHours > 48) {
+        addToast({
+          title: "Validation Error",
+          description: "Hours cannot exceed 48",
+          variant: "destructive"
+        });
+        setSaving(false);
+        return;
+      }
+
+      await apiClient.put('/buzzer-config', buzzerAlertSettings);
+      addToast({
+        title: "Success!",
+        description: "Buzzer alert configuration saved successfully",
+        variant: "success"
+      });
+      await loadSettings(); // Reload to get updated config
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to save buzzer alert configuration",
         variant: "destructive"
       });
     } finally {
@@ -333,6 +410,19 @@ const Settings = () => {
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Working Hours
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('buzzer-alerts')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === 'buzzer-alerts'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Buzzer Alerts
                 </div>
               </button>
             </nav>
@@ -1147,6 +1237,267 @@ const Settings = () => {
                 >
                   <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                   Refresh Configuration
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Buzzer Alert Settings Form */}
+        {activeTab === 'buzzer-alerts' && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 rounded-t-none">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Buzzer Alert Configuration</h2>
+              </div>
+              <p className="text-gray-600">Configure when buzzer alerts are triggered for pending customer messages.</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Alert Time Window Configuration */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                  <div>
+                    <h3 className="font-medium text-gray-900">Alert Time Window</h3>
+                    <p className="text-sm text-gray-500">Set the time range for triggering buzzer alerts</p>
+                  </div>
+                  <Switch
+                    checked={buzzerAlertSettings.isActive}
+                    onCheckedChange={(checked) => setBuzzerAlertSettings(prev => ({ ...prev, isActive: checked }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Minimum Time Configuration */}
+                  <div className="space-y-4 p-4 border border-gray-200 rounded-lg">
+                    <h4 className="font-medium text-gray-900">Minimum Time Before Alert</h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="minHours" className="text-xs font-medium text-gray-600">Hours</Label>
+                        <Input
+                          id="minHours"
+                          type="number"
+                          min="0"
+                          max="48"
+                          value={buzzerAlertSettings.minHours}
+                          onChange={(e) => setBuzzerAlertSettings(prev => ({
+                            ...prev,
+                            minHours: parseInt(e.target.value) || 0
+                          }))}
+                          disabled={!buzzerAlertSettings.isActive}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="minMinutes" className="text-xs font-medium text-gray-600">Minutes</Label>
+                        <Input
+                          id="minMinutes"
+                          type="number"
+                          min="0"
+                          max="59"
+                          value={buzzerAlertSettings.minMinutes}
+                          onChange={(e) => setBuzzerAlertSettings(prev => ({
+                            ...prev,
+                            minMinutes: parseInt(e.target.value) || 0
+                          }))}
+                          disabled={!buzzerAlertSettings.isActive}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="minSeconds" className="text-xs font-medium text-gray-600">Seconds</Label>
+                        <Input
+                          id="minSeconds"
+                          type="number"
+                          min="0"
+                          max="59"
+                          value={buzzerAlertSettings.minSeconds}
+                          onChange={(e) => setBuzzerAlertSettings(prev => ({
+                            ...prev,
+                            minSeconds: parseInt(e.target.value) || 0
+                          }))}
+                          disabled={!buzzerAlertSettings.isActive}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Start triggering alerts after this duration since last customer message
+                    </p>
+                  </div>
+
+                  {/* Maximum Time Configuration */}
+                  <div className="space-y-4 p-4 border border-gray-200 rounded-lg">
+                    <h4 className="font-medium text-gray-900">Maximum Time Before Alert</h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="maxHours" className="text-xs font-medium text-gray-600">Hours</Label>
+                        <Input
+                          id="maxHours"
+                          type="number"
+                          min="0"
+                          max="48"
+                          value={buzzerAlertSettings.maxHours}
+                          onChange={(e) => setBuzzerAlertSettings(prev => ({
+                            ...prev,
+                            maxHours: parseInt(e.target.value) || 0
+                          }))}
+                          disabled={!buzzerAlertSettings.isActive}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="maxMinutes" className="text-xs font-medium text-gray-600">Minutes</Label>
+                        <Input
+                          id="maxMinutes"
+                          type="number"
+                          min="0"
+                          max="59"
+                          value={buzzerAlertSettings.maxMinutes}
+                          onChange={(e) => setBuzzerAlertSettings(prev => ({
+                            ...prev,
+                            maxMinutes: parseInt(e.target.value) || 0
+                          }))}
+                          disabled={!buzzerAlertSettings.isActive}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="maxSeconds" className="text-xs font-medium text-gray-600">Seconds</Label>
+                        <Input
+                          id="maxSeconds"
+                          type="number"
+                          min="0"
+                          max="59"
+                          value={buzzerAlertSettings.maxSeconds}
+                          onChange={(e) => setBuzzerAlertSettings(prev => ({
+                            ...prev,
+                            maxSeconds: parseInt(e.target.value) || 0
+                          }))}
+                          disabled={!buzzerAlertSettings.isActive}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Stop triggering alerts after this duration (messages older than this are ignored)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                    Description (Optional)
+                  </Label>
+                  <Input
+                    id="description"
+                    type="text"
+                    value={buzzerAlertSettings.description}
+                    onChange={(e) => setBuzzerAlertSettings(prev => ({
+                      ...prev,
+                      description: e.target.value
+                    }))}
+                    placeholder="e.g., Default buzzer alert configuration"
+                    disabled={!buzzerAlertSettings.isActive}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Current Configuration Preview */}
+              <div className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-6">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900 mb-3">Current Alert Behavior</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${buzzerAlertSettings.isActive ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                        <span className="text-gray-700">
+                          Status: <span className="font-medium">{buzzerAlertSettings.isActive ? 'Active' : 'Inactive'}</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-gray-500" />
+                        <span className="text-gray-700">
+                          Alert window: <span className="font-medium">
+                            {buzzerAlertSettings.minHours}h {buzzerAlertSettings.minMinutes}m {buzzerAlertSettings.minSeconds}s - {buzzerAlertSettings.maxHours}h {buzzerAlertSettings.maxMinutes}m {buzzerAlertSettings.maxSeconds}s
+                          </span> after last customer message
+                        </span>
+                      </div>
+                      <div className="mt-3 p-3 bg-white/50 rounded border border-orange-200">
+                        <p className="text-xs text-gray-600">
+                          <strong>Example:</strong> If a customer sends a message at 10:00:00 AM, buzzer alerts will trigger between{' '}
+                          <span className="font-medium text-orange-700">
+                            {(() => {
+                              const startTime = new Date();
+                              const minTotalSeconds = buzzerAlertSettings.minHours * 3600 + buzzerAlertSettings.minMinutes * 60 + buzzerAlertSettings.minSeconds;
+                              const maxTotalSeconds = buzzerAlertSettings.maxHours * 3600 + buzzerAlertSettings.maxMinutes * 60 + buzzerAlertSettings.maxSeconds;
+                              
+                              startTime.setHours(10, 0, 0, 0);
+                              startTime.setSeconds(startTime.getSeconds() + minTotalSeconds);
+                              
+                              const endTime = new Date();
+                              endTime.setHours(10, 0, 0, 0);
+                              endTime.setSeconds(endTime.getSeconds() + maxTotalSeconds);
+                              
+                              return `${startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} and ${endTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+                            })()}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Information Section */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Info className="h-4 w-4 text-blue-600" />
+                  <h4 className="font-medium text-blue-900">How Buzzer Alerts Work</h4>
+                </div>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <p>• Buzzer alerts notify Macsoft staff when customer messages are awaiting response</p>
+                  <p>• Alerts only trigger during configured working hours (see Working Hours tab)</p>
+                  <p>• The time window prevents alert fatigue from very old or very recent messages</p>
+                  <p>• Visual effects (red pulsing, vibration) appear on ticket cards when alerts trigger</p>
+                  <p>• Alerts automatically clear after 30 seconds or when staff responds to the message</p>
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex justify-end pt-4 border-t border-gray-200 gap-3">
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={loadSettings}
+                  disabled={loading || saving}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Reset Changes
+                </Button>
+                <Button 
+                  type="button"
+                  onClick={saveBuzzerAlertSettings}
+                  disabled={saving || !buzzerAlertSettings.isActive}
+                  className="bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  {saving ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Configuration
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

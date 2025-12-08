@@ -423,6 +423,20 @@ exports.Prisma.OfficeHolidayScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.BuzzerAlertConfigScalarFieldEnum = {
+  id: 'id',
+  minHours: 'minHours',
+  minMinutes: 'minMinutes',
+  minSeconds: 'minSeconds',
+  maxHours: 'maxHours',
+  maxMinutes: 'maxMinutes',
+  maxSeconds: 'maxSeconds',
+  isActive: 'isActive',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -572,6 +586,10 @@ exports.Prisma.OfficeHolidayOrderByRelevanceFieldEnum = {
   name: 'name',
   description: 'description'
 };
+
+exports.Prisma.BuzzerAlertConfigOrderByRelevanceFieldEnum = {
+  description: 'description'
+};
 exports.Role = exports.$Enums.Role = {
   MACSOFT_ADMIN: 'MACSOFT_ADMIN',
   MACSOFT_HEAD: 'MACSOFT_HEAD',
@@ -667,7 +685,8 @@ exports.Prisma.ModelName = {
   motorhp: 'motorhp',
   WorkingHours: 'WorkingHours',
   BreakTime: 'BreakTime',
-  OfficeHoliday: 'OfficeHoliday'
+  OfficeHoliday: 'OfficeHoliday',
+  BuzzerAlertConfig: 'BuzzerAlertConfig'
 };
 
 /**

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { useSocket } from "../../lib/contexts/SocketContext";
 
 export default function Tickets() {
-    const { tickets, filters, totalPages, currentPage, setTickets, fetchTickets, updateLastMessage, updateTicketWithMessage, addNewTicket } = useTickets();
+    const { tickets, filters, totalPages, currentPage, setTickets, fetchTickets, updateLastMessage, updateTicketWithMessage, addNewTicket, markBuzzerAlert, clearBuzzerAlert } = useTickets();
     const { isConnected } = useSocket();
     const handleStatusChange = (ticketId, newStatus) => {
         setTickets(prev => prev.map(ticket =>
@@ -68,17 +68,52 @@ export default function Tickets() {
             addNewTicket(ticketData);
         };
 
+        const handleBuzzerAlert = (event) => {
+            const alertData = event.detail;
+            console.log('🚨 [TICKETS PAGE] Buzzer alert event received!');
+            console.log('🚨 [TICKETS PAGE] Alert data:', alertData);
+            console.log('🚨 [TICKETS PAGE] Ticket code:', alertData.ticketCode);
+            console.log('🚨 [TICKETS PAGE] Ticket ID:', alertData.ticketId);
+            
+            // Mark ticket with buzzer alert (NO AUTO-CLEAR - persists until Macsoft responds)
+            if (alertData.ticketId) {
+                console.log('🚨 [TICKETS PAGE] Marking ticket with buzzer alert:', alertData.ticketId);
+                markBuzzerAlert(alertData.ticketId, alertData);
+            } else {
+                console.warn('🚨 [TICKETS PAGE] No ticketId in alert data!');
+            }
+        };
+
+        const handleBuzzerAlertCleared = (event) => {
+            const data = event.detail;
+            console.log('🔕 [TICKETS PAGE] Buzzer alert cleared event received!');
+            console.log('🔕 [TICKETS PAGE] Ticket ID:', data.ticketId);
+            
+            if (data.ticketId) {
+                console.log('🔕 [TICKETS PAGE] Clearing buzzer alert for:', data.ticketId);
+                clearBuzzerAlert(data.ticketId);
+            }
+        };
+
         // Listen for ticket message updates
         window.addEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
         
         // Listen for new ticket creation
         window.addEventListener('ticketCreated', handleNewTicketCreated);
+        
+        // Listen for buzzer alerts
+        window.addEventListener('socketBuzzerAlert', handleBuzzerAlert);
+        
+        // Listen for buzzer alert cleared
+        window.addEventListener('socketBuzzerAlertCleared', handleBuzzerAlertCleared);
 
         return () => {
             window.removeEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
             window.removeEventListener('ticketCreated', handleNewTicketCreated);
+            window.removeEventListener('socketBuzzerAlert', handleBuzzerAlert);
+            window.removeEventListener('socketBuzzerAlertCleared', handleBuzzerAlertCleared);
         };
-    }, [updateTicketWithMessage, addNewTicket, tickets]);
+    }, [updateTicketWithMessage, addNewTicket, tickets, markBuzzerAlert, clearBuzzerAlert]);
      const handlePageChange = (newPage) => {
         fetchTickets({ skip: newPage, take: 8, filter: filters });
     }

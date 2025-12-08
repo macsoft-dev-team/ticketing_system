@@ -143,6 +143,11 @@ export type BreakTime = $Result.DefaultSelection<Prisma.$BreakTimePayload>
  * 
  */
 export type OfficeHoliday = $Result.DefaultSelection<Prisma.$OfficeHolidayPayload>
+/**
+ * Model BuzzerAlertConfig
+ * 
+ */
+export type BuzzerAlertConfig = $Result.DefaultSelection<Prisma.$BuzzerAlertConfigPayload>
 
 /**
  * Enums
@@ -651,6 +656,16 @@ export class PrismaClient<
     * ```
     */
   get officeHoliday(): Prisma.OfficeHolidayDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.buzzerAlertConfig`: Exposes CRUD operations for the **BuzzerAlertConfig** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BuzzerAlertConfigs
+    * const buzzerAlertConfigs = await prisma.buzzerAlertConfig.findMany()
+    * ```
+    */
+  get buzzerAlertConfig(): Prisma.BuzzerAlertConfigDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1116,7 +1131,8 @@ export namespace Prisma {
     motorhp: 'motorhp',
     WorkingHours: 'WorkingHours',
     BreakTime: 'BreakTime',
-    OfficeHoliday: 'OfficeHoliday'
+    OfficeHoliday: 'OfficeHoliday',
+    BuzzerAlertConfig: 'BuzzerAlertConfig'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1135,7 +1151,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp" | "workingHours" | "breakTime" | "officeHoliday"
+      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp" | "workingHours" | "breakTime" | "officeHoliday" | "buzzerAlertConfig"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2855,6 +2871,72 @@ export namespace Prisma {
           }
         }
       }
+      BuzzerAlertConfig: {
+        payload: Prisma.$BuzzerAlertConfigPayload<ExtArgs>
+        fields: Prisma.BuzzerAlertConfigFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BuzzerAlertConfigFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BuzzerAlertConfigFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>
+          }
+          findFirst: {
+            args: Prisma.BuzzerAlertConfigFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BuzzerAlertConfigFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>
+          }
+          findMany: {
+            args: Prisma.BuzzerAlertConfigFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>[]
+          }
+          create: {
+            args: Prisma.BuzzerAlertConfigCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>
+          }
+          createMany: {
+            args: Prisma.BuzzerAlertConfigCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.BuzzerAlertConfigDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>
+          }
+          update: {
+            args: Prisma.BuzzerAlertConfigUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>
+          }
+          deleteMany: {
+            args: Prisma.BuzzerAlertConfigDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BuzzerAlertConfigUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.BuzzerAlertConfigUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BuzzerAlertConfigPayload>
+          }
+          aggregate: {
+            args: Prisma.BuzzerAlertConfigAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBuzzerAlertConfig>
+          }
+          groupBy: {
+            args: Prisma.BuzzerAlertConfigGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BuzzerAlertConfigGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BuzzerAlertConfigCountArgs<ExtArgs>
+            result: $Utils.Optional<BuzzerAlertConfigCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2977,6 +3059,7 @@ export namespace Prisma {
     workingHours?: WorkingHoursOmit
     breakTime?: BreakTimeOmit
     officeHoliday?: OfficeHolidayOmit
+    buzzerAlertConfig?: BuzzerAlertConfigOmit
   }
 
   /* Types for Logging */
@@ -31468,6 +31551,1012 @@ export namespace Prisma {
 
 
   /**
+   * Model BuzzerAlertConfig
+   */
+
+  export type AggregateBuzzerAlertConfig = {
+    _count: BuzzerAlertConfigCountAggregateOutputType | null
+    _avg: BuzzerAlertConfigAvgAggregateOutputType | null
+    _sum: BuzzerAlertConfigSumAggregateOutputType | null
+    _min: BuzzerAlertConfigMinAggregateOutputType | null
+    _max: BuzzerAlertConfigMaxAggregateOutputType | null
+  }
+
+  export type BuzzerAlertConfigAvgAggregateOutputType = {
+    id: number | null
+    minHours: number | null
+    minMinutes: number | null
+    minSeconds: number | null
+    maxHours: number | null
+    maxMinutes: number | null
+    maxSeconds: number | null
+  }
+
+  export type BuzzerAlertConfigSumAggregateOutputType = {
+    id: number | null
+    minHours: number | null
+    minMinutes: number | null
+    minSeconds: number | null
+    maxHours: number | null
+    maxMinutes: number | null
+    maxSeconds: number | null
+  }
+
+  export type BuzzerAlertConfigMinAggregateOutputType = {
+    id: number | null
+    minHours: number | null
+    minMinutes: number | null
+    minSeconds: number | null
+    maxHours: number | null
+    maxMinutes: number | null
+    maxSeconds: number | null
+    isActive: boolean | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuzzerAlertConfigMaxAggregateOutputType = {
+    id: number | null
+    minHours: number | null
+    minMinutes: number | null
+    minSeconds: number | null
+    maxHours: number | null
+    maxMinutes: number | null
+    maxSeconds: number | null
+    isActive: boolean | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BuzzerAlertConfigCountAggregateOutputType = {
+    id: number
+    minHours: number
+    minMinutes: number
+    minSeconds: number
+    maxHours: number
+    maxMinutes: number
+    maxSeconds: number
+    isActive: number
+    description: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BuzzerAlertConfigAvgAggregateInputType = {
+    id?: true
+    minHours?: true
+    minMinutes?: true
+    minSeconds?: true
+    maxHours?: true
+    maxMinutes?: true
+    maxSeconds?: true
+  }
+
+  export type BuzzerAlertConfigSumAggregateInputType = {
+    id?: true
+    minHours?: true
+    minMinutes?: true
+    minSeconds?: true
+    maxHours?: true
+    maxMinutes?: true
+    maxSeconds?: true
+  }
+
+  export type BuzzerAlertConfigMinAggregateInputType = {
+    id?: true
+    minHours?: true
+    minMinutes?: true
+    minSeconds?: true
+    maxHours?: true
+    maxMinutes?: true
+    maxSeconds?: true
+    isActive?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuzzerAlertConfigMaxAggregateInputType = {
+    id?: true
+    minHours?: true
+    minMinutes?: true
+    minSeconds?: true
+    maxHours?: true
+    maxMinutes?: true
+    maxSeconds?: true
+    isActive?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BuzzerAlertConfigCountAggregateInputType = {
+    id?: true
+    minHours?: true
+    minMinutes?: true
+    minSeconds?: true
+    maxHours?: true
+    maxMinutes?: true
+    maxSeconds?: true
+    isActive?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BuzzerAlertConfigAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuzzerAlertConfig to aggregate.
+     */
+    where?: BuzzerAlertConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuzzerAlertConfigs to fetch.
+     */
+    orderBy?: BuzzerAlertConfigOrderByWithRelationInput | BuzzerAlertConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BuzzerAlertConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuzzerAlertConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuzzerAlertConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BuzzerAlertConfigs
+    **/
+    _count?: true | BuzzerAlertConfigCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BuzzerAlertConfigAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BuzzerAlertConfigSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BuzzerAlertConfigMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BuzzerAlertConfigMaxAggregateInputType
+  }
+
+  export type GetBuzzerAlertConfigAggregateType<T extends BuzzerAlertConfigAggregateArgs> = {
+        [P in keyof T & keyof AggregateBuzzerAlertConfig]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBuzzerAlertConfig[P]>
+      : GetScalarType<T[P], AggregateBuzzerAlertConfig[P]>
+  }
+
+
+
+
+  export type BuzzerAlertConfigGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BuzzerAlertConfigWhereInput
+    orderBy?: BuzzerAlertConfigOrderByWithAggregationInput | BuzzerAlertConfigOrderByWithAggregationInput[]
+    by: BuzzerAlertConfigScalarFieldEnum[] | BuzzerAlertConfigScalarFieldEnum
+    having?: BuzzerAlertConfigScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BuzzerAlertConfigCountAggregateInputType | true
+    _avg?: BuzzerAlertConfigAvgAggregateInputType
+    _sum?: BuzzerAlertConfigSumAggregateInputType
+    _min?: BuzzerAlertConfigMinAggregateInputType
+    _max?: BuzzerAlertConfigMaxAggregateInputType
+  }
+
+  export type BuzzerAlertConfigGroupByOutputType = {
+    id: number
+    minHours: number
+    minMinutes: number
+    minSeconds: number
+    maxHours: number
+    maxMinutes: number
+    maxSeconds: number
+    isActive: boolean
+    description: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BuzzerAlertConfigCountAggregateOutputType | null
+    _avg: BuzzerAlertConfigAvgAggregateOutputType | null
+    _sum: BuzzerAlertConfigSumAggregateOutputType | null
+    _min: BuzzerAlertConfigMinAggregateOutputType | null
+    _max: BuzzerAlertConfigMaxAggregateOutputType | null
+  }
+
+  type GetBuzzerAlertConfigGroupByPayload<T extends BuzzerAlertConfigGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BuzzerAlertConfigGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BuzzerAlertConfigGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BuzzerAlertConfigGroupByOutputType[P]>
+            : GetScalarType<T[P], BuzzerAlertConfigGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BuzzerAlertConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    minHours?: boolean
+    minMinutes?: boolean
+    minSeconds?: boolean
+    maxHours?: boolean
+    maxMinutes?: boolean
+    maxSeconds?: boolean
+    isActive?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["buzzerAlertConfig"]>
+
+
+
+  export type BuzzerAlertConfigSelectScalar = {
+    id?: boolean
+    minHours?: boolean
+    minMinutes?: boolean
+    minSeconds?: boolean
+    maxHours?: boolean
+    maxMinutes?: boolean
+    maxSeconds?: boolean
+    isActive?: boolean
+    description?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BuzzerAlertConfigOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "minHours" | "minMinutes" | "minSeconds" | "maxHours" | "maxMinutes" | "maxSeconds" | "isActive" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["buzzerAlertConfig"]>
+
+  export type $BuzzerAlertConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BuzzerAlertConfig"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      minHours: number
+      minMinutes: number
+      minSeconds: number
+      maxHours: number
+      maxMinutes: number
+      maxSeconds: number
+      isActive: boolean
+      description: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["buzzerAlertConfig"]>
+    composites: {}
+  }
+
+  type BuzzerAlertConfigGetPayload<S extends boolean | null | undefined | BuzzerAlertConfigDefaultArgs> = $Result.GetResult<Prisma.$BuzzerAlertConfigPayload, S>
+
+  type BuzzerAlertConfigCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BuzzerAlertConfigFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BuzzerAlertConfigCountAggregateInputType | true
+    }
+
+  export interface BuzzerAlertConfigDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BuzzerAlertConfig'], meta: { name: 'BuzzerAlertConfig' } }
+    /**
+     * Find zero or one BuzzerAlertConfig that matches the filter.
+     * @param {BuzzerAlertConfigFindUniqueArgs} args - Arguments to find a BuzzerAlertConfig
+     * @example
+     * // Get one BuzzerAlertConfig
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BuzzerAlertConfigFindUniqueArgs>(args: SelectSubset<T, BuzzerAlertConfigFindUniqueArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BuzzerAlertConfig that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BuzzerAlertConfigFindUniqueOrThrowArgs} args - Arguments to find a BuzzerAlertConfig
+     * @example
+     * // Get one BuzzerAlertConfig
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BuzzerAlertConfigFindUniqueOrThrowArgs>(args: SelectSubset<T, BuzzerAlertConfigFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuzzerAlertConfig that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigFindFirstArgs} args - Arguments to find a BuzzerAlertConfig
+     * @example
+     * // Get one BuzzerAlertConfig
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BuzzerAlertConfigFindFirstArgs>(args?: SelectSubset<T, BuzzerAlertConfigFindFirstArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BuzzerAlertConfig that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigFindFirstOrThrowArgs} args - Arguments to find a BuzzerAlertConfig
+     * @example
+     * // Get one BuzzerAlertConfig
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BuzzerAlertConfigFindFirstOrThrowArgs>(args?: SelectSubset<T, BuzzerAlertConfigFindFirstOrThrowArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BuzzerAlertConfigs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BuzzerAlertConfigs
+     * const buzzerAlertConfigs = await prisma.buzzerAlertConfig.findMany()
+     * 
+     * // Get first 10 BuzzerAlertConfigs
+     * const buzzerAlertConfigs = await prisma.buzzerAlertConfig.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const buzzerAlertConfigWithIdOnly = await prisma.buzzerAlertConfig.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BuzzerAlertConfigFindManyArgs>(args?: SelectSubset<T, BuzzerAlertConfigFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BuzzerAlertConfig.
+     * @param {BuzzerAlertConfigCreateArgs} args - Arguments to create a BuzzerAlertConfig.
+     * @example
+     * // Create one BuzzerAlertConfig
+     * const BuzzerAlertConfig = await prisma.buzzerAlertConfig.create({
+     *   data: {
+     *     // ... data to create a BuzzerAlertConfig
+     *   }
+     * })
+     * 
+     */
+    create<T extends BuzzerAlertConfigCreateArgs>(args: SelectSubset<T, BuzzerAlertConfigCreateArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BuzzerAlertConfigs.
+     * @param {BuzzerAlertConfigCreateManyArgs} args - Arguments to create many BuzzerAlertConfigs.
+     * @example
+     * // Create many BuzzerAlertConfigs
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BuzzerAlertConfigCreateManyArgs>(args?: SelectSubset<T, BuzzerAlertConfigCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a BuzzerAlertConfig.
+     * @param {BuzzerAlertConfigDeleteArgs} args - Arguments to delete one BuzzerAlertConfig.
+     * @example
+     * // Delete one BuzzerAlertConfig
+     * const BuzzerAlertConfig = await prisma.buzzerAlertConfig.delete({
+     *   where: {
+     *     // ... filter to delete one BuzzerAlertConfig
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BuzzerAlertConfigDeleteArgs>(args: SelectSubset<T, BuzzerAlertConfigDeleteArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BuzzerAlertConfig.
+     * @param {BuzzerAlertConfigUpdateArgs} args - Arguments to update one BuzzerAlertConfig.
+     * @example
+     * // Update one BuzzerAlertConfig
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BuzzerAlertConfigUpdateArgs>(args: SelectSubset<T, BuzzerAlertConfigUpdateArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BuzzerAlertConfigs.
+     * @param {BuzzerAlertConfigDeleteManyArgs} args - Arguments to filter BuzzerAlertConfigs to delete.
+     * @example
+     * // Delete a few BuzzerAlertConfigs
+     * const { count } = await prisma.buzzerAlertConfig.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BuzzerAlertConfigDeleteManyArgs>(args?: SelectSubset<T, BuzzerAlertConfigDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BuzzerAlertConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BuzzerAlertConfigs
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BuzzerAlertConfigUpdateManyArgs>(args: SelectSubset<T, BuzzerAlertConfigUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one BuzzerAlertConfig.
+     * @param {BuzzerAlertConfigUpsertArgs} args - Arguments to update or create a BuzzerAlertConfig.
+     * @example
+     * // Update or create a BuzzerAlertConfig
+     * const buzzerAlertConfig = await prisma.buzzerAlertConfig.upsert({
+     *   create: {
+     *     // ... data to create a BuzzerAlertConfig
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BuzzerAlertConfig we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BuzzerAlertConfigUpsertArgs>(args: SelectSubset<T, BuzzerAlertConfigUpsertArgs<ExtArgs>>): Prisma__BuzzerAlertConfigClient<$Result.GetResult<Prisma.$BuzzerAlertConfigPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BuzzerAlertConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigCountArgs} args - Arguments to filter BuzzerAlertConfigs to count.
+     * @example
+     * // Count the number of BuzzerAlertConfigs
+     * const count = await prisma.buzzerAlertConfig.count({
+     *   where: {
+     *     // ... the filter for the BuzzerAlertConfigs we want to count
+     *   }
+     * })
+    **/
+    count<T extends BuzzerAlertConfigCountArgs>(
+      args?: Subset<T, BuzzerAlertConfigCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BuzzerAlertConfigCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BuzzerAlertConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BuzzerAlertConfigAggregateArgs>(args: Subset<T, BuzzerAlertConfigAggregateArgs>): Prisma.PrismaPromise<GetBuzzerAlertConfigAggregateType<T>>
+
+    /**
+     * Group by BuzzerAlertConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BuzzerAlertConfigGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BuzzerAlertConfigGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BuzzerAlertConfigGroupByArgs['orderBy'] }
+        : { orderBy?: BuzzerAlertConfigGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BuzzerAlertConfigGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBuzzerAlertConfigGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BuzzerAlertConfig model
+   */
+  readonly fields: BuzzerAlertConfigFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BuzzerAlertConfig.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BuzzerAlertConfigClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BuzzerAlertConfig model
+   */
+  interface BuzzerAlertConfigFieldRefs {
+    readonly id: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly minHours: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly minMinutes: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly minSeconds: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly maxHours: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly maxMinutes: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly maxSeconds: FieldRef<"BuzzerAlertConfig", 'Int'>
+    readonly isActive: FieldRef<"BuzzerAlertConfig", 'Boolean'>
+    readonly description: FieldRef<"BuzzerAlertConfig", 'String'>
+    readonly createdAt: FieldRef<"BuzzerAlertConfig", 'DateTime'>
+    readonly updatedAt: FieldRef<"BuzzerAlertConfig", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BuzzerAlertConfig findUnique
+   */
+  export type BuzzerAlertConfigFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which BuzzerAlertConfig to fetch.
+     */
+    where: BuzzerAlertConfigWhereUniqueInput
+  }
+
+  /**
+   * BuzzerAlertConfig findUniqueOrThrow
+   */
+  export type BuzzerAlertConfigFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which BuzzerAlertConfig to fetch.
+     */
+    where: BuzzerAlertConfigWhereUniqueInput
+  }
+
+  /**
+   * BuzzerAlertConfig findFirst
+   */
+  export type BuzzerAlertConfigFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which BuzzerAlertConfig to fetch.
+     */
+    where?: BuzzerAlertConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuzzerAlertConfigs to fetch.
+     */
+    orderBy?: BuzzerAlertConfigOrderByWithRelationInput | BuzzerAlertConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuzzerAlertConfigs.
+     */
+    cursor?: BuzzerAlertConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuzzerAlertConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuzzerAlertConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuzzerAlertConfigs.
+     */
+    distinct?: BuzzerAlertConfigScalarFieldEnum | BuzzerAlertConfigScalarFieldEnum[]
+  }
+
+  /**
+   * BuzzerAlertConfig findFirstOrThrow
+   */
+  export type BuzzerAlertConfigFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which BuzzerAlertConfig to fetch.
+     */
+    where?: BuzzerAlertConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuzzerAlertConfigs to fetch.
+     */
+    orderBy?: BuzzerAlertConfigOrderByWithRelationInput | BuzzerAlertConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BuzzerAlertConfigs.
+     */
+    cursor?: BuzzerAlertConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuzzerAlertConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuzzerAlertConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BuzzerAlertConfigs.
+     */
+    distinct?: BuzzerAlertConfigScalarFieldEnum | BuzzerAlertConfigScalarFieldEnum[]
+  }
+
+  /**
+   * BuzzerAlertConfig findMany
+   */
+  export type BuzzerAlertConfigFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * Filter, which BuzzerAlertConfigs to fetch.
+     */
+    where?: BuzzerAlertConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BuzzerAlertConfigs to fetch.
+     */
+    orderBy?: BuzzerAlertConfigOrderByWithRelationInput | BuzzerAlertConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BuzzerAlertConfigs.
+     */
+    cursor?: BuzzerAlertConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BuzzerAlertConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BuzzerAlertConfigs.
+     */
+    skip?: number
+    distinct?: BuzzerAlertConfigScalarFieldEnum | BuzzerAlertConfigScalarFieldEnum[]
+  }
+
+  /**
+   * BuzzerAlertConfig create
+   */
+  export type BuzzerAlertConfigCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to create a BuzzerAlertConfig.
+     */
+    data: XOR<BuzzerAlertConfigCreateInput, BuzzerAlertConfigUncheckedCreateInput>
+  }
+
+  /**
+   * BuzzerAlertConfig createMany
+   */
+  export type BuzzerAlertConfigCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BuzzerAlertConfigs.
+     */
+    data: BuzzerAlertConfigCreateManyInput | BuzzerAlertConfigCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BuzzerAlertConfig update
+   */
+  export type BuzzerAlertConfigUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * The data needed to update a BuzzerAlertConfig.
+     */
+    data: XOR<BuzzerAlertConfigUpdateInput, BuzzerAlertConfigUncheckedUpdateInput>
+    /**
+     * Choose, which BuzzerAlertConfig to update.
+     */
+    where: BuzzerAlertConfigWhereUniqueInput
+  }
+
+  /**
+   * BuzzerAlertConfig updateMany
+   */
+  export type BuzzerAlertConfigUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BuzzerAlertConfigs.
+     */
+    data: XOR<BuzzerAlertConfigUpdateManyMutationInput, BuzzerAlertConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which BuzzerAlertConfigs to update
+     */
+    where?: BuzzerAlertConfigWhereInput
+    /**
+     * Limit how many BuzzerAlertConfigs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuzzerAlertConfig upsert
+   */
+  export type BuzzerAlertConfigUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * The filter to search for the BuzzerAlertConfig to update in case it exists.
+     */
+    where: BuzzerAlertConfigWhereUniqueInput
+    /**
+     * In case the BuzzerAlertConfig found by the `where` argument doesn't exist, create a new BuzzerAlertConfig with this data.
+     */
+    create: XOR<BuzzerAlertConfigCreateInput, BuzzerAlertConfigUncheckedCreateInput>
+    /**
+     * In case the BuzzerAlertConfig was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BuzzerAlertConfigUpdateInput, BuzzerAlertConfigUncheckedUpdateInput>
+  }
+
+  /**
+   * BuzzerAlertConfig delete
+   */
+  export type BuzzerAlertConfigDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+    /**
+     * Filter which BuzzerAlertConfig to delete.
+     */
+    where: BuzzerAlertConfigWhereUniqueInput
+  }
+
+  /**
+   * BuzzerAlertConfig deleteMany
+   */
+  export type BuzzerAlertConfigDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BuzzerAlertConfigs to delete
+     */
+    where?: BuzzerAlertConfigWhereInput
+    /**
+     * Limit how many BuzzerAlertConfigs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BuzzerAlertConfig without action
+   */
+  export type BuzzerAlertConfigDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BuzzerAlertConfig
+     */
+    select?: BuzzerAlertConfigSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BuzzerAlertConfig
+     */
+    omit?: BuzzerAlertConfigOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -31862,6 +32951,23 @@ export namespace Prisma {
   export type OfficeHolidayScalarFieldEnum = (typeof OfficeHolidayScalarFieldEnum)[keyof typeof OfficeHolidayScalarFieldEnum]
 
 
+  export const BuzzerAlertConfigScalarFieldEnum: {
+    id: 'id',
+    minHours: 'minHours',
+    minMinutes: 'minMinutes',
+    minSeconds: 'minSeconds',
+    maxHours: 'maxHours',
+    maxMinutes: 'maxMinutes',
+    maxSeconds: 'maxSeconds',
+    isActive: 'isActive',
+    description: 'description',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BuzzerAlertConfigScalarFieldEnum = (typeof BuzzerAlertConfigScalarFieldEnum)[keyof typeof BuzzerAlertConfigScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -32082,6 +33188,13 @@ export namespace Prisma {
   };
 
   export type OfficeHolidayOrderByRelevanceFieldEnum = (typeof OfficeHolidayOrderByRelevanceFieldEnum)[keyof typeof OfficeHolidayOrderByRelevanceFieldEnum]
+
+
+  export const BuzzerAlertConfigOrderByRelevanceFieldEnum: {
+    description: 'description'
+  };
+
+  export type BuzzerAlertConfigOrderByRelevanceFieldEnum = (typeof BuzzerAlertConfigOrderByRelevanceFieldEnum)[keyof typeof BuzzerAlertConfigOrderByRelevanceFieldEnum]
 
 
   /**
@@ -34333,6 +35446,91 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"OfficeHoliday"> | Date | string
   }
 
+  export type BuzzerAlertConfigWhereInput = {
+    AND?: BuzzerAlertConfigWhereInput | BuzzerAlertConfigWhereInput[]
+    OR?: BuzzerAlertConfigWhereInput[]
+    NOT?: BuzzerAlertConfigWhereInput | BuzzerAlertConfigWhereInput[]
+    id?: IntFilter<"BuzzerAlertConfig"> | number
+    minHours?: IntFilter<"BuzzerAlertConfig"> | number
+    minMinutes?: IntFilter<"BuzzerAlertConfig"> | number
+    minSeconds?: IntFilter<"BuzzerAlertConfig"> | number
+    maxHours?: IntFilter<"BuzzerAlertConfig"> | number
+    maxMinutes?: IntFilter<"BuzzerAlertConfig"> | number
+    maxSeconds?: IntFilter<"BuzzerAlertConfig"> | number
+    isActive?: BoolFilter<"BuzzerAlertConfig"> | boolean
+    description?: StringNullableFilter<"BuzzerAlertConfig"> | string | null
+    createdAt?: DateTimeFilter<"BuzzerAlertConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"BuzzerAlertConfig"> | Date | string
+  }
+
+  export type BuzzerAlertConfigOrderByWithRelationInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
+    isActive?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: BuzzerAlertConfigOrderByRelevanceInput
+  }
+
+  export type BuzzerAlertConfigWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: BuzzerAlertConfigWhereInput | BuzzerAlertConfigWhereInput[]
+    OR?: BuzzerAlertConfigWhereInput[]
+    NOT?: BuzzerAlertConfigWhereInput | BuzzerAlertConfigWhereInput[]
+    minHours?: IntFilter<"BuzzerAlertConfig"> | number
+    minMinutes?: IntFilter<"BuzzerAlertConfig"> | number
+    minSeconds?: IntFilter<"BuzzerAlertConfig"> | number
+    maxHours?: IntFilter<"BuzzerAlertConfig"> | number
+    maxMinutes?: IntFilter<"BuzzerAlertConfig"> | number
+    maxSeconds?: IntFilter<"BuzzerAlertConfig"> | number
+    isActive?: BoolFilter<"BuzzerAlertConfig"> | boolean
+    description?: StringNullableFilter<"BuzzerAlertConfig"> | string | null
+    createdAt?: DateTimeFilter<"BuzzerAlertConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"BuzzerAlertConfig"> | Date | string
+  }, "id">
+
+  export type BuzzerAlertConfigOrderByWithAggregationInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
+    isActive?: SortOrder
+    description?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BuzzerAlertConfigCountOrderByAggregateInput
+    _avg?: BuzzerAlertConfigAvgOrderByAggregateInput
+    _max?: BuzzerAlertConfigMaxOrderByAggregateInput
+    _min?: BuzzerAlertConfigMinOrderByAggregateInput
+    _sum?: BuzzerAlertConfigSumOrderByAggregateInput
+  }
+
+  export type BuzzerAlertConfigScalarWhereWithAggregatesInput = {
+    AND?: BuzzerAlertConfigScalarWhereWithAggregatesInput | BuzzerAlertConfigScalarWhereWithAggregatesInput[]
+    OR?: BuzzerAlertConfigScalarWhereWithAggregatesInput[]
+    NOT?: BuzzerAlertConfigScalarWhereWithAggregatesInput | BuzzerAlertConfigScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    minHours?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    minMinutes?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    minSeconds?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    maxHours?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    maxMinutes?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    maxSeconds?: IntWithAggregatesFilter<"BuzzerAlertConfig"> | number
+    isActive?: BoolWithAggregatesFilter<"BuzzerAlertConfig"> | boolean
+    description?: StringNullableWithAggregatesFilter<"BuzzerAlertConfig"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BuzzerAlertConfig"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BuzzerAlertConfig"> | Date | string
+  }
+
   export type StateCreateInput = {
     name: string
     stateCode?: string | null
@@ -36504,6 +37702,101 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BuzzerAlertConfigCreateInput = {
+    minHours?: number
+    minMinutes?: number
+    minSeconds?: number
+    maxHours?: number
+    maxMinutes?: number
+    maxSeconds?: number
+    isActive?: boolean
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuzzerAlertConfigUncheckedCreateInput = {
+    id?: number
+    minHours?: number
+    minMinutes?: number
+    minSeconds?: number
+    maxHours?: number
+    maxMinutes?: number
+    maxSeconds?: number
+    isActive?: boolean
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuzzerAlertConfigUpdateInput = {
+    minHours?: IntFieldUpdateOperationsInput | number
+    minMinutes?: IntFieldUpdateOperationsInput | number
+    minSeconds?: IntFieldUpdateOperationsInput | number
+    maxHours?: IntFieldUpdateOperationsInput | number
+    maxMinutes?: IntFieldUpdateOperationsInput | number
+    maxSeconds?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuzzerAlertConfigUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    minHours?: IntFieldUpdateOperationsInput | number
+    minMinutes?: IntFieldUpdateOperationsInput | number
+    minSeconds?: IntFieldUpdateOperationsInput | number
+    maxHours?: IntFieldUpdateOperationsInput | number
+    maxMinutes?: IntFieldUpdateOperationsInput | number
+    maxSeconds?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuzzerAlertConfigCreateManyInput = {
+    id?: number
+    minHours?: number
+    minMinutes?: number
+    minSeconds?: number
+    maxHours?: number
+    maxMinutes?: number
+    maxSeconds?: number
+    isActive?: boolean
+    description?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BuzzerAlertConfigUpdateManyMutationInput = {
+    minHours?: IntFieldUpdateOperationsInput | number
+    minMinutes?: IntFieldUpdateOperationsInput | number
+    minSeconds?: IntFieldUpdateOperationsInput | number
+    maxHours?: IntFieldUpdateOperationsInput | number
+    maxMinutes?: IntFieldUpdateOperationsInput | number
+    maxSeconds?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BuzzerAlertConfigUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    minHours?: IntFieldUpdateOperationsInput | number
+    minMinutes?: IntFieldUpdateOperationsInput | number
+    minSeconds?: IntFieldUpdateOperationsInput | number
+    maxHours?: IntFieldUpdateOperationsInput | number
+    maxMinutes?: IntFieldUpdateOperationsInput | number
+    maxSeconds?: IntFieldUpdateOperationsInput | number
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -38501,6 +39794,74 @@ export namespace Prisma {
 
   export type OfficeHolidaySumOrderByAggregateInput = {
     id?: SortOrder
+  }
+
+  export type BuzzerAlertConfigOrderByRelevanceInput = {
+    fields: BuzzerAlertConfigOrderByRelevanceFieldEnum | BuzzerAlertConfigOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type BuzzerAlertConfigCountOrderByAggregateInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
+    isActive?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuzzerAlertConfigAvgOrderByAggregateInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
+  }
+
+  export type BuzzerAlertConfigMaxOrderByAggregateInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
+    isActive?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuzzerAlertConfigMinOrderByAggregateInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
+    isActive?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BuzzerAlertConfigSumOrderByAggregateInput = {
+    id?: SortOrder
+    minHours?: SortOrder
+    minMinutes?: SortOrder
+    minSeconds?: SortOrder
+    maxHours?: SortOrder
+    maxMinutes?: SortOrder
+    maxSeconds?: SortOrder
   }
 
   export type UserCreateNestedManyWithoutStateInput = {

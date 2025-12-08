@@ -1,8 +1,8 @@
 const { prisma } = require("../lib/clients");
 
-// Define Macsoft roles (internal users) - excludes MACSOFT_ADMIN
+// Define Macsoft roles (internal users) - includes MACSOFT_ADMIN for testing
 const MACSOFT_ROLES = [
-  'MACSOFT_HEAD', 
+   'MACSOFT_HEAD', 
   'MACSOFT_SUPPORT'
 ];
 
@@ -114,28 +114,68 @@ const CUSTOMER_ROLES = [
 ];
 
 /**
- * Find tickets where customers messaged last but no Macsoft response within 3 hours
+ * Find tickets where customers messaged last but no Macsoft response within configured time window
  */
 const checkPendingCustomerMessages = async (io = null) => {
   try {
     console.log(`🔔 [${new Date().toISOString()}] Checking for pending customer messages...`);
     
     // Check if we're within working hours
-    if (!(await isWithinWorkingHours())) {
-      return {
-        success: true,
-        pendingCount: 0,
-        tickets: [],
-        skippedReason: 'Outside working hours or holiday'
-      };
+    // TEMPORARILY DISABLED FOR TESTING - REMOVE COMMENTS IN PRODUCTION
+    // if (!(await isWithinWorkingHours())) {
+    //   return {
+    //     success: true,
+    //     pendingCount: 0,
+    //     tickets: [],
+    //     skippedReason: 'Outside working hours or holiday'
+    //   };
+    // }
+    
+    // Fetch buzzer alert configuration from database
+    let buzzerConfig = await prisma.buzzerAlertConfig.findFirst({
+      where: { isActive: true },
+      orderBy: { updatedAt: 'desc' }
+    });
+    
+    // If no config exists, create default configuration
+    if (!buzzerConfig) {
+      console.log('⚠️  No buzzer alert config found, creating default configuration...');
+      buzzerConfig = await prisma.buzzerAlertConfig.create({
+        data: {
+          minHours: 3,
+          minMinutes: 0,
+          minSeconds: 0,
+          maxHours: 5,
+          maxMinutes: 0,
+          maxSeconds: 0,
+          isActive: true,
+          description: 'Default buzzer alert time window'
+        }
+      });
+      console.log(`✅ Created default buzzer config: ${buzzerConfig.minHours}h ${buzzerConfig.minMinutes}m ${buzzerConfig.minSeconds}s - ${buzzerConfig.maxHours}h ${buzzerConfig.maxMinutes}m ${buzzerConfig.maxSeconds}s`);
     }
     
-    // Get current timestamp, 3 hours ago (lower bound) and 5 hours ago (upper bound)
-    const now = new Date();
-    const threeHoursAgo = new Date(now.getTime() - 3 * 60 * 60 * 1000);
-    const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+    // Calculate total milliseconds from hours, minutes, seconds (with defaults to handle null/undefined)
+    const minTotalMs = ((buzzerConfig.minHours || 0) * 3600 + (buzzerConfig.minMinutes || 0) * 60 + (buzzerConfig.minSeconds || 0)) * 1000;
+    const maxTotalMs = ((buzzerConfig.maxHours || 0) * 3600 + (buzzerConfig.maxMinutes || 0) * 60 + (buzzerConfig.maxSeconds || 0)) * 1000;
     
-    console.log(`🔔 Looking for messages between 3-5 hours old: ${fiveHoursAgo.toISOString()} to ${threeHoursAgo.toISOString()}`);
+    // Get current timestamp and time bounds from database config
+    const now = new Date();
+    const minTimeAgo = new Date(now.getTime() - minTotalMs);
+    const maxTimeAgo = new Date(now.getTime() - maxTotalMs);
+    
+    const formatTime = (h, m, s) => {
+      const parts = [];
+      if (h > 0) parts.push(`${h}h`);
+      if (m > 0) parts.push(`${m}m`);
+      if (s > 0) parts.push(`${s}s`);
+      return parts.join(' ') || '0s';
+    };
+    
+    console.log(`🔔 Looking for messages between ${formatTime(buzzerConfig.maxHours, buzzerConfig.maxMinutes, buzzerConfig.maxSeconds)} - ${formatTime(buzzerConfig.minHours, buzzerConfig.minMinutes, buzzerConfig.minSeconds)} old`);
+    console.log(`   Time range: ${maxTimeAgo.toISOString()} to ${minTimeAgo.toISOString()}`);
+    console.log(`📊 Using database config: Min=${formatTime(buzzerConfig.minHours, buzzerConfig.minMinutes, buzzerConfig.minSeconds)}, Max=${formatTime(buzzerConfig.maxHours, buzzerConfig.maxMinutes, buzzerConfig.maxSeconds)} (Config ID: ${buzzerConfig.id})`);
+
     
     // Find open/in-progress tickets that have messages
     const candidateTickets = await prisma.ticket.findMany({
@@ -192,14 +232,14 @@ const checkPendingCustomerMessages = async (io = null) => {
       
       if (!isLastMessageFromCustomer) continue;
       
-      // Check if the last message is between 3-5 hours old (skip if newer than 3 hours or older than 5 hours)
-      const isWithinTimeWindow = lastMessage.createdAt < threeHoursAgo && lastMessage.createdAt >= fiveHoursAgo;
+      // Check if the last message is within the configured time window
+      const isWithinTimeWindow = lastMessage.createdAt < minTimeAgo && lastMessage.createdAt >= maxTimeAgo;
       
       if (!isWithinTimeWindow) {
-        if (lastMessage.createdAt >= threeHoursAgo) {
-          console.log(`⏳ Skipping ticket ${ticket.ticketCode} - message too recent (less than 3 hours)`);
-        } else if (lastMessage.createdAt < fiveHoursAgo) {
-          console.log(`⏰ Skipping ticket ${ticket.ticketCode} - message too old (more than 5 hours)`);
+        if (lastMessage.createdAt >= minTimeAgo) {
+          console.log(`⏳ Skipping ticket ${ticket.ticketCode} - message too recent (less than ${formatTime(buzzerConfig.minHours, buzzerConfig.minMinutes, buzzerConfig.minSeconds)})`);
+        } else if (lastMessage.createdAt < maxTimeAgo) {
+          console.log(`⏰ Skipping ticket ${ticket.ticketCode} - message too old (more than ${formatTime(buzzerConfig.maxHours, buzzerConfig.maxMinutes, buzzerConfig.maxSeconds)})`);
         }
         continue;
       }
@@ -228,10 +268,29 @@ const checkPendingCustomerMessages = async (io = null) => {
     
     console.log(`🔔 Found ${pendingTickets.length} tickets needing Macsoft response`);
     
+    // Clear isBuzzerOn for all OPEN/IN_PROGRESS tickets first
+    await prisma.ticket.updateMany({
+      where: { 
+        status: { in: ['OPEN', 'IN_PROGRESS'] },
+        isBuzzerOn: true
+      },
+      data: { isBuzzerOn: false }
+    });
+    
+    // Mark tickets with isBuzzerOn = true (only those currently in time window)
+    if (pendingTickets.length > 0) {
+      const ticketIds = pendingTickets.map(pt => pt.ticket.id);
+      await prisma.ticket.updateMany({
+        where: { id: { in: ticketIds } },
+        data: { isBuzzerOn: true }
+      });
+      console.log(`🔔 Marked ${ticketIds.length} tickets with isBuzzerOn = true`);
+    }
+    
     // Trigger buzzer alerts if we have pending tickets and io is available
     if (pendingTickets.length > 0 && io) {
       console.log(`🚨 Triggering buzzer alerts for ${pendingTickets.length} tickets...`);
-      await triggerBuzzerAlerts(pendingTickets, io);
+      await triggerBuzzerAlerts(pendingTickets, io, buzzerConfig);
     } else if (pendingTickets.length > 0 && !io) {
       console.log(`⚠️  Found ${pendingTickets.length} pending tickets but no Socket.IO instance available`);
     } else {
@@ -241,6 +300,17 @@ const checkPendingCustomerMessages = async (io = null) => {
     return {
       success: true,
       pendingCount: pendingTickets.length,
+      config: {
+        minTime: formatTime(buzzerConfig.minHours, buzzerConfig.minMinutes, buzzerConfig.minSeconds),
+        maxTime: formatTime(buzzerConfig.maxHours, buzzerConfig.maxMinutes, buzzerConfig.maxSeconds),
+        minHours: buzzerConfig.minHours,
+        minMinutes: buzzerConfig.minMinutes,
+        minSeconds: buzzerConfig.minSeconds,
+        maxHours: buzzerConfig.maxHours,
+        maxMinutes: buzzerConfig.maxMinutes,
+        maxSeconds: buzzerConfig.maxSeconds,
+        configId: buzzerConfig.id
+      },
       tickets: pendingTickets.map(p => ({
         ticketCode: p.ticket.ticketCode,
         customerName: p.ticket.customerName,
@@ -260,7 +330,7 @@ const checkPendingCustomerMessages = async (io = null) => {
 /**
  * Trigger buzzer alerts to Macsoft users
  */
-const triggerBuzzerAlerts = async (pendingTickets, io) => {
+const triggerBuzzerAlerts = async (pendingTickets, io, buzzerConfig) => {
   try {
     console.log(`Triggering buzzer alerts for ${pendingTickets.length} pending tickets...`);
     
@@ -279,13 +349,28 @@ const triggerBuzzerAlerts = async (pendingTickets, io) => {
     
     console.log(`Found ${macsoftUsers.length} active Macsoft users to notify`);
     
+    const formatTime = (h, m, s) => {
+      const parts = [];
+      if (h > 0) parts.push(`${h}h`);
+      if (m > 0) parts.push(`${m}m`);
+      if (s > 0) parts.push(`${s}s`);
+      return parts.join(' ') || '0s';
+    };
+    
+    const timeText = formatTime(
+      buzzerConfig?.minHours || 3,
+      buzzerConfig?.minMinutes || 0,
+      buzzerConfig?.minSeconds || 0
+    );
+    
     // Create buzzer alert data
     const buzzerAlert = {
       type: 'CUSTOMER_RESPONSE_PENDING',
       timestamp: new Date().toISOString(),
       urgency: 'HIGH',
       title: 'Customer Messages Pending Response',
-      message: `${pendingTickets.length} tickets have customer messages waiting for Macsoft response (3+ hours)`,
+      message: `${pendingTickets.length} tickets have customer messages waiting for Macsoft response (${timeText}+ waiting)`,
+
       tickets: pendingTickets.map(p => ({
         ticketCode: p.ticket.ticketCode,
         customerName: p.ticket.customerName,
@@ -314,20 +399,29 @@ const triggerBuzzerAlerts = async (pendingTickets, io) => {
       const userRoom = `notifications-${user.id}`;
       console.log(`📤 Sending to user room: ${userRoom} (${user.name} - ${user.role})`);
       
-      io.to(userRoom).emit('buzzer_alert', {
-        ...buzzerAlert,
-        ticketId: pendingTickets[0]?.ticket?.id,
-        ticketCode: pendingTickets[0]?.ticket?.ticketCode,
-        hoursWaiting: pendingTickets[0]?.hoursSinceLastMessage || 0,
-        targetUser: {
-          id: user.id,
-          name: user.name,
-          role: user.role
-        }
+      // Send alert for EACH pending ticket
+      pendingTickets.forEach(pendingTicket => {
+        const alertData = {
+          ...buzzerAlert,
+          ticketId: pendingTicket.ticket?.id,
+          ticketCode: pendingTicket.ticket?.ticketCode,
+          customerName: pendingTicket.ticket?.createdByUser?.customerName,
+          hoursWaiting: pendingTicket.hoursSinceLastMessage || 0,
+          lastMessageFrom: pendingTicket.lastMessage?.sender?.name,
+          secondsSinceLastMessage: pendingTicket.secondsSinceLastMessage || 0,
+          targetUser: {
+            id: user.id,
+            name: user.name,
+            role: user.role
+          }
+        };
+        
+        console.log(`   📨 Emitting buzzer_alert for ticket ${pendingTicket.ticket?.ticketCode} to ${user.name}`);
+        io.to(userRoom).emit('buzzer_alert', alertData);
       });
     });
     
-    console.log(`✅ Buzzer alerts sent to ${macsoftUsers.length} Macsoft users (excluding MACSOFT_ADMIN)`);
+    console.log(`✅ Buzzer alerts sent to ${macsoftUsers.length} Macsoft users (${pendingTickets.length} tickets)`);
     
     // Log the alert for monitoring
     await logBuzzerAlert(pendingTickets, macsoftUsers.length);

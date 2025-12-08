@@ -520,3 +520,18 @@ model OfficeHoliday {
 
   @@unique([date])
 }
+
+// Buzzer alert configuration
+model BuzzerAlertConfig {
+  id          Int      @id @default(autoincrement())
+  minHours    Int      @default(3) // Minimum hours before triggering alert
+  minMinutes  Int      @default(0) // Additional minutes
+  minSeconds  Int      @default(0) // Additional seconds
+  maxHours    Int      @default(5) // Maximum hours before stopping alert
+  maxMinutes  Int      @default(0) // Additional minutes
+  maxSeconds  Int      @default(0) // Additional seconds
+  isActive    Boolean  @default(true)
+  description String?  @default("Time window for buzzer alerts when customer messages are pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

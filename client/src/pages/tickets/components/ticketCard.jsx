@@ -349,18 +349,44 @@ export default function TicketCard({
 
     const closureInfo = getClosureInfo();
 
+    // Check if this ticket has a buzzer alert
+    const hasBuzzerAlert = localTicket.hasBuzzerAlert;
+    const buzzerAlertData = localTicket.buzzerAlertData;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{ 
+                opacity: 1, 
+                y: 0, 
+                scale: hasBuzzerAlert ? [1, 1.02, 1, 1.02, 1] : 1,
+                boxShadow: hasBuzzerAlert 
+                    ? [
+                        "0 0 0 0 rgba(239, 68, 68, 0)",
+                        "0 0 0 8px rgba(239, 68, 68, 0.4)",
+                        "0 0 0 16px rgba(239, 68, 68, 0)",
+                        "0 0 0 8px rgba(239, 68, 68, 0.4)",
+                        "0 0 0 0 rgba(239, 68, 68, 0)"
+                    ]
+                    : "0 1px 3px 0 rgba(0, 0, 0, 0.1)"
+            }}
             whileHover={{
                 y: -4,
                 scale: 1.02,
                 boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
             }}
             transition={{
-                duration: 0.3,
-                ease: [0.25, 0.46, 0.45, 0.94]
+                duration: hasBuzzerAlert ? 0.6 : 0.3,
+                ease: [0.25, 0.46, 0.45, 0.94],
+                scale: {
+                    repeat: hasBuzzerAlert ? Infinity : 0,
+                    repeatDelay: 0.2
+                },
+                boxShadow: {
+                    repeat: hasBuzzerAlert ? Infinity : 0,
+                    repeatDelay: 0.2,
+                    duration: 1.5
+                }
             }}
             onHoverStart={() => {
                 setIsHovered(true);
@@ -374,15 +400,62 @@ export default function TicketCard({
             className={`
                 relative overflow-hidden cursor-pointer group
                 bg-white border rounded-xl h-full min-h-4/5
-                ${isOverdue ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-200'}
+                ${hasBuzzerAlert ? 'border-red-500 ring-2 ring-red-400 shadow-2xl' : 
+                  isOverdue ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-200'}
                 hover:border-gray-300 shadow-sm transition-all duration-300
                 backdrop-blur-sm
             `}
         >
-            {/* Status indicator line */}
+            {/* Buzzer Alert Indicator - Animated red pulsing overlay */}
+            {hasBuzzerAlert && (
+                <motion.div
+                    className="absolute inset-0 pointer-events-none z-30"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0.15, 0, 0.15, 0] }}
+                    transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        repeatDelay: 0.2
+                    }}
+                    style={{
+                        background: 'radial-gradient(circle at center, rgba(239, 68, 68, 0.3) 0%, rgba(239, 68, 68, 0) 70%)'
+                    }}
+                />
+            )}
+
+            {/* Buzzer Alert Badge */}
+            {hasBuzzerAlert && (
+                <motion.div
+                    initial={{ scale: 0  }}
+                    animate={{ 
+                        scale: [1, 1.1, 1],
+                     }}
+                    transition={{
+                        scale: {
+                            duration: 0.8,
+                            repeat: Infinity,
+                            repeatDelay: 0.3
+                        },
+                        rotate: {
+                            duration: 1,
+                            repeat: Infinity,
+                            repeatDelay: 0.2
+                        }
+                    }}
+                    className="absolute top-24 right-2 z-40"
+                >
+                    <div className="bg-red-600 text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-lg flex items-center gap-1.5 border-2 border-white">
+                         
+                        RESPONSE NEEDED IMMEDIATELY
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Status Bar */}
             <div className={`
                 absolute top-0 left-0 right-0 h-1
-                ${localTicket.status === TICKET_STATUS.OPEN ? 'bg-gradient-to-r from-red-500 to-pink-500' :
+                ${hasBuzzerAlert ? 'bg-gradient-to-r from-red-600 via-red-500 to-red-600' :
+                    localTicket.status === TICKET_STATUS.OPEN ? 'bg-gradient-to-r from-red-500 to-pink-500' :
                     localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
                         'bg-gradient-to-r from-green-500 to-green-200'}
             `} />
@@ -482,6 +555,27 @@ export default function TicketCard({
                                 </span>
                             ))}
                         </div>
+                    )}
+                    
+                    {/* Buzzer Alert Info - Show alert details prominently */}
+                    {hasBuzzerAlert && buzzerAlertData && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mb-3 p-3 bg-red-50 border-2 border-red-500 rounded-lg shadow-md"
+                        >
+                            <div className="flex items-center gap-2 mb-2">
+                                <svg className="w-5 h-5 text-red-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                                </svg>
+                                <span className="text-sm font-bold text-red-800">
+                                    URGENT: Customer Waiting {buzzerAlertData.hoursWaiting}+ Hours
+                                </span>
+                            </div>
+                            <p className="text-xs text-red-700 leading-relaxed">
+                                {buzzerAlertData.message || 'Customer message needs immediate response'}
+                            </p>
+                        </motion.div>
                     )}
                     
                     {/* Show detailed closure information for closed/resolved tickets */}
