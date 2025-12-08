@@ -124,6 +124,135 @@ export default function TicketCard({
 
     const isOverdue = ticket.dueDate && moment(ticket.dueDate).isBefore(moment(), 'day');
 
+    // Helper function to get closure information
+    const getClosureInfo = () => {
+        if (ticket.status !== TICKET_STATUS.CLOSED && ticket.status !== TICKET_STATUS.RESOLVED) {
+            return null;
+        }
+
+        if (!ticket.ticketMilestones || ticket.ticketMilestones.length === 0) {
+            return null;
+        }
+
+        // Check for field clearance scenarios first (higher priority)
+        const fieldClearedMilestone = ticket.ticketMilestones.find(m => 
+            m.stage === 'REQUEST_CLEARED_AT_FIELD' && m.status === 'DONE'
+        );
+        if (fieldClearedMilestone) {
+            return {
+                type: 'field-cleared',
+                label: 'Cleared at Field',
+                icon: '✓',
+                description: fieldClearedMilestone.description || 'Issue resolved on-site by field engineer',
+                bgColor: 'bg-emerald-50',
+                textColor: 'text-emerald-800',
+                borderColor: 'border-emerald-100',
+                iconColor: 'text-emerald-600',
+                closedBy: fieldClearedMilestone.changer?.name,
+                closedAt: fieldClearedMilestone.completedAt,
+                notes: fieldClearedMilestone.notes
+            };
+        }
+
+        // Check for field clearance approval
+        const fieldClearanceApprovedMilestone = ticket.ticketMilestones.find(m => 
+            m.stage === 'FIELD_CLEARANCE_APPROVED' && m.status === 'DONE'
+        );
+        if (fieldClearanceApprovedMilestone) {
+            return {
+                type: 'field-clearance-approved',
+                label: 'Field Clearance Approved',
+                icon: '✓',
+                description: fieldClearanceApprovedMilestone.description || 'Field clearance approved by Head',
+                bgColor: 'bg-green-50',
+                textColor: 'text-green-800',
+                borderColor: 'border-green-100',
+                iconColor: 'text-green-600',
+                closedBy: fieldClearanceApprovedMilestone.changer?.name,
+                closedAt: fieldClearanceApprovedMilestone.completedAt,
+                notes: fieldClearanceApprovedMilestone.notes
+            };
+        }
+
+        // Check for delivery completion
+        const deliveredMilestone = ticket.ticketMilestones.find(m => 
+            m.stage === 'DELIVERED_TO_FIELD' && m.status === 'DONE'
+        );
+        if (deliveredMilestone) {
+            return {
+                type: 'delivered',
+                label: 'Delivered to Field',
+                icon: '📦',
+                description: deliveredMilestone.description || 'Controller delivered/dispatched back to field',
+                bgColor: 'bg-blue-50',
+                textColor: 'text-blue-800',
+                borderColor: 'border-blue-100',
+                iconColor: 'text-blue-600',
+                closedBy: deliveredMilestone.changer?.name,
+                closedAt: deliveredMilestone.completedAt,
+                notes: deliveredMilestone.notes
+            };
+        }
+
+        // Check for general ticket closure (including auto-closure)
+        const ticketClosedMilestone = ticket.ticketMilestones.find(m => 
+            m.stage === 'TICKET_CLOSED' && m.status === 'DONE'
+        );
+        if (ticketClosedMilestone) {
+            // Check if it's an auto-closure based on description or notes
+            const isAutoClosed = ticketClosedMilestone.description?.toLowerCase().includes('automatically') ||
+                                ticketClosedMilestone.notes?.toLowerCase().includes('automatically');
+            
+            const isNoResponse = ticketClosedMilestone.description?.toLowerCase().includes('no customer response') ||
+                               ticketClosedMilestone.notes?.toLowerCase().includes('no customer response');
+
+            let label = 'Ticket Closed';
+            let icon = '🔒';
+            let bgColor = 'bg-gray-50';
+            let textColor = 'text-gray-800';
+            let borderColor = 'border-gray-200';
+            let iconColor = 'text-gray-600';
+
+            if (isAutoClosed) {
+                if (isNoResponse) {
+                    label = 'Auto-Closed (No Response)';
+                    icon = '⏰';
+                    bgColor = 'bg-orange-50';
+                    textColor = 'text-orange-800';
+                    borderColor = 'border-orange-100';
+                    iconColor = 'text-orange-600';
+                } else {
+                    label = 'Auto-Closed';
+                    icon = '🤖';
+                    bgColor = 'bg-purple-50';
+                    textColor = 'text-purple-800';
+                    borderColor = 'border-purple-100';
+                    iconColor = 'text-purple-600';
+                }
+            }
+
+            return {
+                type: isAutoClosed ? 'auto-closed' : 'closed',
+                label,
+                icon,
+                description: ticketClosedMilestone.description || 'Ticket permanently closed',
+                bgColor,
+                textColor,
+                borderColor,
+                iconColor,
+                closedBy: ticketClosedMilestone.changer?.name,
+                closedAt: ticketClosedMilestone.completedAt,
+                notes: ticketClosedMilestone.notes,
+                isAutoClosed,
+                isNoResponse
+            };
+        }
+
+        return null;
+    };
+
+    const closureInfo = getClosureInfo();
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -233,7 +362,7 @@ export default function TicketCard({
                 </div>
 
                 {/* Title and Description */}
-                <div className="flex-1 flex flex-col justify-between mb-4">
+                <div className="flex-1 flex flex-col justify-start mb-4">
                     <motion.h4
                         className="text-base font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug"
                         whileHover={{ color: "#3b82f6" }}
@@ -258,15 +387,32 @@ export default function TicketCard({
                         </div>
                     )}
                     
-                    {/* Show "Ticket closed" for closed/resolved tickets */}
-                    {(ticket.status === TICKET_STATUS.CLOSED || ticket.status === TICKET_STATUS.RESOLVED) && (
-                        <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                            <div className="flex items-center gap-2">
-                                <MessageSquare className="w-4 h-4 text-gray-600" />
-                                <span className="text-xs font-medium text-gray-800">
-                                    Ticket closed
+                    {/* Show detailed closure information for closed/resolved tickets */}
+                    {closureInfo && (
+                        <div className={`mt-3 p-3 ${closureInfo.bgColor} rounded-lg border ${closureInfo.borderColor}`}>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className={`text-sm ${closureInfo.iconColor}`}>{closureInfo.icon}</span>
+                                <span className={`text-xs font-medium ${closureInfo.textColor}`}>
+                                    {closureInfo.label}
                                 </span>
                             </div>
+                            <p className={`text-xs ${closureInfo.textColor} opacity-80 mb-1`}>
+                                {closureInfo.description}
+                            </p>
+                            {closureInfo.closedBy && (
+                                <div className={`text-xs ${closureInfo.textColor} opacity-70 flex items-center gap-1`}>
+                                    <User className="w-3 h-3" />
+                                    <span>Closed by {closureInfo.closedBy}</span>
+                                    {closureInfo.closedAt && (
+                                        <span className="ml-1">• {moment(closureInfo.closedAt).format('MMM DD, YYYY')}</span>
+                                    )}
+                                </div>
+                            )}
+                            {closureInfo.notes && closureInfo.notes !== closureInfo.description && (
+                                <p className={`text-xs ${closureInfo.textColor} opacity-70 mt-1 italic`}>
+                                    "{closureInfo.notes}"
+                                </p>
+                            )}
                         </div>
                     )}
                     

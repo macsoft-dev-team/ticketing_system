@@ -199,8 +199,27 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
       }
     });
     
-    // Create TICKET_CLOSED milestone directly (bypass transition validation for auto-close)
+    // Update all existing pending/in-progress milestones to DONE before creating TICKET_CLOSED
     try {
+      // Update all pending/in-progress milestones to DONE
+      const updatedMilestones = await prisma.ticketMilestone.updateMany({
+        where: {
+          ticketId: ticket.id,
+          status: {
+            in: ['PENDING', 'IN_PROGRESS']
+          }
+        },
+        data: {
+          status: 'DONE',
+          completedAt: new Date(),
+          notes: 'Marked as done due to ticket auto-closure'
+        }
+      });
+      
+      if (updatedMilestones.count > 0) {
+        console.log(`Updated ${updatedMilestones.count} existing milestones to DONE for ${ticket.ticketCode}`);
+      }
+      
       // Get the highest order number for existing milestones
       const lastMilestone = await prisma.ticketMilestone.findFirst({
         where: { ticketId: ticket.id },
@@ -209,6 +228,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
       
       const nextOrder = lastMilestone ? lastMilestone.order + 1 : 1;
       
+      // Create TICKET_CLOSED milestone
       await prisma.ticketMilestone.create({
         data: {
           ticketId: ticket.id,
@@ -225,7 +245,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
       
       console.log(`Created TICKET_CLOSED milestone for ${ticket.ticketCode}`);
     } catch (milestoneError) {
-      console.log(`Could not create TICKET_CLOSED milestone for ${ticket.ticketCode}:`, milestoneError.message);
+      console.log(`Could not update milestones for ${ticket.ticketCode}:`, milestoneError.message);
     }
     
     // Create a system message indicating auto-closure
