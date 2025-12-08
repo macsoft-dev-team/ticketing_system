@@ -18,7 +18,8 @@ import {
   ClipboardList,
   Building,
   ScanLine,
-  PackageSearch
+  PackageSearch,
+  Bell as NotificationBell
 } from 'lucide-react';
 
 import Dashboard from '../../pages/dashboard/dashboard';
@@ -40,6 +41,7 @@ import ProfilePage from '../../pages/profile/Profile';
 import SettingsPage from '../../pages/settings';
 import Projects from '../../pages/projects/projects';
 import DeliveryPage from '../../pages/delivery/DeliveryPage';
+import NotificationsPage from '../../pages/notifications';
 
 const BASE_ITEMS = {
   // -------------------------
@@ -51,6 +53,14 @@ const BASE_ITEMS = {
     label: 'Dashboard',
     category: 'main',
     element: <Dashboard />,
+  },
+
+  notifications: {
+    path: '/notifications',
+    icon: NotificationBell,
+    label: 'Notifications',
+    category: 'main',
+    element: <NotificationsPage />,
   },
 
   tickets: {
@@ -214,7 +224,7 @@ const ROLE_ITEMS = {
 
     BASE_ITEMS.motorhp,
     BASE_ITEMS.settings,
-
+    BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
 
@@ -237,7 +247,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.project,
 
     BASE_ITEMS.motorhp,
-
+    BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
 
@@ -253,7 +263,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.serviceCenter,
 
     BASE_ITEMS.products,
-
+    BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
 
@@ -267,7 +277,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.receiveController,
 
     BASE_ITEMS.inventory,
-
+    BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
 
@@ -280,7 +290,7 @@ const ROLE_ITEMS = {
 
     BASE_ITEMS.receiveController,
     BASE_ITEMS.deliver,
-
+    BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
 
@@ -290,7 +300,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
-
+    BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
 };

@@ -12,6 +12,7 @@ const NotificationBell = () => {
   const { user, token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [markingAllAsRead, setMarkingAllAsRead] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -34,14 +35,17 @@ const NotificationBell = () => {
   const { currentTicketId } = useSocket();
 
   // Transform socket notifications to match UI format
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState([]); // Only first 20 for display
+  const [allNotifications, setAllNotifications] = useState([]); // All notifications for count
   const [unreadCount, setUnreadCount] = useState(0);
   const lastNotificationCountRef = useRef(0);
+  const initialLoadCompleteRef = useRef(false);
 
   // Update local state when socket notifications change
   useEffect(() => {
     if (socketNotifications && socketNotifications.length > 0) {
-      const transformedNotifications = socketNotifications.slice(0, 20).map(item => ({
+      // Always merge socket notifications with existing ones to prevent replacement
+      const transformedSocketNotifications = socketNotifications.map(item => ({
         id: item.id || Date.now() + Math.random(),
         title: item.title || 'Notification',
         message: item.message || item.description || '',
@@ -53,22 +57,58 @@ const NotificationBell = () => {
         rawData: item
       }));
 
-      setNotifications(transformedNotifications);
-      setUnreadCount(unreadNotifications || transformedNotifications.filter(n => n.unread).length);
+      // Merge new notifications with existing ones, avoiding duplicates
+      setAllNotifications(prevAll => {
+        const existingIds = new Set(prevAll.map(n => n.id));
+        const newNotifications = transformedSocketNotifications.filter(n => !existingIds.has(n.id));
+        
+        if (newNotifications.length > 0) {
+          // Add new notifications to the beginning
+          return [...newNotifications, ...prevAll];
+        }
+        
+        // If no new notifications, just update existing ones
+        const updatedNotifications = prevAll.map(existing => {
+          const updated = transformedSocketNotifications.find(n => n.id === existing.id);
+          return updated || existing;
+        });
+        
+        return updatedNotifications;
+      });
+
+      // Update displayed notifications (first 20)
+      setNotifications(prevDisplayed => {
+        const existingIds = new Set(prevDisplayed.map(n => n.id));
+        const newNotifications = transformedSocketNotifications.filter(n => !existingIds.has(n.id));
+        
+        if (newNotifications.length > 0) {
+          const combined = [...newNotifications, ...prevDisplayed];
+          return combined.slice(0, 20);
+        }
+        
+        // Update existing displayed notifications
+        const updatedNotifications = prevDisplayed.map(existing => {
+          const updated = transformedSocketNotifications.find(n => n.id === existing.id);
+          return updated || existing;
+        });
+        
+        return updatedNotifications.slice(0, 20);
+      });
+
+      // Update unread count
+      setUnreadCount(unreadNotifications || transformedSocketNotifications.filter(n => n.unread).length);
     }
   }, [socketNotifications, unreadNotifications]);
 
+  // Track shown toast notifications to prevent duplicates
+  const shownToastIds = useRef(new Set());
+
   // Detect new notifications and show toast + play sound
   useEffect(() => {
-    const currentCount = socketNotifications.length;
-    const lastCount = lastNotificationCountRef.current;
-
-    // Check if we have new notifications
-    if (currentCount > lastCount && lastCount > 0) {
-      const newNotifications = socketNotifications.slice(0, currentCount - lastCount);
-
-      newNotifications.forEach(notification => {
-        if (!notification.seen) {
+    if (socketNotifications && socketNotifications.length > 0) {
+      socketNotifications.forEach(notification => {
+        // Only show toast for unseen notifications that haven't been shown yet
+        if (!notification.seen && !shownToastIds.current.has(notification.id)) {
           // Check if notification is related to current ticket (handle both string and number types)
           const notifTicketId = parseInt(notification.ticketId);
           const currTicketId = parseInt(currentTicketId);
@@ -77,11 +117,7 @@ const NotificationBell = () => {
             (notifTicketId === currTicketId ||
               (metaTicketId && metaTicketId === currTicketId));
 
-          if (isCurrentTicketNotification) {
-            // Suppress both sound and toast for same ticket (SocketContext handles sound)
-            // But don't show toast for same ticket
-          } else {
-
+          if (!isCurrentTicketNotification) {
             // Show toast notification for different tickets
             addToast({
               id: `notification-${notification.id}`,
@@ -90,13 +126,14 @@ const NotificationBell = () => {
               variant: 'default',
               duration: 5000,
             });
+            
+            // Mark this notification as shown
+            shownToastIds.current.add(notification.id);
           }
         }
       });
     }
-
-    lastNotificationCountRef.current = currentCount;
-  }, [socketNotifications, currentTicketId]);
+  }, [socketNotifications, currentTicketId, addToast]);
 
   // Also detect unread count changes for sound
   useEffect(() => {
@@ -126,7 +163,7 @@ const NotificationBell = () => {
           const notificationsArray = responseData.success ? responseData.data : responseData;
 
           if (Array.isArray(notificationsArray) && socketNotifications.length === 0) {
-            const transformedNotifications = notificationsArray.slice(0, 20).map(item => ({
+            const allTransformedNotifications = notificationsArray.map(item => ({
               id: item.id,
               title: item.notification?.title || 'Notification',
               message: item.notification?.description || item.notification?.content || '',
@@ -137,8 +174,10 @@ const NotificationBell = () => {
               ticketCode: item.notification?.ticket?.ticketCode,
             }));
 
-            setNotifications(transformedNotifications);
-            setUnreadCount(transformedNotifications.filter(n => n.unread).length);
+            // Store all notifications and set only first 20 for display
+            setAllNotifications(allTransformedNotifications);
+            setNotifications(allTransformedNotifications.slice(0, 20));
+            setUnreadCount(allTransformedNotifications.filter(n => n.unread).length);
           }
         }
       } catch (error) {
@@ -229,8 +268,12 @@ const NotificationBell = () => {
   };
 
   const markAllAsRead = async () => {
+    if (markingAllAsRead) return; // Prevent multiple clicks
+    
+    setMarkingAllAsRead(true);
     try {
-      const unreadNotifications = notifications.filter(n => n.unread);
+      // Use all notifications for marking as read, not just displayed ones
+      const unreadNotifications = allNotifications.filter(n => n.unread);
 
       // Mark notifications as read using socket system
       unreadNotifications.forEach(notification => {
@@ -258,8 +301,10 @@ const NotificationBell = () => {
       }
     } catch (error) {
       console.error('Error marking notifications as read:', error);
+    } finally {
+      setMarkingAllAsRead(false);
+      setIsOpen(false);
     }
-    setIsOpen(false);
   };
 
   const handleNotificationClick = async (notification) => {
@@ -412,14 +457,14 @@ const NotificationBell = () => {
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs bg-red-500 text-white border-2 border-white">
-            {unreadCount}
+          <Badge className="absolute -top-1 -right-1 min-w-5 h-5 flex items-center justify-center text-xs bg-red-500 text-white border-2 border-white px-1">
+            {unreadCount > 99 ? '99+' : unreadCount}
           </Badge>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute -right-14 sm:right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
+        <div className="absolute -right-14 sm:right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <div className="flex items-center space-x-2">
@@ -433,10 +478,18 @@ const NotificationBell = () => {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm cursor-pointer text-blue-600 hover:text-blue-800 transition-colors"
+                  disabled={markingAllAsRead}
+                  className={`text-sm cursor-pointer transition-colors flex items-center space-x-1 ${
+                    markingAllAsRead 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-blue-600 hover:text-blue-800'
+                  }`}
                   title="Mark all as read"
                 >
-                  Mark all read
+                  {markingAllAsRead && (
+                    <div className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  )}
+                  <span>Mark all read</span>
                 </button>
               )}
               <button
@@ -498,9 +551,20 @@ const NotificationBell = () => {
             )}
           </div>
 
-          {/* Footer */}
+          {/* Footer - Always show */}
           <div className="p-3 border-t border-gray-200 bg-gray-50">
-            <button className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors">
+            {allNotifications.length > notifications.length && (
+              <p className="text-xs text-gray-500 text-center mb-2">
+                Showing {notifications.length} of {allNotifications.length} notifications
+              </p>
+            )}
+            <button 
+              className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              onClick={() => {
+                setIsOpen(false);
+                navigate('/notifications');
+              }}
+            >
               View all notifications
             </button>
           </div>
