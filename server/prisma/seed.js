@@ -4,6 +4,37 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
+  // Seed BuzzerAlertConfig first
+  try {
+    await prisma.buzzerAlertConfig.upsert({
+      where: { id: 1 },
+      update: {
+        minHours: 3,
+        minMinutes: 0,
+        minSeconds: 0,
+        maxHours: 5,
+        maxMinutes: 0,
+        maxSeconds: 0,
+        isActive: true,
+        description: "Time window for buzzer alerts when customer messages are pending"
+      },
+      create: {
+        id: 1,
+        minHours: 3,
+        minMinutes: 0,
+        minSeconds: 0,
+        maxHours: 5,
+        maxMinutes: 0,
+        maxSeconds: 0,
+        isActive: true,
+        description: "Time window for buzzer alerts when customer messages are pending"
+      }
+    });
+    console.log(`✓ Successfully seeded BuzzerAlertConfig`);
+  } catch (error) {
+    console.error(`Error seeding BuzzerAlertConfig:`, error);
+  }
+
   const files = [
   /*   "organisation",
     "project",
