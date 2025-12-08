@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Trash2,
@@ -38,11 +38,114 @@ export default function TicketCard({
 }) {
     const [isHovered, setIsHovered] = useState(false);
     const [isActionVisible, setIsActionVisible] = useState(false);
+    const [localTicket, setLocalTicket] = useState(ticket);
     const navigate = useNavigate();
     const { user } = useAuth();
 
+    // Update local ticket when prop changes
+    useEffect(() => {
+        setLocalTicket(ticket);
+    }, [ticket]);
+
+    // Socket event listener for real-time message updates
+    useEffect(() => {
+        const handleTicketMessageUpdate = (event) => {
+            const messageData = event.detail;
+            
+            // Only update if this message is for the current ticket
+            if (messageData.ticketId === localTicket.id) {
+                console.log('🎫 [TICKET CARD] Received message update for ticket:', localTicket.ticketCode, messageData);
+                
+                // Update local ticket with new message
+                setLocalTicket(prev => {
+                    // Create new message object from socket data
+                    const newMessage = {
+                        id: messageData.id,
+                        content: messageData.content,
+                        senderId: messageData.senderId,
+                        sender: messageData.sender,
+                        createdAt: messageData.createdAt,
+                        attachments: messageData.attachments || [],
+                        seenBy: messageData.seenBy || []
+                    };
+
+                    // Check if message already exists (avoid duplicates)
+                    const messageExists = prev.messages?.some(m => m.id === newMessage.id);
+                    
+                    if (messageExists) {
+                        // Update existing message
+                        return {
+                            ...prev,
+                            messages: prev.messages.map(m => 
+                                m.id === newMessage.id ? newMessage : m
+                            ),
+                            updatedAt: messageData.createdAt
+                        };
+                    } else {
+                        // Add new message
+                        return {
+                            ...prev,
+                            messages: [...(prev.messages || []), newMessage],
+                            updatedAt: messageData.createdAt,
+                            hasNewActivity: true
+                        };
+                    }
+                });
+            }
+        };
+
+        const handleConversationUpdate = (event) => {
+            const messageData = event.detail;
+            
+            // Only update if this message is for the current ticket
+            if (messageData.ticketId === localTicket.id) {
+                console.log('💬 [TICKET CARD] Received conversation update for ticket:', localTicket.ticketCode, messageData);
+                
+                // Update local ticket with new message
+                setLocalTicket(prev => {
+                    // Create new message object from socket data
+                    const newMessage = {
+                        id: messageData.id,
+                        content: messageData.content,
+                        senderId: messageData.senderId,
+                        sender: messageData.sender,
+                        createdAt: messageData.createdAt,
+                        attachments: messageData.attachments || [],
+                        seenBy: messageData.seenBy || []
+                    };
+
+                    // Check if message already exists (avoid duplicates)
+                    const messageExists = prev.messages?.some(m => m.id === newMessage.id);
+                    
+                    if (messageExists) {
+                        return prev; // Don't add duplicate
+                    }
+
+                    // Add new message
+                    return {
+                        ...prev,
+                        messages: [...(prev.messages || []), newMessage],
+                        updatedAt: messageData.createdAt,
+                        hasNewActivity: true
+                    };
+                });
+            }
+        };
+
+        // Listen for ticket message updates (for ticket cards)
+        window.addEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
+        
+        // Also listen for conversation updates (general chat messages)
+        window.addEventListener('conversationUpdate', handleConversationUpdate);
+
+        return () => {
+            window.removeEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
+            window.removeEventListener('conversationUpdate', handleConversationUpdate);
+        };
+    }, [localTicket.id, localTicket.ticketCode]);
+
     const handleStatusChange = (newStatus) => {
-        onStatusChange?.(ticket.id, newStatus);
+        onStatusChange?.(localTicket.id, newStatus);
     };
 
     const handleCardClick = (e) => {
@@ -50,7 +153,7 @@ export default function TicketCard({
         if (e.target.closest('button') || e.target.closest('[data-radix-popper-content-wrapper]')) {
             return;
         }
-        navigate(`/tickets/${ticket.id}`);
+        navigate(`/tickets/${localTicket.id}`);
     };
 
     const handleButtonClick = (e, callback) => {
@@ -60,7 +163,7 @@ export default function TicketCard({
     };
 
     const getPriorityIcon = () => {
-        switch (ticket.priority) {
+        switch (localTicket.priority) {
             case TICKET_PRIORITY.HIGH:
                 return <AlertCircle className="w-3 h-3 text-red-500" />;
             case TICKET_PRIORITY.MEDIUM:
@@ -72,8 +175,8 @@ export default function TicketCard({
 
     // Helper function to get last message
     const getLastMessage = () => {
-        if (!ticket.messages || ticket.messages.length === 0) return null;
-        const lastMessage = ticket.messages[ticket.messages.length - 1];
+        if (!localTicket.messages || localTicket.messages.length === 0) return null;
+        const lastMessage = localTicket.messages[localTicket.messages.length - 1];
         return {
             content: lastMessage.content || '',
             senderName: lastMessage.sender?.name || 'Unknown',
@@ -84,9 +187,9 @@ export default function TicketCard({
 
     // Helper function to get unread/unseen message count
     const getUnreadMessageCount = () => {
-        if (!ticket.messages || ticket.messages.length === 0 || !user?.id) return 0;
+        if (!localTicket.messages || localTicket.messages.length === 0 || !user?.id) return 0;
         
-        return ticket.messages.filter(message => {
+        return localTicket.messages.filter(message => {
             // Skip messages sent by current user (they are automatically "read")
             if (message.senderId === user.id) return false;
             
@@ -107,28 +210,28 @@ export default function TicketCard({
 
     // Helper function to check if we should show last message for open/in-progress tickets
     const shouldShowLastMessageForActiveTickets = () => {
-        return (ticket.status === TICKET_STATUS.OPEN || ticket.status === TICKET_STATUS.IN_PROGRESS) && 
+        return (localTicket.status === TICKET_STATUS.OPEN || localTicket.status === TICKET_STATUS.IN_PROGRESS) && 
                hasMessages && lastMessage;
     };
 
     const lastMessage = getLastMessage();
-    const hasMessages = ticket.messages && ticket.messages.length > 0;
+    const hasMessages = localTicket.messages && localTicket.messages.length > 0;
     const unreadCount = getUnreadMessageCount();
 
-    const isOverdue = ticket.dueDate && moment(ticket.dueDate).isBefore(moment(), 'day');
+    const isOverdue = localTicket.dueDate && moment(localTicket.dueDate).isBefore(moment(), 'day');
 
     // Helper function to get closure information
     const getClosureInfo = () => {
-        if (ticket.status !== TICKET_STATUS.CLOSED && ticket.status !== TICKET_STATUS.RESOLVED) {
+        if (localTicket.status !== TICKET_STATUS.CLOSED && localTicket.status !== TICKET_STATUS.RESOLVED) {
             return null;
         }
 
-        if (!ticket.ticketMilestones || ticket.ticketMilestones.length === 0) {
+        if (!localTicket.ticketMilestones || localTicket.ticketMilestones.length === 0) {
             return null;
         }
 
         // Check for field clearance scenarios first (higher priority)
-        const fieldClearedMilestone = ticket.ticketMilestones.find(m => 
+        const fieldClearedMilestone = localTicket.ticketMilestones.find(m => 
             m.stage === 'REQUEST_CLEARED_AT_FIELD' && m.status === 'DONE'
         );
         if (fieldClearedMilestone) {
@@ -279,8 +382,8 @@ export default function TicketCard({
             {/* Status indicator line */}
             <div className={`
                 absolute top-0 left-0 right-0 h-1
-                ${ticket.status === TICKET_STATUS.OPEN ? 'bg-gradient-to-r from-red-500 to-pink-500' :
-                    ticket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
+                ${localTicket.status === TICKET_STATUS.OPEN ? 'bg-gradient-to-r from-red-500 to-pink-500' :
+                    localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
                         'bg-gradient-to-r from-green-500 to-green-200'}
             `} />
 
@@ -298,7 +401,7 @@ export default function TicketCard({
             )}
 
             {/* New ticket indicator */}
-            {ticket.isNewTicket && (
+            {localTicket.isNewTicket && (
                 <motion.div
                     initial={{ scale: 0, rotate: -10 }}
                     animate={{ scale: 1, rotate: 0 }}
@@ -322,7 +425,7 @@ export default function TicketCard({
                             whileHover={{ scale: 1.05 }}
                             className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded"
                         >
-                            {ticket.ticketCode || ticket.id}
+                            {localTicket.ticketCode || localTicket.id}
                         </motion.span>
                         <motion.div
                             initial={{ scale: 0 }}
@@ -341,16 +444,16 @@ export default function TicketCard({
                         className={`
                             flex items-center gap-2 text-xs font-medium
                             px-3 py-1.5 rounded-full border transition-all
-                            ${STATUS_COLORS[ticket.status] || 'bg-gray-100 text-gray-800 border-gray-200'} 
+                            ${STATUS_COLORS[localTicket.status] || 'bg-gray-100 text-gray-800 border-gray-200'} 
                             capitalize backdrop-blur-sm shadow-sm
                         `}
                     >
                         <div className={`w-2 h-2 rounded-full ${
-                            ticket.status === TICKET_STATUS.OPEN ? 'bg-red-500' :
-                            ticket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
+                            localTicket.status === TICKET_STATUS.OPEN ? 'bg-red-500' :
+                            localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
                             'bg-blue-500'
                         }`}></div>
-                        {ticket.status.replace('-', ' ')}
+                        {localTicket.status.replace('-', ' ')}
                     </motion.div>
                 </div>
 
@@ -362,15 +465,15 @@ export default function TicketCard({
                         whileHover={{ color: "#3b82f6" }}
                         transition={{ duration: 0.2 }}
                     >
-                        {ticket.title}
+                        {localTicket.title}
                     </motion.h4>
                     <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed min-h-10">
-                        {ticket.description}
+                        {localTicket.description}
                     </p>
                     {/* ticket ticketMilestones is array */}
-                    {ticket.ticketMilestones    && ticket.ticketMilestones.length > 0 && (
+                    {localTicket.ticketMilestones    && localTicket.ticketMilestones.length > 0 && (
                         <div className="mt-3 flex items-center gap-2">
-                            {ticket.ticketMilestones.filter((m) => m.status === "IN_PROGRESS").map((milestone) => (
+                            {localTicket.ticketMilestones.filter((m) => m.status === "IN_PROGRESS").map((milestone) => (
                                 <span
                                     key={milestone.id}
                                     className="text-xs bg-blue-50 text-blue-800 px-2 py-1 rounded-tr-xl rounded-bl-xl font-medium"
@@ -484,11 +587,11 @@ export default function TicketCard({
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg flex-1 mr-2">
                             <User className="w-4 h-4 text-slate-400" />
-                            <span className="truncate font-medium">{ticket.createdByUser?.name}</span>
+                            <span className="truncate font-medium">{localTicket.createdByUser?.name}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                             <Tag className="w-4 h-4 text-slate-400" />
-                            <span className="truncate">{ticket.category}</span>
+                            <span className="truncate">{localTicket.category}</span>
                         </div>
                     </div>
 
@@ -496,14 +599,14 @@ export default function TicketCard({
                     <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2 text-slate-500">
                             <Calendar className="w-3 h-3" />
-                            <span>Created {moment(ticket.createdAt).format('MMM DD, YYYY')}</span>
+                            <span>Created {moment(localTicket.createdAt).format('MMM DD, YYYY')}</span>
                         </div>
                         <div className={`flex items-center gap-1 font-medium ${isOverdue ? 'text-red-600' : 'text-slate-500'
                             }`}>
                             <AlertCircle className="w-3 h-3" />
                             <span>
-                                {ticket.dueDate ?
-                                    `Due ${moment(ticket.dueDate).format('MMM DD')}` :
+                                {localTicket.dueDate ?
+                                    `Due ${moment(localTicket.dueDate).format('MMM DD')}` :
                                     'No due date'
                                 }
                             </span>
@@ -514,8 +617,8 @@ export default function TicketCard({
                     <div className="flex justify-between items-center pt-3 border-t border-slate-100">
                         <div className="flex items-center gap-2 text-slate-400 text-xs">
                             <Clock className="w-3 h-3" />
-                            <span>Updated {moment(ticket.updatedAt).fromNow()}</span>
-                            {ticket.hasNewActivity && (
+                            <span>Updated {moment(localTicket.updatedAt).fromNow()}</span>
+                            {localTicket.hasNewActivity && (
                                 <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Recent activity" />
                             )}
                         </div>
