@@ -558,6 +558,7 @@ const NotificationBell = () => {
                 Showing {notifications.length} of {allNotifications.length} notifications
               </p>
             )}
+            {user.role !== "CUSTOMER_FIELD_ENGINEER" && user.role !== "CUSTOMER_SERVICE_HEAD" && (
             <button 
               className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors"
               onClick={() => {
@@ -567,6 +568,7 @@ const NotificationBell = () => {
             >
               View all notifications
             </button>
+            )}
           </div>
         </div>
       )}

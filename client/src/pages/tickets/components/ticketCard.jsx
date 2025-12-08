@@ -99,23 +99,16 @@ export default function TicketCard({
         }).length;
     };
 
-    // Helper function to check if we should show new message indicator
+    // Helper function to check if we should show new message indicator (legacy - keeping for compatibility)
     const shouldShowNewMessageIndicator = () => {
-        // Don't show message indicator for closed tickets
-        if (ticket.status === TICKET_STATUS.CLOSED || ticket.status === TICKET_STATUS.RESOLVED) {
-            return false;
-        }
-        
-        if (!hasMessages || unreadCount === 0) return false;
-        
-        const lastMessage = getLastMessage();
-        if (!lastMessage) return false;
-        
-        // Don't show if the last message sender is the current user
-        const lastMessageFromDb = ticket.messages[ticket.messages.length - 1];
-        if (lastMessageFromDb && lastMessageFromDb.senderId === user?.id) return false;
-        
-        return unreadCount > 0;
+        // This function is no longer used as we now show last message for all open/in-progress tickets
+        return false;
+    };
+
+    // Helper function to check if we should show last message for open/in-progress tickets
+    const shouldShowLastMessageForActiveTickets = () => {
+        return (ticket.status === TICKET_STATUS.OPEN || ticket.status === TICKET_STATUS.IN_PROGRESS) && 
+               hasMessages && lastMessage;
     };
 
     const lastMessage = getLastMessage();
@@ -364,13 +357,14 @@ export default function TicketCard({
                 {/* Title and Description */}
                 <div className="flex-1 flex flex-col justify-start mb-4">
                     <motion.h4
-                        className="text-base font-semibold text-slate-800 mb-2 line-clamp-2 leading-snug"
+                        className="text-base font-semibold mb-2 line-clamp-2 leading-snug"
+                        style={{ color: "#1e293b" }}
                         whileHover={{ color: "#3b82f6" }}
                         transition={{ duration: 0.2 }}
                     >
                         {ticket.title}
                     </motion.h4>
-                    <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">
+                    <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed min-h-10">
                         {ticket.description}
                     </p>
                     {/* ticket ticketMilestones is array */}
@@ -389,7 +383,7 @@ export default function TicketCard({
                     
                     {/* Show detailed closure information for closed/resolved tickets */}
                     {closureInfo && (
-                        <div className={`mt-3 p-3 ${closureInfo.bgColor} rounded-lg border ${closureInfo.borderColor}`}>
+                        <div className={`p-3 ${closureInfo.bgColor} rounded-lg border ${closureInfo.borderColor}`}>
                             <div className="flex items-center gap-2 mb-1">
                                 <span className={`text-sm ${closureInfo.iconColor}`}>{closureInfo.icon}</span>
                                 <span className={`text-xs font-medium ${closureInfo.textColor}`}>
@@ -413,39 +407,73 @@ export default function TicketCard({
                                     "{closureInfo.notes}"
                                 </p>
                             )}
-                        </div>
-                    )}
-                    
-                    {/* Conversation indicator and last message - only show if there are unread messages and last message is not from current user */}
-                    {shouldShowNewMessageIndicator() && (
-                        <div className="mt-3 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
-                            <div className="flex items-center gap-2 mb-1">
-                                <MessageSquare className="w-4 h-4 text-emerald-600" />
-                                <span className="text-xs font-medium text-emerald-800">
-                                    {unreadCount} unread message{unreadCount !== 1 ? 's' : ''}
-                                </span>
-                                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" title="New messages" />
-                                {lastMessage && lastMessage.hasAttachments && (
-                                    <Paperclip title="Has attachments" className="w-2 h-2 sm:w-3 sm:h-3 text-green-600" />
-                                )}
-                            </div>
-                            {lastMessage && (
-                                <div className="text-xs text-emerald-700">
-                                    <span className="font-medium">{lastMessage.senderName}:</span>
-                                    <span className="ml-1 line-clamp-1">
-                                        {lastMessage.content.length > 50 
-                                            ? `${lastMessage.content.substring(0, 50)}...` 
-                                            : lastMessage.content
-                                        }
-                                        {lastMessage && lastMessage.hasAttachments && (
-                                            <span className="ml-1 text-green-600">Attachment</span>
-        )}
-                                    </span>
-                                    <div className="text-emerald-500 mt-1">
-                                        {moment(lastMessage.createdAt).fromNow()}
+                            
+                            {/* Show last message for cleared at field tickets */}
+                            {(closureInfo.type === 'field-cleared' || closureInfo.type === 'field-clearance-approved') && lastMessage && (
+                                <div className={`mt-3 pt-2 border-t ${closureInfo.borderColor}`}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <MessageSquare className={`w-4 h-4 ${closureInfo.iconColor}`} />
+                                        <span className={`text-xs font-semibold ${closureInfo.textColor}`}>
+                                            Final Communication
+                                        </span>
+                                        {lastMessage.hasAttachments && (
+                                            <Paperclip className={`w-3 h-3 ${closureInfo.iconColor}`} title="Has attachments" />
+                                        )}
+                                    </div>
+                                    <div className={`text-xs ${closureInfo.textColor} opacity-90`}>
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <User className="w-3 h-3" />
+                                            <span className="font-medium">{lastMessage.senderName}</span>
+                                            <span className="opacity-60">•</span>
+                                            <span className="opacity-70">{moment(lastMessage.createdAt).fromNow()}</span>
+                                        </div>
+                                        <p className="line-clamp-2 leading-relaxed">
+                                            {lastMessage.content.length > 100 
+                                                ? `${lastMessage.content.substring(0, 100)}...` 
+                                                : lastMessage.content
+                                            }
+                                        </p>
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    )}
+                    
+                    {/* Last message for open/in-progress tickets */}
+                    {shouldShowLastMessageForActiveTickets() && (
+                        <div className={`mt-3 p-3 rounded-lg border ${
+                            unreadCount > 0 
+                                ? 'bg-blue-50 border-blue-200' 
+                                : 'bg-slate-50 border-slate-200'
+                        }`}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <MessageSquare className={`w-4 h-4 ${unreadCount > 0 ? 'text-blue-600' : 'text-slate-600'}`} />
+                                <span className={`text-xs font-medium ${unreadCount > 0 ? 'text-blue-800' : 'text-slate-700'}`}>
+                                    {unreadCount > 0 ? `${unreadCount} Unread Message${unreadCount !== 1 ? 's' : ''}` : 'Recent Message'}
+                                </span>
+                                {unreadCount > 0 && (
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Unread messages" />
+                                )}
+                                {lastMessage.hasAttachments && (
+                                    <Paperclip title="Has attachments" className={`w-3 h-3 ${unreadCount > 0 ? 'text-blue-600' : 'text-slate-600'}`} />
+                                )}
+                            </div>
+                            <div className={`text-xs ${unreadCount > 0 ? 'text-blue-800' : 'text-slate-700'}`}>
+                                <div className="flex items-center gap-1 mb-1">
+                                    <User className="w-3 h-3" />
+                                    <span className="font-medium">{lastMessage.senderName}</span>
+                                    <span className="opacity-60">•</span>
+                                    <span className={`${unreadCount > 0 ? 'text-blue-600' : 'text-slate-500'}`}>
+                                        {moment(lastMessage.createdAt).fromNow()}
+                                    </span>
+                                </div>
+                                <p className="line-clamp-2 leading-relaxed">
+                                    {lastMessage.content.length > 100 
+                                        ? `${lastMessage.content.substring(0, 100)}...` 
+                                        : lastMessage.content
+                                    }
+                                </p>
+                            </div>
                         </div>
                     )}
                 </div>
