@@ -277,8 +277,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.receiveController,
 
     BASE_ITEMS.inventory,
-    BASE_ITEMS.notifications,
-    BASE_ITEMS.profile,
+     BASE_ITEMS.profile,
   ],
 
   SERVICE_CENTER_TECHNICIAN: [
@@ -290,8 +289,7 @@ const ROLE_ITEMS = {
 
     BASE_ITEMS.receiveController,
     BASE_ITEMS.deliver,
-    BASE_ITEMS.notifications,
-    BASE_ITEMS.profile,
+     BASE_ITEMS.profile,
   ],
 
   CUSTOMER_FIELD_ENGINEER: [
@@ -300,8 +298,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
-    BASE_ITEMS.notifications,
-    BASE_ITEMS.profile,
+     BASE_ITEMS.profile,
   ],
 };
 

@@ -10687,6 +10687,9 @@ export namespace Prisma {
     faultType: string | null
     status: $Enums.TicketStatus | null
     priority: string | null
+    pumpPlacementDepth: string | null
+    cableLength: string | null
+    isBuzzerOn: boolean | null
     assignedServiceCenter: string | null
     createdBy: number | null
     updatedBy: number | null
@@ -10719,6 +10722,9 @@ export namespace Prisma {
     faultType: string | null
     status: $Enums.TicketStatus | null
     priority: string | null
+    pumpPlacementDepth: string | null
+    cableLength: string | null
+    isBuzzerOn: boolean | null
     assignedServiceCenter: string | null
     createdBy: number | null
     updatedBy: number | null
@@ -10751,6 +10757,9 @@ export namespace Prisma {
     faultType: number
     status: number
     priority: number
+    pumpPlacementDepth: number
+    cableLength: number
+    isBuzzerOn: number
     assignedServiceCenter: number
     createdBy: number
     updatedBy: number
@@ -10801,6 +10810,9 @@ export namespace Prisma {
     faultType?: true
     status?: true
     priority?: true
+    pumpPlacementDepth?: true
+    cableLength?: true
+    isBuzzerOn?: true
     assignedServiceCenter?: true
     createdBy?: true
     updatedBy?: true
@@ -10833,6 +10845,9 @@ export namespace Prisma {
     faultType?: true
     status?: true
     priority?: true
+    pumpPlacementDepth?: true
+    cableLength?: true
+    isBuzzerOn?: true
     assignedServiceCenter?: true
     createdBy?: true
     updatedBy?: true
@@ -10865,6 +10880,9 @@ export namespace Prisma {
     faultType?: true
     status?: true
     priority?: true
+    pumpPlacementDepth?: true
+    cableLength?: true
+    isBuzzerOn?: true
     assignedServiceCenter?: true
     createdBy?: true
     updatedBy?: true
@@ -10984,6 +11002,9 @@ export namespace Prisma {
     faultType: string
     status: $Enums.TicketStatus
     priority: string | null
+    pumpPlacementDepth: string | null
+    cableLength: string | null
+    isBuzzerOn: boolean | null
     assignedServiceCenter: string | null
     createdBy: number
     updatedBy: number | null
@@ -11035,6 +11056,9 @@ export namespace Prisma {
     faultType?: boolean
     status?: boolean
     priority?: boolean
+    pumpPlacementDepth?: boolean
+    cableLength?: boolean
+    isBuzzerOn?: boolean
     assignedServiceCenter?: boolean
     createdBy?: boolean
     updatedBy?: boolean
@@ -11082,6 +11106,9 @@ export namespace Prisma {
     faultType?: boolean
     status?: boolean
     priority?: boolean
+    pumpPlacementDepth?: boolean
+    cableLength?: boolean
+    isBuzzerOn?: boolean
     assignedServiceCenter?: boolean
     createdBy?: boolean
     updatedBy?: boolean
@@ -11092,7 +11119,7 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "districtCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "districtCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "pumpPlacementDepth" | "cableLength" | "isBuzzerOn" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
@@ -11147,6 +11174,9 @@ export namespace Prisma {
       faultType: string
       status: $Enums.TicketStatus
       priority: string | null
+      pumpPlacementDepth: string | null
+      cableLength: string | null
+      isBuzzerOn: boolean | null
       assignedServiceCenter: string | null
       createdBy: number
       updatedBy: number | null
@@ -11557,6 +11587,9 @@ export namespace Prisma {
     readonly faultType: FieldRef<"Ticket", 'String'>
     readonly status: FieldRef<"Ticket", 'TicketStatus'>
     readonly priority: FieldRef<"Ticket", 'String'>
+    readonly pumpPlacementDepth: FieldRef<"Ticket", 'String'>
+    readonly cableLength: FieldRef<"Ticket", 'String'>
+    readonly isBuzzerOn: FieldRef<"Ticket", 'Boolean'>
     readonly assignedServiceCenter: FieldRef<"Ticket", 'String'>
     readonly createdBy: FieldRef<"Ticket", 'Int'>
     readonly updatedBy: FieldRef<"Ticket", 'Int'>
@@ -28180,7 +28213,7 @@ export namespace Prisma {
   interface motorhpFieldRefs {
     readonly id: FieldRef<"motorhp", 'Int'>
     readonly label: FieldRef<"motorhp", 'String'>
-    readonly value: FieldRef<"motorhp", 'Int'>
+    readonly value: FieldRef<"motorhp", 'Float'>
     readonly sortOrder: FieldRef<"motorhp", 'Int'>
     readonly active: FieldRef<"motorhp", 'Boolean'>
     readonly createdAt: FieldRef<"motorhp", 'DateTime'>
@@ -31559,6 +31592,9 @@ export namespace Prisma {
     faultType: 'faultType',
     status: 'status',
     priority: 'priority',
+    pumpPlacementDepth: 'pumpPlacementDepth',
+    cableLength: 'cableLength',
+    isBuzzerOn: 'isBuzzerOn',
     assignedServiceCenter: 'assignedServiceCenter',
     createdBy: 'createdBy',
     updatedBy: 'updatedBy',
@@ -31920,6 +31956,8 @@ export namespace Prisma {
     faultCode: 'faultCode',
     faultType: 'faultType',
     priority: 'priority',
+    pumpPlacementDepth: 'pumpPlacementDepth',
+    cableLength: 'cableLength',
     assignedServiceCenter: 'assignedServiceCenter',
     code: 'code',
     projectName: 'projectName'
@@ -32714,6 +32752,9 @@ export namespace Prisma {
     faultType?: StringFilter<"Ticket"> | string
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
     priority?: StringNullableFilter<"Ticket"> | string | null
+    pumpPlacementDepth?: StringNullableFilter<"Ticket"> | string | null
+    cableLength?: StringNullableFilter<"Ticket"> | string | null
+    isBuzzerOn?: BoolNullableFilter<"Ticket"> | boolean | null
     assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
     createdBy?: IntFilter<"Ticket"> | number
     updatedBy?: IntNullableFilter<"Ticket"> | number | null
@@ -32758,6 +32799,9 @@ export namespace Prisma {
     faultType?: SortOrder
     status?: SortOrder
     priority?: SortOrderInput | SortOrder
+    pumpPlacementDepth?: SortOrderInput | SortOrder
+    cableLength?: SortOrderInput | SortOrder
+    isBuzzerOn?: SortOrderInput | SortOrder
     assignedServiceCenter?: SortOrderInput | SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
@@ -32806,6 +32850,9 @@ export namespace Prisma {
     faultType?: StringFilter<"Ticket"> | string
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
     priority?: StringNullableFilter<"Ticket"> | string | null
+    pumpPlacementDepth?: StringNullableFilter<"Ticket"> | string | null
+    cableLength?: StringNullableFilter<"Ticket"> | string | null
+    isBuzzerOn?: BoolNullableFilter<"Ticket"> | boolean | null
     assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
     createdBy?: IntFilter<"Ticket"> | number
     updatedBy?: IntNullableFilter<"Ticket"> | number | null
@@ -32850,6 +32897,9 @@ export namespace Prisma {
     faultType?: SortOrder
     status?: SortOrder
     priority?: SortOrderInput | SortOrder
+    pumpPlacementDepth?: SortOrderInput | SortOrder
+    cableLength?: SortOrderInput | SortOrder
+    isBuzzerOn?: SortOrderInput | SortOrder
     assignedServiceCenter?: SortOrderInput | SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
@@ -32890,6 +32940,9 @@ export namespace Prisma {
     faultType?: StringWithAggregatesFilter<"Ticket"> | string
     status?: EnumTicketStatusWithAggregatesFilter<"Ticket"> | $Enums.TicketStatus
     priority?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    pumpPlacementDepth?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    cableLength?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    isBuzzerOn?: BoolNullableWithAggregatesFilter<"Ticket"> | boolean | null
     assignedServiceCenter?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
     createdBy?: IntWithAggregatesFilter<"Ticket"> | number
     updatedBy?: IntNullableWithAggregatesFilter<"Ticket"> | number | null
@@ -34014,7 +34067,7 @@ export namespace Prisma {
     NOT?: motorhpWhereInput | motorhpWhereInput[]
     id?: IntFilter<"motorhp"> | number
     label?: StringFilter<"motorhp"> | string
-    value?: IntFilter<"motorhp"> | number
+    value?: FloatFilter<"motorhp"> | number
     sortOrder?: IntNullableFilter<"motorhp"> | number | null
     active?: BoolFilter<"motorhp"> | boolean
     createdAt?: DateTimeFilter<"motorhp"> | Date | string
@@ -34040,7 +34093,7 @@ export namespace Prisma {
     AND?: motorhpWhereInput | motorhpWhereInput[]
     OR?: motorhpWhereInput[]
     NOT?: motorhpWhereInput | motorhpWhereInput[]
-    value?: IntFilter<"motorhp"> | number
+    value?: FloatFilter<"motorhp"> | number
     sortOrder?: IntNullableFilter<"motorhp"> | number | null
     active?: BoolFilter<"motorhp"> | boolean
     createdAt?: DateTimeFilter<"motorhp"> | Date | string
@@ -34069,7 +34122,7 @@ export namespace Prisma {
     NOT?: motorhpScalarWhereWithAggregatesInput | motorhpScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"motorhp"> | number
     label?: StringWithAggregatesFilter<"motorhp"> | string
-    value?: IntWithAggregatesFilter<"motorhp"> | number
+    value?: FloatWithAggregatesFilter<"motorhp"> | number
     sortOrder?: IntNullableWithAggregatesFilter<"motorhp"> | number | null
     active?: BoolWithAggregatesFilter<"motorhp"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"motorhp"> | Date | string
@@ -34869,6 +34922,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -34910,6 +34966,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -34944,6 +35003,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34985,6 +35047,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -35023,6 +35088,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -35051,6 +35119,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35080,6 +35151,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -36167,7 +36241,7 @@ export namespace Prisma {
 
   export type motorhpUpdateInput = {
     label?: StringFieldUpdateOperationsInput | string
-    value?: IntFieldUpdateOperationsInput | number
+    value?: FloatFieldUpdateOperationsInput | number
     sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36178,7 +36252,7 @@ export namespace Prisma {
   export type motorhpUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     label?: StringFieldUpdateOperationsInput | string
-    value?: IntFieldUpdateOperationsInput | number
+    value?: FloatFieldUpdateOperationsInput | number
     sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36198,7 +36272,7 @@ export namespace Prisma {
 
   export type motorhpUpdateManyMutationInput = {
     label?: StringFieldUpdateOperationsInput | string
-    value?: IntFieldUpdateOperationsInput | number
+    value?: FloatFieldUpdateOperationsInput | number
     sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36208,7 +36282,7 @@ export namespace Prisma {
   export type motorhpUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     label?: StringFieldUpdateOperationsInput | string
-    value?: IntFieldUpdateOperationsInput | number
+    value?: FloatFieldUpdateOperationsInput | number
     sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -37114,6 +37188,11 @@ export namespace Prisma {
     not?: NestedEnumTicketStatusFilter<$PrismaModel> | $Enums.TicketStatus
   }
 
+  export type BoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -37182,6 +37261,9 @@ export namespace Prisma {
     faultType?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    pumpPlacementDepth?: SortOrder
+    cableLength?: SortOrder
+    isBuzzerOn?: SortOrder
     assignedServiceCenter?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
@@ -37222,6 +37304,9 @@ export namespace Prisma {
     faultType?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    pumpPlacementDepth?: SortOrder
+    cableLength?: SortOrder
+    isBuzzerOn?: SortOrder
     assignedServiceCenter?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
@@ -37254,6 +37339,9 @@ export namespace Prisma {
     faultType?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    pumpPlacementDepth?: SortOrder
+    cableLength?: SortOrder
+    isBuzzerOn?: SortOrder
     assignedServiceCenter?: SortOrder
     createdBy?: SortOrder
     updatedBy?: SortOrder
@@ -37280,6 +37368,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTicketStatusFilter<$PrismaModel>
     _max?: NestedEnumTicketStatusFilter<$PrismaModel>
+  }
+
+  export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
   export type EnumServiceStageFilter<$PrismaModel = never> = {
@@ -38186,6 +38282,17 @@ export namespace Prisma {
     id?: SortOrder
   }
 
+  export type FloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type motorhpOrderByRelevanceInput = {
     fields: motorhpOrderByRelevanceFieldEnum | motorhpOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -38232,6 +38339,22 @@ export namespace Prisma {
     id?: SortOrder
     value?: SortOrder
     sortOrder?: SortOrder
+  }
+
+  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
   }
 
   export type WorkingHoursCountOrderByAggregateInput = {
@@ -39712,6 +39835,10 @@ export namespace Prisma {
     set?: $Enums.TicketStatus
   }
 
+  export type NullableBoolFieldUpdateOperationsInput = {
+    set?: boolean | null
+  }
+
   export type UserUpdateOneRequiredWithoutCreatedTicketsNestedInput = {
     create?: XOR<UserCreateWithoutCreatedTicketsInput, UserUncheckedCreateWithoutCreatedTicketsInput>
     connectOrCreate?: UserCreateOrConnectWithoutCreatedTicketsInput
@@ -40768,6 +40895,14 @@ export namespace Prisma {
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
 
+  export type FloatFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type TicketUpdateManyWithoutMotorhpNestedInput = {
     create?: XOR<TicketCreateWithoutMotorhpInput, TicketUncheckedCreateWithoutMotorhpInput> | TicketCreateWithoutMotorhpInput[] | TicketUncheckedCreateWithoutMotorhpInput[]
     connectOrCreate?: TicketCreateOrConnectWithoutMotorhpInput | TicketCreateOrConnectWithoutMotorhpInput[]
@@ -41025,6 +41160,11 @@ export namespace Prisma {
     not?: NestedEnumTicketStatusFilter<$PrismaModel> | $Enums.TicketStatus
   }
 
+  export type NestedBoolNullableFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableFilter<$PrismaModel> | boolean | null
+  }
+
   export type NestedEnumTicketStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TicketStatus | EnumTicketStatusFieldRefInput<$PrismaModel>
     in?: $Enums.TicketStatus[]
@@ -41033,6 +41173,14 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTicketStatusFilter<$PrismaModel>
     _max?: NestedEnumTicketStatusFilter<$PrismaModel>
+  }
+
+  export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel> | null
+    not?: NestedBoolNullableWithAggregatesFilter<$PrismaModel> | boolean | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBoolNullableFilter<$PrismaModel>
+    _max?: NestedBoolNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumServiceStageFilter<$PrismaModel = never> = {
@@ -41135,6 +41283,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumbatchStatusFilter<$PrismaModel>
     _max?: NestedEnumbatchStatusFilter<$PrismaModel>
+  }
+
+  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedFloatFilter<$PrismaModel>
+    _min?: NestedFloatFilter<$PrismaModel>
+    _max?: NestedFloatFilter<$PrismaModel>
   }
 
   export type UserCreateWithoutStateInput = {
@@ -41323,6 +41487,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -41362,6 +41529,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -41537,6 +41707,9 @@ export namespace Prisma {
     faultType?: StringFilter<"Ticket"> | string
     status?: EnumTicketStatusFilter<"Ticket"> | $Enums.TicketStatus
     priority?: StringNullableFilter<"Ticket"> | string | null
+    pumpPlacementDepth?: StringNullableFilter<"Ticket"> | string | null
+    cableLength?: StringNullableFilter<"Ticket"> | string | null
+    isBuzzerOn?: BoolNullableFilter<"Ticket"> | boolean | null
     assignedServiceCenter?: StringNullableFilter<"Ticket"> | string | null
     createdBy?: IntFilter<"Ticket"> | number
     updatedBy?: IntNullableFilter<"Ticket"> | number | null
@@ -41615,6 +41788,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -41654,6 +41830,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -42262,6 +42441,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -42302,6 +42484,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     createdBy: number
     updatedBy?: number | null
     code?: string | null
@@ -42451,6 +42636,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -42491,6 +42679,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     updatedBy?: number | null
     code?: string | null
@@ -42534,6 +42725,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -42574,6 +42768,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     code?: string | null
@@ -44149,7 +44346,7 @@ export namespace Prisma {
 
   export type motorhpUpdateWithoutTicketsInput = {
     label?: StringFieldUpdateOperationsInput | string
-    value?: IntFieldUpdateOperationsInput | number
+    value?: FloatFieldUpdateOperationsInput | number
     sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44159,7 +44356,7 @@ export namespace Prisma {
   export type motorhpUncheckedUpdateWithoutTicketsInput = {
     id?: IntFieldUpdateOperationsInput | number
     label?: StringFieldUpdateOperationsInput | string
-    value?: IntFieldUpdateOperationsInput | number
+    value?: FloatFieldUpdateOperationsInput | number
     sortOrder?: NullableIntFieldUpdateOperationsInput | number | null
     active?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44306,6 +44503,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -44346,6 +44546,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -44488,6 +44691,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44528,6 +44734,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -44711,6 +44920,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -44751,6 +44963,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -44878,6 +45093,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44918,6 +45136,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -45557,6 +45778,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -45597,6 +45821,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -45744,6 +45971,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45784,6 +46014,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -46013,6 +46246,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -46053,6 +46289,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -46253,6 +46492,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46293,6 +46535,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -46644,6 +46889,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -46684,6 +46932,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -46854,6 +47105,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46894,6 +47148,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -47456,6 +47713,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -47496,6 +47756,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -47577,6 +47840,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47617,6 +47883,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -47650,6 +47919,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     code?: string | null
     projectName?: string | null
     createdAt?: Date | string
@@ -47689,6 +47961,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -47781,6 +48056,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -48004,6 +48282,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48043,6 +48324,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -48080,6 +48364,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -48130,6 +48417,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -48158,6 +48448,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48197,6 +48490,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -48234,6 +48530,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -48570,6 +48869,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     createdBy: number
     updatedBy?: number | null
     code?: string | null
@@ -48670,6 +48972,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48710,6 +49015,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48747,6 +49055,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
@@ -48778,6 +49089,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     updatedBy?: number | null
     code?: string | null
@@ -48809,6 +49123,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     code?: string | null
@@ -48933,6 +49250,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -48973,6 +49293,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49010,6 +49333,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49037,6 +49363,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -49077,6 +49406,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     code?: NullableStringFieldUpdateOperationsInput | string | null
@@ -49114,6 +49446,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     code?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50045,6 +50380,9 @@ export namespace Prisma {
     faultType: string
     status?: $Enums.TicketStatus
     priority?: string | null
+    pumpPlacementDepth?: string | null
+    cableLength?: string | null
+    isBuzzerOn?: boolean | null
     assignedServiceCenter?: string | null
     createdBy: number
     updatedBy?: number | null
@@ -50073,6 +50411,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     code?: NullableStringFieldUpdateOperationsInput | string | null
     projectName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -50112,6 +50453,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null
@@ -50149,6 +50493,9 @@ export namespace Prisma {
     faultType?: StringFieldUpdateOperationsInput | string
     status?: EnumTicketStatusFieldUpdateOperationsInput | $Enums.TicketStatus
     priority?: NullableStringFieldUpdateOperationsInput | string | null
+    pumpPlacementDepth?: NullableStringFieldUpdateOperationsInput | string | null
+    cableLength?: NullableStringFieldUpdateOperationsInput | string | null
+    isBuzzerOn?: NullableBoolFieldUpdateOperationsInput | boolean | null
     assignedServiceCenter?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     updatedBy?: NullableIntFieldUpdateOperationsInput | number | null

@@ -201,6 +201,9 @@ model Ticket {
   faultType             String
   status                TicketStatus @default(OPEN)
   priority              String?
+  pumpPlacementDepth    String?
+  cableLength           String?
+  isBuzzerOn            Boolean?     @default(false)
   assignedServiceCenter String? // Service center code assigned based on state
   createdBy             Int
   updatedBy             Int?
@@ -457,8 +460,8 @@ model settings {
 
 model motorhp {
   id        Int      @id @default(autoincrement())
-  label     String   @unique // e.g. "50HP"
-  value     Int // numeric value e.g. 50
+  label     String   @unique // e.g. "7.5 HP"
+  value     Float // numeric value e.g. 7.5
   sortOrder Int? // optional for ordering in dropdowns
   active    Boolean  @default(true)
   createdAt DateTime @default(now())

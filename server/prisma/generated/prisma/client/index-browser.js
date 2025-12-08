@@ -213,6 +213,9 @@ exports.Prisma.TicketScalarFieldEnum = {
   faultType: 'faultType',
   status: 'status',
   priority: 'priority',
+  pumpPlacementDepth: 'pumpPlacementDepth',
+  cableLength: 'cableLength',
+  isBuzzerOn: 'isBuzzerOn',
   assignedServiceCenter: 'assignedServiceCenter',
   createdBy: 'createdBy',
   updatedBy: 'updatedBy',
@@ -490,6 +493,8 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   faultCode: 'faultCode',
   faultType: 'faultType',
   priority: 'priority',
+  pumpPlacementDepth: 'pumpPlacementDepth',
+  cableLength: 'cableLength',
   assignedServiceCenter: 'assignedServiceCenter',
   code: 'code',
   projectName: 'projectName'
