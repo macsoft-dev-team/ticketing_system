@@ -197,10 +197,17 @@ const transitionMilestone = async (
       }
     }
 
-    // Get ticket for file URL generation
+    // Get ticket for file URL generation and notification targeting
     const ticket = await prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { ticketCode: true },
+      select: { 
+        ticketCode: true,
+        id: true,
+        createdBy: true,
+        stateCode: true,
+        customerName: true,
+        priority: true,
+      },
     });
 
     // Handle attachments for CURRENT milestone if provided (to satisfy photo gate)
@@ -388,45 +395,106 @@ const transitionMilestone = async (
         'MACSOFT_ADMIN',
         'MACSOFT_HEAD', 
         'MACSOFT_SUPPORT',
-        'CUSTOMER_SERVICE_HEAD'
       ];
       
-      // For field clearance notifications, also notify field engineers
+      // For field clearance notifications, notify only the field engineer who raised the ticket
+      // and customer service heads assigned to the ticket's state
       if (targetStage === 'REQUEST_CLEARED_AT_FIELD' || targetStage === 'FIELD_CLEARANCE_APPROVED') {
-        targetRoles.push('CUSTOMER_FIELD_ENGINEER');
-      }
-      
-      // For service center related stages, notify technicians
-      if (['SUBMITTED_TO_SERVICE_CENTER', 'RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED', 'READY_FOR_DISPATCH'].includes(targetStage)) {
-        targetRoles.push('SERVICE_CENTER_TECHNICIAN');
-      }
-      
-      const targetUsers = await prisma.user.findMany({
-        where: {
-          role: { in: targetRoles },
+        // Build query conditions
+        const whereConditions = {
+          OR: [
+            // Include MACSOFT roles
+            { role: { in: targetRoles } },
+            // Include the field engineer who created the ticket
+            { 
+              id: ticket.createdBy,
+              role: 'CUSTOMER_FIELD_ENGINEER'
+            },
+          ],
           // Exclude the user who made the transition
           id: { not: userId }
-        },
-        select: { id: true }
-      });
-      
-      const targetUserIds = targetUsers.map(user => user.id);
-      
-      if (targetUserIds.length > 0) {
-        const notificationData = createMilestoneNotification(
-          targetConfig.isFinal ? 'completed' : 'stage_changed',
-          milestoneWithConfig,
-          ticket,
-          userId,
-          {
-            previousStage: currentMilestone?.stage,
-            previousStageLabel: currentMilestone ? getStageConfig(currentMilestone.stage)?.label : null,
-            isTransition: true,
-            spareRequestsApproved: targetStage === "SPARE_APPROVED" && spareApprovalResult
+        };
+
+        // If ticket has a state, include customer service heads assigned to that state
+        // using the many-to-many UserStates relation
+        if (ticket.stateCode) {
+          const stateInfo = await prisma.state.findUnique({
+            where: { stateCode: ticket.stateCode },
+            select: { id: true }
+          });
+
+          if (stateInfo) {
+            whereConditions.OR.push({
+              role: 'CUSTOMER_SERVICE_HEAD',
+              states: {
+                some: {
+                  id: stateInfo.id
+                }
+              }
+            });
           }
-        );
+        }
+
+        const targetUsers = await prisma.user.findMany({
+          where: whereConditions,
+          select: { id: true }
+        });
+
+        const targetUserIds = targetUsers.map(user => user.id);
+
+        if (targetUserIds.length > 0) {
+          const notificationData = createMilestoneNotification(
+            targetConfig.isFinal ? 'completed' : 'stage_changed',
+            milestoneWithConfig,
+            ticket,
+            userId,
+            {
+              previousStage: currentMilestone?.stage,
+              previousStageLabel: currentMilestone ? getStageConfig(currentMilestone.stage)?.label : null,
+              isTransition: true,
+              spareRequestsApproved: targetStage === "SPARE_APPROVED" && spareApprovalResult
+            }
+          );
+
+          await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+        }
+      } else {
+        // For other stages, use the original notification logic
+        // Add CUSTOMER_SERVICE_HEAD to target roles for all other stages
+        targetRoles.push('CUSTOMER_SERVICE_HEAD');
         
-        await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+        // For service center related stages, notify technicians
+        if (['SUBMITTED_TO_SERVICE_CENTER', 'RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED', 'READY_FOR_DISPATCH'].includes(targetStage)) {
+          targetRoles.push('SERVICE_CENTER_TECHNICIAN');
+        }
+        
+        const targetUsers = await prisma.user.findMany({
+          where: {
+            role: { in: targetRoles },
+            // Exclude the user who made the transition
+            id: { not: userId }
+          },
+          select: { id: true }
+        });
+        
+        const targetUserIds = targetUsers.map(user => user.id);
+        
+        if (targetUserIds.length > 0) {
+          const notificationData = createMilestoneNotification(
+            targetConfig.isFinal ? 'completed' : 'stage_changed',
+            milestoneWithConfig,
+            ticket,
+            userId,
+            {
+              previousStage: currentMilestone?.stage,
+              previousStageLabel: currentMilestone ? getStageConfig(currentMilestone.stage)?.label : null,
+              isTransition: true,
+              spareRequestsApproved: targetStage === "SPARE_APPROVED" && spareApprovalResult
+            }
+          );
+
+          await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+        }
       }
     } catch (notificationError) {
       // Don't throw - milestone transition should succeed even if notification fails
