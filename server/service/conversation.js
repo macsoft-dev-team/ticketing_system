@@ -576,9 +576,7 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
     const seenMessageIds = new Set(seenMessages.map((s) => s.messageId));
 
     // Step 11: Filter to only include messages unseen by current user
-    const finalUnrepliedMessages = [...ticketMessageMap.values()]
-      .filter((message) => !seenMessageIds.has(message.id))
-      .map((message) => ({
+    const finalUnrepliedMessages = [...ticketMessageMap.values()].map((message) => ({
         messageId: message.id,
         ticketId: message.ticket.id,
         ticketCode: message.ticket.ticketCode,
