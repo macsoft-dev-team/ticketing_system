@@ -5,7 +5,7 @@ export default function useTitleNotification(count) {
 
     useEffect(() => {
         if (count > 0) {
-            document.title = `${originalTitle.current} (${count}) `;
+            document.title = `(${count}) ${originalTitle.current}`;
         } else {
             document.title = originalTitle.current;
         }
