@@ -15,7 +15,11 @@ export const ticketFormSchema = yup.object({
   block: yup.string().nullable(),
   village: yup.string().nullable(),
   faultType: yup.string().required('Fault type is required'),
-  faultCode: yup.string().nullable(),
+  faultCode: yup.string().when('faultType', {
+    is: 'Motor Not Running',
+    then: (schema) => schema.required('Fault code is required for Motor Not Running'),
+    otherwise: (schema) => schema.nullable()
+  }),
   description: yup.string().required('Description is required'),
   priority: yup.string().required('Priority is required'),
   category: yup.string().required('Category is required'),

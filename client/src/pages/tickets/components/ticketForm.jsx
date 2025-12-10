@@ -26,11 +26,11 @@ import {
 import { NavLink, useNavigate } from 'react-router-dom';
 import { controllerAPI, projectAPI, stateAPI, districtAPI, ticketAPI } from '../../../lib/services/api';
 import { useToast } from '../../../components/ui/toast';
-import { API_ENDPOINTS } from '../../../lib/constants/api';
 import useTickets from '../../../lib/hooks/useTickets';
 import MotorHPSelect from '../../../components/ui/MotorHPSelect';
-
+import { useAuth } from '../../../lib/hooks/useAuth';
 export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
+    const { user } = useAuth();
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isDragActive, setIsDragActive] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,6 +69,13 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const watchedValues = watch();
     const controllerNo = watch('controllerNo');
     const selectedStateCode = watch('state');
+
+    // Set customer name from logged-in user
+    useEffect(() => {
+        if (user?.organisation?.name) {
+            setValue('customerName', user.organisation.name);
+        }
+    }, [user, setValue]);
 
     // Fetch states when component mounts
     useEffect(() => {
@@ -334,7 +341,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             // Extract HP from lot.product.powerrating
             const powerRating = data.lot?.product?.powerrating || '';
             setValue('hp', powerRating);
-            
+
             // Try to match the power rating with available MotorHP options
             // This will be handled by the MotorHPSelect component's internal logic
             // For now, we'll keep the hp field for backward compatibility
@@ -639,9 +646,21 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     };
 
     const motorTypeOptions = [
-        { value: 'AC', label: 'AC' },
-        { value: 'PMC', label: 'PMC' },
-        { value: 'DC', label: 'DC' }
+        { value: 'Induction', label: 'Induction' },
+        { value: 'PMSM', label: 'PMSM' }
+    ];
+
+    const headOptions = [
+        { value: '10', label: '10' },
+        { value: '20', label: '20' },
+        { value: '30', label: '30' },
+        { value: '40', label: '40' },
+        { value: '50', label: '50' },
+        { value: '60', label: '60' },
+        { value: '70', label: '70' },
+        { value: '80', label: '80' },
+        { value: '90', label: '90' },
+        { value: '100', label: '100' }
     ];
 
     return (
@@ -707,8 +726,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             whileHover={{ scale: !isFetchingController ? 1.02 : 1 }}
                                             whileTap={{ scale: !isFetchingController ? 0.98 : 1 }}
                                             className={`flex-shrink-0 px-2 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 rounded-md xs:rounded-lg text-xs sm:text-sm lg:text-base font-medium transition-all duration-200 whitespace-nowrap min-w-[70px] xs:min-w-[90px] sm:min-w-[110px] ${controllerNo && controllerNo.length >= 3 && !isFetchingController
-                                                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
-                                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                                 }`}
                                         >
                                             {isFetchingController ? (
@@ -846,13 +865,18 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         <span className="truncate">Motor Type *</span>
                                         <span className="text-[10px] text-blue-600 bg-blue-50 px-1 xs:px-1.5 py-0.5 rounded flex-shrink-0">Auto-filled</span>
                                     </label>
-                                    <input
+                                    <select
                                         {...register('motorType')}
-                                        datalist="motorTypeOptions"
                                         className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.motorType ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
-                                        placeholder="Motor Type"
-                                    />
+                                    >
+                                        <option value="">Select Motor Type</option>
+                                        {motorTypeOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                     {errors.motorType && (
                                         <motion.p
                                             initial={{ opacity: 0, y: -10 }}
@@ -863,11 +887,6 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             {errors.motorType.message}
                                         </motion.p>
                                     )}
-                                    <datalist id="motorTypeOptions">
-                                        {motorTypeOptions.map(option => (
-                                            <option key={option} value={option} />
-                                        ))}
-                                    </datalist>
                                 </motion.div>
 
                                 {/* Head */}
@@ -875,12 +894,18 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     <label className="block text-xs sm:text-sm font-medium text-gray-700">
                                         Head
                                     </label>
-                                    <input
+                                    <select
                                         {...register('head')}
                                         className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.head ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
-                                        placeholder="Head"
-                                    />
+                                    >
+                                        <option value="">Select Head</option>
+                                        {headOptions.map(option => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                     {errors.head && (
                                         <motion.p
                                             initial={{ opacity: 0, y: -10 }}
@@ -990,17 +1015,15 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                     )}
                                 </motion.div>
                                 {/* Customer Name */}
-                                <motion.div variants={itemVariants} className="space-y-1 xs:col-span-1 sm:col-span-2 lg:col-span-1 2xl:col-span-2  xs:space-y-1.5 sm:space-y-2">
+                                <motion.div variants={itemVariants} className="space-y-1 hidden xs:col-span-1 sm:col-span-2 lg:col-span-1 2xl:col-span-2  xs:space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-1 xs:gap-1.5 text-xs sm:text-sm font-medium text-gray-700">
                                         <User className="w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4" />
                                         <span className="truncate">Customer Name *</span>
-                                        {watchedValues.customerName && controllerNo && (
-                                            <span className="text-[10px] text-blue-600 bg-blue-50 px-1 xs:px-1.5 py-0.5 rounded">Auto-filled</span>
-                                        )}
                                     </label>
                                     <input
                                         {...register('customerName')}
-                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.customerName ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                        disabled
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base bg-gray-50 cursor-not-allowed transition-all duration-200 ${errors.customerName ? 'border-red-300' : 'border-gray-300'
                                             }`}
                                         placeholder="Customer Name"
                                     />
@@ -1014,7 +1037,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             {errors.customerName.message}
                                         </motion.p>
                                     )}
-                                </motion.div>                                
+                                </motion.div>
 
                             </div>
 
@@ -1209,28 +1232,36 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         )}
                                     </motion.div>
 
-                                    {/* Fault Code */}
-                                    <motion.div variants={itemVariants} className="space-y-1.5 sm:space-y-2">
-                                        <label className="block text-xs sm:text-sm font-medium text-gray-700">
-                                            Fault Code
-                                        </label>
-                                        <input
-                                            {...register('faultCode')}
-                                            className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.faultCode ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                                                }`}
-                                            placeholder="e.g., ERR001"
-                                        />
-                                        {errors.faultCode && (
-                                            <motion.p
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
-                                            >
-                                                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                                {errors.faultCode.message}
-                                            </motion.p>
-                                        )}
-                                    </motion.div>
+                                    {/* Fault Code - Only show for Motor Not Running */}
+                                    {watchedValues.faultType === 'Motor Not Running' && (
+                                        <motion.div 
+                                            variants={itemVariants} 
+                                            className="space-y-1.5 sm:space-y-2"
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                        >
+                                            <label className="block text-xs sm:text-sm font-medium text-gray-700">
+                                                Fault Code <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                {...register('faultCode')}
+                                                className={`w-full px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 border rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.faultCode ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                                    }`}
+                                                placeholder="e.g., ERR001"
+                                            />
+                                            {errors.faultCode && (
+                                                <motion.p
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
+                                                >
+                                                    <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                    {errors.faultCode.message}
+                                                </motion.p>
+                                            )}
+                                        </motion.div>
+                                    )}
 
                                     {/* Description */}
                                     <motion.div variants={itemVariants} className="xs:col-span-1 sm:col-span-2 lg:col-span-1 2xl:col-span-2 space-y-1 xs:space-y-1.5 sm:space-y-2">
