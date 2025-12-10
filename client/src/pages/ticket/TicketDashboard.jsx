@@ -74,7 +74,8 @@ const mapTicketData = (apiTicket) => {
     description: apiTicket.description || '',
     complaintType: apiTicket.complaintType || '',
     state: apiTicket.state || '', // Add state at root level for service center assignment
-    assignedServiceCenter: apiTicket.assignedServiceCenter || null, // Add assigned service center
+    assignedServiceCenter: apiTicket.assignedServiceCenter || null, 
+    faultType: apiTicket.faultType || '',
     attachments: (apiTicket.attachments || []).map(att => ({
       id: att.id,
       name: att.fileName,
@@ -99,7 +100,9 @@ const mapTicketData = (apiTicket) => {
       imei: apiTicket.imei || '',
       hp: apiTicket.hp || '',
       motorType: apiTicket.motorType || '',
-      faultCode: apiTicket.faultCode || ''
+      faultCode: apiTicket.faultCode || '',
+      cableLength: apiTicket.cableLength || '',
+      pumpPlacementDepth: apiTicket.pumpPlacementDepth || ''
     },
     createdBy: apiTicket.createdByUser || null,
     updatedBy: apiTicket.updatedByUser || null,
@@ -1145,7 +1148,7 @@ export default function TicketDashboard() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border-b border-gray-200 px-4 sm:px-6 py-2"
+        className="bg-white px-4 sm:px-6 py-2"
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -1434,17 +1437,58 @@ export default function TicketDashboard() {
                     <span className="break-all">{ticketData.controller?.imei || 'N/A'}</span>
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">HP</p>
-                  <p className="text-sm sm:text-base text-gray-900 flex items-center gap-2">
-                    <Zap className="w-[14px] h-[14px] sm:w-4 sm:h-4" />
-                    {ticketData.controller?.hp || 'N/A'}
-                  </p>
+                <div className="border border-gray-300 rounded-md overflow-hidden sm:w-max">
+                  <div className="
+                        grid grid-cols-1 
+                        sm:flex sm:items-center sm:justify-evenly 
+                        divide-y sm:divide-y-0 sm:divide-x divide-gray-300 sm:px-2
+                      "
+                  > 
+                    {/* HP */}
+                    {ticketData.controller?.hp && (
+                      <div className="flex justify-between gap-2 py-2 px-3 sm:px-1.5 text-[14.5px]">
+                        <span className="text-gray-600">HP</span>
+                        <span className="font-medium text-gray-900">{ticketData.controller.hp}</span>
+                      </div>
+                    )} 
+                    {/* Pump Placement Depth */}
+                    {ticketData.controller?.pumpPlacementDepth && (
+                      <div className="flex justify-between gap-2 py-2 px-3 sm:px-1.5 text-[14.5px]">
+                        <span className="text-gray-600">Pump Placement Depth</span>
+                        <span className="font-medium text-gray-900">
+                          {ticketData.controller.pumpPlacementDepth} 
+                        </span>
+                      </div>
+                    )} 
+                    {/* Cable Length */}
+                    {ticketData.controller?.cableLength && (
+                      <div className="flex justify-between gap-2 py-2 px-3 sm:px-1.5 text-[14.5px]">
+                        <span className="text-gray-600">Cable Length</span>
+                        <span className="font-medium text-gray-900">
+                          {ticketData.controller.cableLength} 
+                        </span>
+                      </div>
+                    )}
+
+                  </div>
                 </div>
+
+
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-600">Motor Type</p>
                   <p className="text-sm sm:text-base text-gray-900">{ticketData.controller?.motorType || 'N/A'}</p>
                 </div>
+                {ticketData.faultType && (
+                  <div className="border-t border-gray-200 pt-3">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-2">
+                      <AlertTriangle className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-orange-500" />
+                      Fault Type
+                    </p>
+                    <p className="text-sm sm:text-base text-gray-900 mt-1">
+                      {ticketData.faultType}
+                    </p>
+                  </div>
+                )}
                 {ticketData.controller?.faultCode && (
                   <div className="border-t border-gray-200 pt-3">
                     <p className="text-xs sm:text-sm font-medium text-gray-600 flex items-center gap-2">
@@ -1456,6 +1500,7 @@ export default function TicketDashboard() {
                     </Badge>
                   </div>
                 )}
+                
               </div>
             </div>
           </div>

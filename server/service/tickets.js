@@ -522,7 +522,9 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     category,
     ticketCodePrefix, // Optional custom prefix
     ticketCodeSuffix,
-    farmerName
+    farmerName,
+    cableLength,
+    pumpPlacementDepth,
     // Optional custom suffix
   } = ticket;  
   try {
@@ -596,6 +598,8 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         faultCode: faultCode,
         createdBy: userId,
         farmerName: farmerName,
+        cableLength: cableLength,
+        pumpPlacementDepth: pumpPlacementDepth,
       },
       include: {
         createdByUser: true,

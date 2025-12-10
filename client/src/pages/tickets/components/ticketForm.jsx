@@ -557,6 +557,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 motorHpId: data.motorHpId || null,
                 motorType: data.motorType,
                 head: data.head || '',
+                pumpPlacementDepth: data.pumpPlacementDepth || '',
+                cableLength: data.cableLength || '',
                 project: data.project,
                 state: data.state, // This will now be the state code
                 district: data.district,
@@ -858,7 +860,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         </motion.p>
                                     )}
                                 </motion.div>
-
+                                  
                                 {/* Motor Type */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-1.5 xs:gap-2 text-xs sm:text-sm font-medium text-gray-700">
@@ -914,6 +916,56 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         >
                                             <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                                             {errors.head.message}
+                                        </motion.p>
+                                    )}
+                                </motion.div>
+
+                                {/* Pump Placement Depth */}
+                                <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
+                                    <label className="block text-xs text-nowrap sm:text-sm font-medium text-gray-700">
+                                        Pump Placement Depth (mtr)
+                                    </label>
+                                    <input
+                                        {...register('pumpPlacementDepth')}
+                                        type="number"
+                                        step="0.01"
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.pumpPlacementDepth ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            }`}
+                                        placeholder="Enter depth in meters"
+                                    />
+                                    {errors.pumpPlacementDepth && (
+                                        <motion.p
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
+                                        >
+                                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                            {errors.pumpPlacementDepth.message}
+                                        </motion.p>
+                                    )}
+                                </motion.div>
+
+                                {/* Cable Length */}
+                                <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
+                                    <label className="block text-xs sm:text-sm font-medium text-gray-700">
+                                        Cable Length (mtr)
+                                    </label>
+                                    <input
+                                        {...register('cableLength')}
+                                        type="number"
+                                        step="0.01"
+                                        className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.cableLength ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                            }`}
+                                        placeholder="Enter length in meters"
+                                    />
+                                    {errors.cableLength && (
+                                        <motion.p
+                                            initial={{ opacity: 0, y: -10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="text-red-600 text-xs sm:text-sm flex items-center gap-1"
+                                        >
+                                            <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                            {errors.cableLength.message}
                                         </motion.p>
                                     )}
                                 </motion.div>
