@@ -88,8 +88,7 @@ io.use(async (socket, next) => {
     });
 
     if (!user) {
-      console.log("❌ User not found for token:", decoded.id);
-      return next(new Error("Authentication error: User not found"));
+       return next(new Error("Authentication error: User not found"));
     }
 
     // Set user information on socket
@@ -100,33 +99,27 @@ io.use(async (socket, next) => {
     socket.userState = user.State;
     socket.assignedStates = user.states || [];
 
-    console.log(`✅ Socket authenticated - User: ${user.name} (${user.role})`);
-    next();
+     next();
   } catch (error) {
-    console.log("❌ Socket authentication error:", error.message);
-    next(new Error("Authentication error: Invalid token"));
+     next(new Error("Authentication error: Invalid token"));
   }
 });
 
 io.on("connection", (socket) => {
-  console.log(`✅ Socket connected - User: ${socket.userName} (${socket.userRole}) [${socket.id}]`);
-
+ 
   // Automatically join user-specific notification room
   const userNotificationRoom = `notifications-${socket.userId}`;
   socket.join(userNotificationRoom);
-  console.log(`🔔 User ${socket.userName} joined notification room: ${userNotificationRoom}`);
-
+ 
   // Automatically join role-based rooms
   const roleRoom = `role-${socket.userRole}`;
   socket.join(roleRoom);
-  console.log(`👥 User ${socket.userName} joined role room: ${roleRoom}`);
-
+ 
   // Join service center specific room for service center roles
   if ((socket.userRole === 'SERVICE_CENTER_TECHNICIAN' || socket.userRole === 'SERVICE_CENTER_HEAD') && socket.centerCode) {
     const centerRoom = `center-${socket.centerCode}`;
     socket.join(centerRoom);
-    console.log(`🏢 User ${socket.userName} joined center room: ${centerRoom}`);
-  }
+   }
 
   // Join state-based rooms for Customer Service Heads
   if (socket.userRole === 'CUSTOMER_SERVICE_HEAD') {
@@ -134,23 +127,20 @@ io.on("connection", (socket) => {
     if (socket.userState) {
       const primaryStateRoom = `state-${socket.userState.stateCode}`;
       socket.join(primaryStateRoom);
-      console.log(`🗺️ CSH ${socket.userName} joined primary state room: ${primaryStateRoom}`);
-    }
+     }
     
     // Join assigned states rooms
     socket.assignedStates.forEach(state => {
       const stateRoom = `state-${state.stateCode}`;
       socket.join(stateRoom);
-      console.log(`🗺️ CSH ${socket.userName} joined assigned state room: ${stateRoom}`);
-    });
+     });
   }
 
   // Join Macsoft alerts room for buzzer alerts
   const MACSOFT_ROLES = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
   if (MACSOFT_ROLES.includes(socket.userRole)) {
     socket.join('macsoft_alerts');
-    console.log(`🚨 User ${socket.userName} joined Macsoft alerts room`);
-  }
+   }
 
   // Handle conversation events with permission checks
   socket.on("join-conversation", async (ticketId) => {
@@ -160,8 +150,7 @@ io.on("connection", (socket) => {
       if (hasAccess) {
         const room = `conversation-${ticketId}`;
         socket.join(room);
-        console.log(`💬 User ${socket.userName} joined conversation: ${room}`);
-      } else {
+       } else {
         socket.emit('error', { message: 'Access denied to this conversation' });
       }
     } catch (error) {
@@ -172,13 +161,11 @@ io.on("connection", (socket) => {
   socket.on("leave-conversation", (ticketId) => {
     const room = `conversation-${ticketId}`;
     socket.leave(room);
-    console.log(`👋 User ${socket.userName} left conversation: ${room}`);
-  });
+   });
 
   // Test notification event
   socket.on("send-test-notification", (data) => {
-    console.log(`📧 User ${socket.userName} sending test notification:`, data);
-    // Send to user's own notification room
+     // Send to user's own notification room
     io.to(`notifications-${socket.userId}`).emit("notification", {
       id: Date.now(),
       type: data.type || "test",
@@ -195,9 +182,7 @@ io.on("connection", (socket) => {
       socket.emit('error', { message: 'Access denied: Only Macsoft roles can send buzzer alerts' });
       return;
     }
-    
-    console.log(`🧪 User ${socket.userName} sending test buzzer alert:`, data);
-    const testBuzzerAlert = {
+     const testBuzzerAlert = {
       type: 'CUSTOMER_RESPONSE_PENDING',
       timestamp: new Date().toISOString(),
       urgency: 'HIGH',
@@ -213,8 +198,7 @@ io.on("connection", (socket) => {
     
     // Send to macsoft_alerts room
     io.to('macsoft_alerts').emit('buzzer_alert', testBuzzerAlert);
-    console.log(`✅ Test buzzer alert sent to macsoft_alerts room by ${socket.userName}`);
-  });
+   });
 
   socket.on("disconnect", (reason) => {
     console.log(`❌ User ${socket.userName} disconnected [${socket.id}] - Reason: ${reason}`);
@@ -265,8 +249,7 @@ httpServer.listen(PORT, () => {
   
   // Start the job scheduler after server starts
   setTimeout(() => {
-    console.log('Starting background job scheduler...');
-    jobScheduler.start(io); // Pass io object for buzzer alerts
+     jobScheduler.start(io); // Pass io object for buzzer alerts
   }, 3000); // Wait 3 seconds for database connections to be ready
 });
 
