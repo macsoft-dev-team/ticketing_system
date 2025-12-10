@@ -432,7 +432,11 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
  * Check if there's an active ticket for the given controller number
  * A ticket is considered active if:
  * 1. Status is not CLOSED
- * 2. OR no final milestone is completed (DONE status for REQUEST_CLEARED_AT_FIELD, DELIVERED_TO_FIELD, FIELD_CLEARANCE_APPROVED)
+ * 2. OR no final milestone is completed (DONE status for REQUEST_CLEARED_AT_FIELD, DELIVERED_TO_FIELD, FIELD_CLEARANCE_APPROVED, TICKET_CLOSED)
+ * 
+ * New tickets are permitted when:
+ * - No existing tickets for the controller, OR
+ * - All existing tickets have TICKET_CLOSED milestone in DONE status
  */
 const checkActiveTicketForController = async (controllerNo) => {
   try {
@@ -446,7 +450,7 @@ const checkActiveTicketForController = async (controllerNo) => {
         ticketMilestones: {
           where: {
             stage: {
-              in: ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED']
+              in: ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED']
             }
           },
           orderBy: {
@@ -465,12 +469,12 @@ const checkActiveTicketForController = async (controllerNo) => {
 
     // Check each ticket to see if it's active
     const activeTickets = existingTickets.filter(ticket => {
-      // If ticket status is CLOSED, check if it has completed final milestones
+      // If ticket status is CLOSED, check if it has completed final milestones (including TICKET_CLOSED)
       if (ticket.status === 'CLOSED') {
         // Check if any final milestone is completed
         const hasFinalMilestone = ticket.ticketMilestones.some(milestone => 
           milestone.status === 'DONE' && 
-          ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED'].includes(milestone.stage)
+          ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED'].includes(milestone.stage)
         );
         return !hasFinalMilestone; // If no final milestone is done, ticket is still active
       }

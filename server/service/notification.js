@@ -7,11 +7,28 @@ const getNotifications = async (userId) => {
     if (isNaN(userIdNum)) {
       throw new Error(`Invalid userId: ${userId}`);
     }
+
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+      select: { role: true },
+    });
+
+    // Build where clause based on user role
+    const whereClause = {
+      userId: userIdNum,
+    };
+
+    // For CUSTOMER_FIELD_ENGINEER, only show notifications for tickets they created
+    if (user && user.role === 'CUSTOMER_FIELD_ENGINEER') {
+      whereClause.notification = {
+        ticket: {
+          createdBy: userIdNum,
+        },
+      };
+    }
         
     const notifications = await prisma.notificationRecipient.findMany({
-      where: {
-        userId: userIdNum,
-      },
+      where: whereClause,
       include: {
         notification: {
           include: {
@@ -123,16 +140,34 @@ const updateNotification = async (notificationId, userId, io) => {
 };
 
 const getNotificationCounts = async (userId) => {
-  try {    
+  try {
+    // Fetch user role
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    // Build where clause based on user role
+    const whereClause = {
+      userId: userId,
+    };
+
+    // For CUSTOMER_FIELD_ENGINEER, only count notifications for tickets they created
+    if (user && user.role === 'CUSTOMER_FIELD_ENGINEER') {
+      whereClause.notification = {
+        ticket: {
+          createdBy: userId,
+        },
+      };
+    }
+
     const total = await prisma.notificationRecipient.count({
-      where: {
-        userId: userId,
-      },
+      where: whereClause,
     });
 
     const unread = await prisma.notificationRecipient.count({
       where: {
-        userId: userId,
+        ...whereClause,
         seen: false,
       },
     });
@@ -278,6 +313,12 @@ const getNotificationsWithFilters = async (userId, filters = {}) => {
       throw new Error(`Invalid userId: ${userId}`);
     }
 
+    // Fetch user role
+    const user = await prisma.user.findUnique({
+      where: { id: userIdNum },
+      select: { role: true },
+    });
+
     const skip = (page - 1) * limit;
     
     // Build where clause
@@ -357,6 +398,13 @@ const getNotificationsWithFilters = async (userId, filters = {}) => {
     // Ticket ID filter
     if (ticketId) {
       notificationWhere.ticketId = parseInt(ticketId);
+    }
+
+    // For CUSTOMER_FIELD_ENGINEER, only show notifications for tickets they created
+    if (user && user.role === 'CUSTOMER_FIELD_ENGINEER') {
+      notificationWhere.ticket = {
+        createdBy: userIdNum,
+      };
     }
 
     // Add notification filters to where clause
