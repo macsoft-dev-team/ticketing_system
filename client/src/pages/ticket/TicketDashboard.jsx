@@ -1302,7 +1302,7 @@ export default function TicketDashboard() {
             <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
               <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
                 <User className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
-                Farmer/Customer Details
+                Farmer/Supplier Details
               </h2>
               <div className="space-y-3">
                 <div>
@@ -1310,7 +1310,7 @@ export default function TicketDashboard() {
                   <p className="text-sm sm:text-base font-semibold text-gray-900">{ticketData?.farmerName || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Customer Name</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-600">Supplier Name</p>
                   <p className="text-sm sm:text-base font-semibold text-gray-900">{ticketData.customer?.name || 'N/A'}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

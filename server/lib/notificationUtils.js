@@ -13,7 +13,7 @@ const broadcastNotification = (io, notificationData, targetOptions = {}) => {
   if (targetUserId) {
     const userRoom = `notifications-${targetUserId}`;
     io.to(userRoom).emit("notification", notificationData);
-    console.log(`📢 Notification sent to user ${targetUserId}`);
+   // console.log(`📢 Notification sent to user ${targetUserId}`);
     return;
   }
 
@@ -21,7 +21,7 @@ const broadcastNotification = (io, notificationData, targetOptions = {}) => {
   if (targetRole) {
     const roleRoom = `role-${targetRole}`;
     io.to(roleRoom).emit("notification", notificationData);
-    console.log(`📢 Notification sent to role ${targetRole}`);
+    //console.log(`📢 Notification sent to role ${targetRole}`);
     return;
   }
 
@@ -29,7 +29,7 @@ const broadcastNotification = (io, notificationData, targetOptions = {}) => {
   if (targetStateCode) {
     const stateRoom = `state-${targetStateCode}`;
     io.to(stateRoom).emit("notification", notificationData);
-    console.log(`📢 Notification sent to state ${targetStateCode}`);
+   // console.log(`📢 Notification sent to state ${targetStateCode}`);
     return;
   }
 
@@ -37,7 +37,7 @@ const broadcastNotification = (io, notificationData, targetOptions = {}) => {
   if (targetCenterCode) {
     const centerRoom = `center-${targetCenterCode}`;
     io.to(centerRoom).emit("notification", notificationData);
-    console.log(`📢 Notification sent to center ${targetCenterCode}`);
+    //console.log(`📢 Notification sent to center ${targetCenterCode}`);
     return;
   }
 
@@ -46,11 +46,11 @@ const broadcastNotification = (io, notificationData, targetOptions = {}) => {
     // Send to all rooms except the excluded user
     const excludeRoom = `notifications-${excludeUserId}`;
     io.except(excludeRoom).emit("notification", notificationData);
-    console.log(`📢 Global notification sent (excluding user ${excludeUserId})`);
+   // console.log(`📢 Global notification sent (excluding user ${excludeUserId})`);
   } else {
     // Broadcast to all connected clients
     io.emit("notification", notificationData);
-    console.log(`📢 Global notification sent to all users`);
+    //console.log(`📢 Global notification sent to all users`);
   }
 };
 

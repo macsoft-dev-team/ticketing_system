@@ -7,6 +7,7 @@ import { useSocketActivities } from '../../../../lib/hooks/useSocketActivities';
 import { useSoundManager } from '../../../../lib/hooks/SoundManager';
 import { useToast } from '../../../ui/toast';
 import { useSocket } from '../../../../lib/contexts/SocketContext';
+import useTitleNotification from '../../../../lib/hooks/useTitleNotification';
 
 const NotificationBell = () => {
   const { user, token } = useAuth();
@@ -448,7 +449,7 @@ const NotificationBell = () => {
       navigate(`/tickets/${ticketId}`);
     }
   };
-
+  useTitleNotification(unreadCount);
   return (
     <div className="relative" ref={dropdownRef}>
       <button
