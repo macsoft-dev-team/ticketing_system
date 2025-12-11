@@ -18,7 +18,8 @@ import {
     AlertTriangle,
     Copy,
     Check,
-    X
+    X,
+    AlertCircleIcon
 } from 'lucide-react';
 import moment from 'moment';
 import { useAuth } from '../../../lib/hooks/useAuth';
@@ -67,7 +68,7 @@ export default function TicketCard({
                 setShowControllerTooltip(false);
             }
         };
-        
+
         if (showControllerTooltip) {
             document.addEventListener('mousedown', handleClickOutside);
             return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -83,11 +84,11 @@ export default function TicketCard({
     useEffect(() => {
         const handleTicketMessageUpdate = (event) => {
             const messageData = event.detail;
-            
+
             // Only update if this message is for the current ticket
             if (messageData.ticketId === localTicket.id) {
                 console.log('🎫 [TICKET CARD] Received message update for ticket:', localTicket.ticketCode, messageData);
-                
+
                 // Update local ticket with new message
                 setLocalTicket(prev => {
                     // Create new message object from socket data
@@ -103,12 +104,12 @@ export default function TicketCard({
 
                     // Check if message already exists (avoid duplicates)
                     const messageExists = prev.messages?.some(m => m.id === newMessage.id);
-                    
+
                     if (messageExists) {
                         // Update existing message
                         return {
                             ...prev,
-                            messages: prev.messages.map(m => 
+                            messages: prev.messages.map(m =>
                                 m.id === newMessage.id ? newMessage : m
                             ),
                             updatedAt: messageData.createdAt
@@ -128,11 +129,11 @@ export default function TicketCard({
 
         const handleConversationUpdate = (event) => {
             const messageData = event.detail;
-            
+
             // Only update if this message is for the current ticket
             if (messageData.ticketId === localTicket.id) {
                 console.log('💬 [TICKET CARD] Received conversation update for ticket:', localTicket.ticketCode, messageData);
-                
+
                 // Update local ticket with new message
                 setLocalTicket(prev => {
                     // Create new message object from socket data
@@ -148,7 +149,7 @@ export default function TicketCard({
 
                     // Check if message already exists (avoid duplicates)
                     const messageExists = prev.messages?.some(m => m.id === newMessage.id);
-                    
+
                     if (messageExists) {
                         return prev; // Don't add duplicate
                     }
@@ -166,7 +167,7 @@ export default function TicketCard({
 
         // Listen for ticket message updates (for ticket cards)
         window.addEventListener('ticketMessageUpdate', handleTicketMessageUpdate);
-        
+
         // Also listen for conversation updates (general chat messages)
         window.addEventListener('conversationUpdate', handleConversationUpdate);
 
@@ -220,14 +221,14 @@ export default function TicketCard({
     // Helper function to get unread/unseen message count
     const getUnreadMessageCount = () => {
         if (!localTicket.messages || localTicket.messages.length === 0 || !user?.id) return 0;
-        
+
         return localTicket.messages.filter(message => {
             // Skip messages sent by current user (they are automatically "read")
             if (message.senderId === user.id) return false;
-            
+
             // If seenBy is empty or current user hasn't seen it
             if (!message.seenBy || message.seenBy.length === 0) return true;
-            
+
             // Check if current user has seen this message
             const hasUserSeen = message.seenBy.some(seen => seen.userId === user.id);
             return !hasUserSeen;
@@ -242,8 +243,8 @@ export default function TicketCard({
 
     // Helper function to check if we should show last message for open/in-progress tickets
     const shouldShowLastMessageForActiveTickets = () => {
-        return (localTicket.status === TICKET_STATUS.OPEN || localTicket.status === TICKET_STATUS.IN_PROGRESS) && 
-               hasMessages && lastMessage;
+        return (localTicket.status === TICKET_STATUS.OPEN || localTicket.status === TICKET_STATUS.IN_PROGRESS) &&
+            hasMessages && lastMessage;
     };
 
     const lastMessage = getLastMessage();
@@ -263,7 +264,7 @@ export default function TicketCard({
         }
 
         // Check for field clearance scenarios first (higher priority)
-        const fieldClearedMilestone = localTicket.ticketMilestones.find(m => 
+        const fieldClearedMilestone = localTicket.ticketMilestones.find(m =>
             m.stage === 'REQUEST_CLEARED_AT_FIELD' && m.status === 'DONE'
         );
         if (fieldClearedMilestone) {
@@ -283,7 +284,7 @@ export default function TicketCard({
         }
 
         // Check for field clearance approval
-        const fieldClearanceApprovedMilestone = ticket.ticketMilestones.find(m => 
+        const fieldClearanceApprovedMilestone = ticket.ticketMilestones.find(m =>
             m.stage === 'FIELD_CLEARANCE_APPROVED' && m.status === 'DONE'
         );
         if (fieldClearanceApprovedMilestone) {
@@ -303,7 +304,7 @@ export default function TicketCard({
         }
 
         // Check for delivery completion
-        const deliveredMilestone = ticket.ticketMilestones.find(m => 
+        const deliveredMilestone = ticket.ticketMilestones.find(m =>
             m.stage === 'DELIVERED_TO_FIELD' && m.status === 'DONE'
         );
         if (deliveredMilestone) {
@@ -323,16 +324,16 @@ export default function TicketCard({
         }
 
         // Check for general ticket closure (including auto-closure)
-        const ticketClosedMilestone = ticket.ticketMilestones.find(m => 
+        const ticketClosedMilestone = ticket.ticketMilestones.find(m =>
             m.stage === 'TICKET_CLOSED' && m.status === 'DONE'
         );
         if (ticketClosedMilestone) {
             // Check if it's an auto-closure based on description or notes
             const isAutoClosed = ticketClosedMilestone.description?.toLowerCase().includes('automatically') ||
-                                ticketClosedMilestone.notes?.toLowerCase().includes('automatically');
-            
+                ticketClosedMilestone.notes?.toLowerCase().includes('automatically');
+
             const isNoResponse = ticketClosedMilestone.description?.toLowerCase().includes('no customer response') ||
-                               ticketClosedMilestone.notes?.toLowerCase().includes('no customer response');
+                ticketClosedMilestone.notes?.toLowerCase().includes('no customer response');
 
             let label = 'Ticket Closed';
             let icon = '🔒';
@@ -391,18 +392,18 @@ export default function TicketCard({
     // Play buzzer alert sound when hasBuzzerAlert is true
     useEffect(() => {
         if (hasBuzzerAlert) {
-             play('notify_critical');
+            play('notify_critical');
         }
     }, [hasBuzzerAlert, play, localTicket.ticketCode]);
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ 
-                opacity: 1, 
-                y: 0, 
+            animate={{
+                opacity: 1,
+                y: 0,
                 scale: hasBuzzerAlert ? [1, 1.02, 1, 1.02, 1] : 1,
-                boxShadow: hasBuzzerAlert 
+                boxShadow: hasBuzzerAlert
                     ? [
                         "0 0 0 0 rgba(239, 68, 68, 0)",
                         "0 0 0 8px rgba(239, 68, 68, 0.4)",
@@ -442,8 +443,8 @@ export default function TicketCard({
             className={`
                 relative overflow-hidden cursor-pointer group
                 bg-white border rounded-xl h-full min-h-4/5
-                ${hasBuzzerAlert ? 'border-red-500 ring-2 ring-red-400 shadow-2xl' : 
-                  isOverdue ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-200'}
+                ${hasBuzzerAlert ? 'border-red-500 ring-2 ring-red-400 shadow-2xl' :
+                    isOverdue ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-200'}
                 hover:border-gray-300 shadow-sm transition-all duration-300
                 backdrop-blur-sm
             `}
@@ -468,10 +469,10 @@ export default function TicketCard({
             {/* Buzzer Alert Badge */}
             {hasBuzzerAlert && (
                 <motion.div
-                    initial={{ scale: 0  }}
-                    animate={{ 
+                    initial={{ scale: 0 }}
+                    animate={{
                         scale: [1, 1.1, 1],
-                     }}
+                    }}
                     transition={{
                         scale: {
                             duration: 0.8,
@@ -487,7 +488,7 @@ export default function TicketCard({
                     className="absolute top-24 right-2 z-40"
                 >
                     <div className="bg-red-600 text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-lg flex items-center gap-1.5 border-2 border-white">
-                         
+
                         RESPONSE NEEDED IMMEDIATELY
                     </div>
                 </motion.div>
@@ -498,8 +499,8 @@ export default function TicketCard({
                 absolute top-0 left-0 right-0 h-1
                 ${hasBuzzerAlert ? 'bg-gradient-to-r from-red-600 via-red-500 to-red-600' :
                     localTicket.status === TICKET_STATUS.OPEN ? 'bg-gradient-to-r from-red-500 to-pink-500' :
-                    localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
-                        'bg-gradient-to-r from-green-500 to-green-200'}
+                        localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-gradient-to-r from-yellow-500 to-orange-500' :
+                            'bg-gradient-to-r from-green-500 to-green-200'}
             `} />
 
             {/* Overdue indicator */}
@@ -525,7 +526,7 @@ export default function TicketCard({
                     className="absolute -top-1 -left-1 z-20"
                 >
                     <div className="bg-green-500 text-white text-xs ps-3 tracking-wide  px-2 pt-1 pb-0.5 rounded-br-md rounded-tl-xl font-medium shadow-sm ">
-                        <span className='animate-pulse'>New</span> 
+                        <span className='animate-pulse'>New</span>
                     </div>
                 </motion.div>
             )}
@@ -549,7 +550,7 @@ export default function TicketCard({
                         >
                             {getPriorityIcon()}
                         </motion.div>
-                        
+
                         {/* Controller Info Tooltip */}
                         {localTicket && (
                             <div className="relative controller-tooltip-container">
@@ -565,7 +566,7 @@ export default function TicketCard({
                                 >
                                     <Cpu className="w-4 h-4 text-green-600" />
                                 </motion.button>
-                                
+
                                 <AnimatePresence>
                                     {showControllerTooltip && (
                                         <motion.div
@@ -632,7 +633,7 @@ export default function TicketCard({
                                                                 </button>
                                                             )}
                                                         </div>
-                                                    </div>                                                   
+                                                    </div>
                                                 </div>
                                             </div>
                                         </motion.div>
@@ -654,11 +655,10 @@ export default function TicketCard({
                             capitalize backdrop-blur-sm shadow-sm
                         `}
                     >
-                        <div className={`w-2 h-2 rounded-full ${
-                            localTicket.status === TICKET_STATUS.OPEN ? 'bg-red-500' :
-                            localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
-                            'bg-blue-500'
-                        }`}></div>
+                        <div className={`w-2 h-2 rounded-full ${localTicket.status === TICKET_STATUS.OPEN ? 'bg-red-500' :
+                                localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
+                                    'bg-blue-500'
+                            }`}></div>
                         {localTicket.status.replace('-', ' ')}
                     </motion.div>
                 </div>
@@ -677,7 +677,7 @@ export default function TicketCard({
                         {localTicket.description}
                     </p>
                     {/* ticket ticketMilestones is array */}
-                    {localTicket.ticketMilestones    && localTicket.ticketMilestones.length > 0 && (
+                    {localTicket.ticketMilestones && localTicket.ticketMilestones.length > 0 && (
                         <div className="mt-3 flex items-center gap-2">
                             {localTicket.ticketMilestones.filter((m) => m.status === "IN_PROGRESS").map((milestone) => (
                                 <span
@@ -689,7 +689,7 @@ export default function TicketCard({
                             ))}
                         </div>
                     )}
-                    
+
                     {/* Buzzer Alert Info - Show alert details prominently */}
                     {hasBuzzerAlert && buzzerAlertData && (
                         <motion.div
@@ -697,12 +697,10 @@ export default function TicketCard({
                             animate={{ opacity: 1, y: 0 }}
                             className="mb-3 p-3 bg-red-50 border-2 border-red-500 rounded-lg shadow-md"
                         >
-                            <div className="flex items-center gap-2 mb-2">
-                                <svg className="w-5 h-5 text-red-600 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-                                </svg>
+                            <div className="flex items-start gap-2 mb-2">
+                                <AlertCircleIcon className="w-10 h-10 text-red-600" />
                                 <span className="text-sm font-bold text-red-800">
-                                    URGENT: Customer Waiting {buzzerAlertData.hoursWaiting} 
+                                    URGENT: {lastMessage.senderName || 'Customer'} is Waiting for your response since{lastMessage.createdAt ? ` ${moment(lastMessage.createdAt).fromNow(true)}` : ''}
                                 </span>
                             </div>
                             <p className="text-xs text-red-700 leading-relaxed">
@@ -710,7 +708,7 @@ export default function TicketCard({
                             </p>
                         </motion.div>
                     )}
-                    
+
                     {/* Show detailed closure information for closed/resolved tickets */}
                     {closureInfo && (
                         <div className={`p-3 ${closureInfo.bgColor} rounded-lg border ${closureInfo.borderColor}`}>
@@ -737,7 +735,7 @@ export default function TicketCard({
                                     "{closureInfo.notes}"
                                 </p>
                             )}
-                            
+
                             {/* Show last message for cleared at field tickets */}
                             {(closureInfo.type === 'field-cleared' || closureInfo.type === 'field-clearance-approved') && lastMessage && (
                                 <div className={`mt-3 pt-2 border-t ${closureInfo.borderColor}`}>
@@ -758,8 +756,8 @@ export default function TicketCard({
                                             <span className="opacity-70">{moment(lastMessage.createdAt).fromNow()}</span>
                                         </div>
                                         <p className="line-clamp-2 leading-relaxed">
-                                            {lastMessage.content.length > 100 
-                                                ? `${lastMessage.content.substring(0, 100)}...` 
+                                            {lastMessage.content.length > 100
+                                                ? `${lastMessage.content.substring(0, 100)}...`
                                                 : lastMessage.content
                                             }
                                         </p>
@@ -768,14 +766,13 @@ export default function TicketCard({
                             )}
                         </div>
                     )}
-                    
+
                     {/* Last message for open/in-progress tickets */}
                     {shouldShowLastMessageForActiveTickets() && (
-                        <div className={`mt-3 p-3 rounded-lg border ${
-                            unreadCount > 0 
-                                ? 'bg-blue-50 border-blue-200' 
+                        <div className={`mt-3 p-3 rounded-lg border ${unreadCount > 0
+                                ? 'bg-blue-50 border-blue-200'
                                 : 'bg-slate-50 border-slate-200'
-                        }`}>
+                            }`}>
                             <div className="flex items-center gap-2 mb-2">
                                 <MessageSquare className={`w-4 h-4 ${unreadCount > 0 ? 'text-blue-600' : 'text-slate-600'}`} />
                                 <span className={`text-xs font-medium ${unreadCount > 0 ? 'text-blue-800' : 'text-slate-700'}`}>
@@ -798,8 +795,8 @@ export default function TicketCard({
                                     </span>
                                 </div>
                                 <p className="line-clamp-2 leading-relaxed">
-                                    {lastMessage.content.length > 100 
-                                        ? `${lastMessage.content.substring(0, 100)}...` 
+                                    {lastMessage.content.length > 100
+                                        ? `${lastMessage.content.substring(0, 100)}...`
                                         : lastMessage.content
                                     }
                                 </p>
