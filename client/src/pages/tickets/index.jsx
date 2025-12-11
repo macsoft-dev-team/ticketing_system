@@ -44,9 +44,7 @@ export default function Tickets() {
     useEffect(() => {
         const handleTicketMessageUpdate = (event) => {
             const messageData = event.detail;
-            console.log('📩 Updating ticket card with new message:', messageData);
-            
-            // Update the ticket's last message and ticket data in Redux store
+             // Update the ticket's last message and ticket data in Redux store
             if (messageData.ticketId) {
                 // Use server-provided ticket updates if available, or generate client-side
                 const ticketUpdates = messageData.ticketUpdates || {
@@ -62,23 +60,15 @@ export default function Tickets() {
 
         const handleNewTicketCreated = (event) => {
             const ticketData = event.detail;
-            console.log('🎫 New ticket created:', ticketData);
-            
-            // Add new ticket to the list
-            addNewTicket(ticketData);
+             addNewTicket(ticketData);
         };
 
         const handleBuzzerAlert = (event) => {
             const alertData = event.detail;
-            console.log('🚨 [TICKETS PAGE] Buzzer alert event received!');
-            console.log('🚨 [TICKETS PAGE] Alert data:', alertData);
-            console.log('🚨 [TICKETS PAGE] Ticket code:', alertData.ticketCode);
-            console.log('🚨 [TICKETS PAGE] Ticket ID:', alertData.ticketId);
-            
+             
             // Mark ticket with buzzer alert (NO AUTO-CLEAR - persists until Macsoft responds)
             if (alertData.ticketId) {
-                console.log('🚨 [TICKETS PAGE] Marking ticket with buzzer alert:', alertData.ticketId);
-                markBuzzerAlert(alertData.ticketId, alertData);
+                 markBuzzerAlert(alertData.ticketId, alertData);
             } else {
                 console.warn('🚨 [TICKETS PAGE] No ticketId in alert data!');
             }
@@ -86,12 +76,8 @@ export default function Tickets() {
 
         const handleBuzzerAlertCleared = (event) => {
             const data = event.detail;
-            console.log('🔕 [TICKETS PAGE] Buzzer alert cleared event received!');
-            console.log('🔕 [TICKETS PAGE] Ticket ID:', data.ticketId);
-            
-            if (data.ticketId) {
-                console.log('🔕 [TICKETS PAGE] Clearing buzzer alert for:', data.ticketId);
-                clearBuzzerAlert(data.ticketId);
+             if (data.ticketId) {
+                 clearBuzzerAlert(data.ticketId);
             }
         };
 
@@ -103,7 +89,8 @@ export default function Tickets() {
         
         // Listen for buzzer alerts
         window.addEventListener('socketBuzzerAlert', handleBuzzerAlert);
-        
+        // if socketBuzzerAlert refresh the ticket list to show the alert icon
+    
         // Listen for buzzer alert cleared
         window.addEventListener('socketBuzzerAlertCleared', handleBuzzerAlertCleared);
 

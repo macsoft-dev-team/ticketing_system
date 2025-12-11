@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import moment from 'moment';
 import { useAuth } from '../../../lib/hooks/useAuth';
+import { useSoundManager } from '../../../lib/hooks/SoundManager';
 import { TICKET_STATUS, STATUS_COLORS, TICKET_PRIORITY, PRIORITY_COLORS } from '../../../lib/constants';
 
 export default function TicketCard({
@@ -49,6 +50,7 @@ export default function TicketCard({
     const [localTicket, setLocalTicket] = useState(ticket);
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { play } = useSoundManager();
 
     // Handle copy to clipboard
     const handleCopy = (text, fieldName) => {
@@ -386,6 +388,13 @@ export default function TicketCard({
     const hasBuzzerAlert = shouldShowBuzzerEffects && localTicket.hasBuzzerAlert;
     const buzzerAlertData = shouldShowBuzzerEffects ? localTicket.buzzerAlertData : null;
 
+    // Play buzzer alert sound when hasBuzzerAlert is true
+    useEffect(() => {
+        if (hasBuzzerAlert) {
+             play('notify_critical');
+        }
+    }, [hasBuzzerAlert, play, localTicket.ticketCode]);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -693,7 +702,7 @@ export default function TicketCard({
                                     <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                                 </svg>
                                 <span className="text-sm font-bold text-red-800">
-                                    URGENT: Customer Waiting {buzzerAlertData.hoursWaiting}+ Hours
+                                    URGENT: Customer Waiting {buzzerAlertData.hoursWaiting} 
                                 </span>
                             </div>
                             <p className="text-xs text-red-700 leading-relaxed">
