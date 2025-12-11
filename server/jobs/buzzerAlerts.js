@@ -165,7 +165,7 @@ const checkPendingCustomerMessages = async (io = null) => {
     const candidateTickets = await prisma.ticket.findMany({
       where: {
         status: {
-          in: ['OPEN', 'IN_PROGRESS']
+          in: ["OPEN", "IN_PROGRESS"]
         },
         messages: {
           some: {} // Has at least one message
@@ -178,27 +178,34 @@ const checkPendingCustomerMessages = async (io = null) => {
               select: {
                 id: true,
                 role: true,
-                name: true
-              }
-            }
+                name: true,
+              },
+            },
           },
           orderBy: {
-            createdAt: 'desc'
-          }
+            createdAt: "desc",
+          },
         },
         createdByUser: {
           select: {
             id: true,
-            name: true
-          }
+            name: true,
+          },
         },
         serviceCenter: {
           select: {
             name: true,
-            centerCode: true
+            centerCode: true,
+          },
+        },
+        ticketMilestones: {
+          where: {
+            stage: {
+              in: ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED']
+            }
           }
         }
-      }
+      },
     });
 
      
@@ -206,6 +213,17 @@ const checkPendingCustomerMessages = async (io = null) => {
     
     for (const ticket of candidateTickets) {
       if (ticket.messages.length === 0) continue;
+      
+      // Exclude tickets with CLOSED status
+      if (ticket.status === 'CLOSED') continue;
+      
+      // Exclude tickets that have completed any final milestone stages
+      const hasFinalMilestone = ticket.ticketMilestones.some(milestone => 
+        milestone.status === 'DONE' && 
+        ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED'].includes(milestone.stage)
+      );
+      
+      if (hasFinalMilestone) continue;
       
       // Get the last message
       const lastMessage = ticket.messages[0];
