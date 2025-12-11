@@ -9,7 +9,7 @@ import React, { createContext, useContext, useRef, useCallback, useEffect, useSt
  * Place sound files in /public/sounds/<filename>
  */
 
-const SOUND_URL = import.meta.env.SOUND_URL || import.meta.env.VITE_SOUND_URL || 'http://localhost:3057/api/uploads/sounds'
+const SOUND_URL = import.meta.env.VITE_SOUND_URL || 'http://localhost:3057/api/uploads/sounds'
 
 const SOUND_MAP = {
     notify_critical: { label: "System Alert", file: `${SOUND_URL}/system-alert.wav` },
