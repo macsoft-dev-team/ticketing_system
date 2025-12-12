@@ -55,16 +55,14 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
         const caller = stack.split('\n')[2]?.trim() || 'unknown caller';
 
         if (muted) {
-            console.log(`🔇 [SOUNDMANAGER] MUTED - not playing "${key}"`);
-            return;
+             return;
         }
 
         // Prevent duplicate sounds within 500ms window
         const now = Date.now();
         const lastPlayTime = recentSoundsRef.current.get(key);
         if (lastPlayTime && (now - lastPlayTime) < 500) {
-            console.log(`🚫 [SOUNDMANAGER] DUPLICATE BLOCKED: "${key}" (played ${now - lastPlayTime}ms ago)`);
-            return;
+             return;
         }
 
         // Update the last play time and clean up old entries
@@ -82,10 +80,7 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
             console.warn(`[SoundManager] No sound configured for key: "${key}"`);
             return;
         }
-
-        console.log(`🔊 [SOUNDMANAGER] PLAYING SOUND: "${key}" (${entry.label})`);
-
-        // Try to reuse preloaded Audio object, otherwise create one.
+         // Try to reuse preloaded Audio object, otherwise create one.
         let audio = audiosRef.current[key];
         if (!audio) {
             audio = new Audio(entry.file);
@@ -111,7 +106,6 @@ export function SoundProvider({ children, defaultVolume = 0.5, preload = true })
 
         audio.volume = volumeRef.current;
         audio.play().then(() => {
-            console.log(`✅ [SOUNDMANAGER] Successfully played: "${key}"`);
         }).catch((err) => {
             console.warn(`❌ [SOUNDMANAGER] Failed to play "${key}":`, err);
             // Common reason: autoplay restrictions. Do nothing.
