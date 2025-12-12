@@ -161,7 +161,7 @@ const checkPendingCustomerMessages = async (io = null) => {
     };
     
      
-    // Find open/in-progress tickets that have messages
+    // Find open/in-progress tickets that have messages (exclude RESOLVED and CLOSED)
     const candidateTickets = await prisma.ticket.findMany({
       where: {
         status: {
@@ -214,12 +214,12 @@ const checkPendingCustomerMessages = async (io = null) => {
     for (const ticket of candidateTickets) {
       if (ticket.messages.length === 0) continue;
       
-      // Exclude tickets with CLOSED status
-      if (ticket.status === 'CLOSED') continue;
+      // Exclude tickets with CLOSED or RESOLVED status (safety check)
+      if (ticket.status === 'CLOSED' || ticket.status === 'RESOLVED') continue;
       
       // Exclude tickets that have completed any final milestone stages
       const hasFinalMilestone = ticket.ticketMilestones.some(milestone => 
-        milestone.status === 'DONE' && 
+        milestone.stage === 'DONE' && 
         ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED'].includes(milestone.stage)
       );
       
