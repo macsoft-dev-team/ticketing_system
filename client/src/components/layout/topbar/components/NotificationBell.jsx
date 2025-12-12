@@ -62,18 +62,18 @@ const NotificationBell = () => {
       setAllNotifications(prevAll => {
         const existingIds = new Set(prevAll.map(n => n.id));
         const newNotifications = transformedSocketNotifications.filter(n => !existingIds.has(n.id));
-        
+
         if (newNotifications.length > 0) {
           // Add new notifications to the beginning
           return [...newNotifications, ...prevAll];
         }
-        
+
         // If no new notifications, just update existing ones
         const updatedNotifications = prevAll.map(existing => {
           const updated = transformedSocketNotifications.find(n => n.id === existing.id);
           return updated || existing;
         });
-        
+
         return updatedNotifications;
       });
 
@@ -81,18 +81,18 @@ const NotificationBell = () => {
       setNotifications(prevDisplayed => {
         const existingIds = new Set(prevDisplayed.map(n => n.id));
         const newNotifications = transformedSocketNotifications.filter(n => !existingIds.has(n.id));
-        
+
         if (newNotifications.length > 0) {
           const combined = [...newNotifications, ...prevDisplayed];
           return combined.slice(0, 20);
         }
-        
+
         // Update existing displayed notifications
         const updatedNotifications = prevDisplayed.map(existing => {
           const updated = transformedSocketNotifications.find(n => n.id === existing.id);
           return updated || existing;
         });
-        
+
         return updatedNotifications.slice(0, 20);
       });
 
@@ -127,7 +127,7 @@ const NotificationBell = () => {
               variant: 'default',
               duration: 5000,
             });
-            
+
             // Mark this notification as shown
             shownToastIds.current.add(notification.id);
           }
@@ -270,7 +270,7 @@ const NotificationBell = () => {
 
   const markAllAsRead = async () => {
     if (markingAllAsRead) return; // Prevent multiple clicks
-    
+
     setMarkingAllAsRead(true);
     try {
       // Use all notifications for marking as read, not just displayed ones
@@ -452,18 +452,29 @@ const NotificationBell = () => {
   useTitleNotification(unreadCount);
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Bell className="w-5 h-5" />
-        {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 min-w-5 h-5 flex items-center justify-center text-xs bg-red-500 text-white border-2 border-white px-1">
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </Badge>
-        )}
-      </button>
+ 
+  <div onClick={() => setIsOpen(!isOpen)} title="Unread Notifications" className="relative">
+        <button
+          className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
 
+          <Bell className="w-6 h-6" />
+        </button>
+
+        {/* Badge for unread count */}
+        {unreadCount > 0 && (
+          <button 
+          type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+                console.log("Badge clicked!");
+            }}
+            className="absolute rounded-full px-1 py-0.5 font-bold cursor-pointer xsmall pointer-events-auto -top-1 -right-1 flex items-center justify-center text-[0.6rem] bg-red-500 text-white border-2 border-white z-10">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </button>
+        )}
+      </div>
       {isOpen && (
         <div className="absolute -right-14 sm:right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
           {/* Header */}
@@ -480,11 +491,10 @@ const NotificationBell = () => {
                 <button
                   onClick={markAllAsRead}
                   disabled={markingAllAsRead}
-                  className={`text-sm cursor-pointer transition-colors flex items-center space-x-1 ${
-                    markingAllAsRead 
-                      ? 'text-gray-400 cursor-not-allowed' 
-                      : 'text-blue-600 hover:text-blue-800'
-                  }`}
+                  className={`text-sm cursor-pointer transition-colors flex items-center space-x-1 ${markingAllAsRead
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-blue-600 hover:text-blue-800'
+                    }`}
                   title="Mark all as read"
                 >
                   {markingAllAsRead && (
@@ -560,15 +570,15 @@ const NotificationBell = () => {
               </p>
             )}
             {user.role !== "CUSTOMER_FIELD_ENGINEER" && user.role !== "CUSTOMER_SERVICE_HEAD" && (
-            <button 
-              className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors"
-              onClick={() => {
-                setIsOpen(false);
-                navigate('/notifications');
-              }}
-            >
-              View all notifications
-            </button>
+              <button
+                className="w-full text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate('/notifications');
+                }}
+              >
+                View all notifications
+              </button>
             )}
           </div>
         </div>

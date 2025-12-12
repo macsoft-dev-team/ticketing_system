@@ -2,7 +2,7 @@ import React from "react";
 
 const Badge = ({ children, variant = "default", size = "medium", className = "", ...props }) => {
   const baseStyles =
-    "inline-flex items-center rounded-full font-semibold border transition-colors";
+    "inline-flex items-center rounded-full font-semibold border transition-colors pointer-events-auto";
   
   const variants = {
     default: "bg-gray-200 text-gray-800 border-gray-300",
@@ -16,7 +16,7 @@ const Badge = ({ children, variant = "default", size = "medium", className = "",
   };
 
   const sizes = {
-    xsmall: "px-1.5 py-0.5 text-[0.6rem]",
+    xsmall: "px-1 py-0.5 text-[0.6rem]",
     small: "px-2 py-0.5 text-xs",
     medium: "px-3 py-1 text-xs",
     large: "px-4 py-1.5 text-sm",

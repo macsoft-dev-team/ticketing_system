@@ -27,15 +27,15 @@ const MessageBox = () => {
     setLoading(true);
     try {
       const baseUrl = import.meta.env.VITE_API_URL;
-      
+
       // Determine audience based on user role
       // MACSOFT users see customer messages needing replies
       // CUSTOMER users see MACSOFT messages needing replies
       const isMacsoftUser = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
       const audience = isMacsoftUser ? 'MACSOFT' : 'CUSTOMER';
-      
+
       console.log(`MessageBox: Fetching unreplied messages for ${audience} audience (User role: ${user?.role})`);
-      
+
       const response = await fetch(`${baseUrl}/messages/unreplied?audience=${audience}`, {
         method: 'GET',
         headers: {
@@ -43,14 +43,14 @@ const MessageBox = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (response.ok) {
         const result = await response.json();
 
         if (result.success && Array.isArray(result.data)) {
           // Group messages by ticket to show one entry per ticket with latest message
           const ticketsMap = new Map();
-          
+
           result.data.forEach(message => {
             if (!ticketsMap.has(message.ticketId)) {
               ticketsMap.set(message.ticketId, {
@@ -67,9 +67,9 @@ const MessageBox = () => {
               });
             }
           });
-          
+
           const transformedTickets = Array.from(ticketsMap.values());
-          
+
           console.log(`✅ MessageBox: Successfully loaded ${transformedTickets.length} unreplied messages for ${audience} audience`);
           setUnrepliedTickets(transformedTickets);
           setUnreadCount(transformedTickets.length);
@@ -147,11 +147,11 @@ const MessageBox = () => {
   // Format relative time helper
   const formatRelativeTime = (dateString) => {
     if (!dateString) return 'Unknown';
-    
+
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
-    
+
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
@@ -177,7 +177,7 @@ const MessageBox = () => {
   const handleTicketClick = (ticketId) => {
     navigate(`/tickets/${ticketId}#conversation`);
     setIsOpen(false);
-    
+
     // Scroll to conversation section after navigation
     setTimeout(() => {
       const conversationElement = document.getElementById('conversation-section');
@@ -190,11 +190,11 @@ const MessageBox = () => {
   // Mark all as read functionality
   const markAllAsRead = async () => {
     if (markingAllAsRead || unrepliedTickets.length === 0) return;
-    
+
     setMarkingAllAsRead(true);
     try {
       const baseUrl = import.meta.env.VITE_API_URL;
-      
+
       // Mark all unreplied tickets as read
       await Promise.all(
         unrepliedTickets.map(async (ticket) => {
@@ -237,20 +237,28 @@ const MessageBox = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Message Bell Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-        title="Unreplied Messages"
-      >
-        <MessageCircle className="w-5 h-5" />
-        
+      <div onClick={() => setIsOpen(!isOpen)} title="Unreplied Messages" className="relative">
+        <button
+          className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+
+          <MessageCircle className="w-5.8 h-5.8" />
+        </button>
+
         {/* Badge for unread count */}
         {unreadCount > 0 && (
-          <Badge className="absolute -top-1 -right-1 min-w-5 h-5 flex items-center justify-center text-xs bg-red-500 text-white border-2 border-white px-1">
+          <button 
+          type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+                console.log("Badge clicked!");
+            }}
+            className="absolute rounded-full px-1 py-0.5 font-bold cursor-pointer xsmall pointer-events-auto -top-1 -right-1 flex items-center justify-center text-[0.6rem] bg-red-500 text-white border-2 border-white z-10">
             {unreadCount > 99 ? '99+' : unreadCount}
-          </Badge>
+          </button>
         )}
-      </button>
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -265,7 +273,7 @@ const MessageBox = () => {
               />
             </div>
             <div className="flex items-center space-x-2">
-            
+
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
@@ -307,7 +315,7 @@ const MessageBox = () => {
                           <div className="flex items-center space-x-2">
                             <span className="text-sm font-semibold text-gray-900 truncate">
                               {ticket.ticketCode}
-                            </span> 
+                            </span>
                           </div>
                           {/* Unread indicator */}
                           <div className="flex items-center space-x-1 text-xs text-gray-400">
@@ -320,11 +328,11 @@ const MessageBox = () => {
                         {/* Subject */}
                         {ticket.subject && (
                           <p className="text-sm text-gray-800 mt-1 truncate">
-                            {ticket.subject}  
+                            {ticket.subject}
                           </p>
                         )}
 
-                                            
+
 
                         {/* Attachments indicator */}
                         {ticket.hasAttachments && (

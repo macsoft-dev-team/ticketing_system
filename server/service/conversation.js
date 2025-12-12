@@ -310,7 +310,10 @@ const markMessageAsSeen = async (messageId, userId) => {
 };
 
 // Mark multiple messages as seen for a ticket
-const markMessagesAsSeen = async (ticketId, userId, messageIds = null) => {
+const markMessagesAsSeen = async (ticketId, userId, messageIds = null, retryCount = 0) => {
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 100; // Base delay in milliseconds
+  
   try {
     // Get messages to mark as seen
     const whereClause = { ticketId: ticketId };
@@ -323,8 +326,36 @@ const markMessagesAsSeen = async (ticketId, userId, messageIds = null) => {
       select: { id: true },
     });
 
-    // Create MessageSeen records for messages not already seen by this user
-    const messageSeenData = messages.map(message => ({
+    if (messages.length === 0) {
+      return {
+        success: true,
+        markedCount: 0,
+        totalMessages: 0,
+      };
+    }
+
+    // Filter out messages that are already seen by this user
+    const existingSeenRecords = await prisma.messageSeen.findMany({
+      where: {
+        messageId: { in: messages.map(m => m.id) },
+        userId: userId,
+      },
+      select: { messageId: true },
+    });
+
+    const seenMessageIds = new Set(existingSeenRecords.map(r => r.messageId));
+    const unseenMessages = messages.filter(m => !seenMessageIds.has(m.id));
+
+    if (unseenMessages.length === 0) {
+      return {
+        success: true,
+        markedCount: 0,
+        totalMessages: messages.length,
+      };
+    }
+
+    // Create MessageSeen records for unseen messages
+    const messageSeenData = unseenMessages.map(message => ({
       messageId: message.id,
       userId: userId,
       seenAt: new Date(),
@@ -342,6 +373,16 @@ const markMessagesAsSeen = async (ticketId, userId, messageIds = null) => {
       totalMessages: messages.length,
     };
   } catch (error) {
+    // Handle write conflict/deadlock errors (P2034) with retry logic
+    if (error.code === 'P2034' && retryCount < MAX_RETRIES) {
+      // Exponential backoff: wait longer with each retry
+      const delay = RETRY_DELAY_MS * Math.pow(2, retryCount);
+      console.log(`Write conflict detected, retrying in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})...`);
+      
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return markMessagesAsSeen(ticketId, userId, messageIds, retryCount + 1);
+    }
+    
     throw error;
   }
 };
