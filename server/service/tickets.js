@@ -111,22 +111,32 @@ const getTickets = async (skip, take, filter, userId, role) => {
     if (filter && filter.search) {
       const s = String(filter.search).trim();
       if (s.length > 0) {
-        // `mode: "insensitive"` works on supported connectors (MySQL/Postgres)
-        where.OR = [
-          { ticketCode: { contains: s } },
-          { description: { contains: s } },
-          { customerName: { contains: s } },
-          { controllerNo: { contains: s } },
-          { imei: { contains: s } },
-          { hp: { contains: s } },
-          { motorType: { contains: s } },
-          { stateCode: { contains: s } },
-          { district: { contains: s } },
-          { village: { contains: s } },
-          { block: { contains: s } },
-          { complaintType: { contains: s } },
-          { faultCode: { contains: s } },
-        ];
+        const searchType = filter.searchType || 'controller'; // default to controller
+        
+        if (searchType === 'ticket') {
+          // Search only in ticket code
+          where.ticketCode = { contains: s };
+        } else if (searchType === 'controller') {
+          // Search only in controller number
+          where.controllerNo = { contains: s };
+        } else {
+          // Fallback to search all fields if searchType is not recognized
+          where.OR = [
+            { ticketCode: { contains: s } },
+            { description: { contains: s } },
+            { customerName: { contains: s } },
+            { controllerNo: { contains: s } },
+            { imei: { contains: s } },
+            { hp: { contains: s } },
+            { motorType: { contains: s } },
+            { stateCode: { contains: s } },
+            { district: { contains: s } },
+            { village: { contains: s } },
+            { block: { contains: s } },
+            { complaintType: { contains: s } },
+            { faultCode: { contains: s } },
+          ];
+        }
       }
     }
 

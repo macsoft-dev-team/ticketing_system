@@ -11,6 +11,7 @@ export default function Header() {
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
     const [activeStageFilter, setActiveStageFilter] = useState(filters?.stage || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [searchType, setSearchType] = useState(filters?.searchType || 'controller');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isStageDropdownOpen, setIsStageDropdownOpen] = useState(false);
@@ -45,11 +46,13 @@ export default function Header() {
         const statusParam = searchParams.get('status');
         const stageParam = searchParams.get('stage');
         const searchParam = searchParams.get('search');
+        const searchTypeParam = searchParams.get('searchType');
         
         // Convert hyphens to underscores and uppercase
         if (statusParam) setActiveFilter(statusParam.replace(/-/g, '_').toUpperCase());
         if (stageParam) setActiveStageFilter(stageParam.replace(/-/g, '_').toUpperCase());
         if (searchParam) setSearchTerm(searchParam);
+        if (searchTypeParam) setSearchType(searchTypeParam);
     }, []);
     
     const filterTabItems = [
@@ -62,7 +65,7 @@ export default function Header() {
     // Handle filter changes
     const handleFilterChange = useCallback((status) => {
         setActiveFilter(status);
-        setFilters({ status, stage: activeStageFilter, search: debouncedSearchTerm || '' });
+        setFilters({ status, stage: activeStageFilter, search: debouncedSearchTerm || '', searchType });
         setCurrentPage(0); // Reset to first page on filter change
         
         // Update URL params (convert underscores to hyphens for URL)
@@ -73,12 +76,12 @@ export default function Header() {
             newParams.delete('status');
         }
         setSearchParams(newParams);
-    }, [activeStageFilter, debouncedSearchTerm, setFilters, setCurrentPage, searchParams, setSearchParams]);
+    }, [activeStageFilter, debouncedSearchTerm, searchType, setFilters, setCurrentPage, searchParams, setSearchParams]);
 
     // Handle stage filter changes
     const handleStageFilterChange = useCallback((stage) => {
         setActiveStageFilter(stage);
-        setFilters({ status: activeFilter, stage, search: debouncedSearchTerm || '' });
+        setFilters({ status: activeFilter, stage, search: debouncedSearchTerm || '', searchType });
         setCurrentPage(0); // Reset to first page on filter change
         setIsStageDropdownOpen(false);
         
@@ -90,7 +93,7 @@ export default function Header() {
             newParams.delete('stage');
         }
         setSearchParams(newParams);
-    }, [activeFilter, debouncedSearchTerm, setFilters, setCurrentPage, searchParams, setSearchParams]);
+    }, [activeFilter, debouncedSearchTerm, searchType, setFilters, setCurrentPage, searchParams, setSearchParams]);
 
     // Handle search changes
     const handleSearchChange = useCallback((search) => {
@@ -102,8 +105,8 @@ export default function Header() {
     useEffect(() => {
         // Only update if the values have actually changed and setFilters is available
         const currentSearch = debouncedSearchTerm || '';
-        if (setFilters && (filters?.status !== activeFilter || filters?.stage !== activeStageFilter || filters?.search !== currentSearch)) {
-            setFilters({ status: activeFilter, stage: activeStageFilter, search: currentSearch });
+        if (setFilters && (filters?.status !== activeFilter || filters?.stage !== activeStageFilter || filters?.search !== currentSearch || filters?.searchType !== searchType)) {
+            setFilters({ status: activeFilter, stage: activeStageFilter, search: currentSearch, searchType });
             
             // Update URL params for search
             const newParams = new URLSearchParams(searchParams);
@@ -112,9 +115,12 @@ export default function Header() {
             } else {
                 newParams.delete('search');
             }
+            if (searchType) {
+                newParams.set('searchType', searchType);
+            }
             setSearchParams(newParams);
         }
-    }, [debouncedSearchTerm, activeFilter, activeStageFilter, filters?.status, filters?.stage, filters?.search, setFilters, searchParams, setSearchParams]);
+    }, [debouncedSearchTerm, activeFilter, activeStageFilter, searchType, filters?.status, filters?.stage, filters?.search, filters?.searchType, setFilters, searchParams, setSearchParams]);
 
     // Close stage dropdown when clicking outside
     useEffect(() => {
@@ -283,6 +289,19 @@ export default function Header() {
 
                 {/* Right Section */}
                 <div className="flex items-center space-x-2 sm:space-x-3">
+                    {/* Search Type Select - Desktop */}
+                    <motion.select
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.25 }}
+                        value={searchType}
+                        onChange={(e) => setSearchType(e.target.value)}
+                        className="hidden md:block px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    >
+                        <option value="controller">Controller No</option>
+                        <option value="ticket">Ticket No</option>
+                    </motion.select>
+
                     {/* Search Input - Desktop */}
                          <motion.div
                             initial={{ opacity: 0, x: 20 }}
@@ -354,16 +373,29 @@ export default function Header() {
                             transition={{ duration: 0.3 }}
                             className="md:hidden px-4 pb-4 border-t border-gray-200"
                         >
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <input
-                                    type="search"
-                                    placeholder="Search tickets..."
-                                    value={searchTerm}
-                                    onChange={(e) => handleSearchChange(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                    autoFocus
-                                />
+                            <div className="space-y-2">
+                                {/* Search Type Select - Mobile */}
+                                <select
+                                    value={searchType}
+                                    onChange={(e) => setSearchType(e.target.value)}
+                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="controller">Controller No</option>
+                                    <option value="ticket">Ticket No</option>
+                                </select>
+                                
+                                {/* Search Input - Mobile */}
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                    <input
+                                        type="search"
+                                        placeholder="Search tickets..."
+                                        value={searchTerm}
+                                        onChange={(e) => handleSearchChange(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                        autoFocus
+                                    />
+                                </div>
                             </div>
                         </motion.div>
                     )}
