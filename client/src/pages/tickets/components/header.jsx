@@ -1,12 +1,13 @@
 import { Plus, Search, Filter, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect, useCallback } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 import useTickets from "../../../lib/hooks/useTickets";
 import { useDebounce } from "../../../lib/hooks/ticketHooks";
 
 export default function Header() {
     const { tickets, setFilters, filters, statusCount, setCurrentPage } = useTickets();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
     const [activeStageFilter, setActiveStageFilter] = useState(filters?.stage || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
@@ -38,6 +39,19 @@ export default function Header() {
 
     // Debounce the search term with 300ms delay
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
+    
+    // Initialize from URL params on mount
+    useEffect(() => {
+        const statusParam = searchParams.get('status');
+        const stageParam = searchParams.get('stage');
+        const searchParam = searchParams.get('search');
+        
+        // Convert hyphens to underscores and uppercase
+        if (statusParam) setActiveFilter(statusParam.replace(/-/g, '_').toUpperCase());
+        if (stageParam) setActiveStageFilter(stageParam.replace(/-/g, '_').toUpperCase());
+        if (searchParam) setSearchTerm(searchParam);
+    }, []);
+    
     const filterTabItems = [
         { id: '', label: 'All', shortLabel: 'All', key: 'ALL' },
         { id: 'OPEN', label: 'Open', shortLabel: 'Open', key: 'OPEN' },
@@ -50,7 +64,16 @@ export default function Header() {
         setActiveFilter(status);
         setFilters({ status, stage: activeStageFilter, search: debouncedSearchTerm || '' });
         setCurrentPage(0); // Reset to first page on filter change
-    }, [activeStageFilter, debouncedSearchTerm, setFilters, setCurrentPage]);
+        
+        // Update URL params (convert underscores to hyphens for URL)
+        const newParams = new URLSearchParams(searchParams);
+        if (status) {
+            newParams.set('status', status.toLowerCase().replace(/_/g, '-'));
+        } else {
+            newParams.delete('status');
+        }
+        setSearchParams(newParams);
+    }, [activeStageFilter, debouncedSearchTerm, setFilters, setCurrentPage, searchParams, setSearchParams]);
 
     // Handle stage filter changes
     const handleStageFilterChange = useCallback((stage) => {
@@ -58,7 +81,16 @@ export default function Header() {
         setFilters({ status: activeFilter, stage, search: debouncedSearchTerm || '' });
         setCurrentPage(0); // Reset to first page on filter change
         setIsStageDropdownOpen(false);
-    }, [activeFilter, debouncedSearchTerm, setFilters, setCurrentPage]);
+        
+        // Update URL params (convert underscores to hyphens for URL)
+        const newParams = new URLSearchParams(searchParams);
+        if (stage) {
+            newParams.set('stage', stage.toLowerCase().replace(/_/g, '-'));
+        } else {
+            newParams.delete('stage');
+        }
+        setSearchParams(newParams);
+    }, [activeFilter, debouncedSearchTerm, setFilters, setCurrentPage, searchParams, setSearchParams]);
 
     // Handle search changes
     const handleSearchChange = useCallback((search) => {
@@ -72,8 +104,17 @@ export default function Header() {
         const currentSearch = debouncedSearchTerm || '';
         if (setFilters && (filters?.status !== activeFilter || filters?.stage !== activeStageFilter || filters?.search !== currentSearch)) {
             setFilters({ status: activeFilter, stage: activeStageFilter, search: currentSearch });
+            
+            // Update URL params for search
+            const newParams = new URLSearchParams(searchParams);
+            if (currentSearch) {
+                newParams.set('search', currentSearch);
+            } else {
+                newParams.delete('search');
+            }
+            setSearchParams(newParams);
         }
-    }, [debouncedSearchTerm, activeFilter, activeStageFilter, filters?.status, filters?.stage, filters?.search, setFilters]);
+    }, [debouncedSearchTerm, activeFilter, activeStageFilter, filters?.status, filters?.stage, filters?.search, setFilters, searchParams, setSearchParams]);
 
     // Close stage dropdown when clicking outside
     useEffect(() => {

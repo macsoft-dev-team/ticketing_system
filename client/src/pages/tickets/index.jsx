@@ -5,10 +5,29 @@ import TicketCard from "./components/ticketCard";
 import { motion } from "motion/react";
 import { useEffect } from "react";
 import { useSocket } from "../../lib/contexts/SocketContext";
+import { useSearchParams } from "react-router-dom";
 
 export default function Tickets() {
-    const { tickets, filters, totalPages, currentPage, setTickets, fetchTickets, updateLastMessage, updateTicketWithMessage, addNewTicket, markBuzzerAlert, clearBuzzerAlert } = useTickets();
+    const { tickets, filters, totalPages, currentPage, setTickets, fetchTickets, updateLastMessage, updateTicketWithMessage, addNewTicket, markBuzzerAlert, clearBuzzerAlert, setFilters } = useTickets();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { isConnected } = useSocket();
+    
+    // Initialize filters from URL on mount
+    useEffect(() => {
+        const statusParam = searchParams.get('status');
+        const stageParam = searchParams.get('stage');
+        const searchParam = searchParams.get('search');
+        
+        // Only update filters if URL params exist (convert hyphens to underscores)
+        if (statusParam || stageParam || searchParam) {
+            setFilters({
+                status: statusParam ? statusParam.replace(/-/g, '_').toUpperCase() : '',
+                stage: stageParam ? stageParam.replace(/-/g, '_').toUpperCase() : '',
+                search: searchParam || ''
+            });
+        }
+    }, []); // Run only on mount
+    
     const handleStatusChange = (ticketId, newStatus) => {
         setTickets(prev => prev.map(ticket =>
             ticket.id === ticketId
