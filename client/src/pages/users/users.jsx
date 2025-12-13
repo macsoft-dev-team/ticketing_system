@@ -23,6 +23,7 @@ export default function UsersPage() {
         { key: 'role', label: 'Role', align: 'left' },
         { key: 'status', label: 'Status', align: 'center' },
         { key: 'organisation', label: 'Organisation', align: 'left', textWrap: 'nowrap' },
+        { key: 'createdTicketsCount', label: 'Tickets', align: 'left', textWrap: 'nowrap' },
         {
             key: 'createdAt',
             label: 'Created Date',

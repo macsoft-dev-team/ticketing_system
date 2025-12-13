@@ -5,24 +5,25 @@ const { hashPassword } = require("../lib/hashPassword");
 const getStateIdByCode = async (stateCode) => {
   if (!stateCode) return null;
   const state = await prisma.state.findUnique({
-    where: { stateCode }
+    where: { stateCode },
   });
   return state ? state.id : null;
 };
 
 // Helper function to convert array of state codes to array of state IDs
 const getStateIdsByCodes = async (stateCodes) => {
-  if (!stateCodes || !Array.isArray(stateCodes) || stateCodes.length === 0) return [];
+  if (!stateCodes || !Array.isArray(stateCodes) || stateCodes.length === 0)
+    return [];
   const states = await prisma.state.findMany({
-    where: { stateCode: { in: stateCodes } }
+    where: { stateCode: { in: stateCodes } },
   });
-  return states.map(state => ({ id: state.id }));
+  return states.map((state) => ({ id: state.id }));
 };
- 
+
 const getAll = async (skip, take, filter, currentUser) => {
   try {
     // Check if current user is MACSOFT_ADMIN
-    if (!currentUser || currentUser.role !== 'MACSOFT_ADMIN') {
+    if (!currentUser || currentUser.role !== "MACSOFT_ADMIN") {
       throw new Error("Unauthorized: Only MACSOFT_ADMIN can access user list");
     }
 
@@ -74,10 +75,10 @@ const getAll = async (skip, take, filter, currentUser) => {
 
     // Exclude deleted users
     where.deletedAt = null;
-    
+
     // Exclude the current admin user from results
     where.id = {
-      not: currentUser.id
+      not: currentUser.id,
     };
 
     const users = await prisma.user.findMany({
@@ -93,7 +94,8 @@ const getAll = async (skip, take, filter, currentUser) => {
         organisation: true,
         State: true,
         states: true,
-      },
+        createdTickets: true,
+       },
       orderBy: [{ createdAt: "desc" }],
     });
 
@@ -101,11 +103,11 @@ const getAll = async (skip, take, filter, currentUser) => {
 
     const statusCounts = await prisma.user.groupBy({
       by: ["isActive"],
-       _count: {
+      _count: {
         id: true,
       },
     });
-    // Transform statusCounts to have 'ALL','ACTIVE' and 'INACTIVE' 
+    // Transform statusCounts to have 'ALL','ACTIVE' and 'INACTIVE'
     const _transformedStatusCounts = { ALL: 0, ACTIVE: 0, INACTIVE: 0 };
     _transformedStatusCounts.ALL = await prisma.user.count();
     statusCounts.forEach((statusGroup) => {
@@ -118,7 +120,7 @@ const getAll = async (skip, take, filter, currentUser) => {
     const count = await prisma.user.count({ where });
     return { users, count, statusCounts: _transformedStatusCounts };
   } catch (error) {
-    console.error('Error in getAll users service:', error);
+    console.error("Error in getAll users service:", error);
     throw new Error("Failed to fetch users");
   }
 };
@@ -142,11 +144,11 @@ const getCurrentUser = async (userId) => {
         updatedAt: true,
         serviceCenter: {
           include: {
-            organisation: true
-          }
+            organisation: true,
+          },
         },
         State: true,
-        states: true
+        states: true,
       },
     });
 
@@ -156,7 +158,7 @@ const getCurrentUser = async (userId) => {
 
     return user;
   } catch (error) {
-    console.error('Error in getCurrentUser service:', error);
+    console.error("Error in getCurrentUser service:", error);
     throw new Error("Failed to fetch current user");
   }
 };
@@ -171,12 +173,12 @@ const getById = async (id) => {
       include: {
         serviceCenter: {
           include: {
-            organisation: true
-          }
+            organisation: true,
+          },
         },
         State: true,
-        states: true
-      }
+        states: true,
+      },
     });
 
     if (!user) {
@@ -185,7 +187,7 @@ const getById = async (id) => {
 
     return user;
   } catch (error) {
-    console.error('Error in getById service:', error);
+    console.error("Error in getById service:", error);
     throw new Error("Failed to fetch user");
   }
 };
@@ -201,8 +203,8 @@ const create = async (userData) => {
     const existingUser = await prisma.user.findFirst({
       where: {
         phone: userData.phone,
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     if (existingUser) {
@@ -211,14 +213,14 @@ const create = async (userData) => {
 
     // Hash password
     const hashedPassword = await hashPassword(userData.password);
-    
+
     // Prepare user data
     const createData = {
       name: userData.name,
       phone: userData.phone,
       password: hashedPassword,
-      role: userData.role || 'SCE_USER',
-      isActive: userData.status === 'ACTIVE' || userData.isActive !== false,
+      role: userData.role || "SCE_USER",
+      isActive: userData.status === "ACTIVE" || userData.isActive !== false,
     };
 
     // Note: Email field is commented out until schema migration is run
@@ -231,9 +233,9 @@ const create = async (userData) => {
     if (userData.projectCode) {
       // Find service center by projectCode
       const serviceCenter = await prisma.serviceCenter.findFirst({
-        where: { projectCode: userData.projectCode }
+        where: { projectCode: userData.projectCode },
       });
-      
+
       if (serviceCenter) {
         createData.centerCode = serviceCenter.centerCode;
       }
@@ -259,25 +261,25 @@ const create = async (userData) => {
       data: {
         ...createData,
         states: {
-          connect: multipleStatesConnect
-        }
+          connect: multipleStatesConnect,
+        },
       },
       include: {
         serviceCenter: {
           include: {
-            project: true
-          }
+            project: true,
+          },
         },
         State: true,
-        states: true
-      }
+        states: true,
+      },
     });
 
     // Remove password from response
     const { password, ...userResponse } = newUser;
     return userResponse;
   } catch (error) {
-    console.error('Error in create user service:', error);
+    console.error("Error in create user service:", error);
     throw error; // Re-throw to preserve specific error messages
   }
 };
@@ -287,8 +289,8 @@ const update = async (id, userData) => {
     const existingUser = await prisma.user.findFirst({
       where: {
         id: parseInt(id),
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     if (!existingUser) {
@@ -301,8 +303,8 @@ const update = async (id, userData) => {
         where: {
           phone: userData.phone,
           id: { not: parseInt(id) },
-          deletedAt: null
-        }
+          deletedAt: null,
+        },
       });
 
       if (phoneConflict) {
@@ -317,10 +319,10 @@ const update = async (id, userData) => {
     if (userData.name) updateData.name = userData.name;
     if (userData.phone) updateData.phone = userData.phone;
     if (userData.role) updateData.role = userData.role;
-    if (userData.hasOwnProperty('status')) {
-      updateData.isActive = userData.status === 'ACTIVE';
+    if (userData.hasOwnProperty("status")) {
+      updateData.isActive = userData.status === "ACTIVE";
     }
-    if (userData.hasOwnProperty('isActive')) {
+    if (userData.hasOwnProperty("isActive")) {
       updateData.isActive = userData.isActive;
     }
 
@@ -331,20 +333,20 @@ const update = async (id, userData) => {
     // }
 
     // Handle password update
-    if (userData.password && userData.password.trim() !== '') {
+    if (userData.password && userData.password.trim() !== "") {
       updateData.password = await hashPassword(userData.password);
     }
     //Handle service center code update
-    if(userData.centerCode){
+    if (userData.centerCode) {
       updateData.centerCode = userData.centerCode;
     }
-    
-    //Handle Organization code update 
-    if (userData.orgCode ) {
+
+    //Handle Organization code update
+    if (userData.orgCode) {
       updateData.orgCode = userData.orgCode;
     }
     // Handle primary state relationship
-    if (userData.hasOwnProperty('primaryState')) {
+    if (userData.hasOwnProperty("primaryState")) {
       if (userData.primaryState) {
         const primaryStateId = await getStateIdByCode(userData.primaryState);
         updateData.stateId = primaryStateId;
@@ -357,20 +359,28 @@ const update = async (id, userData) => {
 
     // Handle multiple states relationship
     let statesUpdate = {};
-    if (userData.hasOwnProperty('multipleStates')) {
+    if (userData.hasOwnProperty("multipleStates")) {
       // First disconnect all existing states
       const currentUser = await prisma.user.findUnique({
         where: { id: parseInt(id) },
-        include: { states: true }
+        include: { states: true },
       });
-      
+
       if (currentUser && currentUser.states.length > 0) {
-        statesUpdate.disconnect = currentUser.states.map(state => ({ id: state.id }));
+        statesUpdate.disconnect = currentUser.states.map((state) => ({
+          id: state.id,
+        }));
       }
-      
+
       // Then connect new states if provided
-      if (userData.multipleStates && Array.isArray(userData.multipleStates) && userData.multipleStates.length > 0) {
-        const multipleStatesConnect = await getStateIdsByCodes(userData.multipleStates);
+      if (
+        userData.multipleStates &&
+        Array.isArray(userData.multipleStates) &&
+        userData.multipleStates.length > 0
+      ) {
+        const multipleStatesConnect = await getStateIdsByCodes(
+          userData.multipleStates
+        );
         if (multipleStatesConnect.length > 0) {
           statesUpdate.connect = multipleStatesConnect;
         }
@@ -381,25 +391,25 @@ const update = async (id, userData) => {
       where: { id: parseInt(id) },
       data: {
         ...updateData,
-        ...(Object.keys(statesUpdate).length > 0 && { states: statesUpdate })
+        ...(Object.keys(statesUpdate).length > 0 && { states: statesUpdate }),
       },
       include: {
         serviceCenter: {
           include: {
-            project: true
-          }
+            project: true,
+          },
         },
         organisation: true,
         State: true,
-        states: true
-      }
+        states: true,
+      },
     });
 
     // Remove password from response
     const { password, ...userResponse } = updatedUser;
     return userResponse;
   } catch (error) {
-    console.error('Error in update user service:', error);
+    console.error("Error in update user service:", error);
     throw error; // Re-throw to preserve specific error messages
   }
 };
@@ -410,8 +420,8 @@ const deleteUser = async (id) => {
     const existingUser = await prisma.user.findFirst({
       where: {
         id: parseInt(id),
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     if (!existingUser) {
@@ -439,7 +449,7 @@ const deleteUser = async (id) => {
     const { password, ...userResponse } = deletedUser;
     return userResponse;
   } catch (error) {
-    console.error('Error in delete user service:', error);
+    console.error("Error in delete user service:", error);
     throw error; // Re-throw to preserve specific error messages
   }
 };
@@ -450,8 +460,8 @@ const updateProfile = async (userId, profileData) => {
     const existingUser = await prisma.user.findFirst({
       where: {
         id: userId,
-        deletedAt: null
-      }
+        deletedAt: null,
+      },
     });
 
     if (!existingUser) {
@@ -464,8 +474,8 @@ const updateProfile = async (userId, profileData) => {
         where: {
           phone: profileData.phone,
           id: { not: userId },
-          deletedAt: null
-        }
+          deletedAt: null,
+        },
       });
 
       if (phoneConflict) {
@@ -498,15 +508,15 @@ const updateProfile = async (userId, profileData) => {
       include: {
         serviceCenter: true,
         State: true,
-        states: true
-      }
+        states: true,
+      },
     });
 
     // Remove password from response
     const { password, ...userResponse } = updatedUser;
     return userResponse;
   } catch (error) {
-    console.error('Error in updateProfile service:', error);
+    console.error("Error in updateProfile service:", error);
     throw error; // Re-throw to preserve specific error messages
   }
 };
@@ -514,12 +524,12 @@ const updateProfile = async (userId, profileData) => {
 const validateOrganization = async (orgCode) => {
   try {
     const organization = await prisma.organisation.findUnique({
-      where: { orgCode: orgCode.toString() }
+      where: { orgCode: orgCode.toString() },
     });
 
     return organization;
   } catch (error) {
-    console.error('Error validating organization:', error);
+    console.error("Error validating organization:", error);
     return null;
   }
 };
@@ -528,11 +538,11 @@ const updateOrganization = async (userId, orgCode) => {
   try {
     // Verify user exists
     const existingUser = await prisma.user.findUnique({
-      where: { id: parseInt(userId) }
+      where: { id: parseInt(userId) },
     });
 
     if (!existingUser) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Update user's organization
@@ -552,7 +562,7 @@ const updateOrganization = async (userId, orgCode) => {
     const { password, ...userResponse } = updatedUser;
     return userResponse;
   } catch (error) {
-    console.error('Error in updateOrganization service:', error);
+    console.error("Error in updateOrganization service:", error);
     throw error;
   }
 };

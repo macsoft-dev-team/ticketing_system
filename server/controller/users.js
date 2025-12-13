@@ -28,6 +28,7 @@ const getAll = async (req, res) => {
           multipleStates: user.states?.map(state => state.stateCode) || [],
           createdAt: moment(user.createdAt).format("DD MMM YYYY, hh:mm A"),
           lastLogin: moment(user.lastLogin).format("DD MMM YYYY, hh:mm A"),
+          createdTicketsCount: user.createdTickets ? user.createdTickets.length : 0,
         }));
 
         res.status(200).json({
