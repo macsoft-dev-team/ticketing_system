@@ -94,8 +94,10 @@ export default function Signup() {
         if (name === 'phone') {
             // Remove all non-digit characters
             const digitsOnly = value.replace(/\D/g, '');
+            // Remove leading zeros
+            const withoutLeadingZero = digitsOnly.replace(/^0+/, '');
             // Limit to 10 digits
-            const limitedValue = digitsOnly.slice(0, 10);
+            const limitedValue = withoutLeadingZero.slice(0, 10);
             
             setFormData(prev => ({
                 ...prev,
