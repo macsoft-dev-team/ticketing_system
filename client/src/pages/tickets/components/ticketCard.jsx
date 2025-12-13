@@ -19,7 +19,9 @@ import {
     Copy,
     Check,
     X,
-    AlertCircleIcon
+    AlertCircleIcon,
+    CardSim,
+    Hash
 } from 'lucide-react';
 import moment from 'moment';
 import { useAuth } from '../../../lib/hooks/useAuth';
@@ -46,7 +48,9 @@ export default function TicketCard({
 }) {
     const [isHovered, setIsHovered] = useState(false);
     const [isActionVisible, setIsActionVisible] = useState(false);
+    const [showTicketTooltip, setShowTicketTooltip] = useState(false);
     const [showControllerTooltip, setShowControllerTooltip] = useState(false);
+    const [showSimTooltip, setShowSimTooltip] = useState(false);
     const [copiedField, setCopiedField] = useState(null);
     const [localTicket, setLocalTicket] = useState(ticket);
     const navigate = useNavigate();
@@ -64,16 +68,22 @@ export default function TicketCard({
     // Handle click outside to close tooltip
     useEffect(() => {
         const handleClickOutside = (event) => {
+            if (showTicketTooltip && !event.target.closest('.ticket-tooltip-container')) {
+                setShowTicketTooltip(false);
+            }
             if (showControllerTooltip && !event.target.closest('.controller-tooltip-container')) {
                 setShowControllerTooltip(false);
             }
+            if (showSimTooltip && !event.target.closest('.sim-tooltip-container')) {
+                setShowSimTooltip(false);
+            }
         };
 
-        if (showControllerTooltip) {
+        if (showTicketTooltip || showControllerTooltip || showSimTooltip) {
             document.addEventListener('mousedown', handleClickOutside);
             return () => document.removeEventListener('mousedown', handleClickOutside);
         }
-    }, [showControllerTooltip]);
+    }, [showTicketTooltip, showControllerTooltip, showSimTooltip]);
 
     // Update local ticket when prop changes
     useEffect(() => {
@@ -202,7 +212,7 @@ export default function TicketCard({
             case TICKET_PRIORITY.MEDIUM:
                 return <Zap className="w-3 h-3 text-orange-500" />;
             default:
-                return <Tag className="w-3 h-3 text-blue-500" />;
+                return '';
         }
     };
 
@@ -551,18 +561,89 @@ export default function TicketCard({
                             {getPriorityIcon()}
                         </motion.div>
 
-                        {/* Controller Info Tooltip */}
+                        {/* Ticket Copy Icon */}
                         {localTicket && (
+                            <div className="relative ticket-tooltip-container">
+                                <motion.button
+                                    onClick={(e) => {
+                                        handleButtonClick(e, () => {
+                                            handleCopy(localTicket.ticketCode || localTicket.id, 'ticket');
+                                            setShowTicketTooltip(true);
+                                            setTimeout(() => setShowTicketTooltip(false), 2000);
+                                        });
+                                    }}
+                                    onHoverStart={() => setShowTicketTooltip(true)}
+                                    onHoverEnd={() => {
+                                        if (copiedField !== 'ticket') {
+                                            setShowTicketTooltip(false);
+                                        }
+                                    }}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="cursor-pointer p-1 rounded-full hover:bg-purple-100 transition-colors"
+                                    title="Click to copy Ticket Code"
+                                >
+                                    <Hash className="w-4 h-4 text-purple-600" />
+                                </motion.button>
+
+                                <AnimatePresence>
+                                    {showTicketTooltip && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-xl"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <div className="bg-purple-50 p-3 rounded-lg">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="text-xs font-semibold text-gray-900 flex items-center gap-1">
+                                                        <Hash className="w-3 h-3" />
+                                                        Ticket Code
+                                                    </h3>
+                                                    {copiedField === 'ticket' ? (
+                                                        <Check className="w-3 h-3 text-green-600" />
+                                                    ) : (
+                                                        <Copy className="w-3 h-3 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <div className="bg-white p-2 rounded">
+                                                    <p className="text-xs font-mono font-semibold text-gray-900 break-all">
+                                                        {localTicket.ticketCode || localTicket.id}
+                                                    </p>
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-2 text-center">
+                                                    {copiedField === 'ticket' ? 'Copied!' : 'Click to copy'}
+                                                </p>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        )}
+
+                        {/* Controller Info Tooltip */}
+                        {localTicket && localTicket.controllerNo && (
                             <div className="relative controller-tooltip-container">
                                 <motion.button
                                     onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowControllerTooltip(!showControllerTooltip);
+                                        handleButtonClick(e, () => {
+                                            handleCopy(localTicket.controllerNo, 'cpu');
+                                            setShowControllerTooltip(true);
+                                            setTimeout(() => setShowControllerTooltip(false), 2000);
+                                        });
+                                    }}
+                                    onHoverStart={() => setShowControllerTooltip(true)}
+                                    onHoverEnd={() => {
+                                        if (copiedField !== 'cpu') {
+                                            setShowControllerTooltip(false);
+                                        }
                                     }}
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
                                     className="cursor-pointer p-1 rounded-full hover:bg-green-100 transition-colors"
-                                    title="Click to view controller details"
+                                    title="Click to copy Controller No"
                                 >
                                     <Cpu className="w-4 h-4 text-green-600" />
                                 </motion.button>
@@ -574,67 +655,91 @@ export default function TicketCard({
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 10, scale: 0.9 }}
                                             transition={{ duration: 0.2 }}
-                                            className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 z-50 w-72 bg-white border border-gray-200 rounded-lg shadow-xl"
+                                            className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-xl"
                                             onClick={(e) => e.stopPropagation()}
                                         >
                                             <div className="bg-green-50 p-3 rounded-lg">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                                                        <Cpu className="w-4 h-4" />
-                                                        Controller Details
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="text-xs font-semibold text-gray-900 flex items-center gap-1">
+                                                        <Cpu className="w-3 h-3" />
+                                                        Controller No
                                                     </h3>
-                                                    <button
-                                                        onClick={() => setShowControllerTooltip(false)}
-                                                        className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
+                                                    {copiedField === 'cpu' ? (
+                                                        <Check className="w-3 h-3 text-green-600" />
+                                                    ) : (
+                                                        <Copy className="w-3 h-3 text-gray-400" />
+                                                    )}
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <div className="group">
-                                                        <p className="text-xs font-medium text-gray-600">Controller No</p>
-                                                        <div className="flex items-center justify-between gap-2 bg-white p-2 rounded">
-                                                            <p className="text-sm font-mono font-semibold text-gray-900 break-all flex-1">
-                                                                {localTicket?.controllerNo || 'N/A'}
-                                                            </p>
-                                                            {localTicket?.controllerNo && localTicket.controllerNo !== 'N/A' && (
-                                                                <button
-                                                                    onClick={() => handleCopy(localTicket.controllerNo, 'controllerNo')}
-                                                                    className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                                                    title="Copy"
-                                                                >
-                                                                    {copiedField === 'controllerNo' ? (
-                                                                        <Check className="w-3 h-3 text-green-600" />
-                                                                    ) : (
-                                                                        <Copy className="w-3 h-3 text-gray-600" />
-                                                                    )}
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className="group">
-                                                        <p className="text-xs font-medium text-gray-600">IMEI</p>
-                                                        <div className="flex items-center justify-between gap-2 bg-white p-2 rounded">
-                                                            <p className="text-sm font-mono text-gray-900 flex items-center gap-2 flex-1">
-                                                                <Smartphone className="w-3 h-3" />
-                                                                <span className="break-all">{localTicket?.imei || 'N/A'}</span>
-                                                            </p>
-                                                            {localTicket?.imei && localTicket.imei !== 'N/A' && (
-                                                                <button
-                                                                    onClick={() => handleCopy(localTicket.imei, 'imei')}
-                                                                    className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                                                    title="Copy"
-                                                                >
-                                                                    {copiedField === 'imei' ? (
-                                                                        <Check className="w-3 h-3 text-green-600" />
-                                                                    ) : (
-                                                                        <Copy className="w-3 h-3 text-gray-600" />
-                                                                    )}
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
+                                                <div className="bg-white p-2 rounded">
+                                                    <p className="text-xs font-mono font-semibold text-gray-900 break-all">
+                                                        {localTicket.controllerNo}
+                                                    </p>
                                                 </div>
+                                                <p className="text-xs text-gray-500 mt-2 text-center">
+                                                    {copiedField === 'cpu' ? 'Copied!' : 'Click to copy'}
+                                                </p>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        )}
+
+                        {/* SIM/IMEI Info - Tooltip */}
+                        {localTicket && localTicket.imei && (
+                            <div className="relative sim-tooltip-container">
+                                <motion.button
+                                    onClick={(e) => {
+                                        handleButtonClick(e, () => {
+                                            handleCopy(localTicket.imei, 'simImei');
+                                            setShowSimTooltip(true);
+                                            setTimeout(() => setShowSimTooltip(false), 2000);
+                                        });
+                                    }}
+                                    onHoverStart={() => setShowSimTooltip(true)}
+                                    onHoverEnd={() => {
+                                        if (copiedField !== 'simImei') {
+                                            setShowSimTooltip(false);
+                                        }
+                                    }}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="cursor-pointer p-1 rounded-full hover:bg-blue-100 transition-colors"
+                                    title="Click to copy IMEI"
+                                >
+                                    <CardSim className="w-4 h-4 text-blue-600" />
+                                </motion.button>
+
+                                <AnimatePresence>
+                                    {showSimTooltip && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-xl"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <div className="bg-blue-50 p-3 rounded-lg">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="text-xs font-semibold text-gray-900 flex items-center gap-1">
+                                                        <CardSim className="w-3 h-3" />
+                                                        IMEI
+                                                    </h3>
+                                                    {copiedField === 'simImei' ? (
+                                                        <Check className="w-3 h-3 text-green-600" />
+                                                    ) : (
+                                                        <Copy className="w-3 h-3 text-gray-400" />
+                                                    )}
+                                                </div>
+                                                <div className="bg-white p-2 rounded">
+                                                    <p className="text-xs font-mono font-semibold text-gray-900 break-all">
+                                                        {localTicket.imei}
+                                                    </p>
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-2 text-center">
+                                                    {copiedField === 'simImei' ? 'Copied!' : 'Click to copy'}
+                                                </p>
                                             </div>
                                         </motion.div>
                                     )}

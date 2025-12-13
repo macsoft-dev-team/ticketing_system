@@ -298,8 +298,8 @@ export default function Header() {
                         onChange={(e) => setSearchType(e.target.value)}
                         className="hidden md:block px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     >
-                        <option value="controller">Controller No</option>
-                        <option value="ticket">Ticket No</option>
+                        <option value="controller">Controller Number</option>
+                        <option value="ticket">Ticket Code</option>
                     </motion.select>
 
                     {/* Search Input - Desktop */}
@@ -363,44 +363,42 @@ export default function Header() {
             </div>
 
             {/* Mobile Search Bar */}
-            {tickets.length > 0 && (
-                <AnimatePresence>
-                    {isSearchOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="md:hidden px-4 pb-4 border-t border-gray-200"
-                        >
-                            <div className="space-y-2">
-                                {/* Search Type Select - Mobile */}
-                                <select
-                                    value={searchType}
-                                    onChange={(e) => setSearchType(e.target.value)}
-                                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                >
-                                    <option value="controller">Controller No</option>
-                                    <option value="ticket">Ticket No</option>
-                                </select>
-                                
-                                {/* Search Input - Mobile */}
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                    <input
-                                        type="search"
-                                        placeholder="Search tickets..."
-                                        value={searchTerm}
-                                        onChange={(e) => handleSearchChange(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                        autoFocus
-                                    />
-                                </div>
+            <AnimatePresence>
+                {isSearchOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="md:hidden px-4 py-4 border-t border-gray-200"
+                    >
+                        <div className="space-y-2">
+                            {/* Search Type Select - Mobile */}
+                            <select
+                                value={searchType}
+                                onChange={(e) => setSearchType(e.target.value)}
+                                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="controller">Controller No</option>
+                                <option value="ticket">Ticket No</option>
+                            </select>
+                            
+                            {/* Search Input - Mobile */}
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <input
+                                    type="search"
+                                    placeholder="Search tickets..."
+                                    value={searchTerm}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    autoFocus
+                                />
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile Filter Menu */}
             <AnimatePresence>
