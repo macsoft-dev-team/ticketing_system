@@ -18,9 +18,7 @@ const createSocket = () => {
   });
 
   // Set up connection event listeners
-  socket.on('connect', () => {
-    console.log('🔌 Socket connected successfully');
-  });
+  socket.on('connect', () => { });
 
   socket.on('connect_error', (error) => {
     console.error('❌ Socket connection error:', error.message);
@@ -32,9 +30,7 @@ const createSocket = () => {
     }
   });
 
-  socket.on('disconnect', (reason) => {
-    console.log('🔌 Socket disconnected:', reason);
-  });
+  socket.on('disconnect', (reason) => { });
 
   socket.on('error', (error) => {
     console.error('❌ Socket error:', error);
@@ -42,8 +38,7 @@ const createSocket = () => {
 
   // Set up notification listeners
   socket.on('notification', (notificationData) => {
-    console.log('📢 [SOCKET_JS] Received notification:', notificationData);
-    
+     
     // Check if this is a message notification for current ticket - suppress toast but allow sound
     const currentTicketId = window.currentTicketId;
     if (notificationData.type === 'message' && notificationData.ticketId && currentTicketId) {
@@ -51,51 +46,38 @@ const createSocket = () => {
       const notifTicketId = parseInt(notificationData.ticketId);
       const currTicketId = parseInt(currentTicketId);
       if (notifTicketId === currTicketId) {
-        console.log(`🔕 [SOCKET_JS] User in same ticket ${currTicketId} - modifying notification to suppress toast only`);
-        // Modify notification to suppress toast but allow sound
+         // Modify notification to suppress toast but allow sound
         notificationData.suppressToast = true;
         notificationData.allowSound = true;
       }
     }
     
-    console.log('📨 [SOCKET_JS] Dispatching socketNotification event');
-    // Dispatch custom event for components to listen to
+     // Dispatch custom event for components to listen to
     window.dispatchEvent(new CustomEvent('socketNotification', {
       detail: notificationData
     }));
   });
 
   socket.on('buzzer_alert', (alertData) => {
-    console.log('🚨 [SOCKET.JS] Received buzzer alert:', alertData);
-    console.log('🚨 [SOCKET.JS] Alert details:', {
-      ticketCode: alertData.ticketCode,
-      ticketId: alertData.ticketId,
-      type: alertData.type,
-      urgency: alertData.urgency
-    });
+ 
     
     // Dispatch custom event for buzzer alerts
     const customEvent = new CustomEvent('socketBuzzerAlert', {
       detail: alertData
     });
-    console.log('🚨 [SOCKET.JS] Dispatching socketBuzzerAlert event to window');
-    window.dispatchEvent(customEvent);
-    console.log('🚨 [SOCKET.JS] Event dispatched successfully');
-  });
+     window.dispatchEvent(customEvent);
+   });
 
   socket.on('buzzer_alert_cleared', (data) => {
-    console.log('🔕 [SOCKET.JS] Received buzzer alert cleared:', data);
-    
+     
     // Dispatch custom event to clear buzzer alert
     window.dispatchEvent(new CustomEvent('socketBuzzerAlertCleared', {
       detail: data
     }));
-    console.log('🔕 [SOCKET.JS] Buzzer alert cleared event dispatched');
-  });
+   });
 
   socket.on('conversation', (messageData) => {
-    console.log('💬 [SOCKET_JS] Received conversation message:', messageData);
-    
+     
     // Check if this is a message for current ticket - allow sound but suppress toast
     const currentTicketId = window.currentTicketId;
     if (messageData.ticketId && currentTicketId) {
@@ -103,23 +85,20 @@ const createSocket = () => {
       const msgTicketId = parseInt(messageData.ticketId);
       const currTicketId = parseInt(currentTicketId);
       if (msgTicketId === currTicketId) {
-        console.log(`🔕 [SOCKET_JS] User in same ticket ${currTicketId} - allowing conversation event with toast suppression`);
-        // Modify message to suppress toast but allow sound
+         // Modify message to suppress toast but allow sound
         messageData.suppressToast = true;
         messageData.allowSound = true;
       }
     }
     
-    console.log('📨 [SOCKET_JS] Dispatching socketConversation event');
-    // Dispatch custom event for conversation updates
+     // Dispatch custom event for conversation updates
     window.dispatchEvent(new CustomEvent('socketConversation', {
       detail: messageData
     }));
   });
 
   socket.on('milestone-updated', (milestoneData) => {
-    console.log('🎯 Received milestone update:', milestoneData);
-    
+     
     // Dispatch custom event for milestone updates
     window.dispatchEvent(new CustomEvent('socketMilestone', {
       detail: milestoneData
@@ -127,8 +106,7 @@ const createSocket = () => {
   });
 
   socket.on('milestone-created', (milestoneData) => {
-    console.log('🎯 Received milestone creation:', milestoneData);
-    
+     
     // Dispatch custom event for milestone creation
     window.dispatchEvent(new CustomEvent('socketMilestoneCreated', {
       detail: milestoneData
@@ -136,8 +114,7 @@ const createSocket = () => {
   });
 
   socket.on('milestone-transitioned', (milestoneData) => {
-    console.log('🎯 Received milestone transition:', milestoneData);
-    
+     
     // Dispatch custom event for milestone transitions
     window.dispatchEvent(new CustomEvent('socketMilestoneTransitioned', {
       detail: milestoneData
@@ -146,8 +123,7 @@ const createSocket = () => {
 
   // Listen for ticket message events (for updating last message in ticket cards)
   socket.on('ticket-message', (messageData) => {
-    console.log('🎫 [SOCKET_JS] Received ticket message update:', messageData);
-    
+     
     // Check if this is a message for current ticket - allow sound but suppress toast
     const currentTicketId = window.currentTicketId;
     if (messageData.ticketId && currentTicketId) {
@@ -155,15 +131,13 @@ const createSocket = () => {
       const msgTicketId = parseInt(messageData.ticketId);
       const currTicketId = parseInt(currentTicketId);
       if (msgTicketId === currTicketId) {
-        console.log(`🔕 [SOCKET_JS] User in same ticket ${currTicketId} - allowing ticket-message event with toast suppression`);
-        // Modify message to suppress toast but allow sound
+         // Modify message to suppress toast but allow sound
         messageData.suppressToast = true;
         messageData.allowSound = true;
       }
     }
     
-    console.log('📨 [SOCKET_JS] Dispatching socketTicketMessage event');
-    // Dispatch custom event for ticket message updates
+     // Dispatch custom event for ticket message updates
     window.dispatchEvent(new CustomEvent('socketTicketMessage', {
       detail: messageData
     }));
@@ -171,7 +145,6 @@ const createSocket = () => {
 
   // Listen for new ticket creation events
   socket.on('ticket-created', (ticketData) => {
-    console.log('🎫 Received new ticket creation:', ticketData);
     
     // Dispatch custom event for new ticket creation
     window.dispatchEvent(new CustomEvent('socketTicketCreated', {

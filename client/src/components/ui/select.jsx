@@ -243,8 +243,8 @@ const Select = ({
         onBlur={onBlur}
         {...props}
       >
-        <div className="flex items-center justify-between w-full px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded focus:outline-none">
-          <span className={`${!selectedLabel ? "text-gray-400" : ""} whitespace-nowrap`}>
+        <div className="flex items-center justify-between w-full overflow-hidden px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded focus:outline-none">
+          <span className={`${!selectedLabel ? "text-gray-400" : ""} text-truncate whitespace-nowrap`}>
             {selectedLabel || placeholder}
           </span>
           <ChevronDown size={20} className="ml-2 text-gray-400" />

@@ -97,8 +97,7 @@ export default function TicketCard({
 
             // Only update if this message is for the current ticket
             if (messageData.ticketId === localTicket.id) {
-                console.log('🎫 [TICKET CARD] Received message update for ticket:', localTicket.ticketCode, messageData);
-
+ 
                 // Update local ticket with new message
                 setLocalTicket(prev => {
                     // Create new message object from socket data
@@ -142,8 +141,7 @@ export default function TicketCard({
 
             // Only update if this message is for the current ticket
             if (messageData.ticketId === localTicket.id) {
-                console.log('💬 [TICKET CARD] Received conversation update for ticket:', localTicket.ticketCode, messageData);
-
+ 
                 // Update local ticket with new message
                 setLocalTicket(prev => {
                     // Create new message object from socket data

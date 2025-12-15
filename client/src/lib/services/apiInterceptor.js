@@ -31,21 +31,38 @@ axios.interceptors.response.use(
     return response;
   },
   (error) => {
- 
-    
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn('🔒 Unauthorized access - clearing session');
-      // Token is expired or invalid
-      if (store) {
-        store.dispatch(logout());
-      }
-      // Clear storage
-      sessionStorage.removeItem('user');
-      sessionStorage.removeItem('token');
+    // Only logout on authentication-related 401 errors, not authorization (403) errors
+    if (error.response?.status === 401) {
+      // Check if it's a token-related authentication error
+      const authErrorMessages = [
+        'token expired',
+        'invalid token',
+        'no token provided',
+        'unauthorized',
+        'access denied'
+      ];
       
-      // Redirect to login if not already there
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      const errorMessage = (error.response?.data?.message || '').toLowerCase();
+      const isAuthError = authErrorMessages.some(msg => errorMessage.includes(msg));
+      
+      // Also logout if the error is from auth endpoints
+      const isAuthEndpoint = error.config?.url?.includes('/auth/') || 
+                            error.config?.url?.includes('/user/me');
+      
+      if (isAuthError || isAuthEndpoint) {
+        console.warn('🔒 Authentication failed - clearing session');
+        // Token is expired or invalid
+        if (store) {
+          store.dispatch(logout());
+        }
+        // Clear storage
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem('token');
+        
+        // Redirect to login if not already there
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

@@ -32,6 +32,9 @@ export function DialogTrigger({ asChild, children }) {
 export function DialogContent({ className = "", children }) {
     const { open, onOpenChange } = useContext(DialogContext);
 
+    // Check if custom max-width is provided in className
+    const hasCustomWidth = className.includes('max-w-');
+
     useEffect(() => {
         if (open) {
             document.body.style.overflow = "hidden";
@@ -48,8 +51,7 @@ export function DialogContent({ className = "", children }) {
             {open && (
                 <motion.div
                     className={
-                        "fixed inset-0 z-50 flex min-h-screen w-full min-w-full items-center justify-center " +
-                        className
+                        "fixed inset-0 z-50 flex min-h-screen w-full min-w-full items-center justify-center "
                     }
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -62,7 +64,7 @@ export function DialogContent({ className = "", children }) {
                     />
                     {/* Modal Box */}
                     <motion.div
-                        className="relative bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full z-10 max-h-[90vh] overflow-y-auto"
+                        className={`relative bg-white rounded-lg shadow-lg p-6 w-full z-10 max-h-[90vh] overflow-y-auto ${hasCustomWidth ? '' : 'max-w-2xl'} ${className}`}
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}

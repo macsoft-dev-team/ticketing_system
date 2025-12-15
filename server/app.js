@@ -67,8 +67,7 @@ io.use(async (socket, next) => {
     const token = socket.handshake.auth.token;
 
     if (!token) {
-      console.log("⚠️ No token provided for socket connection");
-      return next(new Error("Authentication error: No token provided"));
+       return next(new Error("Authentication error: No token provided"));
     }
 
     // Verify JWT token
@@ -200,9 +199,7 @@ io.on("connection", (socket) => {
     io.to('macsoft_alerts').emit('buzzer_alert', testBuzzerAlert);
    });
 
-  socket.on("disconnect", (reason) => {
-    console.log(`❌ User ${socket.userName} disconnected [${socket.id}] - Reason: ${reason}`);
-  });
+  socket.on("disconnect", (reason) => { });
 });
 
 // Helper function to check if user has access to a specific ticket

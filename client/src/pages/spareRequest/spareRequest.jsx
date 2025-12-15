@@ -323,7 +323,7 @@ export default function SpareRequest() {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
-            onAdd={hasApprovalRights() ? () => console.log("Add spare request") : undefined}
+           // onAdd={hasApprovalRights() ? () => console.log("Add spare request") : undefined}
             onView={(row) => {
               setShowItems(true);
               setSelectedSpare(row);

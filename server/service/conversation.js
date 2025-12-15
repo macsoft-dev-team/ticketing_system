@@ -7,34 +7,40 @@ const {
 } = require("../lib/notificationUtils");
 
 // RBAC Socket emission helper for conversation events
-const emitConversationEventWithRBAC = (io, eventName, ticketData, eventData) => {
+const emitConversationEventWithRBAC = (
+  io,
+  eventName,
+  ticketData,
+  eventData
+) => {
   if (!io || !ticketData) return;
-  
+
   const dataToEmit = eventData;
-  
+
   // Always emit to MACSOFT roles (global access)
-  io.to('role-MACSOFT_ADMIN').emit(eventName, dataToEmit);
-  io.to('role-MACSOFT_HEAD').emit(eventName, dataToEmit);
-  io.to('role-MACSOFT_SUPPORT').emit(eventName, dataToEmit);
-  
+  io.to("role-MACSOFT_ADMIN").emit(eventName, dataToEmit);
+  io.to("role-MACSOFT_HEAD").emit(eventName, dataToEmit);
+  io.to("role-MACSOFT_SUPPORT").emit(eventName, dataToEmit);
+
   // Emit to ticket creator (if they are a field engineer)
   if (ticketData.createdBy) {
     io.to(`notifications-${ticketData.createdBy}`).emit(eventName, dataToEmit);
   }
-  
+
   // Emit to assigned service center
   if (ticketData.assignedServiceCenter) {
-    io.to(`center-${ticketData.assignedServiceCenter}`).emit(eventName, dataToEmit);
+    io.to(`center-${ticketData.assignedServiceCenter}`).emit(
+      eventName,
+      dataToEmit
+    );
   }
-  
+
   // Emit to Customer Service Heads
-  io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
-  
+  io.to("role-CUSTOMER_SERVICE_HEAD").emit(eventName, dataToEmit);
+
   // Also emit to conversation room for real-time chat
   const conversationRoom = `conversation-${ticketData.id}`;
   io.to(conversationRoom).emit(eventName, dataToEmit);
-  
-  console.log(`💬 [RBAC SOCKET] Emitted ${eventName} for ticket ${ticketData.ticketCode || ticketData.id} to authorized roles`);
 };
 
 const getConversations = async (ticketId) => {
@@ -181,7 +187,6 @@ const createConversation = async (conversation, userId, io, files = []) => {
     }
     // Verify sender is not in target list
     const senderInTargets = targetUserIds.includes(userId);
-  
 
     if (senderInTargets) {
       console.error(
@@ -196,44 +201,53 @@ const createConversation = async (conversation, userId, io, files = []) => {
       notificationData,
       targetUserIds
     );
-    
+
     // If sender is a MACSOFT user, turn off buzzer alert for this ticket
     const senderUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true }
+      select: { role: true },
     });
-    
-    const MACSOFT_ROLES = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+
+    const MACSOFT_ROLES = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"];
     if (senderUser && MACSOFT_ROLES.includes(senderUser.role)) {
       await prisma.ticket.update({
         where: { id: ticketId },
-        data: { isBuzzerOn: false }
+        data: { isBuzzerOn: false },
       });
-      console.log(`🔕 Turned off buzzer alert for ticket ${newMessage.ticket?.ticketCode} - Macsoft user responded`);
-      
+
       // Emit socket event to clear buzzer alert
       if (io) {
-        io.to('role-MACSOFT_HEAD').emit('buzzer_alert_cleared', { ticketId, ticketCode: newMessage.ticket?.ticketCode });
-        io.to('role-MACSOFT_SUPPORT').emit('buzzer_alert_cleared', { ticketId, ticketCode: newMessage.ticket?.ticketCode });
-        console.log(`📤 Emitted buzzer_alert_cleared event for ticket ${newMessage.ticket?.ticketCode}`);
+        io.to("role-MACSOFT_HEAD").emit("buzzer_alert_cleared", {
+          ticketId,
+          ticketCode: newMessage.ticket?.ticketCode,
+        });
+        io.to("role-MACSOFT_SUPPORT").emit("buzzer_alert_cleared", {
+          ticketId,
+          ticketCode: newMessage.ticket?.ticketCode,
+        });
       }
     }
-    
+
     if (io) {
       // Get ticket data for RBAC emission
       const ticketData = await prisma.ticket.findUnique({
         where: { id: ticketId },
-        select: { 
-          id: true, 
-          ticketCode: true, 
-          createdBy: true, 
-          assignedServiceCenter: true 
-        }
+        select: {
+          id: true,
+          ticketCode: true,
+          createdBy: true,
+          assignedServiceCenter: true,
+        },
       });
-      
+
       // Use RBAC-aware emission
       if (ticketData) {
-        emitConversationEventWithRBAC(io, "conversation", ticketData, newMessage);
+        emitConversationEventWithRBAC(
+          io,
+          "conversation",
+          ticketData,
+          newMessage
+        );
       } else {
         // Fallback if ticket not found
         io.emit("conversation", newMessage);
@@ -252,20 +266,24 @@ const createConversation = async (conversation, userId, io, files = []) => {
         // Additional ticket-level data
         ticketUpdates: {
           lastMessageAt: newMessage.createdAt,
-          lastMessageBy: newMessage.sender?.name || 'Unknown',
+          lastMessageBy: newMessage.sender?.name || "Unknown",
           hasNewMessage: true,
-          lastActivity: newMessage.createdAt
-        }
+          lastActivity: newMessage.createdAt,
+        },
       };
-      
+
       // Broadcast to authorized users to update ticket cards using RBAC
       if (ticketData) {
-        emitConversationEventWithRBAC(io, "ticket-message", ticketData, ticketMessageData);
+        emitConversationEventWithRBAC(
+          io,
+          "ticket-message",
+          ticketData,
+          ticketMessageData
+        );
       } else {
         // Fallback if ticket not found
         io.emit("ticket-message", ticketMessageData);
       }
-      console.log(`🎫 Emitted RBAC ticket-message update for ticket ${ticketId}`);
     }
     return newMessage;
   } catch (error) {
@@ -276,8 +294,8 @@ const createConversation = async (conversation, userId, io, files = []) => {
 const updateSeen = async (conversationId, userId) => {
   try {
     // This function is deprecated - use markMessagesAsSeen instead
-    console.warn('updateSeen is deprecated, use markMessagesAsSeen instead');
-    return { success: false, message: 'Function deprecated' };
+    console.warn("updateSeen is deprecated, use markMessagesAsSeen instead");
+    return { success: false, message: "Function deprecated" };
   } catch (error) {
     throw error;
   }
@@ -310,17 +328,22 @@ const markMessageAsSeen = async (messageId, userId) => {
 };
 
 // Mark multiple messages as seen for a ticket
-const markMessagesAsSeen = async (ticketId, userId, messageIds = null, retryCount = 0) => {
+const markMessagesAsSeen = async (
+  ticketId,
+  userId,
+  messageIds = null,
+  retryCount = 0
+) => {
   const MAX_RETRIES = 3;
   const RETRY_DELAY_MS = 100; // Base delay in milliseconds
-  
+
   try {
     // Get messages to mark as seen
     const whereClause = { ticketId: ticketId };
     if (messageIds && messageIds.length > 0) {
       whereClause.id = { in: messageIds };
     }
-    
+
     const messages = await prisma.message.findMany({
       where: whereClause,
       select: { id: true },
@@ -337,14 +360,14 @@ const markMessagesAsSeen = async (ticketId, userId, messageIds = null, retryCoun
     // Filter out messages that are already seen by this user
     const existingSeenRecords = await prisma.messageSeen.findMany({
       where: {
-        messageId: { in: messages.map(m => m.id) },
+        messageId: { in: messages.map((m) => m.id) },
         userId: userId,
       },
       select: { messageId: true },
     });
 
-    const seenMessageIds = new Set(existingSeenRecords.map(r => r.messageId));
-    const unseenMessages = messages.filter(m => !seenMessageIds.has(m.id));
+    const seenMessageIds = new Set(existingSeenRecords.map((r) => r.messageId));
+    const unseenMessages = messages.filter((m) => !seenMessageIds.has(m.id));
 
     if (unseenMessages.length === 0) {
       return {
@@ -355,7 +378,7 @@ const markMessagesAsSeen = async (ticketId, userId, messageIds = null, retryCoun
     }
 
     // Create MessageSeen records for unseen messages
-    const messageSeenData = unseenMessages.map(message => ({
+    const messageSeenData = unseenMessages.map((message) => ({
       messageId: message.id,
       userId: userId,
       seenAt: new Date(),
@@ -374,15 +397,13 @@ const markMessagesAsSeen = async (ticketId, userId, messageIds = null, retryCoun
     };
   } catch (error) {
     // Handle write conflict/deadlock errors (P2034) with retry logic
-    if (error.code === 'P2034' && retryCount < MAX_RETRIES) {
+    if (error.code === "P2034" && retryCount < MAX_RETRIES) {
       // Exponential backoff: wait longer with each retry
       const delay = RETRY_DELAY_MS * Math.pow(2, retryCount);
-      console.log(`Write conflict detected, retrying in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})...`);
-      
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
       return markMessagesAsSeen(ticketId, userId, messageIds, retryCount + 1);
     }
-    
+
     throw error;
   }
 };
@@ -417,7 +438,11 @@ const MACSOFT_ROLES = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"];
  * @param {string} audience - Either "MACSOFT" or "CUSTOMER" - determines which team's unreplied messages to fetch
  * @returns {Promise<Array>} Array of unreplied message objects with ticket and sender details
  */
-const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audience) => {
+const getUnrepliedMessagesForUser = async (
+  currentUserId,
+  currentUserRole,
+  audience
+) => {
   try {
     // Validate audience parameter
     if (!["MACSOFT", "CUSTOMER"].includes(audience)) {
@@ -485,7 +510,7 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
     // Step 4: Determine which sender roles to look for based on audience
     let targetSenderRoles;
     let replierRoles;
-    
+
     if (audience === "MACSOFT") {
       // MACSOFT audience: Find non-MACSOFT messages that MACSOFT hasn't replied to
       targetSenderRoles = { notIn: MACSOFT_ROLES };
@@ -493,7 +518,11 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
     } else {
       // CUSTOMER audience: Find MACSOFT messages that CUSTOMER hasn't replied to
       targetSenderRoles = { in: MACSOFT_ROLES };
-      replierRoles = ["CUSTOMER_FIELD_ENGINEER", "SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"];
+      replierRoles = [
+        "CUSTOMER_FIELD_ENGINEER",
+        "SERVICE_CENTER_TECHNICIAN",
+        "CUSTOMER_SERVICE_HEAD",
+      ];
     }
 
     // Step 5: Get latest message per ticket from the target sender group
@@ -532,19 +561,18 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
 
     // Create a map of ticketId -> latest reply timestamp
     const latestReplyTimestamps = new Map(
-      latestReplies.map((m) => [
-        m.ticketId,
-        m._max.createdAt?.getTime() || 0,
-      ])
+      latestReplies.map((m) => [m.ticketId, m._max.createdAt?.getTime() || 0])
     );
 
     // Step 7: Filter tickets where target message is after latest reply (or no reply exists)
-    const unrepliedTicketIds = [...latestTargetTimestamps.keys()].filter((ticketId) => {
-      const targetTime = latestTargetTimestamps.get(ticketId) || 0;
-      const replyTime = latestReplyTimestamps.get(ticketId) || 0;
-      // Include ticket if no reply exists OR target message is newer than reply
-      return targetTime > replyTime;
-    });
+    const unrepliedTicketIds = [...latestTargetTimestamps.keys()].filter(
+      (ticketId) => {
+        const targetTime = latestTargetTimestamps.get(ticketId) || 0;
+        const replyTime = latestReplyTimestamps.get(ticketId) || 0;
+        // Include ticket if no reply exists OR target message is newer than reply
+        return targetTime > replyTime;
+      }
+    );
 
     if (unrepliedTicketIds.length === 0) {
       return [];
@@ -588,22 +616,25 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
 
     // Step 9: Filter to keep only the latest message per ticket and check if unseen by current user
     const ticketMessageMap = new Map();
-    
+
     for (const message of unrepliedMessages) {
       const ticketId = message.ticketId;
       const messageTime = new Date(message.createdAt).getTime();
       const latestTargetTime = latestTargetTimestamps.get(ticketId) || 0;
-      
+
       // Only keep if this is the latest target message for this ticket
       if (messageTime === latestTargetTime) {
-        if (!ticketMessageMap.has(ticketId) || 
-            messageTime > new Date(ticketMessageMap.get(ticketId).createdAt).getTime()) {
+        if (
+          !ticketMessageMap.has(ticketId) ||
+          messageTime >
+            new Date(ticketMessageMap.get(ticketId).createdAt).getTime()
+        ) {
           ticketMessageMap.set(ticketId, message);
         }
       }
     }
 
-    const messageIdsToCheck = [...ticketMessageMap.values()].map(m => m.id);
+    const messageIdsToCheck = [...ticketMessageMap.values()].map((m) => m.id);
 
     // Step 10: Check which messages are unseen by current user
     const seenMessages = await prisma.messageSeen.findMany({
@@ -617,7 +648,8 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
     const seenMessageIds = new Set(seenMessages.map((s) => s.messageId));
 
     // Step 11: Filter to only include messages unseen by current user
-    const finalUnrepliedMessages = [...ticketMessageMap.values()].map((message) => ({
+    const finalUnrepliedMessages = [...ticketMessageMap.values()]
+      .map((message) => ({
         messageId: message.id,
         ticketId: message.ticket.id,
         ticketCode: message.ticket.ticketCode,
@@ -629,7 +661,10 @@ const getUnrepliedMessagesForUser = async (currentUserId, currentUserRole, audie
         hasAttachments: message.attachments.length > 0,
         unreadByUser: true, // By definition, these are all unread
       }))
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
     return finalUnrepliedMessages;
   } catch (error) {
@@ -770,7 +805,6 @@ const getTicketsNotRepliedByMacsoft = async (userId, userRole) => {
   }
 };
 
-
 module.exports = {
   getConversations,
   createConversation,
@@ -778,6 +812,6 @@ module.exports = {
   markMessageAsSeen,
   markMessagesAsSeen,
   getUnreadMessageCount,
-  getUnrepliedTickets : getTicketsNotRepliedByMacsoft,
+  getUnrepliedTickets: getTicketsNotRepliedByMacsoft,
   getUnrepliedMessagesForUser, // New function for flexible unreplied messages
 };

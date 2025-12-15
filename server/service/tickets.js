@@ -37,9 +37,7 @@ const emitTicketEventWithRBAC = (io, eventName, ticketData, eventData = null) =>
   // Emit to Customer Service Heads based on ticket's state/location
   // Note: This could be enhanced with state-based targeting
   io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
-  
-  console.log(`🎫 [RBAC SOCKET] Emitted ${eventName} for ticket ${ticketData.ticketCode || ticketData.id} to authorized roles`);
-};
+ };
 
 const getTickets = async (skip, take, filter, userId, role) => {
   try {
@@ -762,8 +760,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         createdAt: completeTicket.createdAt
       };
       emitTicketEventWithRBAC(io, "ticket-created", completeTicket, newTicketData);
-      console.log(`🎫 Emitted RBAC ticket-created for ticket ${completeTicket.ticketCode}`);
-    }
+     }
     return completeTicket;
   } catch (error) {
     throw error;

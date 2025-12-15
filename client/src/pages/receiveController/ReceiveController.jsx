@@ -840,8 +840,7 @@ const ReceiveController = () => {
                         att.fileType?.startsWith('image/') || 
                         att.fileName?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
                     );
-                    console.log('Found RECEIVED_AT_SERVICE_CENTER milestone images:', images.length);
-                }
+                 }
                 
                 // If no images in RECEIVED_AT_SERVICE_CENTER, check other milestone attachments
                 if (images.length === 0) {
@@ -857,8 +856,7 @@ const ReceiveController = () => {
                                 att.fileName?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
                             )
                         );
-                        console.log('Found milestone images from other stages:', images.length);
-                    }
+                     }
                 }
                 
                 // If still no images, check general ticket attachments
@@ -867,8 +865,7 @@ const ReceiveController = () => {
                         att.fileType?.startsWith('image/') || 
                         att.fileName?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
                     );
-                    console.log('Found general ticket images:', images.length);
-                }
+                 }
             }
             
             // If still no images, check if there are locally uploaded photos for this ticket
@@ -881,8 +878,7 @@ const ReceiveController = () => {
                     label: photo.label,
                     isLocal: true // Flag to indicate this is a local preview
                 }));
-                console.log('Found local photos:', images.length);
-            }
+             }
             
             if (images && images.length > 0) {
                 setCurrentBatchImages(images);
@@ -890,14 +886,8 @@ const ReceiveController = () => {
                 setSelectedTicketForImages(ticketId);
                 setViewingImages(true);
                 
-                console.log('Displaying images:', images.map(img => ({
-                    fileName: img.fileName,
-                    fileUrl: img.fileUrl,
-                    isLocal: img.isLocal
-                })));
             } else {
-                console.log('No images found for ticket:', ticketId);
-                addToast({
+                 addToast({
                     title: 'No Images',
                     description: 'No images found for this ticket. Upload photos during receiving process.',
                     variant: 'info'
@@ -967,34 +957,20 @@ const ReceiveController = () => {
         formData.append('batchCount', String(batchItems.length));
         formData.append('batchId', String(currentBatch.id));
 
-        console.log('🚀 Building batch FormData:', {
-            itemCount: batchItems.length,
-            items: batchItems.map((item, idx) => ({
-                index: idx,
-                controllerNo: item.ticket.controllerNo,
-                ticketCode: item.ticket.ticketCode,
-                note: 'Photos already attached to milestone'
-            }))
-        });
-
+       
         batchItems.forEach((item, idx) => {
             // Append item metadata with correct FormData key format
             formData.append(`items[${idx}][ticketCode]`, item.ticket.ticketCode || '');
             formData.append(`items[${idx}][controllerNo]`, item.ticket.controllerNo);
 
-            console.log(`📦 Item ${idx}:`, {
-                ticketCode: item.ticket.ticketCode,
-                controllerNo: item.ticket.controllerNo,
-                note: 'Milestone and photos already created'
-            });
+            
 
             // If there are additional photos in batchItemPhotos (uploaded later), include them
             const additionalPhotos = batchItemPhotos[item.ticket.id] || [];
             additionalPhotos.forEach((photo, pidx) => {
                 formData.append(`items[${idx}][additionalPhotos]`, photo.file, photo.file.name);
                 formData.append(`items[${idx}][additionalPhotoLabels][${pidx}]`, photo.label || '');
-                console.log(`  📸 Additional Photo ${pidx}: ${photo.label} - ${photo.file.name}`);
-            });
+             });
         });
 
         try {
@@ -1004,8 +980,7 @@ const ReceiveController = () => {
                 variant: 'info'
             });
             
-            console.log('📤 Sending batch request to:', `${API_URL}/milestones/receive-batch`);
-            
+             
             const response = await axios.post(
                 `${API_URL}/milestones/receive-batch`,
                 formData,
@@ -1018,8 +993,7 @@ const ReceiveController = () => {
                 }
             );
 
-            console.log('✅ Batch submission successful:', response.data);
-
+ 
             addToast({
                 title: 'Success',
                 description: `Batch processed: ${response.data?.message || 'All items received at service center'}`,
@@ -1043,8 +1017,7 @@ const ReceiveController = () => {
                 // If there are specific item errors, show them
                 const errorCount = error.response.data.errors.length;
                 errorMessage = `${errorCount} item(s) failed. Check console for details.`;
-                console.log('Item errors:', error.response.data.errors);
-            }
+             }
             
             addToast({
                 title: 'Submission Failed',

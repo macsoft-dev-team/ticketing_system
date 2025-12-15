@@ -354,26 +354,14 @@ const DeliveryPage = () => {
         formData.append('batchCount', String(batchItems.length));
         formData.append('batchId', String(currentBatch.id));
 
-        console.log('🚀 Building delivery batch FormData:', {
-            itemCount: batchItems.length,
-            items: batchItems.map((item, idx) => ({
-                index: idx,
-                controllerNo: item.ticket.controllerNo,
-                ticketCode: item.ticket.ticketCode,
-                note: 'Delivery milestone already created'
-            }))
-        });
+ 
 
         batchItems.forEach((item, idx) => {
             // Append item metadata with correct FormData key format
             formData.append(`items[${idx}][ticketCode]`, item.ticket.ticketCode || '');
             formData.append(`items[${idx}][controllerNo]`, item.ticket.controllerNo);
 
-            console.log(`📦 Item ${idx}:`, {
-                ticketCode: item.ticket.ticketCode,
-                controllerNo: item.ticket.controllerNo,
-                note: 'Delivery milestone already created'
-            });
+          
         });
 
         try {
@@ -383,8 +371,7 @@ const DeliveryPage = () => {
                 variant: 'info'
             });
 
-            console.log('📤 Sending delivery batch request to:', `${API_URL}/milestones/delivery-batch`);
-
+ 
             const response = await axios.post(
                 `${API_URL}/milestones/delivery-batch`,
                 formData,
@@ -397,8 +384,7 @@ const DeliveryPage = () => {
                 }
             );
 
-            console.log('✅ Delivery batch submission successful:', response.data);
-
+ 
             addToast({
                 title: 'Success',
                 description: `Batch processed: ${response.data?.message || 'All items delivered to field'}`,
@@ -421,8 +407,7 @@ const DeliveryPage = () => {
                 // If there are specific item errors, show them
                 const errorCount = error.response.data.errors.length;
                 errorMessage = `${errorCount} item(s) failed. Check console for details.`;
-                console.log('Item errors:', error.response.data.errors);
-            }
+             }
 
             addToast({
                 title: 'Submission Failed',

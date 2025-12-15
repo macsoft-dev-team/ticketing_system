@@ -3,8 +3,7 @@ const { prisma } = require('./lib/clients');
 
 (async () => {
   try {
-    console.log('🧪 Testing manual buzzer alert emission...');
-    
+     
     // Get all MACSOFT users
     const macsoftUsers = await prisma.user.findMany({
       where: {
@@ -14,8 +13,7 @@ const { prisma } = require('./lib/clients');
       }
     });
     
-    console.log(`Found ${macsoftUsers.length} Macsoft users:`, macsoftUsers.map(u => ({ id: u.id, name: u.name, role: u.role })));
-    
+     
     const testAlert = {
       type: 'CUSTOMER_RESPONSE_PENDING',
       urgency: 'HIGH',
@@ -29,8 +27,7 @@ const { prisma } = require('./lib/clients');
     // Emit to each user
     macsoftUsers.forEach(user => {
       const userRoom = `notifications-${user.id}`;
-      console.log(`📤 Emitting to room: ${userRoom}`);
-      
+       
       if (io) {
         io.to(userRoom).emit('buzzer_alert', {
           ...testAlert,
@@ -40,15 +37,11 @@ const { prisma } = require('./lib/clients');
             role: user.role
           }
         });
-        console.log(`✅ Emitted to ${user.name}`);
-      } else {
-        console.log('❌ IO instance not available');
-      }
+       } else {
+       }
     });
     
-    console.log('✅ Test buzzer alerts emitted!');
-    console.log('Check your client console for the alert.');
-    
+     
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {

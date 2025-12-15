@@ -288,6 +288,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.ticketNew,
 
     BASE_ITEMS.receiveController,
+    BASE_ITEMS.inventory,
     BASE_ITEMS.deliver,
      BASE_ITEMS.profile,
   ],
@@ -311,7 +312,7 @@ const getRouteProtection = (item, role) => {
   const routeProtections = {
     '/users': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
     '/service-center': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_SERVICE_HEAD'],
-    '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+    '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'CUSTOMER_SERVICE_HEAD'],
     '/settings': ['MACSOFT_ADMIN'], // Only MACSOFT_ADMIN can access settings
     '/spare-request-approval': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Only these roles can approve spare requests
     '/motorhp': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Motor HP management for admin and head roles
