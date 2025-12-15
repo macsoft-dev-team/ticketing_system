@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MessageCircle, Ticket, Clock, X, User, Paperclip } from 'lucide-react';
-import { Badge } from '../../../ui/badge';
 import useAuth from '../../../../lib/hooks/useAuth';
 import { useSocket } from '../../../../lib/contexts/SocketContext';
 
