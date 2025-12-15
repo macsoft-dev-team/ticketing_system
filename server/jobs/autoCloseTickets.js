@@ -26,8 +26,7 @@ const CUSTOMER_ROLES = [
  */
 const autoCloseTickets = async () => {
   try {
-    console.log('Starting auto-close ticket job...');
-    
+     
     // Get current timestamp in UTC (as stored in database)
     const nowUTC = new Date();
     
@@ -37,12 +36,7 @@ const autoCloseTickets = async () => {
     // For logging purposes, show IST times
     const istNow = new Date(nowUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
     const fortyEightHoursAgoIST = new Date(fortyEightHoursAgoUTC.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-    
-    console.log(`Current UTC time: ${nowUTC.toISOString()}`);
-    console.log(`Current IST time: ${istNow.toLocaleString()}`);
-    console.log(`48 hours ago UTC: ${fortyEightHoursAgoUTC.toISOString()}`);
-    console.log(`48 hours ago IST: ${fortyEightHoursAgoIST.toLocaleString()}`);
-    
+     
     // Find open tickets that have messages (no age restriction on ticket itself)
     const candidateTickets = await prisma.ticket.findMany({
       where: {
@@ -77,8 +71,7 @@ const autoCloseTickets = async () => {
       }
     });
 
-    console.log(`Found ${candidateTickets.length} candidate tickets to check`);
-    
+     
     let closedCount = 0;
     
     for (const ticket of candidateTickets) {
@@ -103,8 +96,7 @@ const autoCloseTickets = async () => {
       const ticketCreatedIST = new Date(ticket.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
       const messageTimeIST = new Date(lastMessage.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
       
-      console.log(`Checking ticket ${ticket.ticketCode}: Created at ${ticketCreatedIST.toLocaleString()} IST, Last message at ${messageTimeIST.toLocaleString()} IST, 48h cutoff: ${fortyEightHoursAgoIST.toLocaleString()} IST`);
-      
+       
       // Check if there are any customer messages after the last Macsoft message
       const hasCustomerResponseAfterMacsoft = ticket.messages.some(message => {
         return CUSTOMER_ROLES.includes(message.sender.role) && 
@@ -124,8 +116,7 @@ const autoCloseTickets = async () => {
       });
       
       if (pendingSpareRequests.length > 0) {
-        console.log(`Skipping auto-close for ticket ${ticket.ticketCode} - has ${pendingSpareRequests.length} pending spare request(s)`);
-        continue;
+         continue;
       }
       
       // Check if there are any active spare-related milestones
@@ -142,8 +133,7 @@ const autoCloseTickets = async () => {
       });
       
       if (spareRelatedMilestones.length > 0) {
-        console.log(`Skipping auto-close for ticket ${ticket.ticketCode} - has ${spareRelatedMilestones.length} active spare-related milestone(s)`);
-        continue;
+         continue;
       }
       
       // Check if there are any active workflow milestones that should prevent auto-closing
@@ -168,19 +158,16 @@ const autoCloseTickets = async () => {
       });
       
       if (activeWorkflowMilestones.length > 0) {
-        console.log(`Skipping auto-close for ticket ${ticket.ticketCode} - has ${activeWorkflowMilestones.length} active workflow milestone(s): ${activeWorkflowMilestones.map(m => m.stage).join(', ')}`);
-        continue;
+         continue;
       }
       
       // Close the ticket
       await closeTicketDueToNoResponse(ticket, lastMessage);
       closedCount++;
       
-      console.log(`Auto-closed ticket: ${ticket.ticketCode} - Last message from ${lastMessage.sender.name} at ${lastMessage.createdAt}`);
-    }
+     }
     
-    console.log(`Auto-close job completed. Closed ${closedCount} tickets.`);
-    return { success: true, closedCount };
+     return { success: true, closedCount };
     
   } catch (error) {
     console.error('Error in auto-close ticket job:', error);
@@ -220,8 +207,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
       });
       
       if (updatedMilestones.count > 0) {
-        console.log(`Updated ${updatedMilestones.count} existing milestones to DONE for ${ticket.ticketCode}`);
-      }
+       }
       
       // Get the highest order number for existing milestones
       const lastMilestone = await prisma.ticketMilestone.findFirst({
@@ -246,8 +232,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
         }
       });
       
-      console.log(`Created TICKET_CLOSED milestone for ${ticket.ticketCode}`);
-    } catch (milestoneError) {
+     } catch (milestoneError) {
       console.log(`Could not update milestones for ${ticket.ticketCode}:`, milestoneError.message);
     }
     
@@ -320,8 +305,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
         }
       }
       
-      console.log(`Marked ${messageIds.length} messages as seen for ${participantUserIds.length} participants in ticket ${ticket.ticketCode}`);
-    } catch (messageSeenError) {
+     } catch (messageSeenError) {
       console.log(`Could not mark messages as seen for ${ticket.ticketCode}:`, messageSeenError.message);
     }
     
@@ -349,8 +333,7 @@ const closeTicketDueToNoResponse = async (ticket, lastMessage) => {
         });
       }
       
-      console.log(`Marked ${ticketNotifications.length} notifications as seen for ticket ${ticket.ticketCode}`);
-    } catch (notificationSeenError) {
+     } catch (notificationSeenError) {
       console.log(`Could not mark notifications as seen for ${ticket.ticketCode}:`, notificationSeenError.message);
     }
     

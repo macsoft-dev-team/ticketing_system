@@ -32,9 +32,7 @@ const emitMilestoneEventWithRBAC = (io, eventName, ticketData, eventData) => {
   
   // Emit to Customer Service Heads
   io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
-  
-  console.log(`🏗️ [RBAC SOCKET] Emitted ${eventName} for ticket ${ticketData.ticketCode || ticketData.id} to authorized roles`);
-};
+ };
 
 const createMilestone = async (milestoneData, io) => {
   try {

@@ -33,9 +33,7 @@ const MessageBox = () => {
       // CUSTOMER users see MACSOFT messages needing replies
       const isMacsoftUser = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
       const audience = isMacsoftUser ? 'MACSOFT' : 'CUSTOMER';
-
-      console.log(`MessageBox: Fetching unreplied messages for ${audience} audience (User role: ${user?.role})`);
-
+ 
       const response = await fetch(`${baseUrl}/messages/unreplied?audience=${audience}`, {
         method: 'GET',
         headers: {
@@ -69,13 +67,10 @@ const MessageBox = () => {
           });
 
           const transformedTickets = Array.from(ticketsMap.values());
-
-          console.log(`✅ MessageBox: Successfully loaded ${transformedTickets.length} unreplied messages for ${audience} audience`);
-          setUnrepliedTickets(transformedTickets);
+           setUnrepliedTickets(transformedTickets);
           setUnreadCount(transformedTickets.length);
         } else {
-          console.log('MessageBox: No messages data received or invalid format');
-          setUnrepliedTickets([]);
+           setUnrepliedTickets([]);
           setUnreadCount(0);
         }
       } else {
@@ -99,20 +94,17 @@ const MessageBox = () => {
   useEffect(() => {
     if (socket) {
       const handleNewMessage = (data) => {
-        console.log('MessageBox: New message received, refreshing unreplied messages');
-        // Refresh unreplied messages when new message arrives
+         // Refresh unreplied messages when new message arrives
         fetchUnrepliedTickets();
       };
 
       const handleMessageReply = (data) => {
-        console.log('MessageBox: Message reply received, refreshing unreplied messages');
-        // Refresh unreplied messages when reply is sent
+         // Refresh unreplied messages when reply is sent
         fetchUnrepliedTickets();
       };
 
       const handleConversation = (data) => {
-        console.log('MessageBox: Conversation update received, refreshing unreplied messages');
-        // Refresh when any conversation update occurs
+         // Refresh when any conversation update occurs
         fetchUnrepliedTickets();
       };
 
@@ -252,8 +244,7 @@ const MessageBox = () => {
               e.preventDefault();
               e.stopPropagation();
               setIsOpen(!isOpen);
-                console.log("Badge clicked!");
-            }}
+             }}
             className="absolute rounded-full px-1 py-0.5 font-bold cursor-pointer xsmall pointer-events-auto -top-1 -right-1 flex items-center justify-center text-[0.6rem] bg-red-500 text-white border-2 border-white z-10">
             {unreadCount > 99 ? '99+' : unreadCount}
           </button>

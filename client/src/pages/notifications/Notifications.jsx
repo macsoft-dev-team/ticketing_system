@@ -338,9 +338,7 @@ const NotificationsPage = () => {
       markAsRead(notification.id);
     }
 
-    // Navigate based on type - you can implement navigation logic here
-    console.log('Navigate to notification:', notification);
-  };
+   };
 
   return (
     <div className="min-h-screen bg-gray-50">

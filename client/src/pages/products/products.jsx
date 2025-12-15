@@ -212,8 +212,7 @@ export default function Products() {
           totalPages={totalPages}
           searchPlaceholder="Search products..."
           showSearch={false} // Disable table search since we have header search
-          onAdd={() => console.log("Add products item")}
-          onEdit={(row) => {
+           onEdit={(row) => {
             setProductToEdit(row);
             setFormData({
               name: row.name,

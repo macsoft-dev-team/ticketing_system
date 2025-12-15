@@ -3,370 +3,584 @@ import TitleHead from "../../components/TitleHead";
 import ReusableTable from "../../components/ui/reusableTable";
 import axios from "axios";
 import { API_URL } from "../../lib/constants/api";
-import { 
-  Package, 
-  Plus, 
-  AlertTriangle, 
-  TrendingUp, 
-  CheckCircle, 
+import {
+  Package,
+  Plus,
+  AlertTriangle,
+  TrendingUp,
+  CheckCircle,
   XCircle,
   Clock,
   Download,
-  Upload,
-  Eye,
-  Edit,
-  X
+  RefreshCw,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "../../lib/hooks/useAuth";
-import InventoryModal from "../../components/InventoryModal";
-import InboundActivityModal from "../../components/InboundActivityModal";
+import InventoryModal from "./components/InventoryModal";
+import InventoryAnalytics from "./components/InventoryAnalytics";
+import BulkTransactionModal from "./components/BulkTransactionModal";
+import AdjustmentModal from "./components/AdjustmentModal";
+import { Button } from "../../components/ui/button";
+import Select from "../../components/ui/select";
 
 export default function Inventory() {
   const [inventoryData, setInventoryData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showInboundModal, setShowInboundModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [lowStockItems, setLowStockItems] = useState([]);
-  const [stats, setStats] = useState({
-    totalItems: 0,
-    lowStockCount: 0,
-    outOfStockCount: 0,
-    totalValue: 0
+  const [showBulkTransactionModal, setShowBulkTransactionModal] = useState(false);
+  const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    search: '',
+    centerCode: '',
+    condition: '',
+    category: ''
   });
+  const [serviceCenters, setServiceCenters] = useState([]);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 10;
+  
+  // Predefined categories
+  const categories = [
+    'MCB',
+    'VFD',
+    'RMS',
+    'SPD',
+    'WIRE',
+    'CONNECTOR',
+    'ENCLOSURE_AND_ACCESSORIES'
+  ];
 
-  // Use authentication hook
-  const { user: currentUser, isAuthenticated, hasRole, canAccess } = useAuth();
+  const { isAuthenticated, canAccess, user } = useAuth();
 
-  // Check if user can manage inventory
-  const canManageInventory = () => {
-    return canAccess(['MACSOFT_ADMIN', 'MACSOFT_HEAD']);
-  };
+  // MACSOFT roles can do adjustments and view all inventory
+  const isMacsoftRole = () => canAccess(["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"]);
+  
+  // Roles that can adjust inventory (only MACSOFT_ADMIN and MACSOFT_HEAD)
+  const canAdjustInventory = () => canAccess(["MACSOFT_ADMIN", "MACSOFT_HEAD"]);
+  
+  // Roles that can manage inventory (add/edit) - excludes service center technicians
+  const canManageInventory = () => canAccess([
+    "MACSOFT_ADMIN", 
+    "MACSOFT_HEAD", 
+    "MACSOFT_SUPPORT",
+    "CUSTOMER_SERVICE_HEAD"
+  ]);
 
-  // Fetch inventory data
-  const fetchInventoryData = async () => {
+  // Roles that can do transactions
+  const canDoTransactions = () => canAccess([
+    "MACSOFT_ADMIN", 
+    "MACSOFT_HEAD",
+    "MACSOFT_SUPPORT",
+    "SERVICE_CENTER_TECHNICIAN", 
+    "CUSTOMER_SERVICE_HEAD"
+  ]);
+
+  // Check if user is service center technician
+  const isServiceCenterTechnician = () => canAccess(["SERVICE_CENTER_TECHNICIAN"]);
+
+  // ---------------- FETCH INVENTORY ----------------
+  const fetchInventoryData = async (paginationParams = null) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/inventory`, {
-        withCredentials: true
-      });
+       
+      // Use provided pagination params or current state
+      // Convert 1-based currentPage to 0-based for backend
+      const page = paginationParams?.skip !== undefined ? paginationParams.skip : currentPage - 1;
+      const take = paginationParams?.take || pageSize;
       
-      if (response.data.success) {
-        const transformedData = response.data.inventory.map(item => ({
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (filters.search) params.append('filter', filters.search);
+      if (filters.centerCode) params.append('centerCode', filters.centerCode);
+      if (filters.condition) params.append('condition', filters.condition);
+      if (filters.category) params.append('category', filters.category);
+      
+      // Add pagination parameters
+      params.append('skip', page.toString());
+      params.append('take', take.toString());
+      
+       
+      const res = await axios.get(`${API_URL}/inventory?${params.toString()}`, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        const transformed = res.data.inventory.map((item) => ({
           ...item,
           productname: item.productName,
           availableQuantity: item.quantity,
           minQty: item.minStock,
-          maxQty: item.maxStock || 'N/A'
+          maxQty: item.maxStock || "N/A",
         }));
+
+        setInventoryData(transformed);
         
-        setInventoryData(transformedData);
+        // Update pagination state
+        const count = res.data.count || 0;
+        const calculatedTotalPages = Math.ceil(count / take);
+        setTotalCount(count);
+        setTotalPages(calculatedTotalPages);
+        setCurrentPage(page + 1); // Convert 0-based backend page to 1-based for ReusableTable
         
-        // Calculate stats
-        const stats = {
-          totalItems: transformedData.length,
-          lowStockCount: transformedData.filter(item => item.status === 'LOW_STOCK').length,
-          outOfStockCount: transformedData.filter(item => item.status === 'OUT_OF_STOCK').length,
-        };
-        setStats(stats);
+       }
+    } catch (err) {
+      console.error("❌ Fetch inventory failed:", err.response?.status, err.response?.data?.message || err.message);
+      
+      // Don't show error for permission issues, just log them
+      if (err.response?.status === 403) {
+        console.warn('⚠️ Access denied to inventory - user may not have required permissions');
       }
-    } catch (error) {
-      console.error('Error fetching inventory:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch low stock items
   const fetchLowStockItems = async () => {
     try {
-      const response = await axios.get(`${API_URL}/inventory/low-stock`, {
-        withCredentials: true
+      const res = await axios.get(`${API_URL}/inventory/low-stock`, {
+        withCredentials: true,
       });
-      
-      if (response.data.success) {
-        setLowStockItems(response.data.data);
+      if (res.data.success) {
+        setLowStockItems(res.data.data);
       }
-    } catch (error) {
-      console.error('Error fetching low stock items:', error);
+    } catch (err) {
+      console.error("❌ Fetch low stock items failed:", err.response?.status, err.response?.data?.message || err.message);
+      
+      // Don't show error for permission issues, just log them
+      if (err.response?.status === 403) {
+        console.warn('⚠️ Access denied to low stock items - user may not have required permissions');
+      }
     }
   };
+
+  const fetchServiceCenters = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/service-centers`, {
+        withCredentials: true,
+      });
+      if (res.data.serviceCenters) {
+        setServiceCenters(res.data.serviceCenters);
+      }
+    } catch (err) {
+      console.error("Failed to fetch service centers:", err);
+    }
+  };
+
+
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchInventoryData();
       fetchLowStockItems();
+      fetchServiceCenters();
     }
   }, [isAuthenticated]);
 
-  // Get status color and icon
+  // Fetch inventory when filters change (reset to first page)
+  useEffect(() => {
+    if (isAuthenticated) {
+      const timeoutId = setTimeout(() => {
+        setCurrentPage(1); // Reset to first page when filters change
+        fetchInventoryData({ skip: 0, take: pageSize });
+      }, 300); // Debounce search
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [filters, isAuthenticated]);
+
+  // Refresh function
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchInventoryData({ skip: currentPage - 1, take: pageSize });
+    await fetchLowStockItems();
+    setRefreshing(false);
+  };
+
+  // Filter handling
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+  
+  // Pagination handling
+  const handlePageChange = (page) => {
+    // Convert 1-based page to 0-based for backend
+    fetchInventoryData({ skip: page - 1, take: pageSize });
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      search: '',
+      centerCode: '',
+      condition: '',
+      category: ''
+    });
+  };
+
+  // Export inventory data to CSV
+  const handleExport = () => {
+    if (inventoryData.length === 0) return;
+
+    const headers = [
+      'Product Name', 'Product Code', 'Category', 'Service Center',
+      'Condition', 'Quantity', 'Min Stock', 'Max Stock', 'Location', 'Status'
+    ];
+
+    const csvData = inventoryData.map(item => [
+      item.productname || '',
+      item.productCode || '',
+      item.category || '',
+      item.centerInfo || '',
+      item.condition || '',
+      item.availableQuantity || 0,
+      item.minQty || 0,
+      item.maxQty || '',
+      item.location || '',
+      item.status || ''
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => row.map(cell =>
+        typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell
+      ).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `inventory_export_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // ---------------- STATUS BADGE ----------------
   const getStatusDisplay = (status) => {
     switch (status) {
-      case 'IN_STOCK':
+      case "IN_STOCK":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            In Stock
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-green-100 text-green-800">
+            <CheckCircle className="w-3 h-3 mr-1" /> In Stock
           </span>
         );
-      case 'LOW_STOCK':
+      case "LOW_STOCK":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Low Stock
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-yellow-100 text-yellow-800">
+            <AlertTriangle className="w-3 h-3 mr-1" /> Low Stock
           </span>
         );
-      case 'OUT_OF_STOCK':
+      case "OUT_OF_STOCK":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            <XCircle className="w-3 h-3 mr-1" />
-            Out of Stock
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-red-100 text-red-800">
+            <XCircle className="w-3 h-3 mr-1" /> Out of Stock
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            <Clock className="w-3 h-3 mr-1" />
-            Unknown
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-gray-100 text-gray-800">
+            <Clock className="w-3 h-3 mr-1" /> Unknown
           </span>
         );
     }
   };
 
-  // Transform data for display
-  const transformedInventoryData = inventoryData.map(item => ({
-    ...item,
-    status: getStatusDisplay(item.status)
+  const getConditionDisplay = (condition) => {
+    switch (condition) {
+      case "GOOD":
+        return (
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-green-100 text-green-800">
+            Good
+          </span>
+        );
+      case "DEFECTIVE":
+        return (
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-red-100 text-red-800">
+            Defective
+          </span>
+        );
+      case "REPAIRABLE":
+        return (
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-yellow-100 text-yellow-800">
+            Repairable
+          </span>
+        );
+      case "SCRAP":
+        return (
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-gray-100 text-gray-800">
+            Scrap
+          </span>
+        );
+      default:
+        return (
+          <span className="flex rounded-sm items-center w-max py-0.5 px-2 bg-blue-100 text-blue-800">
+            {condition}
+          </span>
+        );
+    }
+  };
+
+  const tableData = inventoryData.map((i) => ({
+    ...i,
+    status: getStatusDisplay(i.status),
+    conditionBadge: getConditionDisplay(i.condition),
+    centerInfo: `${i.centerName || i.centerCode}`,
   }));
 
   return (
-    <section className="px-6 py-4 space-y-6">
-      <TitleHead title="Inventory Management" description="Monitor and manage your inventory levels, stock movements, and replenishment activities." >
+    <section className="px-6 py-4 space-y-4">
+      <TitleHead
+        title="Inventory Management"
+        description="Monitor and manage inventory levels and stock conditions"
+      >
+        <div className="flex items-center gap-2">
+         {/*  <button
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md ${showAnalytics
+              ? 'bg-purple-600 text-white hover:bg-purple-700 ring-2 ring-purple-400'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+          >
+            <TrendingUp className="w-5 h-5" />
+          </button> */}
 
-     
-      
-      {/* Stats Cards */}
-      <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-1 text-xs *:lg:max-w-40 *:lg:min-w-40 lg:justify-end">
-        <div className="bg-white rounded-lg shadow py-3 px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex-shrink-0">
-              <Package className="sm:h-8 sm:w-8 text-blue-600" />
-            </div>
-            <div className="w-0 flex-1">
-              <dl>
-                <dt className="text-xs font-medium text-gray-500 truncate">Total Items</dt>
-                <dd className="font-medium text-gray-900">{stats.totalItems}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
+          <Button
+            onClick={handleExport}
+            disabled={inventoryData.length === 0}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+          >
+            <Download className="w-5 h-5" />
+          </Button>
 
-        <div className="bg-white rounded-lg shadow py-3 px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex-shrink-0">
-              <AlertTriangle className="sm:h-8 sm:w-8 text-yellow-600" />
-            </div>
-            <div className="w-0 flex-1">
-              <dl>
-                <dt className="text-xs font-medium text-gray-500 truncate">Low Stock</dt>
-                <dd className="font-medium text-gray-900">{stats.lowStockCount}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+          >
 
-        <div className="bg-white rounded-lg shadow py-3 px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex-shrink-0">
-              <XCircle className="sm:h-8 sm:w-8 text-red-600" />
-            </div>
-            <div className="w-0 flex-1">
-              <dl>
-                <dt className="text-xs font-medium text-gray-500 truncate">Out of Stock</dt>
-                <dd className="font-medium text-gray-900">{stats.outOfStockCount}</dd>
-              </dl>
-            </div>
-          </div>
-        </div>
+            <span className={`${refreshing ? "animate-spin" : ""}`}><RefreshCw className="w-5 h-5" /></span>
+          </Button>
 
-        <div className="bg-white rounded-lg shadow py-3 px-4">
-          <div className="flex items-center gap-2">
-            <div className="flex-shrink-0">
-              <TrendingUp className="sm:h-8 sm:w-8 text-green-600" />
-            </div>
-            <div className="w-0 flex-1">
-              <dl>
-                <dt className="text-xs font-medium text-gray-500 truncate">Total Products</dt>
-                <dd className="font-medium text-gray-900">{inventoryData.length}</dd>
-              </dl>
-            </div>
-          </div>
+          {canDoTransactions() && (
+            <button
+              onClick={() => setShowBulkTransactionModal(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-700"
+            >
+              <Package className="w-4 h-4" />
+              Transaction
+            </button>
+          )}
+
+          {canAdjustInventory() && (
+            <button
+              onClick={() => setShowAdjustmentModal(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700"
+            >
+              <Settings className="w-4 h-4" />
+              Adjust
+            </button>
+          )}
+
+          {canManageInventory() && (
+            <button
+              onClick={() => {
+                setSelectedItem(null);
+                setShowAddModal(true);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
         </div>
-      </div>
       </TitleHead>
-      {/* Low Stock Alert */}
-      {lowStockItems.length > 0 && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertTriangle className="h-5 w-5 text-yellow-400" />
+
+      {/* ANALYTICS */}
+      {showAnalytics && (
+        <InventoryAnalytics inventoryData={inventoryData} />
+      )}
+
+
+      {/* LOW STOCK ALERT */}
+     {/*  {lowStockItems.length > 0 && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm">
+          <strong>Low Stock Alert:</strong> {lowStockItems.length} items need attention
+        </div>
+      )}
+ */}
+      {/* FILTERS - Available for MACSOFT roles and Service Center Technicians */}
+      {(isMacsoftRole() || isServiceCenterTechnician()) && (
+        <div className=" rounded-lg space-y-4">
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${isMacsoftRole() ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4 items-center *:flex *:flex-col *:gap-2`}>
+          {/* Search Input */}
+          <div>
+{/*             <label className="text-sm font-medium text-gray-700">Search</label>
+ */}            <input
+              type="search"
+              placeholder="Search by name, code..."
+              value={filters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Service Center Filter - Only for MACSOFT roles */}
+          {isMacsoftRole() && (
+            <div>
+{/*               <label className="text-sm font-medium text-gray-700">Service Center</label>
+ */}              <Select
+                value={filters.centerCode}
+                onChange={(e) => handleFilterChange('centerCode', e.target.value)}
+                options={[
+                  { label: 'All Centers', value: '' },
+                  ...serviceCenters.map((center) => ({
+                    label: `${center.name} (${center.centerCode})`,
+                    value: center.centerCode
+                  }))
+                ]}
+                placeholder="All Centers"
+                className="w-full"
+              />
             </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                <strong>Low Stock Alert:</strong> {lowStockItems.length} items are running low on stock and may need replenishment.
-              </p>
-            </div>
+          )}
+
+          {/* Condition Filter */}
+          <div>
+{/*             <label className="text-sm font-medium text-gray-700">Condition</label>
+ */}            <Select
+              value={filters.condition}
+              onChange={(e) => handleFilterChange('condition', e.target.value)}
+              options={[
+                { label: 'All Conditions', value: '' },
+                { label: 'Good', value: 'GOOD' },
+                { label: 'Defective', value: 'DEFECTIVE' },
+                { label: 'Repairable', value: 'REPAIRABLE' },
+                { label: 'Scrap', value: 'SCRAP' }
+              ]}
+              placeholder="All Conditions"
+              className="w-full"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div>
+{/*             <label className="text-sm font-medium text-gray-700">Category</label>
+ */}            <Select
+              value={filters.category}
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+              options={[
+                { label: 'All Categories', value: '' },
+                ...categories.map((category) => ({
+                  label: category,
+                  value: category
+                }))
+              ]}
+              placeholder="All Categories"
+              className="w-full"
+            />
+          </div>
+
+          {/* Clear All Filter */}
+          <div>
+{/*             <label htmlFor="clear-filters-button" className="invisible">Clear All Filters</label>
+ */}            <Button
+              onClick={clearFilters}
+              id="clear-filters-button"
+             >
+              Clear All
+            </Button>
           </div>
         </div>
-      )}
-
-      {/* Action Buttons */}
-      {canManageInventory() && (
-        <div className="flex gap-3 mb-4">
-          <button
-            onClick={() => setShowInboundModal(true)}
-            className="inline-flex items-center text-xs px-4 py-2 border border-transparent lg:text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Stock Inbound
-          </button>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center text-xs px-4 py-2 border border-transparent lg:text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Update Inventory
-          </button>
         </div>
       )}
 
-      {/* Inventory Table */}
-      <div className="bg-white rounded-lg shadow">
-        <ReusableTable
-          columns={[
-            { key: 'productname', label: 'Product Name', align: 'left', textWrap: 'nowrap', },
-            { key: 'productCode', label: 'Product Code', align: 'left', textWrap: 'nowrap', },
-            { key: 'category', label: 'Category', align: 'left', textWrap: 'nowrap', },
-            { key: 'location', label: 'Location', align: 'left', textWrap: 'nowrap', },
-            { key: 'availableQuantity', label: 'Available Qty', align: 'center', textWrap: 'nowrap', },
-            { key: 'minQty', label: 'Min Stock', align: 'center', textWrap: 'nowrap', },
-            { key: 'maxQty', label: 'Max Stock', align: 'center', textWrap: 'nowrap', },
-            { key: 'status', label: 'Status', align: 'center', textWrap: 'nowrap', },
-          ]}
-          data={transformedInventoryData}
-          title="Inventory"
-          headerColor="bg-gray-700"
-          headerTextColor="text-white"
-          bordered
-          searchPlaceholder="Search inventory by product name, code, or category..."
-          loading={loading}
-          onView={(row) => {
-            setSelectedItem(row);
-            setShowDetailsModal(true);
-          }}
-          onEdit={canManageInventory() ? (row) => {
-            setSelectedItem(row);
-            setShowAddModal(true);
-          } : undefined}
-        />
-      </div>
+      {/* TABLE */}
+       <ReusableTable
+        title="Inventory"
+        loading={loading}
+        bordered
+        headerColor="bg-gray-700"
+        headerTextColor="text-white"
+        searchPlaceholder="Search by product, code, category..."
+        columns={[
+          { key: "productname", label: "Product Name" },
+          { key: "productCode", label: "Product Code" },
+          { key: "category", label: "Category" },
+          { key: "centerInfo", label: "Service Center" },
+          { key: "conditionBadge", label: "Condition", align: "start" },
+/*           { key: "location", label: "Location" },
+ */          { key: "availableQuantity", label: "Qty", align: "start" },
+          { key: "minQty", label: "Min", align: "start" },
+          { key: "maxQty", label: "Max", align: "start" },
+          { key: "status", label: "Status", align: "start" },
+        ]}
+        data={tableData}
+        onPageChange={handlePageChange}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onView={(row) => {
+          setSelectedItem(row);
+          setShowDetailsModal(true);
+        }}
+        onEdit={
+          canManageInventory()
+            ? (row) => {
+              setSelectedItem(row);
+              setShowAddModal(true);
+            }
+            : undefined
+        }
+      />
 
-      {/* Modals */}
+      {/* CREATE / EDIT MODAL */}
       <InventoryModal
-        isOpen={showAddModal}
+        open={showAddModal}
+        mode={selectedItem ? "edit" : "create"}
+        initialData={selectedItem}
         onClose={() => {
           setShowAddModal(false);
           setSelectedItem(null);
         }}
-        onSuccess={() => {
-          fetchInventoryData();
-          fetchLowStockItems();
+        onSuccess={fetchInventoryData}
+      />
+
+      {/* VIEW MODAL */}
+      <InventoryModal
+        open={showDetailsModal}
+        mode="view"
+        initialData={selectedItem}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setSelectedItem(null);
         }}
-        editItem={selectedItem}
-        mode={selectedItem ? 'edit' : 'add'}
       />
 
-      <InboundActivityModal
-        isOpen={showInboundModal}
-        onClose={() => setShowInboundModal(false)}
-        onSuccess={(data) => {
-          fetchInventoryData();
-          fetchLowStockItems();
-          // You could show a success message here
-         }}
+      {/* BULK TRANSACTION MODAL */}
+      <BulkTransactionModal
+        open={showBulkTransactionModal}
+        onClose={() => setShowBulkTransactionModal(false)}
+        onSuccess={fetchInventoryData}
+        inventoryData={inventoryData}
       />
 
-      {/* Details Modal - You can implement this later for viewing item details */}
-      {showDetailsModal && selectedItem && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <Package className="h-6 w-6 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Inventory Details
-                </h2>
-              </div>
-              <button
-                onClick={() => setShowDetailsModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-            
-            <div className="p-6">
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Product Name</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.productname}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Product Code</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.productCode}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Category</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.category}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Location</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.location || 'Not specified'}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Available Quantity</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.availableQuantity}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Minimum Stock</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.minQty}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Maximum Stock</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.maxQty}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Status</dt>
-                  <dd className="text-sm text-gray-900">{getStatusDisplay(selectedItem.status)}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
-                  <dd className="text-sm text-gray-900">{selectedItem.updatedAt}</dd>
-                </div>
-              </dl>
-              
-              <div className="flex justify-end mt-6">
-                <button
-                  onClick={() => setShowDetailsModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* ADJUSTMENT MODAL (MACSOFT only) */}
+      {canAdjustInventory() && (
+        <AdjustmentModal
+          open={showAdjustmentModal}
+          onClose={() => setShowAdjustmentModal(false)}
+          onSuccess={fetchInventoryData}
+          inventoryData={inventoryData}
+        />
       )}
     </section>
   );

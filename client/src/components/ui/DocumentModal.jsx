@@ -146,7 +146,7 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             src={fileUrl}
             alt={fileDocument.name}
             className="sm:max-w-1/2 object-contain"
-            onLoad={() => console.log('Image loaded successfully:', fileUrl)}
+           // onLoad={() => console.log('Image loaded successfully:', fileUrl)}
             onError={(e) => {
               console.error('Image failed to load:', fileUrl, e);
               setError(`Failed to load image: ${fileUrl}`);
@@ -190,7 +190,7 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             controls
             className="max-w-full max-h-full sm:min-w-60 sm:max-h-96 object-contain"
             onError={() => setError('Failed to load video file')}
-            onLoadStart={() => console.log('Video loading:', fileUrl)}
+           // onLoadStart={() => console.log('Video loading:', fileUrl)}
             preload="metadata"
           >
             <source src={fileUrl} type={fileDocument.mimetype} />

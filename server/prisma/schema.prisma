@@ -48,11 +48,6 @@ enum TicketStatus {
   CLOSED
 }
 
-enum TransactionType {
-  RECEIPT
-  DELIVERY
-}
-
 enum Role {
   MACSOFT_ADMIN // Global superuser – all access
   MACSOFT_HEAD // Approver – oversees multiple states/centers
@@ -70,6 +65,23 @@ enum Category {
   WIRE
   CONNECTOR
   ENCLOSURE_AND_ACCESSORIES
+}
+
+enum TransactionType {
+  RECEIPT // Stock inward
+  DELIVERY // Stock outward
+  TICKET_ISSUE // Issued for service ticket
+  RETURN // Returned from field
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+}
+
+enum InventoryCondition {
+  GOOD
+  DEFECTIVE
+  REPAIRABLE
+  SCRAP
 }
 
 model State {
@@ -128,20 +140,22 @@ model Project {
 }
 
 model ServiceCenter {
-  id                Int       @id @default(autoincrement())
+  id                Int                  @id @default(autoincrement())
   name              String
   projectCode       String?
-  centerCode        String    @unique
-  email             String    @unique
+  centerCode        String               @unique
+  email             String               @unique
   address           String?
-  isActive          Boolean   @default(false)
+  isActive          Boolean              @default(false)
   serviceableStates String? // Comma-separated list of states this center serves
   users             User[]
-  project           Project?  @relation(fields: [projectCode], references: [projectCode])
-  assignedTickets   Ticket[] // Tickets assigned to this service center
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime? @updatedAt
-  deletedAt         DateTime? @map("deleted_at")
+  project           Project?             @relation(fields: [projectCode], references: [projectCode])
+  assignedTickets   Ticket[]             @relation("TicketforServiceCenter") // Tickets assigned to this service center
+  inventories       Inventory[] // 👈 relation via centerCode
+  transactions      ProductTransaction[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime?            @updatedAt
+  deletedAt         DateTime?            @map("deleted_at")
 }
 
 model User {
@@ -217,7 +231,7 @@ model Ticket {
   // Relations
   createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
-  serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
+  serviceCenter       ServiceCenter?       @relation("TicketforServiceCenter", fields: [assignedServiceCenter], references: [centerCode])
   state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
   selectedDistrict    district?            @relation(fields: [districtCode], references: [districtCode])
   motorhp             motorhp?             @relation(fields: [motorHpId], references: [id])
@@ -308,49 +322,84 @@ model spareRequestItem {
 }
 
 model Product {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  brandName   String?
-  productCode String    @unique
-  category    Category?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  name          String
+  productCode   String    @unique
+  description   String?
+  brandName     String?
+  category      Category?
+  unitOfMeasure Int? // optional, if you want pcs / sets etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  transactions      ProductTransaction[]
-  inventory         Inventory?
-  spareRequestItems spareRequestItem[]
+  inventories            Inventory[]
+  transactions           ProductTransaction[]
+  spareRequestItems      spareRequestItem[]
+  ProductTransactionItem ProductTransactionItem[]
 }
 
 model ProductTransaction {
-  id        Int             @id @default(autoincrement())
-  productId Int
-  type      TransactionType
-  quantity  Int
+  id              Int             @id @default(autoincrement())
+  transactionType TransactionType
+  centerCode      String
+
+  invoiceNo    String?
+  billNo       String?
+  receiptDate  DateTime?
+  deliveryDate DateTime?
+
   ticketId  Int?
-  notes     String?
+  remarks   String?
   createdBy Int
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  createdAt DateTime @default(now())
 
   // Relations
-  product       Product @relation(fields: [productId], references: [id])
-  ticket        Ticket? @relation(fields: [ticketId], references: [id])
-  createdByUser User    @relation("ProductTransactionCreated", fields: [createdBy], references: [id])
+  serviceCenter ServiceCenter            @relation(fields: [centerCode], references: [centerCode])
+  ticket        Ticket?                  @relation(fields: [ticketId], references: [id])
+  items         ProductTransactionItem[]
+  createdByUser User                     @relation("ProductTransactionCreated", fields: [createdBy], references: [id])
+  Product       Product?                 @relation(fields: [productId], references: [id])
+  productId     Int?
+
+  @@index([centerCode])
+}
+
+model ProductTransactionItem {
+  id            Int                @id @default(autoincrement())
+  transactionId Int
+  productId     Int
+  condition     InventoryCondition
+  quantity      Int // always positive
+
+  // Relations
+  transaction ProductTransaction @relation(fields: [transactionId], references: [id])
+  product     Product            @relation(fields: [productId], references: [id])
+
+  @@index([productId])
 }
 
 model Inventory {
-  id        Int      @id @default(autoincrement())
-  productId Int      @unique
-  quantity  Int      @default(0)
+  id         Int    @id @default(autoincrement())
+  centerCode String
+  productId  Int
+
+  goodQty       Int @default(0)
+  repairableQty Int @default(0)
+  damagedQty    Int @default(0)
+  scrapQty      Int @default(0)
+
   minStock  Int      @default(0)
   maxStock  Int?
   location  String?
   updatedAt DateTime @updatedAt
 
   // Relations
-  product Product @relation(fields: [productId], references: [id])
+  serviceCenter ServiceCenter @relation(fields: [centerCode], references: [centerCode])
+  product       Product       @relation(fields: [productId], references: [id])
+
+  @@unique([centerCode, productId])
 }
 
 model Message {
@@ -523,15 +572,15 @@ model OfficeHoliday {
 
 // Buzzer alert configuration
 model BuzzerAlertConfig {
-  id                      Int      @id @default(autoincrement())
-  minHours                Int      @default(3) // Minimum hours before triggering alert
-  minMinutes              Int      @default(0) // Additional minutes
-  minSeconds              Int      @default(0) // Additional seconds
-  maxHours                Int      @default(5) // Maximum hours before stopping alert
-  maxMinutes              Int      @default(0) // Additional minutes
-  maxSeconds              Int      @default(0) // Additional seconds
-  isActive                Boolean  @default(true)
-  description             String?  @default("Time window for buzzer alerts when customer messages are pending")
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  minHours    Int      @default(3) // Minimum hours before triggering alert
+  minMinutes  Int      @default(0) // Additional minutes
+  minSeconds  Int      @default(0) // Additional seconds
+  maxHours    Int      @default(5) // Maximum hours before stopping alert
+  maxMinutes  Int      @default(0) // Additional minutes
+  maxSeconds  Int      @default(0) // Additional seconds
+  isActive    Boolean  @default(true)
+  description String?  @default("Time window for buzzer alerts when customer messages are pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

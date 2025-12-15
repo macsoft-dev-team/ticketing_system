@@ -194,9 +194,7 @@ const transitionMilestone = async (req, res) => {
       io.to('admin').emit('milestone-transitioned', milestoneTransitionData);
       io.to('servicecenter').emit('milestone-transitioned', milestoneTransitionData);
       io.to('customer').emit('milestone-transitioned', milestoneTransitionData);
-      
-      console.log(`🏁 Milestone transitioned via socket for ticket: ${updatedMilestone.ticket.ticketCode} -> ${targetStage}`);
-    }
+          }
 
     const isTicketClosed = updatedMilestone.config?.isFinal;
     const responseMessage =
@@ -251,8 +249,7 @@ const updateMilestoneNotes = async (req, res) => {
       io.to('servicecenter').emit('milestone-updated', milestoneUpdateData);
       io.to('customer').emit('milestone-updated', milestoneUpdateData);
       
-      console.log(`🏁 Milestone notes updated via socket for ticket: ${updatedMilestone.ticket.ticketCode}`);
-    }
+     }
 
     res.status(200).json({
       message: "Milestone notes updated successfully",
@@ -312,8 +309,7 @@ const addPhotosToCurrentMilestone = async (req, res) => {
       io.to('servicecenter').emit('milestone-updated', milestoneUpdateData);
       io.to('customer').emit('milestone-updated', milestoneUpdateData);
       
-      console.log(`🏁 Milestone photos added via socket for ticket: ${updatedMilestone.ticket.ticketCode}`);
-    }
+     }
 
     res.status(200).json({
       message: "Photos added to milestone successfully",
@@ -363,9 +359,7 @@ const updateMilestone = async (req, res) => {
       io.to('admin').emit('milestone-updated', milestoneUpdateData);
       io.to('servicecenter').emit('milestone-updated', milestoneUpdateData);
       io.to('customer').emit('milestone-updated', milestoneUpdateData);
-      
-      console.log(`🏁 Milestone updated via socket for ticket: ${newMilestoneData.ticket.ticketCode}`);
-    }
+     }
 
     res.status(200).json({
       message: "Milestone updated successfully",
@@ -416,9 +410,7 @@ const createMilestone = async (req, res) => {
       io.to('admin').emit('milestone-created', milestoneCreateData);
       io.to('servicecenter').emit('milestone-created', milestoneCreateData);
       io.to('customer').emit('milestone-created', milestoneCreateData);
-      
-      console.log(`🏁 New milestone created via socket for ticket: ${newMilestone.ticket.ticketCode}`);
-    }
+     }
 
     res.status(201).json({
       message: "Milestone created successfully",

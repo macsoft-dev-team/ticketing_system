@@ -468,8 +468,7 @@ const NotificationBell = () => {
               e.preventDefault();
               e.stopPropagation();
               setIsOpen(!isOpen);
-                console.log("Badge clicked!");
-            }}
+             }}
             className="absolute rounded-full px-1 py-0.5 font-bold cursor-pointer xsmall pointer-events-auto -top-1 -right-1 flex items-center justify-center text-[0.6rem] bg-red-500 text-white border-2 border-white z-10">
             {unreadCount > 99 ? '99+' : unreadCount}
           </button>

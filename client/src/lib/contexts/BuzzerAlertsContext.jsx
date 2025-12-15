@@ -44,15 +44,12 @@ export const BuzzerAlertsProvider = ({ children }) => {
 
       // Play the critical notification sound immediately
       play('notify_critical');
-      console.log('🔊 Playing buzzer alert sound (1/3)');
-
-      // Play sound 2 more times with 2 second intervals (total 3 times)
+       // Play sound 2 more times with 2 second intervals (total 3 times)
       let playCount = 1;
       soundIntervalRef.current = setInterval(() => {
         playCount++;
         play('notify_critical');
-        console.log(`🔊 Playing buzzer alert sound (${playCount}/3)`);
-        
+         
         if (playCount >= 3) {
           clearInterval(soundIntervalRef.current);
           soundIntervalRef.current = null;

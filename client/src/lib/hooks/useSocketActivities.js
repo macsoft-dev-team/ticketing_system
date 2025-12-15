@@ -114,9 +114,7 @@ export const useSocketActivities = () => {
     window.dispatchEvent(new CustomEvent('socketTicketMessage', {
       detail: testTicketMessage
     }));
-    
-    console.log('🎫 Sent test ticket message with updates:', testTicketMessage);
-  }, []);
+   }, []);
 
   // Send test new ticket creation (for testing ticket list updates)
   const sendTestTicketCreation = useCallback((ticketData = {}) => {
@@ -146,8 +144,7 @@ export const useSocketActivities = () => {
       detail: testTicket
     }));
     
-    console.log('🎫 Sent test ticket creation:', testTicket);
-  }, []);
+   }, []);
 
   // Send test milestone creation
   const sendTestMilestoneCreation = useCallback((milestoneData = {}) => {
@@ -184,8 +181,7 @@ export const useSocketActivities = () => {
       detail: testMilestone
     }));
     
-    console.log('🎯 Sent test milestone creation:', testMilestone);
-  }, []);
+   }, []);
 
   // Send test milestone transition
   const sendTestMilestoneTransition = useCallback((transitionData = {}) => {
@@ -225,8 +221,7 @@ export const useSocketActivities = () => {
       detail: testTransition
     }));
     
-    console.log('🎯 Sent test milestone transition:', testTransition);
-  }, []);
+   }, []);
 
   // Send test milestone update
   const sendTestMilestoneUpdate = useCallback((updateData = {}) => {
