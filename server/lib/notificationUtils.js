@@ -495,7 +495,7 @@ const saveAndBroadcastNotification = async (
         io.emit("notification", enrichedNotification);
       }
       
-      console.log(`📢 Notification "${notification.title}" sent to ${recipients.length} recipients`);
+      //console.log(`📢 Notification "${notification.title}" sent to ${recipients.length} recipients`);
     }
 
     return { notification, recipients };
