@@ -819,11 +819,11 @@ export default function TicketDashboard() {
 
       setSpareRequests(transformedRequests);
     } catch (error) {
-      addToast({
+/*       addToast({
         title: 'Error',
         description: 'Failed to fetch spare requests',
         variant: 'error'
-      });
+      }); */
     } finally {
       setLoadingSpareRequests(false);
     }
