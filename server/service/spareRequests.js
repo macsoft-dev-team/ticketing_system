@@ -150,7 +150,7 @@ async function getSpareRequestsByTicket(ticketCode) {
           include: {
             product: {
               include: {
-                inventory: true,
+                inventories: true,
               },
             },
           },
@@ -1004,7 +1004,7 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
             include: {
               product: {
                 include: {
-                  inventory: true
+                  inventories: true
                 }
               }
             }
