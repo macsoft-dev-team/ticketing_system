@@ -26,6 +26,15 @@ const getNotifications = async (userId) => {
         },
       };
     }
+
+    // For SERVICE_CENTER_TECHNICIAN, only show notifications for tickets assigned to them
+    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN') {
+      whereClause.notification = {
+        ticket: {
+          assignedTo: userIdNum,
+        },
+      };
+    }
         
     const notifications = await prisma.notificationRecipient.findMany({
       where: whereClause,
@@ -157,6 +166,15 @@ const getNotificationCounts = async (userId) => {
       whereClause.notification = {
         ticket: {
           createdBy: userId,
+        },
+      };
+    }
+
+    // For SERVICE_CENTER_TECHNICIAN, only count notifications for tickets assigned to them
+    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN') {
+      whereClause.notification = {
+        ticket: {
+          assignedTo: userId,
         },
       };
     }
@@ -404,6 +422,13 @@ const getNotificationsWithFilters = async (userId, filters = {}) => {
     if (user && user.role === 'CUSTOMER_FIELD_ENGINEER') {
       notificationWhere.ticket = {
         createdBy: userIdNum,
+      };
+    }
+
+    // For SERVICE_CENTER_TECHNICIAN, only show notifications for tickets assigned to them
+    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN') {
+      notificationWhere.ticket = {
+        assignedTo: userIdNum,
       };
     }
 
