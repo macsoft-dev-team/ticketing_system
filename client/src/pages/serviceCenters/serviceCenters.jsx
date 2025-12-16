@@ -15,6 +15,27 @@ export default function ServiceCenters() {
     const columns = [
         { key: 'name', label: 'Name', align: 'left', textWrap: 'nowrap', },
         { key: 'centerCode', label: 'Center Code', align: 'left' },
+        { 
+            key: 'type', 
+            label: 'Type', 
+            align: 'left',
+            render: (row) => (
+                <div className="flex gap-1">
+                    {row.isMacsoftHead && (
+                        <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                            Head Office
+                        </span>
+                    )}
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        row.isMacsoft 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-gray-100 text-gray-800'
+                    }`}>
+                        {row.isMacsoft ? 'HSC' : 'SSC'}
+                    </span>
+                </div>
+            )
+        },
         { key: 'email', label: 'Email', align: 'left' },
         { key: 'address', label: 'Address', align: 'left', textWrap: 'nowrap', },
         {

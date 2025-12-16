@@ -88,7 +88,7 @@ const getAll = async (skip, take, filter, currentUser) => {
       include: {
         serviceCenter: {
           include: {
-            project: true,
+            organisation: true,
           },
         },
         organisation: true,
@@ -267,7 +267,7 @@ const create = async (userData) => {
       include: {
         serviceCenter: {
           include: {
-            project: true,
+            organisation: true,
           },
         },
         State: true,
@@ -396,7 +396,7 @@ const update = async (id, userData) => {
       include: {
         serviceCenter: {
           include: {
-            project: true,
+            organisation: true,
           },
         },
         organisation: true,
@@ -438,7 +438,7 @@ const deleteUser = async (id) => {
       include: {
         serviceCenter: {
           include: {
-            project: true,
+            organisation: true,
           },
         },
         State: true,

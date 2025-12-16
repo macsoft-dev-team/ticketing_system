@@ -10,7 +10,7 @@ const getNotifications = async (userId) => {
 
     const user = await prisma.user.findUnique({
       where: { id: parseInt(userId) },
-      select: { role: true },
+      select: { role: true, centerCode: true },
     });
 
     // Build where clause based on user role
@@ -27,11 +27,11 @@ const getNotifications = async (userId) => {
       };
     }
 
-    // For SERVICE_CENTER_TECHNICIAN, only show notifications for tickets assigned to them
-    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN') {
+    // For SERVICE_CENTER_TECHNICIAN, only show notifications for tickets assigned to their service center
+    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN' && user.centerCode) {
       whereClause.notification = {
         ticket: {
-          assignedTo: userIdNum,
+          assignedServiceCenter: user.centerCode,
         },
       };
     }
@@ -153,7 +153,7 @@ const getNotificationCounts = async (userId) => {
     // Fetch user role
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { role: true },
+      select: { role: true, centerCode: true },
     });
 
     // Build where clause based on user role
@@ -170,11 +170,11 @@ const getNotificationCounts = async (userId) => {
       };
     }
 
-    // For SERVICE_CENTER_TECHNICIAN, only count notifications for tickets assigned to them
-    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN') {
+    // For SERVICE_CENTER_TECHNICIAN, only count notifications for tickets assigned to their service center
+    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN' && user.centerCode) {
       whereClause.notification = {
         ticket: {
-          assignedTo: userId,
+          assignedServiceCenter: user.centerCode,
         },
       };
     }
@@ -334,7 +334,7 @@ const getNotificationsWithFilters = async (userId, filters = {}) => {
     // Fetch user role
     const user = await prisma.user.findUnique({
       where: { id: userIdNum },
-      select: { role: true },
+      select: { role: true, centerCode: true },
     });
 
     const skip = (page - 1) * limit;
@@ -425,10 +425,10 @@ const getNotificationsWithFilters = async (userId, filters = {}) => {
       };
     }
 
-    // For SERVICE_CENTER_TECHNICIAN, only show notifications for tickets assigned to them
-    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN') {
+    // For SERVICE_CENTER_TECHNICIAN, only show notifications for tickets assigned to their service center
+    if (user && user.role === 'SERVICE_CENTER_TECHNICIAN' && user.centerCode) {
       notificationWhere.ticket = {
-        assignedTo: userIdNum,
+        assignedServiceCenter: user.centerCode,
       };
     }
 

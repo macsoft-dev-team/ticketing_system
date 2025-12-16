@@ -796,8 +796,26 @@ export default function TicketDashboard() {
       // Transform spare requests to match the format expected by the approval component
       const transformedRequests = [];
       if (result.success && result.data) {
+        // Get ticket details to determine requesting center
+        const ticket = ticketData;
+        
         result.data.forEach(request => {
           request.spareItems.forEach(item => {
+            // Find MACSOFT_MAIN inventory for this product
+            const macsoftInventory = item.product.inventories?.find(
+              inv => inv.centerCode === 'MACSOFT_MAIN'
+            );
+            
+            // Find inventory at requesting service center
+            const requestingCenter = ticket?.assignedServiceCenter || request.createdByUser?.centerCode;
+            const centerInventory = requestingCenter ? item.product.inventories?.find(
+              inv => inv.centerCode === requestingCenter
+            ) : null;
+            
+            // Available quantity from MACSOFT_MAIN and requesting center
+            const macsoftQty = macsoftInventory?.goodQty || 0;
+            const centerQty = centerInventory?.goodQty || 0;
+            
             transformedRequests.push({
               itemId: item.id,
               requestId: request.id,
@@ -806,12 +824,14 @@ export default function TicketDashboard() {
               productName: item.product.name,
               productCode: item.product.productCode,
               requestedQuantity: item.quantity,
-              availableQuantity: item.product.inventory?.quantity || 0,
+              availableQuantity: macsoftQty,
+              centerAvailableQuantity: centerQty,
+              requestingCenter: requestingCenter,
               status: item.status,
               requestedBy: request.createdByUser?.name || 'Unknown',
               requestedByRole: request.createdByUser?.role || 'Unknown',
               requestedDate: request.createdAt,
-              canApprove: (item.product.inventory?.quantity || 0) >= item.quantity && item.status === 'REQUESTED'
+              canApprove: (macsoftQty >= item.quantity || centerQty >= item.quantity) && item.status === 'REQUESTED'
             });
           });
         });
@@ -933,8 +953,9 @@ export default function TicketDashboard() {
     }
   };
 
-  const getStockStatus = useCallback((requested, available) => {
-    if (available >= requested) {
+  const getStockStatus = useCallback((requested, macsoftAvailable, centerAvailable) => {
+    const totalAvailable = Math.max(macsoftAvailable, centerAvailable || 0);
+    if (totalAvailable >= requested) {
       return {
         status: 'sufficient',
         icon: CheckCircle,
@@ -1583,7 +1604,7 @@ export default function TicketDashboard() {
             ) : (
               <div className="space-y-3">
                 {spareRequests.map((item) => {
-                  const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
+                  const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity, item.centerAvailableQuantity);
                   const StockIcon = stockStatus.icon;
 
                   return (
@@ -1617,14 +1638,32 @@ export default function TicketDashboard() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-xs">
+                        <div className="flex flex-col space-y-1 text-xs">
                           <span className="text-gray-600">
                             Requested: <span className="font-medium text-blue-600">{item.requestedQuantity}</span>
                           </span>
-                          <span className="text-gray-600">
-                            Available: <span className={`font-medium ${item.availableQuantity >= item.requestedQuantity ? 'text-green-600' : 'text-red-600'
-                              }`}>{item.availableQuantity}</span>
-                          </span>
+                          <div className="flex flex-col space-y-1">
+                            {/* Show MACSOFT quantity only for MACSOFT roles */}
+                            {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' || user?.role === 'MACSOFT_SUPPORT') && (
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                item.availableQuantity >= item.requestedQuantity 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                MACSOFT: {item.availableQuantity}
+                              </span>
+                            )}
+                            {/* Show center quantity for service center roles or if requesting center exists */}
+                            {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                (user?.role === 'SERVICE_CENTER_TECHNICIAN' || user?.role === 'CUSTOMER_SERVICE_HEAD') 
+                                  ? (item.centerAvailableQuantity >= item.requestedQuantity ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}>
+                                {item.requestingCenter}: {item.centerAvailableQuantity}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex items-center space-x-1 text-xs text-gray-500">
@@ -1749,7 +1788,7 @@ export default function TicketDashboard() {
             ) : (
               <div className="space-y-4">
                 {spareRequests.map((item) => {
-                  const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
+                  const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity, item.centerAvailableQuantity);
                   const StockIcon = stockStatus.icon;
 
                   return (
@@ -1794,12 +1833,28 @@ export default function TicketDashboard() {
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 mb-1">Available</p>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.availableQuantity >= item.requestedQuantity
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                              }`}>
-                              {item.availableQuantity}
-                            </span>
+                            <div className="flex flex-col space-y-1">
+                              {/* Show MACSOFT quantity only for MACSOFT roles */}
+                              {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' || user?.role === 'MACSOFT_SUPPORT') && (
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  item.availableQuantity >= item.requestedQuantity
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  MACSOFT: {item.availableQuantity}
+                                </span>
+                              )}
+                              {/* Show center quantity for service center roles or if requesting center exists */}
+                              {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
+                                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                  (user?.role === 'SERVICE_CENTER_TECHNICIAN' || user?.role === 'CUSTOMER_SERVICE_HEAD') 
+                                    ? (item.centerAvailableQuantity >= item.requestedQuantity ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}>
+                                  {item.requestingCenter}: {item.centerAvailableQuantity}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -2121,7 +2176,7 @@ export default function TicketDashboard() {
                           {transactionHistory.map((transaction, index) => (
                             <div key={index} className="flex items-center justify-between text-xs">
                               <span className="text-gray-600">
-                                {transaction.type} - {transaction.quantity} units
+                                {transaction.transactionType} - {transaction.items.length > 0 ? transaction.items.reduce((acc, item) => acc + item.quantity, 0) : 0} units
                               </span>
                               <span className="text-gray-500">
                                 {formatDate(transaction.createdAt)}

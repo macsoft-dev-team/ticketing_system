@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   CheckCircle, 
   XCircle, 
@@ -245,6 +245,20 @@ export default function SpareRequestApproval() {
       return;
     }
 
+    // Check if total selected quantity is zero
+    const totalSelectedQuantity = pendingRequests
+      .filter(item => selectedItems.has(item.itemId))
+      .reduce((sum, item) => sum + (item.requestedQuantity || 0), 0);
+
+    if (totalSelectedQuantity === 0) {
+      addToast({
+        title: 'Warning',
+        description: 'Cannot approve items with zero quantity',
+        variant: 'warning',
+      });
+      return;
+    }
+
     try {
       setBulkActionLoading(true);
       
@@ -303,6 +317,13 @@ export default function SpareRequestApproval() {
     }
   };
 
+  // Calculate total selected quantity
+  const totalSelectedQuantity = useMemo(() => {
+    return pendingRequests
+      .filter(item => selectedItems.has(item.itemId))
+      .reduce((sum, item) => sum + (item.requestedQuantity || 0), 0);
+  }, [pendingRequests, selectedItems]);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -313,8 +334,9 @@ export default function SpareRequestApproval() {
     });
   };
 
-  const getStockStatus = (requested, available) => {
-    if (available >= requested) {
+  const getStockStatus = (requested, macsoftAvailable, centerAvailable) => {
+    const totalAvailable = Math.max(macsoftAvailable, centerAvailable || 0);
+    if (totalAvailable >= requested) {
       return { status: 'sufficient', color: 'text-green-600 bg-green-50', icon: CheckCircle };
     } else {
       return { status: 'insufficient', color: 'text-red-600 bg-red-50', icon: AlertTriangle };
@@ -351,8 +373,8 @@ export default function SpareRequestApproval() {
             {selectedItems.size > 0 && (
               <button
                 onClick={handleBulkApprove}
-                disabled={bulkActionLoading}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                disabled={bulkActionLoading || totalSelectedQuantity === 0}
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {bulkActionLoading ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -392,7 +414,7 @@ export default function SpareRequestApproval() {
                 </label>
               </div>
               {pendingRequests.map((item) => {
-                const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
+                const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity, item.centerAvailableQuantity);
                 const StockIcon = stockStatus.icon;
                 
                 return (
@@ -436,13 +458,20 @@ export default function SpareRequestApproval() {
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 mb-1">Available</p>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            item.availableQuantity >= item.requestedQuantity 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {item.availableQuantity}
-                          </span>
+                          <div className="flex flex-col space-y-1">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.availableQuantity >= item.requestedQuantity 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              MACSOFT: {item.availableQuantity}
+                            </span>
+                            {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {item.requestingCenter}: {item.centerAvailableQuantity}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
@@ -542,7 +571,7 @@ export default function SpareRequestApproval() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {pendingRequests.map((item) => {
-                    const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity);
+                    const stockStatus = getStockStatus(item.requestedQuantity, item.availableQuantity, item.centerAvailableQuantity);
                     const StockIcon = stockStatus.icon;
                     
                     return (
@@ -582,13 +611,20 @@ export default function SpareRequestApproval() {
                           </span>
                         </td>
                         <td className="px-3 lg:px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            item.availableQuantity >= item.requestedQuantity 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {item.availableQuantity}
-                          </span>
+                          <div className="flex flex-col space-y-1">
+                            <span className={`inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              item.availableQuantity >= item.requestedQuantity 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              MACSOFT: {item.availableQuantity}
+                            </span>
+                            {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
+                              <span className="inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                {item.requestingCenter}: {item.centerAvailableQuantity}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-3 lg:px-6 py-4 whitespace-nowrap">
                           <div className={`inline-flex items-center px-1.5 lg:px-2 py-1 rounded-full text-xs font-medium ${stockStatus.color}`}>
@@ -699,7 +735,7 @@ export default function SpareRequestApproval() {
 
       {/* Reject Modal */}
       {showRejectModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/25 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
           <div className="relative mx-auto p-4 sm:p-5 border w-full max-w-md sm:max-w-lg shadow-lg rounded-md bg-white">
             <div className="text-center">
               <XCircle className="w-12 h-12 sm:w-16 sm:h-16 text-red-600 mx-auto" />
@@ -747,8 +783,8 @@ export default function SpareRequestApproval() {
 
       {/* Spare Details Modal */}
       {showSpareModal && selectedSpare && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative mx-auto p-6 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black/25 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative mx-auto p-6 border border-gray-200 w-full max-w-2xl  max-h-[calc(100vh-4rem)] overflow-y-auto shadow-lg rounded-md bg-white">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-gray-900">Spare Request Details</h3>
               <button
@@ -894,15 +930,15 @@ export default function SpareRequestApproval() {
                     <Calendar className="h-4 w-4 mr-2" />
                     Recent Transactions (Last 5)
                   </h4>
-                  <div className="space-y-2">
+                  <div className="divide-y divide-gray-200">
                     {transactionHistory.map((transaction, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                      <div key={index} className="flex items-center justify-between p-2 bg-white">
                         <div className="flex items-center space-x-2">
                           <div className={`w-2 h-2 rounded-full ${
-                            transaction.type === 'INBOUND' ? 'bg-green-500' : 'bg-red-500'
+                            transaction.transactionType === 'INBOUND' ? 'bg-green-500' : 'bg-red-500'
                           }`}></div>
                           <span className="text-sm text-gray-900">
-                            {transaction.type === 'INBOUND' ? 'Added' : 'Issued'} {transaction.quantity} units
+                            {transaction.transactionType === 'INBOUND' ? 'Added' : 'Issued'} {transaction.items.length > 0 ? transaction.items.reduce((acc, item) => acc + item.quantity, 0) : 0} units
                           </span>
                         </div>
                         <div className="text-xs text-gray-500">

@@ -14,12 +14,21 @@ import {
   Download,
   RefreshCw,
   Settings,
+  ArrowLeftRight,
+  PackageCheck,
+  History,
+  RotateCcw,
 } from "lucide-react";
 import { useAuth } from "../../lib/hooks/useAuth";
 import InventoryModal from "./components/InventoryModal";
 import InventoryAnalytics from "./components/InventoryAnalytics";
-import BulkTransactionModal from "./components/BulkTransactionModal";
+// import BulkTransactionModal from "./components/BulkTransactionModal"; // Not needed for now
 import AdjustmentModal from "./components/AdjustmentModal";
+import CustomerReturnModal from "./components/CustomerReturnModal";
+import TransferDispatchModal from "./components/TransferDispatchModal";
+import PendingTransfersModal from "./components/PendingTransfersModal";
+import PendingApprovalsModal from "./components/PendingApprovalsModal";
+import TransactionHistoryModal from "./components/TransactionHistoryModal";
 import { Button } from "../../components/ui/button";
 import Select from "../../components/ui/select";
 
@@ -32,8 +41,17 @@ export default function Inventory() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [lowStockItems, setLowStockItems] = useState([]);
-  const [showBulkTransactionModal, setShowBulkTransactionModal] = useState(false);
+  // const [showBulkTransactionModal, setShowBulkTransactionModal] = useState(false); // Not needed for now
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+  
+  // New modals
+  const [showCustomerReturnModal, setShowCustomerReturnModal] = useState(false);
+  const [showTransferDispatchModal, setShowTransferDispatchModal] = useState(false);
+  const [showPendingTransfersModal, setShowPendingTransfersModal] = useState(false);
+  const [showPendingApprovalsModal, setShowPendingApprovalsModal] = useState(false);
+  const [showTransactionHistoryModal, setShowTransactionHistoryModal] = useState(false);
+  const [pendingTransfersCount, setPendingTransfersCount] = useState(0);
+  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   
   // Filter states
   const [filters, setFilters] = useState({
@@ -66,16 +84,36 @@ export default function Inventory() {
   // MACSOFT roles can do adjustments and view all inventory
   const isMacsoftRole = () => canAccess(["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"]);
   
-  // Roles that can adjust inventory (only MACSOFT_ADMIN and MACSOFT_HEAD)
-  const canAdjustInventory = () => canAccess(["MACSOFT_ADMIN", "MACSOFT_HEAD"]);
+  // Check if user is from MACSOFT Head Office
+  const isHeadOffice = () => {
+    return user?.serviceCenter?.isMacsoftHead === true;
+  };
   
-  // Roles that can manage inventory (add/edit) - excludes service center technicians
-  const canManageInventory = () => canAccess([
-    "MACSOFT_ADMIN", 
-    "MACSOFT_HEAD", 
-    "MACSOFT_SUPPORT",
-    "CUSTOMER_SERVICE_HEAD"
-  ]);
+  // Check if user is from a Head Service Center (regional HSC)
+  const isHeadServiceCenter = () => {
+    return user?.serviceCenter?.isMacsoft === true && !isHeadOffice();
+  };
+  
+  // Check if user is from any MACSOFT center (Head Office or regional HSC)
+  const isAnyMacsoftCenter = () => {
+    return user?.serviceCenter?.isMacsoft === true || isHeadOffice();
+  };
+  
+  // Roles that can adjust inventory (MACSOFT roles, Head Office, and HSC technicians)
+  const canAdjustInventory = () => {
+    return canAccess(["MACSOFT_ADMIN", "MACSOFT_HEAD"]) || 
+           (canAccess(["SERVICE_CENTER_TECHNICIAN"]) && isAnyMacsoftCenter());
+  };
+  
+  // Roles that can manage inventory (add/edit) - includes Head Office and HSC technicians
+  const canManageInventory = () => {
+    return canAccess([
+      "MACSOFT_ADMIN", 
+      "MACSOFT_HEAD", 
+      "MACSOFT_SUPPORT",
+      "CUSTOMER_SERVICE_HEAD"
+    ]) || (canAccess(["SERVICE_CENTER_TECHNICIAN"]) && isAnyMacsoftCenter());
+  };
 
   // Roles that can do transactions
   const canDoTransactions = () => canAccess([
@@ -177,13 +215,42 @@ export default function Inventory() {
     }
   };
 
+  const fetchPendingTransfersCount = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/inventory-transactions/transfer/pending`, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        setPendingTransfersCount(res.data.transfers?.length || 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch pending transfers count:", err);
+    }
+  };
 
+  const fetchPendingApprovalsCount = async () => {
+    try {
+      const res = await axios.get(
+        `${API_URL}/inventory-transactions/history?status=PENDING_APPROVAL`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        setPendingApprovalsCount(res.data.transactions?.length || 0);
+      }
+    } catch (err) {
+      console.error("Failed to fetch pending approvals count:", err);
+    }
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchInventoryData();
       fetchLowStockItems();
       fetchServiceCenters();
+      fetchPendingTransfersCount();
+      if (isMacsoftRole()) {
+        fetchPendingApprovalsCount();
+      }
     }
   }, [isAuthenticated]);
 
@@ -367,11 +434,74 @@ export default function Inventory() {
             disabled={refreshing}
             className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
           >
-
             <span className={`${refreshing ? "animate-spin" : ""}`}><RefreshCw className="w-5 h-5" /></span>
           </Button>
 
+          {/* Transaction History - All authenticated users */}
+          <button
+            onClick={() => setShowTransactionHistoryModal(true)}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700"
+          >
+            <History className="w-4 h-4" />
+            History
+          </button>
+
+          {/* Customer Return - Service Center Technicians and above */}
           {canDoTransactions() && (
+            <button
+              onClick={() => setShowCustomerReturnModal(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Return
+            </button>
+          )}
+
+          {/* Pending Transfers - All roles that can do transactions */}
+          {canDoTransactions() && (
+            <button
+              onClick={() => setShowPendingTransfersModal(true)}
+              className="relative flex items-center gap-2 px-3 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              <PackageCheck className="w-4 h-4" />
+              Pending
+              {pendingTransfersCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {pendingTransfersCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Pending Approvals - MACSOFT only */}
+          {isMacsoftRole() && (
+            <button
+              onClick={() => setShowPendingApprovalsModal(true)}
+              className="relative flex items-center gap-2 px-3 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700"
+            >
+              <Clock className="w-4 h-4" />
+              Approvals
+              {pendingApprovalsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {pendingApprovalsCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Transfer Dispatch/Request - MACSOFT can dispatch, SSC can request */}
+          {canDoTransactions() && (
+            <button
+              onClick={() => setShowTransferDispatchModal(true)}
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+              {isMacsoftRole() ? "Transfer" : "Request"}
+            </button>
+          )}
+
+          {/* Bulk Transaction Modal - Not needed for now */}
+          {/* {canDoTransactions() && (
             <button
               onClick={() => setShowBulkTransactionModal(true)}
               className="flex items-center gap-2 px-3 py-2 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-700"
@@ -379,12 +509,12 @@ export default function Inventory() {
               <Package className="w-4 h-4" />
               Transaction
             </button>
-          )}
+          )} */}
 
           {canAdjustInventory() && (
             <button
               onClick={() => setShowAdjustmentModal(true)}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              className="flex items-center gap-2 px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
             >
               <Settings className="w-4 h-4" />
               Adjust
@@ -565,13 +695,13 @@ export default function Inventory() {
         }}
       />
 
-      {/* BULK TRANSACTION MODAL */}
-      <BulkTransactionModal
+      {/* BULK TRANSACTION MODAL - Not needed for now */}
+      {/* <BulkTransactionModal
         open={showBulkTransactionModal}
         onClose={() => setShowBulkTransactionModal(false)}
         onSuccess={fetchInventoryData}
         inventoryData={inventoryData}
-      />
+      /> */}
 
       {/* ADJUSTMENT MODAL (MACSOFT only) */}
       {canAdjustInventory() && (
@@ -582,6 +712,57 @@ export default function Inventory() {
           inventoryData={inventoryData}
         />
       )}
+
+      {/* CUSTOMER RETURN MODAL */}
+      <CustomerReturnModal
+        open={showCustomerReturnModal}
+        onClose={() => setShowCustomerReturnModal(false)}
+        onSuccess={() => {
+          fetchInventoryData();
+          fetchPendingTransfersCount();
+        }}
+      />
+
+      {/* TRANSFER DISPATCH MODAL (MACSOFT and SSC) */}
+      <TransferDispatchModal
+        open={showTransferDispatchModal}
+        onClose={() => setShowTransferDispatchModal(false)}
+        onSuccess={() => {
+          fetchInventoryData();
+          if (isMacsoftRole()) {
+            fetchPendingApprovalsCount();
+          }
+        }}
+      />
+
+      {/* PENDING APPROVALS MODAL (MACSOFT only) */}
+      {isMacsoftRole() && (
+        <PendingApprovalsModal
+          open={showPendingApprovalsModal}
+          onClose={() => setShowPendingApprovalsModal(false)}
+          onSuccess={() => {
+            fetchInventoryData();
+            fetchPendingApprovalsCount();
+            fetchPendingTransfersCount();
+          }}
+        />
+      )}
+
+      {/* PENDING TRANSFERS MODAL (All roles that can do transactions) */}
+      <PendingTransfersModal
+        open={showPendingTransfersModal}
+        onClose={() => setShowPendingTransfersModal(false)}
+        onSuccess={() => {
+          fetchInventoryData();
+          fetchPendingTransfersCount();
+        }}
+      />
+
+      {/* TRANSACTION HISTORY MODAL */}
+      <TransactionHistoryModal
+        open={showTransactionHistoryModal}
+        onClose={() => setShowTransactionHistoryModal(false)}
+      />
     </section>
   );
 }

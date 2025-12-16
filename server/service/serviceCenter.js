@@ -7,8 +7,17 @@ const getAll = async (skip, take, filter, currentUser) => {
       throw new Error("Authentication required: User not found");
     }
     
-    if (!['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(currentUser.role)) {
-      throw new Error(`Unauthorized: Role '${currentUser.role}' is not authorized. Only MACSOFT_ADMIN, MACSOFT_HEAD, or MACSOFT_SUPPORT can access service centers list`);
+    if (
+      ![
+        "MACSOFT_ADMIN",
+        "MACSOFT_HEAD",
+        "MACSOFT_SUPPORT",
+        "SERVICE_CENTER_TECHNICIAN",
+      ].includes(currentUser.role)
+    ) {
+      throw new Error(
+        `Unauthorized: Role '${currentUser.role}' is not authorized. Only MACSOFT_ADMIN, MACSOFT_HEAD, or MACSOFT_SUPPORT can access service centers list`
+      );
     }
 
     // Parse pagination parameters
@@ -39,7 +48,7 @@ const getAll = async (skip, take, filter, currentUser) => {
           where.OR = [
             { name: { contains: searchTerm } },
             { centerCode: { contains: searchTerm } },
-            { projectCode: { contains: searchTerm } },
+            { orgCode: { contains: searchTerm } },
             { address: { contains: searchTerm } },
             { email: { contains: searchTerm } },
           ];
@@ -122,7 +131,7 @@ const createServiceCenter = async (data) => {
     // If orgCode is empty string, set it to null to avoid foreign key constraint
     const cleanData = {
       ...data,
-      projectCode: data.projectCode === '' ? null : data.projectCode
+      orgCode: data.orgCode === '' ? null : data.orgCode
     };
     
     const newServiceCenter = await prisma.serviceCenter.create({

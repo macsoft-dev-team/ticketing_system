@@ -4,50 +4,56 @@ import { Button } from './ui/button';
 import Input from './ui/input';
 import Select from './ui/select';
 import { Label } from './ui/label';
- import useProject from '../lib/hooks/useProject';
+ import useOrganisation from '../lib/hooks/useOrganisation';
 
 const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = null, mode = 'create' }) => {
-         const {projects, fetchProjects } = useProject();
+         const {organisations, getOrganisations } = useOrganisation();
     const [formData, setFormData] = useState({
         name: '',
-        projectCode: '',
+        orgCode: '',
         centerCode: '',
         email: '',
         address: '',
         serviceableStates: '',
         isActive: true,
+        isMacsoft: false,
+        isMacsoftHead: false,
     });
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Fetch projects for dropdown when modal opens
+    // Fetch organisations for dropdown when modal opens
     useEffect(() => {
         if (open) {
-            fetchProjects();
+            getOrganisations({ skip: 0, take: 1000 });
         }
-    }, [open, fetchProjects]);
+    }, [open, getOrganisations]);
 
     useEffect(() => {
         if (initialData) {
             setFormData({
                 name: initialData.name || '',
-                projectCode: initialData.projectCode || '',
+                orgCode: initialData.orgCode || '',
                 centerCode: initialData.centerCode || '',
                 email: initialData.email || '',
                 address: initialData.address || '',
                 serviceableStates: initialData.serviceableStates || '',
                 isActive: initialData.isActive !== undefined ? initialData.isActive : true,
+                isMacsoft: initialData.isMacsoft !== undefined ? initialData.isMacsoft : false,
+                isMacsoftHead: initialData.isMacsoftHead !== undefined ? initialData.isMacsoftHead : false,
             });
         } else {
             setFormData({
                 name: '',
-                projectCode: '',
+                orgCode: '',
                 centerCode: '',
                 email: '',
                 address: '',
                 serviceableStates: '',
                 isActive: true,
+                isMacsoft: false,
+                isMacsoftHead: false,
             });
         }
         setErrors({});
@@ -85,7 +91,7 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
             newErrors.email = 'Invalid email format';
         }
 
-        // projectCode is optional, no validation needed
+        // orgCode is optional, no validation needed
         // address is optional, no validation needed
 
         setErrors(newErrors);
@@ -110,14 +116,14 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
         }
     };
 
-    // Prepare project options for dropdown
-    const projectOptions = projects?.map(org => ({
-        label: `${org.name} (${org.projectCode})`,
-        value: org.projectCode
+    // Prepare organisation options for dropdown
+    const organisationOptions = organisations?.map(org => ({
+        label: `${org.name} (${org.orgCode})`,
+        value: org.orgCode
     })) || [];
 
-    // Add empty option for optional projectCode
-    projectOptions.unshift({ label: 'No Organization', value: '' });
+    // Add empty option for optional organisation
+    organisationOptions.unshift({ label: 'No Customer', value: '' });
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -168,24 +174,24 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
                             )}
                         </div>
 
-                        {/* Organization */}
+                        {/* Customer */}
                         <div className="space-y-2">
-                            <Label htmlFor="projectCode">
-                                Organization <span className="text-xs text-gray-500">(optional)</span>
+                            <Label htmlFor="orgCode">
+                                Customer <span className="text-xs text-gray-500">(optional)</span>
                             </Label>
                             <Select
-                                id="projectCode"
-                                name="projectCode"
-                                value={formData.projectCode}
+                                id="orgCode"
+                                name="orgCode"
+                                value={formData.orgCode}
                                 onChange={handleChange}
-                                options={projectOptions}
-                                placeholder="Select organization"
+                                options={organisationOptions}
+                                placeholder="Select Customer"
                                 disabled={isSubmitting}
                                 direction="down"
-                                className={errors.projectCode ? 'border-red-500' : ''}
+                                className={errors.orgCode ? 'border-red-500' : ''}
                             />
-                            {errors.projectCode && (
-                                <p className="text-red-500 text-xs mt-1">{errors.projectCode}</p>
+                            {errors.orgCode && (
+                                <p className="text-red-500 text-xs mt-1">{errors.orgCode}</p>
                             )}
                         </div>
 
@@ -251,7 +257,7 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
                         </div>
 
                         {/* Active Status */}
-                        <div className="space-y-2 md:col-span-2">
+                        <div className="space-y-2">
                             <div className="flex items-center space-x-2">
                                 <input
                                     type="checkbox"
@@ -270,6 +276,48 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
                                 Uncheck to deactivate this service center
                             </p>
                         </div>
+
+                        {/* MACSOFT Service Center */}
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="isMacsoft"
+                                    name="isMacsoft"
+                                    checked={formData.isMacsoft}
+                                    onChange={handleChange}
+                                    disabled={isSubmitting}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                />
+                                <Label htmlFor="isMacsoft" className="text-sm font-medium text-gray-700">
+                                    MACSOFT Head Service Center (HSC)
+                                </Label>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                                Check if this is a MACSOFT-operated head service center
+                            </p>
+                        </div>
+
+                        {/* MACSOFT Head Office Service Center */}
+                        <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    id="isMacsoftHead"
+                                    name="isMacsoftHead"
+                                    checked={formData.isMacsoftHead}
+                                    onChange={handleChange}
+                                    disabled={isSubmitting}
+                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                />
+                                <Label htmlFor="isMacsoftHead" className="text-sm font-medium text-gray-700">
+                                    MACSOFT Head Office
+                                </Label>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                                Check if this is the main MACSOFT head office
+                            </p>
+                        </div>
                     </div>
 
                     {/* Action Buttons */}
@@ -283,12 +331,14 @@ const ServiceCenterFormModal = ({ open, onOpenChange, onSubmit, initialData = nu
                                 // Reset form data
                                 setFormData({
                                     name: '',
-                                    projectCode: '',
+                                    orgCode: '',
                                     centerCode: '',
                                     email: '',
                                     address: '',
                                     serviceableStates: '',
                                     isActive: true,
+                                    isMacsoft: false,
+                                    isMacsoftHead: false,
                                 });
                                 setErrors({});
                                 setIsSubmitting(false);

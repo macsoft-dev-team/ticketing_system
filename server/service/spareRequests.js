@@ -70,7 +70,7 @@ async function createSpareRequest(data) {
           include: {
             product: {
               include: {
-                inventory: true,
+                inventories: true,
               },
             },
           },
@@ -197,7 +197,7 @@ async function updateSpareRequestStatus(id, data) {
           include: {
             product: {
               include: {
-                inventory: true,
+                inventories: true,
               },
             },
           },
@@ -220,7 +220,7 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
       include: {
         product: {
           include: {
-            inventory: true,
+            inventories: true,
           },
         },
         spareRequest: {
@@ -229,7 +229,7 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
               include: {
                 product: {
                   include: {
-                    inventory: true,
+                    inventories: true,
                   },
                 },
               },
@@ -253,7 +253,7 @@ async function updateSpareRequestItemStatus(itemId, status, updatedBy = null) {
       include: {
         product: {
           include: {
-            inventory: true,
+            inventories: true,
           },
         },
         spareRequest: true,
@@ -422,7 +422,7 @@ async function getAllSpareRequests(skip, take, filters) {
           include: {
             product: {
               include: {
-                inventory: true,
+                inventories: true,
               },
             },
           },
@@ -559,15 +559,11 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
       const spareItem = await tx.spareRequestItem.findUnique({
         where: { id: itemId },
         include: {
-          product: {
-            include: {
-              inventory: true,
-            },
-          },
+          product: true,
           spareRequest: {
             include: {
               createdByUser: {
-                select: { id: true, name: true, role: true }
+                select: { id: true, name: true, role: true, centerCode: true }
               }
             }
           }
@@ -582,34 +578,103 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         throw new Error('Spare request item is already approved');
       }
 
-      // Check inventory availability
-      const inventory = await tx.inventory.findUnique({
-        where: { productId: spareItem.productId }
+      // Get ticket to find destination center
+      const ticket = await tx.ticket.findUnique({
+        where: { ticketCode: spareItem.spareRequest.ticketCode },
+        select: { assignedServiceCenter: true }
       });
 
-      if (!inventory || inventory.quantity < spareItem.quantity) {
-        throw new Error(`Insufficient inventory. Available: ${inventory?.quantity || 0}, Required: ${spareItem.quantity}`);
+      // Determine centers
+      const toCenterCode = ticket?.assignedServiceCenter || spareItem.spareRequest.createdByUser?.centerCode;
+
+      if (!toCenterCode) {
+        throw new Error('Unable to determine destination service center');
       }
 
-      // Deduct inventory
+      // Check inventory availability - GOOD condition by default
+      const condition = 'GOOD';
+      const conditionField = 'goodQty';
+
+      // First, check if spare is available at the requesting service center
+      const centerInventory = await tx.inventory.findUnique({
+        where: {
+          centerCode_productId: {
+            centerCode: toCenterCode,
+            productId: spareItem.productId
+          }
+        }
+      });
+
+      const centerAvailableQty = centerInventory?.[conditionField] || 0;
+      
+      let fromCenterCode;
+      let inventory;
+      let availableQty;
+      let isLocalApproval = false;
+
+      // If available at requesting center, approve from there
+      if (centerAvailableQty >= spareItem.quantity) {
+        fromCenterCode = toCenterCode;
+        inventory = centerInventory;
+        availableQty = centerAvailableQty;
+        isLocalApproval = true;
+        console.log(`✅ Spare available at requesting center ${toCenterCode}. Approving from local inventory.`);
+      } else {
+        // Otherwise, check MACSOFT_MAIN
+        fromCenterCode = 'MACSOFT_MAIN';
+        inventory = await tx.inventory.findUnique({
+          where: {
+            centerCode_productId: {
+              centerCode: fromCenterCode,
+              productId: spareItem.productId
+            }
+          }
+        });
+        availableQty = inventory?.[conditionField] || 0;
+        console.log(`⚠️ Spare not available at ${toCenterCode}. Checking MACSOFT_MAIN inventory.`);
+      }
+
+      if (availableQty < spareItem.quantity) {
+        throw new Error(`Insufficient ${condition} inventory. Available at ${fromCenterCode}: ${availableQty}, Required: ${spareItem.quantity}`);
+      }
+
+      // Deduct inventory from source center
       await tx.inventory.update({
-        where: { productId: spareItem.productId },
+        where: { id: inventory.id },
         data: {
-          quantity: {
+          [conditionField]: {
             decrement: spareItem.quantity
           }
         }
       });
 
-      // Create product transaction record
-      await tx.productTransaction.create({
+      // Create ProductTransaction for DELIVERY or TICKET_ISSUE with items
+      // If local approval (same center), mark as TICKET_ISSUE instead of DELIVERY
+      const transactionType = isLocalApproval ? 'TICKET_ISSUE' : 'DELIVERY';
+      const transactionRemarks = isLocalApproval 
+        ? `Spare request approved from local inventory by ${approverName} (${approverRole}) - Item already available at ${fromCenterCode} - Ticket: ${spareItem.spareRequest.ticketCode} - Product: ${spareItem.product.productCode} - Spare Request Item ID: ${itemId}`
+        : `Spare request approved by ${approverName} (${approverRole}) - Delivery from ${fromCenterCode} to ${toCenterCode} - Ticket: ${spareItem.spareRequest.ticketCode} - Product: ${spareItem.product.productCode} - Spare Request Item ID: ${itemId}`;
+
+      const transaction = await tx.productTransaction.create({
         data: {
-          productId: spareItem.productId,
-          type: 'DELIVERY',
-          quantity: spareItem.quantity,
-          ticketId: null, // Can be linked to ticket if needed
-          notes: `Spare request approved - Item ID: ${itemId}`,
-          createdBy: approvedBy
+          transactionType: transactionType,
+          status: 'COMPLETED',
+          centerCode: fromCenterCode,
+          fromCenterCode: fromCenterCode,
+          toCenterCode: isLocalApproval ? fromCenterCode : toCenterCode,
+          remarks: transactionRemarks,
+          createdBy: approvedBy,
+          deliveryDate: new Date(),
+          items: {
+            create: {
+              productId: spareItem.productId,
+              condition: condition,
+              quantity: spareItem.quantity
+            }
+          }
+        },
+        include: {
+          items: true
         }
       });
 
@@ -623,7 +688,7 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         include: {
           product: {
             include: {
-              inventory: true,
+              inventories: true,
             },
           },
           spareRequest: {
@@ -753,7 +818,7 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
       const notification = await tx.notification.create({
         data: {
           title: 'Spare Request Approved',
-          description: `Your spare request for ${spareItem.product.name} (Qty: ${spareItem.quantity}) has been approved by ${approverName} (${approverRole})`,
+          description: `Your spare request for ${spareItem.product.name} (Qty: ${spareItem.quantity}) has been approved by ${approverName} (${approverRole}). Item will be delivered to ${toCenterCode}.`,
           type: 'SPARE_APPROVED',
           createdById: approvedBy,
           recipients: {
@@ -765,9 +830,10 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         }
       });
 
-      return { updatedItem, notification, milestoneTransitionResult };
+      return { updatedItem, notification, milestoneTransitionResult, transaction };
     });
 
+    console.log(`✅ Spare request item ${itemId} approved. Inventory deducted from ${result.transaction.fromCenterCode}, Transaction ID: ${result.transaction.id}`);
     return result;
   } catch (error) {
     console.error('❌ Error approving spare request item:', error);
@@ -787,7 +853,7 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
         include: {
           product: {
             include: {
-              inventory: true,
+              inventories: true,
             },
           },
           spareRequest: {
@@ -822,7 +888,7 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
         include: {
           product: {
             include: {
-              inventory: true,
+              inventories: true,
             },
           },
           spareRequest: {
@@ -1013,7 +1079,8 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
             select: {
               id: true,
               name: true,
-              role: true
+              role: true,
+              centerCode: true
             }
           }
         },
@@ -1028,10 +1095,46 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
       })
     ]);
 
+    // Get all unique ticket codes to fetch ticket details
+    const ticketCodes = [...new Set(spareRequests.map(req => req.ticketCode))];
+    const tickets = await prisma.ticket.findMany({
+      where: {
+        ticketCode: {
+          in: ticketCodes
+        }
+      },
+      select: {
+        ticketCode: true,
+        assignedServiceCenter: true
+      }
+    });
+
+    // Create a map for quick ticket lookup
+    const ticketMap = new Map(tickets.map(t => [t.ticketCode, t]));
+
     // Flatten the result to show individual items for approval
     const approvalItems = [];
     spareRequests.forEach(request => {
+      const ticket = ticketMap.get(request.ticketCode);
+      const requestingCenter = ticket?.assignedServiceCenter || request.createdByUser.centerCode;
+
       request.spareItems.forEach(item => {
+        // Find inventory at MACSOFT_MAIN (central warehouse)
+        const macsoftInventory = item.product.inventories?.find(
+          inv => inv.centerCode === 'MACSOFT_MAIN'
+        );
+        
+        // Find inventory at requesting service center
+        const centerInventory = requestingCenter ? item.product.inventories?.find(
+          inv => inv.centerCode === requestingCenter
+        ) : null;
+        
+        // Available quantity from MACSOFT_MAIN (where spares are approved from)
+        const macsoftQty = macsoftInventory?.goodQty || 0;
+        
+        // Available quantity at requesting center (for reference)
+        const centerQty = centerInventory?.goodQty || 0;
+        
         approvalItems.push({
           itemId: item.id,
           requestId: request.id,
@@ -1040,12 +1143,14 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
           productName: item.product.name,
           productCode: item.product.productCode,
           requestedQuantity: item.quantity,
-          availableQuantity: item.product.inventory?.quantity || 0,
+          availableQuantity: macsoftQty,
+          centerAvailableQuantity: centerQty,
+          requestingCenter: requestingCenter,
           status: item.status,
           requestedBy: request.createdByUser.name,
           requestedByRole: request.createdByUser.role,
           requestedDate: request.createdAt,
-          canApprove: (item.product.inventory?.quantity || 0) >= item.quantity
+          canApprove: macsoftQty >= item.quantity || centerQty >= item.quantity
         });
       });
     });

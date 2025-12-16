@@ -71,14 +71,14 @@ const ImageViewerComponent = ({
                                 <>
                                     <Button
                                         onClick={prevImage}
-                                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white"
+                                        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/25 hover:bg-opacity-70 text-white"
                                         size="small"
                                     >
                                         ‹
                                     </Button>
                                     <Button
                                         onClick={nextImage}
-                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white"
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/25 hover:bg-opacity-70 text-white"
                                         size="small"
                                     >
                                         ›

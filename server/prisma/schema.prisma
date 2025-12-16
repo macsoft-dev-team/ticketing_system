@@ -68,13 +68,23 @@ enum Category {
 }
 
 enum TransactionType {
-  RECEIPT // Stock inward
-  DELIVERY // Stock outward
-  TICKET_ISSUE // Issued for service ticket
-  RETURN // Returned from field
-  TRANSFER_IN
-  TRANSFER_OUT
+  RECEIPT
+  DELIVERY
+  TICKET_ISSUE
+  RETURN
+  TRANSFER
   ADJUSTMENT
+  REPLACEMENT
+}
+
+enum TransactionStatus {
+  PENDING_APPROVAL // Transfer requested by SSC, waiting for MACSOFT approval
+  APPROVED // Approved by MACSOFT, inventory deducted
+  REJECTED // Rejected by MACSOFT
+  PENDING // Transfer dispatched, waiting to be received
+  RECEIVED
+  COMPLETED
+  CANCELLED
 }
 
 enum InventoryCondition {
@@ -107,18 +117,19 @@ model district {
 }
 
 model Organisation {
-  id        Int       @id @default(autoincrement())
-  name      String
-  orgCode   String    @unique
-  email     String    @unique
-  phone     String    @unique
-  address   String?
-  isActive  Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime? @map("deleted_at")
-  project   Project[]
-  users     User[]
+  id             Int             @id @default(autoincrement())
+  name           String
+  orgCode        String          @unique
+  email          String          @unique
+  phone          String          @unique
+  address        String?
+  isActive       Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime?       @updatedAt
+  deletedAt      DateTime?       @map("deleted_at")
+  project        Project[]
+  users          User[]
+  serviceCenters ServiceCenter[]
 }
 
 model Project {
@@ -132,7 +143,6 @@ model Project {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime?       @updatedAt
   deletedAt      DateTime?       @map("deleted_at")
-  ServiceCenter  ServiceCenter[]
   state          State?          @relation("StateProjects", fields: [stateId], references: [id])
   organisation   Organisation?   @relation(fields: [organisationId], references: [id])
   organisationId Int?
@@ -142,17 +152,21 @@ model Project {
 model ServiceCenter {
   id                Int                  @id @default(autoincrement())
   name              String
-  projectCode       String?
+  orgCode           String?
   centerCode        String               @unique
   email             String               @unique
   address           String?
   isActive          Boolean              @default(false)
+  isMacsoft         Boolean              @default(false) // True for MACSOFT head service center
+  isMacsoftHead     Boolean              @default(false) // True for MACSOFT head office service center
   serviceableStates String? // Comma-separated list of states this center serves
   users             User[]
-  project           Project?             @relation(fields: [projectCode], references: [projectCode])
+  organisation      Organisation?        @relation(fields: [orgCode], references: [orgCode])
   assignedTickets   Ticket[]             @relation("TicketforServiceCenter") // Tickets assigned to this service center
   inventories       Inventory[] // 👈 relation via centerCode
   transactions      ProductTransaction[]
+  transfersFrom     ProductTransaction[] @relation("TransferFrom")
+  transfersTo       ProductTransaction[] @relation("TransferTo")
   createdAt         DateTime             @default(now())
   updatedAt         DateTime?            @updatedAt
   deletedAt         DateTime?            @map("deleted_at")
@@ -181,6 +195,7 @@ model User {
   spareRequestsCreated   spareRequest[]          @relation("SpareRequestCreated")
   spareRequestsUpdated   spareRequest[]          @relation("SpareRequestUpdated")
   productTransactions    ProductTransaction[]    @relation("ProductTransactionCreated")
+  approvedTransactions   ProductTransaction[]    @relation("ProductTransactionApproved")
   TicketMilestone        TicketMilestone[]
   State                  State?                  @relation("PrimaryState", fields: [stateId], references: [id])
   stateId                Int?
@@ -341,43 +356,64 @@ model Product {
 }
 
 model ProductTransaction {
-  id              Int             @id @default(autoincrement())
+  id              Int               @id @default(autoincrement())
   transactionType TransactionType
-  centerCode      String
+  status          TransactionStatus @default(PENDING)
+
+  // Center information
+  centerCode     String // Current center (for backwards compatibility)
+  fromCenterCode String? // Source center (for TRANSFER)
+  toCenterCode   String? // Destination center (for TRANSFER)
+
+  // Approval workflow (for SSC transfer requests)
+  approvedBy     Int? // MACSOFT admin who approved
+  approvedAt     DateTime? // When approved/rejected
+  rejectionReason String?  @db.Text // If rejected, reason from approver
 
   invoiceNo    String?
   billNo       String?
   receiptDate  DateTime?
   deliveryDate DateTime?
+  receivedAt   DateTime? // When TRANSFER was received
 
   ticketId  Int?
-  remarks   String?
+  remarks   String?  @db.Text
   createdBy Int
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   serviceCenter ServiceCenter            @relation(fields: [centerCode], references: [centerCode])
+  fromCenter    ServiceCenter?           @relation("TransferFrom", fields: [fromCenterCode], references: [centerCode])
+  toCenter      ServiceCenter?           @relation("TransferTo", fields: [toCenterCode], references: [centerCode])
   ticket        Ticket?                  @relation(fields: [ticketId], references: [id])
   items         ProductTransactionItem[]
   createdByUser User                     @relation("ProductTransactionCreated", fields: [createdBy], references: [id])
+  approverUser  User?                    @relation("ProductTransactionApproved", fields: [approvedBy], references: [id])
   Product       Product?                 @relation(fields: [productId], references: [id])
   productId     Int?
 
   @@index([centerCode])
+  @@index([fromCenterCode])
+  @@index([toCenterCode])
+  @@index([status])
+  @@index([transactionType])
 }
 
 model ProductTransactionItem {
   id            Int                @id @default(autoincrement())
   transactionId Int
-  productId     Int
+  productId     Int? // Optional for unknown products in RETURN
+  productName   String? // For unknown products
   condition     InventoryCondition
   quantity      Int // always positive
 
   // Relations
   transaction ProductTransaction @relation(fields: [transactionId], references: [id])
-  product     Product            @relation(fields: [productId], references: [id])
+  product     Product?           @relation(fields: [productId], references: [id])
 
   @@index([productId])
+  @@index([transactionId])
 }
 
 model Inventory {
