@@ -8,8 +8,6 @@ async function createSpareRequest(req, res) {
       ticketCode,
       spareItems,
       requestReason,
-      urgencyLevel,
-      expectedDelivery,
       additionalNotes,
     } = req.body;
 
@@ -51,8 +49,6 @@ async function createSpareRequest(req, res) {
       userRole: userRole,
       spareItems,
       requestReason,
-      urgencyLevel,
-      expectedDelivery,
       additionalNotes,
       io: req.io, // Pass socket.io instance
     });

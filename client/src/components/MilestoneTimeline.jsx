@@ -984,8 +984,6 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 ticketCode: ticketData.ticketCode,
                 spareItems,
                 requestReason: formData.requestReason || 'Spare parts required',
-                urgencyLevel: formData.urgencyLevel?.toUpperCase() || 'MEDIUM',
-                expectedDelivery: formData.expectedDelivery,
                 additionalNotes: formData.additionalNotes
             };
             // Submit spare request to API

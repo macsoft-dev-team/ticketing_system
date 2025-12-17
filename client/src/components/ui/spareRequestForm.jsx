@@ -15,8 +15,6 @@ import useProduct from '../../lib/hooks/useProducts';
 // Validation Schema for Spare Request
 const spareRequestSchema = yup.object({
   requestReason: yup.string().required('Request reason is required'),
-  urgencyLevel: yup.string().required('Urgency level is required'),
-  expectedDelivery: yup.string(),
   products: yup.array().of(
     yup.object({
       productId: yup.string().required('Product is required'),
@@ -212,8 +210,6 @@ export const SpareRequestForm = ({ onSubmit, onCancel, isLoading = false }) => {
     resolver: yupResolver(spareRequestSchema),
     defaultValues: {
       requestReason: '',
-      urgencyLevel: 'medium',
-      expectedDelivery: '',
       products: [],
       additionalNotes: ''
     }
@@ -293,49 +289,7 @@ export const SpareRequestForm = ({ onSubmit, onCancel, isLoading = false }) => {
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4 sm:space-y-6">
  
         
-        {/* Basic Request Information */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Urgency Level *
-            </label>
-            <Controller
-              name="urgencyLevel"
-              control={control}
-              render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="low">Low - Can wait a week</option>
-                  <option value="medium">Medium - Needed within 3-5 days</option>
-                  <option value="high">High - Needed within 1-2 days</option>
-                  <option value="critical">Critical - Needed immediately</option>
-                </select>
-              )}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Expected Delivery Date
-            </label>
-            <Controller
-              name="expectedDelivery"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="date"
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              )}
-            />
-            {errors.expectedDelivery && (
-              <p className="mt-1 text-sm text-red-600">{errors.expectedDelivery.message}</p>
-            )}
-          </div>
-        </div>
+        {/* Basic Request Information - Fields removed as per requirements */}
 
         {/* Product Selection */}
         <div>

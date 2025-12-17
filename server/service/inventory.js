@@ -265,7 +265,10 @@ async function checkStockAvailability(items) {
     };
 
     const stockChecks = await Promise.all(
-      items.map(async (item) => {
+      items.map(async (item, idx) => {
+        if (!item.centerCode || !item.productId) {
+          throw new Error(`Missing centerCode or productId for item at index ${idx}. Received: centerCode='${item.centerCode}', productId='${item.productId}'`);
+        }
         const inventory = await prisma.inventory.findUnique({
           where: {
             centerCode_productId: {

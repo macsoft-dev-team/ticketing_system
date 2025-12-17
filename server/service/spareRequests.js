@@ -11,11 +11,19 @@ async function createSpareRequest(data) {
       userRole,
       spareItems,
       requestReason,
-      urgencyLevel,
-      expectedDelivery,
       additionalNotes,
       io,
     } = data;
+
+    // Get user details to determine their role and service center
+    const user = await prisma.user.findUnique({
+      where: { id: createdBy },
+      select: { centerCode: true, role: true, name: true }
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
 
     // Validate ticket exists
     const ticket = await prisma.ticket.findUnique({
@@ -29,6 +37,24 @@ async function createSpareRequest(data) {
       throw new Error(`Ticket ${ticketCode} not found`);
     }
 
+    // Determine which service center to check inventory for
+    let checkCenterCode;
+    const macsoftRoles = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'];
+    
+    if (macsoftRoles.includes(user.role)) {
+      // For MACSOFT roles, check the service center assigned to the ticket
+      if (!ticket.assignedServiceCenter) {
+        throw new Error("Ticket is not assigned to any service center");
+      }
+      checkCenterCode = ticket.assignedServiceCenter;
+    } else {
+      // For service center roles, use their own center code
+      if (!user.centerCode) {
+        throw new Error("User not assigned to a service center");
+      }
+      checkCenterCode = user.centerCode;
+    }
+
     // Validate all products exist
     const productIds = spareItems.map((item) => item.productId);
     const products = await prisma.product.findMany({
@@ -38,24 +64,34 @@ async function createSpareRequest(data) {
     if (products.length !== productIds.length) {
       throw new Error("One or more products not found");
     }
-     const stockCheck = await inventoryService.checkStockAvailability(spareItems);
+
+    // Check inventory at the appropriate service center
+    const itemsWithCenterCode = spareItems.map(item => ({
+      ...item,
+      centerCode: checkCenterCode
+    }));
     
-    if (!stockCheck.allAvailable) {
+    const stockCheck = await inventoryService.checkStockAvailability(itemsWithCenterCode);
+    
+    if (stockCheck.allAvailable) {
+      // Service center already has the required items in stock
+      console.log(`ℹ️ All items available at center ${checkCenterCode}. Spare request still created for approval workflow.`);
+    } else {
       const insufficientItems = stockCheck.insufficientItems.map(item => 
-        `${item.product?.name || `Product ${item.productId}`}: Required ${item.requestedQuantity}, Available ${item.availableQuantity}`
+        `${item.product?.name || `Product ${item.productId}`}: Required ${item.requestedQuantity}, Available at ${checkCenterCode}: ${item.availableQuantity}`
       );
       
-      console.warn(`⚠️ Insufficient inventory for spare request:`, insufficientItems);
+      console.warn(`⚠️ Service center ${checkCenterCode} has insufficient inventory:`, insufficientItems);
       
-      // Create the spare request even with insufficient stock, but add a note
-      // This allows for back-ordering and tracking of requirements
+      // Create the spare request as items are not available locally
+      // This will trigger the approval workflow to get items from MACSOFT_MAIN
     }
 
     // Create spare request with items in a transaction
     const spareRequest = await prisma.spareRequest.create({
       data: {
         ticketCode,
-        status: urgencyLevel === "CRITICAL" ? "URGENT" : "PENDING",
+        status: "PENDING",
         createdBy,
         spareItems: {
           create: spareItems.map((item) => ({

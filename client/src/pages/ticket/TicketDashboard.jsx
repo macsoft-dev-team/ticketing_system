@@ -432,8 +432,6 @@ export default function TicketDashboard() {
         ticketCode: ticketData.ticketCode,
         spareItems,
         requestReason: formData.requestReason || 'Spare parts required',
-        urgencyLevel: formData.urgencyLevel || 'NORMAL',
-        expectedDelivery: formData.expectedDelivery,
         additionalNotes: formData.additionalNotes
       };
       const baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
