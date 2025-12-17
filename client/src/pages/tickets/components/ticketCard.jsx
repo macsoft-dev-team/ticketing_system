@@ -547,9 +547,20 @@ export default function TicketCard({
                     <div className="flex items-center gap-2">
                         <motion.span
                             whileHover={{ scale: 1.05 }}
-                            className="text-xs text-nowrap font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded"
+                            className="text-xs text-nowrap font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded flex flex-col items-center gap-0"
                         >
-                            {localTicket.ticketCode || localTicket.id}
+                            {/* Show ticket code with large number part below prefix */}
+                            {(() => {
+                                const code = localTicket.ticketCode || localTicket.id;
+                                const match = code.match(/^(TKT-\d{4})-(\d+)$/);
+                                if (match) {
+                                    return <>
+                                        <span>{match[1]}</span>
+                                        <span className="text-[0.96rem] font-bold text-emerald-800">{match[2]}</span>
+                                    </>;
+                                }
+                                return code;
+                            })()}
                         </motion.span>
                         <motion.div
                             initial={{ scale: 0 }}
