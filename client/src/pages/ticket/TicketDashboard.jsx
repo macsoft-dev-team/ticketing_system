@@ -799,9 +799,9 @@ export default function TicketDashboard() {
         
         result.data.forEach(request => {
           request.spareItems.forEach(item => {
-            // Find MACSOFT_MAIN inventory for this product
+            // Find MHSEC inventory for this product
             const macsoftInventory = item.product.inventories?.find(
-              inv => inv.centerCode === 'MACSOFT_MAIN'
+              inv => inv.centerCode === 'MHSEC'
             );
             
             // Find inventory at requesting service center

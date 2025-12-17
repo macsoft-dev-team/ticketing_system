@@ -79,6 +79,7 @@ const NOTIFICATION_TYPES = {
   TICKET_CLOSED: "ticket_closed",
   TICKET_REOPENED: "ticket_reopened",
   TICKET_ASSIGNED: "ticket_assigned",
+  TICKET_DIAGNOSIS_READY: "ticket_diagnosis_ready",
 
   // Message/Conversation operations
   MESSAGE_RECEIVED: "message_received",
@@ -144,6 +145,7 @@ const createTicketNotification = (
     closed: `Ticket ${ticket.ticketCode} has been closed`,
     reopened: `Ticket ${ticket.ticketCode} has been reopened`,
     assigned: `Ticket ${ticket.ticketCode} has been assigned to you`,
+    diagnosis_ready: `Ticket ${ticket.ticketCode} is ready for repair/replacement decision at service center ${additionalData.serviceCenter || 'Unknown'}. Controller: ${ticket.controllerNo || 'N/A'}`,
   };
 
   const titles = {
@@ -152,11 +154,19 @@ const createTicketNotification = (
     closed: "✅ Ticket Closed",
     reopened: "🔄 Ticket Reopened",
     assigned: "📋 Ticket Assigned",
+    diagnosis_ready: "🔧 Ready for Diagnosis",
   };
 
+  // Map diagnosis_ready to the correct notification type
+  let notificationType;
+  if (action === 'diagnosis_ready') {
+    notificationType = NOTIFICATION_TYPES.TICKET_DIAGNOSIS_READY;
+  } else {
+    notificationType = NOTIFICATION_TYPES[`TICKET_${action.toUpperCase()}`] || NOTIFICATION_TYPES.TICKET_UPDATED;
+  }
+
   return createNotification(
-    NOTIFICATION_TYPES[`TICKET_${action.toUpperCase()}`] ||
-      NOTIFICATION_TYPES.TICKET_UPDATED,
+    notificationType,
     titles[action] ||
       `Ticket ${action.charAt(0).toUpperCase() + action.slice(1)}`,
     actions[action] || `Ticket ${ticket.ticketCode} has been ${action}`,

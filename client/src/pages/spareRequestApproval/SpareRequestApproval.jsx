@@ -336,6 +336,16 @@ export default function SpareRequestApproval() {
 
   const getStockStatus = (requested, macsoftAvailable, centerAvailable) => {
     const totalAvailable = Math.max(macsoftAvailable, centerAvailable || 0);
+    
+    // Debug logging for stock status calculation
+    console.log(`🔍 Stock Status Debug:`, {
+      requested,
+      macsoftAvailable,
+      centerAvailable,
+      totalAvailable,
+      sufficient: totalAvailable >= requested
+    });
+    
     if (totalAvailable >= requested) {
       return { status: 'sufficient', color: 'text-green-600 bg-green-50', icon: CheckCircle };
     } else {

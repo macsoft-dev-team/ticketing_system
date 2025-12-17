@@ -511,6 +511,17 @@ const checkActiveTicketForController = async (controllerNo) => {
   }
 };
 
+/**
+ * Create a new ticket with role-based workflow
+ * 
+ * For SERVICE_CENTER_TECHNICIAN:
+ * - Auto-assigns their service center to the ticket
+ * - Auto-progresses through milestones up to DIAGNOSIS_IN_PROGRESS 
+ * - Creates notification for repair/replacement decision
+ * 
+ * For other roles:
+ * - Standard ticket creation workflow
+ */
 const createTicket = async (ticket, userId, io, attachments = []) => {
   const {
     description,
@@ -536,6 +547,27 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     // Optional custom suffix
   } = ticket;  
   try {
+    // Fetch user information to determine role-based logic
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        centerCode: true,
+        serviceCenter: {
+          select: {
+            id: true,
+            centerCode: true,
+            name: true
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     // Validate controller number - check for active tickets
     if (controllerNo) {
       const controllerCheck = await checkActiveTicketForController(controllerNo);
@@ -552,7 +584,13 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     const ticketCode = await generateTicketCode(
       ticketCodePrefix,
       ticketCodeSuffix
-    ); 
+    );
+
+    // For SERVICE_CENTER_TECHNICIAN, auto-assign their service center
+    let assignedServiceCenter = null;
+    if (user.role === 'SERVICE_CENTER_TECHNICIAN' && user.centerCode) {
+      assignedServiceCenter = user.centerCode;
+    } 
     // Process attachments - move from temp folder to ticket folder
     let processedAttachments = [];
     if (attachments && attachments.length > 0) {
@@ -605,6 +643,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         complaintType: complaintType || category,
         faultCode: faultCode,
         createdBy: userId,
+        assignedServiceCenter: assignedServiceCenter,
         farmerName: farmerName,
         cableLength: cableLength,
         pumpPlacementDepth: pumpPlacementDepth,
@@ -630,20 +669,63 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
 
 
     // Create initial milestones for the ticket
-    const milestonesData = {
-      stage: "TICKET_RAISED", // Updated to use new stage name
-      order: 0,
-      notes: "Ticket has been raised and awaiting service center assignment.",
-      status: "IN_PROGRESS",
-      startedAt: new Date(),
-      eta: null,
-      slaDueAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-      photoRequired: false,
-    };
+    if (user.role === 'SERVICE_CENTER_TECHNICIAN') {
+      // For SERVICE_CENTER_TECHNICIAN, create milestones up to RECEIVED_AT_SERVICE_CENTER
+      const milestoneStages = [
+        {
+          stage: "TICKET_RAISED",
+          order: 0,
+          notes: "Ticket raised by service center technician.",
+          status: "DONE",
+          startedAt: new Date(),
+          completedAt: new Date(),
+        },
+        {
+          stage: "SERVICE_CENTER_ASSIGNED",
+          order: 1,
+          notes: `Auto-assigned to service center: ${user.serviceCenter?.name || user.centerCode}`,
+          status: "DONE",
+          startedAt: new Date(),
+          completedAt: new Date(),
+        },
+        {
+          stage: "RECEIVED_AT_SERVICE_CENTER",
+          order: 5,
+          notes: "Controller received at service center by technician. Please upload 4 required photos: Controller Front, Controller Bottom, Full View Open, MCB Close Up.",
+          status: "IN_PROGRESS",
+          startedAt: new Date(),
+          eta: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days ETA
+          slaDueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days SLA
+          photoRequired: true,
+        }
+      ];
 
-    milestonesData.ticketId = newTicket.id;
-    milestonesData.changedBy = userId;
-    await createMilestone(milestonesData);
+      // Create all milestones in sequence
+      for (const milestoneData of milestoneStages) {
+        await createMilestone({
+          ...milestoneData,
+          ticketId: newTicket.id,
+          changedBy: userId,
+          photoRequired: milestoneData.photoRequired || false,
+        });
+      }
+    } else {
+      // Standard milestone creation for other roles
+      const milestonesData = {
+        stage: "TICKET_RAISED",
+        order: 0,
+        notes: "Ticket has been raised and awaiting service center assignment.",
+        status: "IN_PROGRESS",
+        startedAt: new Date(),
+        eta: null,
+        slaDueAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        photoRequired: false,
+        ticketId: newTicket.id,
+        changedBy: userId,
+      };
+      
+      await createMilestone(milestonesData);
+    }
 
     // Create initial message with ticket description
     const conversation = await prisma.message.create({
@@ -711,34 +793,81 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     });
 
     // Create and broadcast ticket creation notification
-    const notificationData = createTicketNotification(
-      "created",
-      completeTicket,
-      userId,
-      {
-        messageId: conversation.id,
-        priority: completeTicket.priority,
-        customerName: completeTicket.customerName,
-        description: completeTicket.description,
-      }
-    ); 
+    let notificationData;
+    let targetUserIds = [];
 
-    // Get target users (ADMIN, HEAD, and SUPPORT roles)
-    const targetUsers = await prisma.user.findMany({
-      where: {
-        AND: [
-          { id: { not: userId } },
-          {
-            role: {
-              in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
+    if (user.role === 'SERVICE_CENTER_TECHNICIAN') {
+      // For SERVICE_CENTER_TECHNICIAN, create notification about diagnosis ready
+      notificationData = createTicketNotification(
+        "diagnosis_ready",
+        completeTicket,
+        userId,
+        {
+          messageId: conversation.id,
+          priority: completeTicket.priority,
+          customerName: completeTicket.customerName,
+          description: completeTicket.description,
+          serviceCenter: user.serviceCenter?.name || user.centerCode,
+        }
+      );
+
+      // Target other technicians in the same service center and management roles
+      const targetUsers = await prisma.user.findMany({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            {
+              OR: [
+                {
+                  role: {
+                    in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
+                  },
+                },
+                {
+                  AND: [
+                    { centerCode: user.centerCode },
+                    { role: { in: ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"] } }
+                  ]
+                }
+              ]
             },
-          },
-        ],
-      },
-      select: { id: true, name: true, role: true },
-    });
+          ],
+        },
+        select: { id: true, name: true, role: true },
+      });
 
-    const targetUserIds = targetUsers.map((user) => user.id);
+      targetUserIds = targetUsers.map((u) => u.id);
+    } else {
+      // Standard notification for other roles
+      notificationData = createTicketNotification(
+        "created",
+        completeTicket,
+        userId,
+        {
+          messageId: conversation.id,
+          priority: completeTicket.priority,
+          customerName: completeTicket.customerName,
+          description: completeTicket.description,
+        }
+      );
+
+      // Get target users (ADMIN, HEAD, and SUPPORT roles)
+      const targetUsers = await prisma.user.findMany({
+        where: {
+          AND: [
+            { id: { not: userId } },
+            {
+              role: {
+                in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
+              },
+            },
+          ],
+        },
+        select: { id: true, name: true, role: true },
+      });
+
+      targetUserIds = targetUsers.map((u) => u.id);
+    }
  
     // Save and broadcast notification
     await saveAndBroadcastNotification(

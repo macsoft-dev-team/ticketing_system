@@ -84,7 +84,7 @@ async function createSpareRequest(data) {
       console.warn(`⚠️ Service center ${checkCenterCode} has insufficient inventory:`, insufficientItems);
       
       // Create the spare request as items are not available locally
-      // This will trigger the approval workflow to get items from MACSOFT_MAIN
+      // This will trigger the approval workflow to get items from MHSEC
     }
 
     // Create spare request with items in a transaction
@@ -656,8 +656,8 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         isLocalApproval = true;
         console.log(`✅ Spare available at requesting center ${toCenterCode}. Approving from local inventory.`);
       } else {
-        // Otherwise, check MACSOFT_MAIN
-        fromCenterCode = 'MACSOFT_MAIN';
+        // Otherwise, check MHSEC (MACSOFT HEAD SERVICE CENTER)
+        fromCenterCode = 'MHSEC';
         inventory = await tx.inventory.findUnique({
           where: {
             centerCode_productId: {
@@ -667,7 +667,7 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
           }
         });
         availableQty = inventory?.[conditionField] || 0;
-        console.log(`⚠️ Spare not available at ${toCenterCode}. Checking MACSOFT_MAIN inventory.`);
+        console.log(`⚠️ Spare not available at ${toCenterCode}. Checking MHSEC inventory.`);
       }
 
       if (availableQty < spareItem.quantity) {
@@ -1155,9 +1155,9 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
       const requestingCenter = ticket?.assignedServiceCenter || request.createdByUser.centerCode;
 
       request.spareItems.forEach(item => {
-        // Find inventory at MACSOFT_MAIN (central warehouse)
+        // Find inventory at MACSOFT HEAD SERVICE CENTER (central warehouse)
         const macsoftInventory = item.product.inventories?.find(
-          inv => inv.centerCode === 'MACSOFT_MAIN'
+          inv => inv.centerCode === 'MHSEC'
         );
         
         // Find inventory at requesting service center
@@ -1165,13 +1165,25 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
           inv => inv.centerCode === requestingCenter
         ) : null;
         
-        // Available quantity from MACSOFT_MAIN (where spares are approved from)
+        // Available quantity from MHSEC (where spares are approved from)
         const macsoftQty = macsoftInventory?.goodQty || 0;
         
         // Available quantity at requesting center (for reference)
         const centerQty = centerInventory?.goodQty || 0;
         
-        approvalItems.push({
+        // Debug logging to identify inventory issues
+        console.log(`🔍 DEBUG - Product: ${item.product.name} (${item.product.productCode})`);
+        console.log(`   All inventories:`, item.product.inventories?.map(inv => ({ 
+          centerCode: inv.centerCode, 
+          goodQty: inv.goodQty, 
+          repairableQty: inv.repairableQty,
+          damagedQty: inv.damagedQty,
+          scrapQty: inv.scrapQty 
+        })));
+        console.log(`   MHSEC qty: ${macsoftQty}, ${requestingCenter} qty: ${centerQty}`);
+        console.log(`   Requested: ${item.quantity}, Can approve: ${macsoftQty >= item.quantity || centerQty >= item.quantity}`);
+        
+        const approvalItem = {
           itemId: item.id,
           requestId: request.id,
           ticketCode: request.ticketCode,
@@ -1187,7 +1199,17 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
           requestedByRole: request.createdByUser.role,
           requestedDate: request.createdAt,
           canApprove: macsoftQty >= item.quantity || centerQty >= item.quantity
+        };
+        
+        console.log(`📋 Approval item created:`, {
+          productName: approvalItem.productName,
+          requested: approvalItem.requestedQuantity,
+          macsoftAvailable: approvalItem.availableQuantity,
+          centerAvailable: approvalItem.centerAvailableQuantity,
+          canApprove: approvalItem.canApprove
         });
+        
+        approvalItems.push(approvalItem);
       });
     });
 
