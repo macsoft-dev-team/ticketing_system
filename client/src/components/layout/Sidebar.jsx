@@ -65,7 +65,7 @@ const Sidebar = () => {
 
   if (sidebarCollapsed)
   return (
-    <div className="w-64 relative h-full bg-white shadow-lg lg:shadow-sm border-r border-gray-200  n">
+    <div className="w-64 fixed z-50 h-full bg-white shadow-lg lg:shadow-sm border-r border-gray-200  n">
       <div className="p-6 lg:px-6 lg:py-2">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center">

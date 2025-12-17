@@ -57,7 +57,9 @@ export default function Projects() {
         updateProject,
         deleteProject,
         uploadProjects,
-        setFilters
+        setFilters,
+        currentPage,
+        totalPages
     } = useProject();
 
     useEffect(() => {
@@ -217,6 +219,11 @@ export default function Projects() {
                         onAdd={handleCreate}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                           currentPage={currentPage}
+                        totalPages={totalPages}
+                         onPageChange={(page) => {
+                            getProjects({ skip: page, take: 10, filter: filter });
+                        }}
                     />
                 )}
             </div>

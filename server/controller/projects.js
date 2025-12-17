@@ -26,7 +26,7 @@ const getAllProjects = async (req, res) => {
     res.status(200).json({
       projects: _transformedProjects,
       totalPages: Math.ceil(count / takeNum),
-      currentPage: Math.floor(skipNum / takeNum) + 1,
+      currentPage: parseInt(skip) || 1,
       total: count,
       skip: skipNum,
       take: takeNum,
