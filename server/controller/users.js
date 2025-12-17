@@ -20,7 +20,7 @@ const getAll = async (req, res) => {
           ...user,
           password: undefined, // Remove password from response
           status: user.isActive ? "ACTIVE" : "INACTIVE",
-          organisation: user?.organisation?.name ? user.organisation.name : (user.serviceCenter?.organisation?.name || "N/A"),
+          organisation: user?.organisation?.name ? user.organisation.name : (user.serviceCenter?.name || "N/A"),
           orgCode: user.orgCode || null,
           centerCode: user.centerCode || null,
           state: user.State?.name || null,

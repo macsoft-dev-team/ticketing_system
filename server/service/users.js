@@ -223,6 +223,10 @@ const create = async (userData) => {
       isActive: userData.status === "ACTIVE" || userData.isActive !== false,
     };
 
+    if (userData.centerCode) {
+      createData.centerCode = userData.centerCode;
+    }
+
     // Note: Email field is commented out until schema migration is run
     // Add email if provided and email field exists in schema
     // if (userData.email && userData.email.trim() !== '') {
