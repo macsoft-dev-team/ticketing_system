@@ -298,7 +298,7 @@ export default function TransactionHistoryModal({ open, onClose }) {
                       </thead>
                       <tbody>
                         {transaction.items?.map((item) => (
-                          <tr key={item.id} className="border-b last:border-b-0">
+                          <tr key={item.id} className="border-b last:border-b-0 border-gray-200">
                             <td className="py-2">
                               {item.product?.name || item.productName || "Unknown"}
                             </td>
@@ -316,7 +316,7 @@ export default function TransactionHistoryModal({ open, onClose }) {
                     </table>
 
                     {transaction.remarks && (
-                      <div className="mt-3 pt-3 border-t text-sm">
+                      <div className="mt-3 pt-3 border-t text-sm border-gray-200">
                         <span className="font-medium text-gray-700">Remarks:</span>{" "}
                         <span className="text-gray-600">{transaction.remarks}</span>
                       </div>

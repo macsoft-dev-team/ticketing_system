@@ -540,14 +540,14 @@ export default function TicketCard({
             )}
 
             {/* Content */}
-            <div className="relative z-10 h-full flex flex-col p-5">
+            <div className="relative z-10 h-full flex flex-col p-4">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                     {/* Ticket ID & Priority */}
                     <div className="flex items-center gap-2">
                         <motion.span
                             whileHover={{ scale: 1.05 }}
-                            className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded"
+                            className="text-xs text-nowrap font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded"
                         >
                             {localTicket.ticketCode || localTicket.id}
                         </motion.span>

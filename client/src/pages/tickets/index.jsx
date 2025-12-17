@@ -143,7 +143,7 @@ export default function Tickets() {
                 className="px-5 py-2 pb-20 "
             >
                 <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
                     variants={containerVariants}
                 >
                     {tickets.map((ticket, index) => (
