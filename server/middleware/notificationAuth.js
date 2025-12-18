@@ -120,7 +120,7 @@ const validateNotificationOwnership = async (req, res, next) => {
     // Check if notification belongs to user
     const notificationRecipient = await prisma.notificationRecipient.findFirst({
       where: {
-        id: parseInt(notificationId),
+        notificationId: parseInt(notificationId),
         userId: userId
       }
     });
@@ -163,7 +163,7 @@ const validateBulkNotificationOwnership = async (req, res, next) => {
     // Check if all notifications belong to user
     const notificationRecipients = await prisma.notificationRecipient.findMany({
       where: {
-        id: { in: notificationIds.map(id => parseInt(id)) },
+        notificationId: { in: notificationIds.map(id => parseInt(id)) },
         userId: userId
       }
     });

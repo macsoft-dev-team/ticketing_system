@@ -86,11 +86,19 @@ const getNotifications = async (userId) => {
 
 const updateNotification = async (notificationId, userId, io) => {
   try {    
+    // Validate inputs
+    if (!notificationId || isNaN(parseInt(notificationId))) {
+      throw new Error("Invalid notification ID provided");
+    }
+    if (!userId || isNaN(parseInt(userId))) {
+      throw new Error("Invalid user ID provided");
+    }
+    
     // First check if the notification recipient exists and belongs to the user
     const existingRecipient = await prisma.notificationRecipient.findFirst({
       where: {
-        id: notificationId,
-        userId: userId,
+        notificationId: parseInt(notificationId),
+        userId: parseInt(userId),
       },
     });
 
@@ -100,7 +108,7 @@ const updateNotification = async (notificationId, userId, io) => {
 
     const notification = await prisma.notificationRecipient.update({
       where: {
-        id: notificationId,
+        id: existingRecipient.id,
       },
       data: {
         seen: true,
@@ -199,11 +207,19 @@ const getNotificationCounts = async (userId) => {
 
 const markNotificationAsRead = async (notificationId, userId) => {
   try {
+    // Validate inputs
+    if (!notificationId || isNaN(parseInt(notificationId))) {
+      throw new Error("Invalid notification ID provided");
+    }
+    if (!userId || isNaN(parseInt(userId))) {
+      throw new Error("Invalid user ID provided");
+    }
+    
     // Find the notification recipient record
     const recipient = await prisma.notificationRecipient.findFirst({
       where: {
-        notificationId: notificationId,
-        userId: userId,
+        notificationId: parseInt(notificationId),
+        userId: parseInt(userId),
       },
       include: {
         notification: {
@@ -511,11 +527,19 @@ const getNotificationsWithFilters = async (userId, filters = {}) => {
 
 const deleteNotification = async (notificationId, userId) => {
   try {
+    // Validate inputs
+    if (!notificationId || isNaN(parseInt(notificationId))) {
+      throw new Error("Invalid notification ID provided");
+    }
+    if (!userId || isNaN(parseInt(userId))) {
+      throw new Error("Invalid user ID provided");
+    }
+    
     // First check if the notification recipient exists and belongs to the user
     const existingRecipient = await prisma.notificationRecipient.findFirst({
       where: {
-        id: notificationId,
-        userId: userId,
+        notificationId: parseInt(notificationId),
+        userId: parseInt(userId),
       },
     });
 
@@ -526,7 +550,7 @@ const deleteNotification = async (notificationId, userId) => {
     // Delete the notification recipient
     await prisma.notificationRecipient.delete({
       where: {
-        id: notificationId,
+        id: existingRecipient.id,
       },
     });
 
@@ -541,7 +565,7 @@ const bulkUpdateNotifications = async (notificationIds, userId, updateData) => {
     // Verify all notifications belong to the user
     const existingRecipients = await prisma.notificationRecipient.findMany({
       where: {
-        id: { in: notificationIds },
+        notificationId: { in: notificationIds },
         userId: userId,
       },
     });
@@ -553,7 +577,7 @@ const bulkUpdateNotifications = async (notificationIds, userId, updateData) => {
     // Update notifications
     const result = await prisma.notificationRecipient.updateMany({
       where: {
-        id: { in: notificationIds },
+        notificationId: { in: notificationIds },
         userId: userId,
       },
       data: {
@@ -577,7 +601,7 @@ const bulkDeleteNotifications = async (notificationIds, userId) => {
     // Verify all notifications belong to the user
     const existingRecipients = await prisma.notificationRecipient.findMany({
       where: {
-        id: { in: notificationIds },
+        notificationId: { in: notificationIds },
         userId: userId,
       },
     });
@@ -589,7 +613,7 @@ const bulkDeleteNotifications = async (notificationIds, userId) => {
     // Delete notifications
     const result = await prisma.notificationRecipient.deleteMany({
       where: {
-        id: { in: notificationIds },
+        notificationId: { in: notificationIds },
         userId: userId,
       },
     });

@@ -217,6 +217,38 @@ const bulkDeleteNotifications = async (req, res) => {
     }
 };
 
+const markAllNotificationsAsRead = async (req, res) => {
+    try {
+        const { notificationIds } = req.body;
+        const userId = req.user.id;
+        
+        if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No notification IDs provided"
+            });
+        }
+        
+        const result = await notificationService.bulkUpdateNotifications(
+            notificationIds.map(id => parseInt(id)),
+            userId,
+            { seen: true }
+        );
+        
+        res.status(200).json({
+            success: true,
+            data: result,
+            message: "All notifications marked as read successfully"
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            message: error.message || "Internal server error",
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
 module.exports = {
     getNotifications,
     updateNotification,
@@ -226,4 +258,5 @@ module.exports = {
     getNotificationCounts,
     markNotificationAsRead,
     markTicketNotificationsAsSeen,
+    markAllNotificationsAsRead,
 };

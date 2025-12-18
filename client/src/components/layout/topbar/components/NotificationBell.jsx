@@ -165,7 +165,7 @@ const NotificationBell = () => {
 
           if (Array.isArray(notificationsArray) && socketNotifications.length === 0) {
             const allTransformedNotifications = notificationsArray.map(item => ({
-              id: item.id,
+              id: item.notification?.id || item.id, // Use notification ID, fallback to recipient ID
               title: item.notification?.title || 'Notification',
               message: item.notification?.description || item.notification?.content || '',
               type: getNotificationType(item.notification?.type),
@@ -282,20 +282,33 @@ const NotificationBell = () => {
       });
 
       // Also try to mark as read on server if possible
-      if (token) {
+      if (token && unreadNotifications.length > 0) {
         try {
-          await Promise.all(
-            unreadNotifications.map(async (notification) => {
-              const baseUrl = import.meta.env.VITE_API_URL;
-              return fetch(`${baseUrl}/notifications/${notification.id}`, {
-                method: 'PUT',
-                headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              });
-            })
-          );
+          const baseUrl = import.meta.env.VITE_API_URL;
+          const notificationIds = unreadNotifications.map(n => n.id);
+          
+          // Send all notification IDs in a single request
+          const response = await fetch(`${baseUrl}/notifications/mark-all-read`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ notificationIds })
+          });
+
+          if (response.ok) {
+            // Update local state immediately after successful API call
+            setAllNotifications(prevAll => 
+              prevAll.map(notification => ({ ...notification, unread: false }))
+            );
+            
+            setNotifications(prevDisplayed => 
+              prevDisplayed.map(notification => ({ ...notification, unread: false }))
+            );
+            
+            setUnreadCount(0);
+          }
         } catch (error) {
           console.warn('Could not mark notifications as read on server:', error);
         }
@@ -317,13 +330,30 @@ const NotificationBell = () => {
       if (token) {
         try {
           const baseUrl = import.meta.env.VITE_API_URL;
-          await fetch(`${baseUrl}/notifications/${notification.id}`, {
+          const response = await fetch(`${baseUrl}/notifications/${notification.id}`, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
           });
+
+          if (response.ok) {
+            // Update local state immediately after successful API call
+            setAllNotifications(prevAll => 
+              prevAll.map(n => 
+                n.id === notification.id ? { ...n, unread: false } : n
+              )
+            );
+            
+            setNotifications(prevDisplayed => 
+              prevDisplayed.map(n => 
+                n.id === notification.id ? { ...n, unread: false } : n
+              )
+            );
+            
+            setUnreadCount(prev => Math.max(0, prev - 1));
+          }
         } catch (error) {
           console.warn('Could not mark notification as read on server:', error);
         }

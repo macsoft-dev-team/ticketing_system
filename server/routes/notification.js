@@ -28,20 +28,12 @@ router.get("/counts",
   notificationController.getNotificationCounts
 );
 
-// Update single notification (mark as read)
-router.put("/:id", 
+// Mark all notifications as read (bulk operation) - Must be before /:id routes
+router.put("/mark-all-read", 
   authenticate, 
-  authorizeNotification('update'),
-  validateNotificationOwnership,
-  notificationController.updateNotification
-);
-
-// Delete single notification
-router.delete("/:id", 
-  authenticate, 
-  authorizeNotification('delete'),
-  validateNotificationOwnership,
-  notificationController.deleteNotification
+  authorizeNotification('bulkAction'),
+  validateBulkNotificationOwnership,
+  notificationController.markAllNotificationsAsRead
 );
 
 // Bulk update notifications
@@ -61,19 +53,35 @@ router.delete("/bulk/delete",
   notificationController.bulkDeleteNotifications
 );
 
+// Mark ticket notifications as seen
+router.patch("/ticket/:ticketId/mark-seen", 
+  authenticate, 
+  authorizeNotification('update'),
+  notificationController.markTicketNotificationsAsSeen
+);
+
+// Update single notification (mark as read)
+router.put("/:id", 
+  authenticate, 
+  authorizeNotification('update'),
+  validateNotificationOwnership,
+  notificationController.updateNotification
+);
+
+// Delete single notification
+router.delete("/:id", 
+  authenticate, 
+  authorizeNotification('delete'),
+  validateNotificationOwnership,
+  notificationController.deleteNotification
+);
+
 // Mark notification as read (alternative endpoint)
 router.patch("/:id/read", 
   authenticate, 
   authorizeNotification('update'),
   validateNotificationOwnership,
   notificationController.markNotificationAsRead
-);
-
-// Mark ticket notifications as seen
-router.patch("/ticket/:ticketId/mark-seen", 
-  authenticate, 
-  authorizeNotification('update'),
-  notificationController.markTicketNotificationsAsSeen
 );
 
 module.exports = router;
