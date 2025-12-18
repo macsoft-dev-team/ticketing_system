@@ -337,15 +337,6 @@ export default function SpareRequestApproval() {
   const getStockStatus = (requested, macsoftAvailable, centerAvailable) => {
     const totalAvailable = Math.max(macsoftAvailable, centerAvailable || 0);
     
-    // Debug logging for stock status calculation
-    console.log(`🔍 Stock Status Debug:`, {
-      requested,
-      macsoftAvailable,
-      centerAvailable,
-      totalAvailable,
-      sufficient: totalAvailable >= requested
-    });
-    
     if (totalAvailable >= requested) {
       return { status: 'sufficient', color: 'text-green-600 bg-green-50', icon: CheckCircle };
     } else {
@@ -474,7 +465,7 @@ export default function SpareRequestApproval() {
                                 ? 'bg-green-100 text-green-800' 
                                 : 'bg-red-100 text-red-800'
                             }`}>
-                              MACSOFT: {item.availableQuantity}
+                              {user?.role?.includes('MACSOFT') ? 'MACSOFT' : (user?.centerCode || 'Local')}: {item.availableQuantity}
                             </span>
                             {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
                               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -627,7 +618,7 @@ export default function SpareRequestApproval() {
                                 ? 'bg-green-100 text-green-800' 
                                 : 'bg-red-100 text-red-800'
                             }`}>
-                              MACSOFT: {item.availableQuantity}
+                              {user?.role?.includes('MACSOFT') ? 'MACSOFT' : (user?.centerCode || 'Local')}: {item.availableQuantity}
                             </span>
                             {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
                               <span className="inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -872,7 +863,9 @@ export default function SpareRequestApproval() {
                         <p className="text-2xl font-bold text-blue-600">{selectedSpare.requestedQuantity}</p>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-500">Available Quantity</label>
+                        <label className="block text-xs font-medium text-gray-500">
+                          Available Quantity ({user?.role?.includes('MACSOFT') ? 'MACSOFT' : (user?.centerCode || 'Local')})
+                        </label>
                         <p className={`text-2xl font-bold ${
                           selectedSpare.availableQuantity >= selectedSpare.requestedQuantity 
                             ? 'text-green-600' 
@@ -880,6 +873,11 @@ export default function SpareRequestApproval() {
                         }`}>
                           {selectedSpare.availableQuantity}
                         </p>
+                        {selectedSpare.centerAvailableQuantity !== undefined && selectedSpare.requestingCenter && (
+                          <p className="text-sm text-gray-600 mt-1">
+                            {selectedSpare.requestingCenter}: {selectedSpare.centerAvailableQuantity}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-500">Status</label>

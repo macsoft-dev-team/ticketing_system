@@ -467,6 +467,9 @@ async function getPendingSpareRequestsForApproval(req, res) {
       await spareRequestService.getPendingSpareRequestsForApproval({
         skip: skip ? parseInt(skip) : 0,
         take: take ? parseInt(take) : 20,
+        userRole,
+        userId,
+        userCenterCode: req.user.centerCode
       });
 
     res.status(200).json({

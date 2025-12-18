@@ -1078,7 +1078,7 @@ async function rejectSpareRequestItem(itemId, rejectedBy, rejecterName, rejecter
 /**
  * Get pending spare request items for approval
  */
-async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) {
+async function getPendingSpareRequestsForApproval({ skip = 0, take = 20, userRole = null, userId = null, userCenterCode = null } = {}) {
   try {
     const whereCondition = {
       status: {
@@ -1171,17 +1171,29 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
         // Available quantity at requesting center (for reference)
         const centerQty = centerInventory?.goodQty || 0;
         
-        // Debug logging to identify inventory issues
-        console.log(`🔍 DEBUG - Product: ${item.product.name} (${item.product.productCode})`);
-        console.log(`   All inventories:`, item.product.inventories?.map(inv => ({ 
-          centerCode: inv.centerCode, 
-          goodQty: inv.goodQty, 
-          repairableQty: inv.repairableQty,
-          damagedQty: inv.damagedQty,
-          scrapQty: inv.scrapQty 
-        })));
-        console.log(`   MHSEC qty: ${macsoftQty}, ${requestingCenter} qty: ${centerQty}`);
-        console.log(`   Requested: ${item.quantity}, Can approve: ${macsoftQty >= item.quantity || centerQty >= item.quantity}`);
+        // Get user's service center inventory for service center roles
+        const userCenterInventory = userCenterCode ? item.product.inventories?.find(
+          inv => inv.centerCode === userCenterCode
+        ) : null;
+        const userCenterQty = userCenterInventory?.goodQty || 0;
+        
+        // Determine role-based inventory display
+        const isMacsoftRole = userRole && userRole.includes('MACSOFT');
+        
+        let displayedAvailableQty, displayedCenterQty, displayedCenter;
+        
+        if (isMacsoftRole) {
+          // MACSOFT roles see both MACSOFT and requesting service center quantities
+          displayedAvailableQty = macsoftQty;
+          displayedCenterQty = centerQty; // Always show requesting center quantity
+          displayedCenter = requestingCenter;
+        } else {
+          // Service center roles see their own inventory as primary
+          displayedAvailableQty = userCenterQty;
+          // Show requesting center quantity if it's different from user's center
+          displayedCenterQty = (requestingCenter && requestingCenter !== userCenterCode) ? centerQty : undefined;
+          displayedCenter = userCenterCode;
+        }
         
         const approvalItem = {
           itemId: item.id,
@@ -1191,23 +1203,19 @@ async function getPendingSpareRequestsForApproval({ skip = 0, take = 20 } = {}) 
           productName: item.product.name,
           productCode: item.product.productCode,
           requestedQuantity: item.quantity,
-          availableQuantity: macsoftQty,
-          centerAvailableQuantity: centerQty,
-          requestingCenter: requestingCenter,
+          availableQuantity: displayedAvailableQty,
+          centerAvailableQuantity: displayedCenterQty,
+          requestingCenter: displayedCenter,
+          // Keep original values for approval logic
+          macsoftQty: macsoftQty,
+          actualCenterQty: centerQty,
+          actualRequestingCenter: requestingCenter,
           status: item.status,
           requestedBy: request.createdByUser.name,
           requestedByRole: request.createdByUser.role,
           requestedDate: request.createdAt,
-          canApprove: macsoftQty >= item.quantity || centerQty >= item.quantity
+          canApprove: macsoftQty >= item.quantity || centerQty >= item.quantity || userCenterQty >= item.quantity
         };
-        
-        console.log(`📋 Approval item created:`, {
-          productName: approvalItem.productName,
-          requested: approvalItem.requestedQuantity,
-          macsoftAvailable: approvalItem.availableQuantity,
-          centerAvailable: approvalItem.centerAvailableQuantity,
-          canApprove: approvalItem.canApprove
-        });
         
         approvalItems.push(approvalItem);
       });

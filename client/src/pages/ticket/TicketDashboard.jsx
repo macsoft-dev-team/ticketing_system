@@ -795,7 +795,7 @@ export default function TicketDashboard() {
       const transformedRequests = [];
       if (result.success && result.data) {
         // Get ticket details to determine requesting center
-        const ticket = ticketData;
+        const ticketFromHook = ticket; // Use the fresh ticket data from hook
         
         result.data.forEach(request => {
           request.spareItems.forEach(item => {
@@ -805,14 +805,42 @@ export default function TicketDashboard() {
             );
             
             // Find inventory at requesting service center
-            const requestingCenter = ticket?.assignedServiceCenter || request.createdByUser?.centerCode;
+            // Priority: assignedServiceCenter -> serviceCenter.centerCode -> createdByUser.centerCode
+            const requestingCenter = ticketFromHook?.assignedServiceCenter || 
+                                   ticketFromHook?.serviceCenter?.centerCode || 
+                                   request.createdByUser?.centerCode;
+            
             const centerInventory = requestingCenter ? item.product.inventories?.find(
               inv => inv.centerCode === requestingCenter
             ) : null;
             
-            // Available quantity from MACSOFT_MAIN and requesting center
+            // Get current user's service center for service center roles
+            const userCenterInventory = user?.centerCode ? item.product.inventories?.find(
+              inv => inv.centerCode === user.centerCode
+            ) : null;
+            
+            // Available quantity calculations
             const macsoftQty = macsoftInventory?.goodQty || 0;
             const centerQty = centerInventory?.goodQty || 0;
+            const userCenterQty = userCenterInventory?.goodQty || 0;
+            
+            // Determine which quantities to show based on user role
+            const isMacsoftRole = user?.role?.includes('MACSOFT');
+            const isServiceCenterRole = !isMacsoftRole;
+            
+            let displayedAvailableQty, displayedCenterQty, displayedCenter;
+            
+            if (isMacsoftRole) {
+              // MACSOFT roles see both MACSOFT and requesting service center quantities
+              displayedAvailableQty = macsoftQty;
+              displayedCenterQty = centerQty;
+              displayedCenter = requestingCenter;
+            } else {
+              // Service center roles see their own inventory as primary, but still show service center quantity if it's different
+              displayedAvailableQty = userCenterQty;
+              displayedCenterQty = (requestingCenter && requestingCenter !== user?.centerCode) ? centerQty : userCenterQty;
+              displayedCenter = requestingCenter || user?.centerCode;
+            }
             
             transformedRequests.push({
               itemId: item.id,
@@ -822,14 +850,18 @@ export default function TicketDashboard() {
               productName: item.product.name,
               productCode: item.product.productCode,
               requestedQuantity: item.quantity,
-              availableQuantity: macsoftQty,
-              centerAvailableQuantity: centerQty,
-              requestingCenter: requestingCenter,
+              availableQuantity: displayedAvailableQty,
+              centerAvailableQuantity: displayedCenterQty,
+              requestingCenter: displayedCenter,
+              // Keep original values for approval logic
+              macsoftQty: macsoftQty,
+              actualCenterQty: centerQty,
+              actualRequestingCenter: requestingCenter,
               status: item.status,
               requestedBy: request.createdByUser?.name || 'Unknown',
               requestedByRole: request.createdByUser?.role || 'Unknown',
               requestedDate: request.createdAt,
-              canApprove: (macsoftQty >= item.quantity || centerQty >= item.quantity) && item.status === 'REQUESTED'
+              canApprove: (macsoftQty >= item.quantity || centerQty >= item.quantity || userCenterQty >= item.quantity) && item.status === 'REQUESTED'
             });
           });
         });
@@ -845,7 +877,7 @@ export default function TicketDashboard() {
     } finally {
       setLoadingSpareRequests(false);
     }
-  }, [token, addToast]);
+  }, [token, addToast, ticket, user]);
 
   // Handle spare request approval
   const handleSpareApprove = async (itemId) => {
@@ -967,12 +999,13 @@ export default function TicketDashboard() {
     };
   }, []);
 
-  // Fetch spare requests when ticket code changes
+  // Fetch spare requests when ticket data changes (including service center info)
   useEffect(() => {
-    if (ticketData.ticketCode) {
+    if (ticketData.ticketCode && ticket?.id) {
+      // Ensure we have the full ticket data before fetching spare requests
       fetchSpareRequests(ticketData.ticketCode);
     }
-  }, [ticketData.ticketCode, fetchSpareRequests]);
+  }, [ticketData.ticketCode, ticket?.id, ticket?.assignedServiceCenter, ticket?.serviceCenter?.id, fetchSpareRequests]);
 
   // Mobile tab navigation
   const tabs = useMemo(() => [
@@ -1640,7 +1673,7 @@ export default function TicketDashboard() {
                           <span className="text-gray-600">
                             Requested: <span className="font-medium text-blue-600">{item.requestedQuantity}</span>
                           </span>
-                          <div className="flex flex-col space-y-1">
+                          <div className="flex items-center gap-1">
                             {/* Show MACSOFT quantity only for MACSOFT roles */}
                             {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' || user?.role === 'MACSOFT_SUPPORT') && (
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -1651,12 +1684,12 @@ export default function TicketDashboard() {
                                 MACSOFT: {item.availableQuantity}
                               </span>
                             )}
-                            {/* Show center quantity for service center roles or if requesting center exists */}
+                            {/* Show center quantity for MACSOFT roles (showing service center inventory) or service center roles (showing their own inventory) */}
                             {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                (user?.role === 'SERVICE_CENTER_TECHNICIAN' || user?.role === 'CUSTOMER_SERVICE_HEAD') 
-                                  ? (item.centerAvailableQuantity >= item.requestedQuantity ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')
-                                  : 'bg-blue-100 text-blue-800'
+                                item.centerAvailableQuantity >= item.requestedQuantity 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
                               }`}>
                                 {item.requestingCenter}: {item.centerAvailableQuantity}
                               </span>
