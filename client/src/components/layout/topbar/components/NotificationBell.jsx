@@ -480,26 +480,42 @@ const NotificationBell = () => {
     }
   };
   useTitleNotification(unreadCount);
+  const toggleNotifications = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
- 
-  <div onClick={() => setIsOpen(!isOpen)} title="Unread Notifications" className="relative">
+      <div className="relative">
         <button
-          className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
-
+          onClick={toggleNotifications}
+          title="Notifications"
+          className="p-2 text-gray-400 cursor-pointer hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+        >
           <Bell className="w-6 h-6" />
         </button>
 
         {/* Badge for unread count */}
         {unreadCount > 0 && (
-          <button 
-          type="button"
+          <button
+            type="button"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setIsOpen(!isOpen);
-             }}
-            className="absolute rounded-full px-1 py-0.5 font-bold cursor-pointer xsmall pointer-events-auto -top-1 -right-1 flex items-center justify-center text-[0.6rem] bg-red-500 text-white border-2 border-white z-10">
+              toggleNotifications();
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="absolute rounded-full min-w-[1.25rem] px-1.5 py-0.5 font-bold cursor-pointer -top-1 -right-1 flex items-center justify-center text-[0.6rem] bg-red-500 text-white border-2 border-white hover:bg-red-600 transition-colors"
+            style={{ 
+              zIndex: 1000,
+              pointerEvents: 'auto',
+              position: 'absolute'
+            }}
+            title={`${unreadCount} unread notifications`}
+          >
             {unreadCount > 99 ? '99+' : unreadCount}
           </button>
         )}
