@@ -1273,6 +1273,101 @@ async function bulkApproveSpareRequestItems(itemIds, approvedBy, approverName, a
   }
 }
 
+/**
+ * Bulk cancel all spare requests for a ticket
+ * Used when service center technician wants to cancel spare request and close ticket
+ */
+async function bulkCancelSpareRequestsByTicket(ticketCode, cancelledBy, reason = 'Spare requests cancelled') {
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // Get all pending spare request items for this ticket
+      const spareRequests = await tx.spareRequest.findMany({
+        where: { 
+          ticketCode,
+          status: { in: ['REQUESTED', 'pending'] }
+        },
+        include: {
+          spareItems: {
+            where: {
+              status: { in: ['REQUESTED', 'pending'] }
+            }
+          }
+        }
+      });
+
+      if (spareRequests.length === 0) {
+        return {
+          success: true,
+          message: 'No pending spare requests found to cancel',
+          cancelledRequests: 0,
+          cancelledItems: 0
+        };
+      }
+
+      let totalCancelledRequests = 0;
+      let totalCancelledItems = 0;
+
+      // Cancel all spare request items
+      for (const spareRequest of spareRequests) {
+        if (spareRequest.spareItems.length > 0) {
+          // Update all pending items to cancelled
+          await tx.spareRequestItem.updateMany({
+            where: {
+              spareRequestId: spareRequest.id,
+              status: { in: ['REQUESTED', 'pending'] }
+            },
+            data: {
+              status: 'cancelled',
+              updatedAt: new Date()
+            }
+          });
+
+          // Update spare request status to cancelled
+          await tx.spareRequest.update({
+            where: { id: spareRequest.id },
+            data: {
+              status: 'CANCELLED',
+              updatedBy: cancelledBy,
+              updatedAt: new Date()
+            }
+          });
+
+          totalCancelledRequests++;
+          totalCancelledItems += spareRequest.spareItems.length;
+
+          // Create notification for requester
+          await tx.notification.create({
+            data: {
+              title: 'Spare Request Cancelled',
+              description: `Your spare request has been cancelled. ${reason}`,
+              type: 'SPARE_CANCELLED',
+              createdById: cancelledBy,
+              recipients: {
+                create: {
+                  userId: spareRequest.createdBy,
+                  seen: false
+                }
+              }
+            }
+          });
+        }
+      }
+
+      return {
+        success: true,
+        message: `Successfully cancelled ${totalCancelledRequests} spare request(s) with ${totalCancelledItems} item(s)`,
+        cancelledRequests: totalCancelledRequests,
+        cancelledItems: totalCancelledItems
+      };
+    });
+
+    return result;
+  } catch (error) {
+    console.error('❌ Error cancelling spare requests:', error);
+    throw new Error(`Failed to cancel spare requests: ${error.message}`);
+  }
+}
+
 module.exports = {
   createSpareRequest,
   getSpareRequestsByTicket,
@@ -1284,4 +1379,5 @@ module.exports = {
   rejectSpareRequestItem,
   getPendingSpareRequestsForApproval,
   bulkApproveSpareRequestItems,
+  bulkCancelSpareRequestsByTicket,
 };

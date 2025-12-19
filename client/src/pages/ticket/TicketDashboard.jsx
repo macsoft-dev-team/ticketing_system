@@ -508,7 +508,7 @@ export default function TicketDashboard() {
   }, [ticketId, token, addToast, fetchTicketById]);
 
   const handleMilestoneAction = useCallback(async (actionData) => {
-    const { action, targetStage, currentStage } = actionData;
+    const { action, targetStage, currentStage, notes } = actionData;
 
     try {
       if (action === 'spare_request') {
@@ -520,6 +520,48 @@ export default function TicketDashboard() {
       } else if (action === 'service_center_assignment') {
         // Open service center assignment modal
         setShowServiceCenterModal(true);
+      } else if (action === 'close_ticket') {
+        // Close ticket directly (for intermediate stages)
+        const resultAction = await updateMilestone({
+          ticketId: parseInt(ticketId),
+          milestoneData: {
+            targetStage: 'TICKET_CLOSED',
+            action: 'close_ticket',
+            notes: notes || 'Ticket closed by service center technician'
+          }
+        });
+
+        if (resultAction.meta.requestStatus === 'fulfilled') {
+          addToast({
+            title: 'Ticket Closed',
+            description: 'Ticket has been successfully closed',
+            variant: 'success'
+          });
+          await fetchTicketById(ticketId);
+        } else {
+          throw new Error(resultAction.payload || 'Failed to close ticket');
+        }
+      } else if (action === 'cancel_spare_and_close') {
+        // Cancel spare request and close ticket
+        const resultAction = await updateMilestone({
+          ticketId: parseInt(ticketId),
+          milestoneData: {
+            targetStage: 'TICKET_CLOSED',
+            action: 'cancel_spare_and_close',
+            notes: notes || 'Spare request cancelled and ticket closed by service center technician'
+          }
+        });
+
+        if (resultAction.meta.requestStatus === 'fulfilled') {
+          addToast({
+            title: 'Spare Request Cancelled',
+            description: 'Spare request has been cancelled and ticket closed',
+            variant: 'warning'
+          });
+          await fetchTicketById(ticketId);
+        } else {
+          throw new Error(resultAction.payload || 'Failed to cancel spare request and close ticket');
+        }
       } else if (action === 'transition') {
         // Validate that we have a valid target stage and it's different from current
         if (!targetStage) {
@@ -594,23 +636,30 @@ export default function TicketDashboard() {
   const handlePhotoUpload = useCallback(async (files) => {
     if (!files || files.length === 0) return;
 
+    // If files are objects with {file, label}, extract them
+    let attachments = files;
+    let labels = [];
+    if (files[0] && files[0].file) {
+      attachments = files.map(f => f.file);
+      labels = files.map(f => f.label || '');
+    }
+
     try {
       setUploadingPhotos(true);
 
-      // Use updateMilestone from ticket hook - only add photos, don't transition
       const resultAction = await updateMilestone({
         ticketId: parseInt(ticketId),
         milestoneData: {
-          attachments: files,
-          action: 'add_photos'
+          attachments,
+          action: 'add_photos',
+          ...(labels.length === attachments.length && labels.length > 0 ? { photoLabels: JSON.stringify(labels) } : {})
         }
       });
 
-      // Check if the action was successful
       if (resultAction.meta.requestStatus === 'fulfilled') {
         addToast({
           title: 'Photos Uploaded',
-          description: `${files.length} photo(s) added to current milestone`,
+          description: `${attachments.length} photo(s) added to current milestone`,
           variant: 'success'
         });
         await fetchTicketById(ticketId);
@@ -623,7 +672,7 @@ export default function TicketDashboard() {
         description: error.message || 'Failed to upload photos',
         variant: 'error'
       });
-      throw error; // Re-throw to let modal handle it
+      throw error;
     } finally {
       setUploadingPhotos(false);
     }
@@ -1095,37 +1144,46 @@ export default function TicketDashboard() {
   const photoModalInfo = useMemo(() => {
     if (!currentMilestone) return { title: 'Upload Photos', description: 'Add photos for this milestone' };
 
-    const stageInfo = {
-      REQUEST_CLEARED_AT_FIELD: {
+    let info;
+    if (currentMilestone.stage === 'REQUEST_CLEARED_AT_FIELD') {
+      info = {
         title: 'Field Clearance Photos (Optional)',
         description: 'Add photos if available to document that the issue has been resolved at field. Photos help provide better documentation but are not mandatory.',
-      },
-      SUBMITTED_TO_SERVICE_CENTER: {
+        minPhotos: 0
+      };
+    } else if (currentMilestone.stage === 'SUBMITTED_TO_SERVICE_CENTER') {
+      info = {
         title: 'Upload Submission Photos',
         description: 'Add 4 specific photos confirming controller submission: Controller Front, Controller Bottom, Full View Open, MCB Close Up',
-      },
-      RECEIVED_AT_SERVICE_CENTER: {
+        minPhotos: 4,
+        requiredPhotos: ['Controller Front', 'Controller Bottom', 'Full View Open', 'MCB Close Up']
+      };
+    } else if (currentMilestone.stage === 'RECEIVED_AT_SERVICE_CENTER') {
+      info = {
         title: 'Upload Receipt Photos',
-        description: 'Add photos of the controller received at service center',
-      },
-      SPARE_REQUESTED: {
+        description: 'Add 4 specific photos of the controller received at service center: Controller Front, Controller Bottom, Full View Open, MCB Close Up',
+        minPhotos: 4,
+        requiredPhotos: ['Controller Front', 'Controller Bottom', 'Full View Open', 'MCB Close Up']
+      };
+    } else if (currentMilestone.stage === 'SPARE_REQUESTED') {
+      info = {
         title: 'Upload Spare Parts Photos',
         description: 'Add photos of the requested spare parts',
-      },
-      READY_FOR_DISPATCH: {
+        minPhotos: 1
+      };
+    } else if (currentMilestone.stage === 'READY_FOR_DISPATCH') {
+      info = {
         title: 'Upload Dispatch Photos',
         description: 'Add photos of the controller ready for dispatch',
-      },
-    };
-
-    const info = stageInfo[currentMilestone.stage] || {
-      title: 'Upload Milestone Photos',
-      description: `Add photos for ${currentMilestone.stage.replace(/_/g, ' ')}`,
-    };
-
-    // Set minimum photos requirement - 0 for field clearance, 1 for others
-    info.minPhotos = currentMilestone.stage === 'REQUEST_CLEARED_AT_FIELD' ? 0 : 1;
-
+        minPhotos: 1
+      };
+    } else {
+      info = {
+        title: 'Upload Milestone Photos',
+        description: `Add photos for ${currentMilestone.stage.replace(/_/g, ' ')}`,
+        minPhotos: 1
+      };
+    }
     return info;
   }, [currentMilestone]);
 
@@ -1567,6 +1625,7 @@ export default function TicketDashboard() {
               onAction={handleMilestoneAction}
               onUpdateNotes={handleUpdateNotes}
               ticketStatus={ticketData?.status}
+              ticketCreatedBy={ticketData?.createdBy}
             />
           </div>
 
@@ -1646,9 +1705,11 @@ export default function TicketDashboard() {
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center space-x-1">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                          <span className={`inline-flex items-center uppercase px-2 py-1 rounded-full text-xs font-medium ${item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
                             item.status === 'approved' ? 'bg-green-100 text-green-800' :
                               item.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              item.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                              item.status === 'partiallyapproved' ? 'bg-blue-100 text-blue-800' :
                                 'bg-gray-100 text-gray-800'
                             }`}>
                             {item.status}
@@ -1832,7 +1893,7 @@ export default function TicketDashboard() {
                         <div className="flex items-center space-x-2">
                           <Hash className="h-4 w-4 text-gray-400" />
                           <span className="text-sm font-semibold text-gray-900">{item.ticketCode}</span>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
+                          <span className={`inline-flex uppercase items-center px-2 py-1 rounded-full text-xs font-medium ${item.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
                             item.status === 'approved' ? 'bg-green-100 text-green-800' :
                               item.status === 'rejected' ? 'bg-red-100 text-red-800' :
                                 'bg-gray-100 text-gray-800'
@@ -2005,6 +2066,8 @@ export default function TicketDashboard() {
         description={photoModalInfo.description}
         minPhotos={photoModalInfo.minPhotos || 1}
         uploading={uploadingPhotos}
+        requireLabels={!!photoModalInfo.requiredPhotos}
+        requiredLabels={photoModalInfo.requiredPhotos || []}
       />
 
       {/* Service Center Assignment Modal */}

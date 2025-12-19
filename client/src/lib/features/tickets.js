@@ -283,6 +283,27 @@ export const updateMilestone = createAsyncThunk(
         return response.data;
       }
 
+      // Handle close_ticket and cancel_spare_and_close actions - use transition endpoint
+      if (milestoneData.action === 'close_ticket' || milestoneData.action === 'cancel_spare_and_close') {
+        const formData = new FormData();
+        formData.append("targetStage", milestoneData.targetStage);
+        formData.append("action", milestoneData.action);
+        if (milestoneData.notes) {
+          formData.append("notes", milestoneData.notes);
+        }
+
+        const response = await axios.post(
+          `${API_ENDPOINTS.milestone}/ticket/${ticketId}/transition`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        return response.data;
+      }
+
       // Handle generic milestone updates (requires milestoneId)
       const hasAttachments =
         milestoneData.attachments && milestoneData.attachments.length > 0;

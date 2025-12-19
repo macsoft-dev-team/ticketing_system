@@ -6,6 +6,7 @@ import { X, Upload, Camera, Image as ImageIcon, Trash2 } from 'lucide-react';
  * Photo Upload Modal for Milestone Photos
  * Shows a popup to select and preview photos before uploading
  */
+
 const PhotoUploadModal = ({ 
   isOpen, 
   onClose, 
@@ -20,6 +21,7 @@ const PhotoUploadModal = ({
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [photoLabels, setPhotoLabels] = useState([]);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -51,8 +53,9 @@ const PhotoUploadModal = ({
   };
 
   const handleUpload = async () => {
+    setErrorMsg('');
     if (selectedFiles.length < minPhotos) {
-      alert(`Please select at least ${minPhotos} photo(s)`);
+      setErrorMsg(`Please select at least ${minPhotos} photo(s)`);
       return;
     }
 
@@ -60,7 +63,7 @@ const PhotoUploadModal = ({
     if (requireLabels) {
       const missingLabels = photoLabels.some((label, index) => !label && index < selectedFiles.length);
       if (missingLabels) {
-        alert('Please assign labels to all photos');
+        setErrorMsg('Please assign labels to all photos');
         return;
       }
 
@@ -69,7 +72,7 @@ const PhotoUploadModal = ({
         const usedLabels = photoLabels.filter(label => label);
         const duplicates = usedLabels.filter((label, index) => usedLabels.indexOf(label) !== index);
         if (duplicates.length > 0) {
-          alert('Each photo must have a unique label');
+          setErrorMsg('Each photo must have a unique label');
           return;
         }
       }
@@ -82,6 +85,11 @@ const PhotoUploadModal = ({
           label: photoLabels[index] || ''
         }))
       : selectedFiles;
+
+    if (!filesWithLabels.length) {
+      setErrorMsg('No photos provided. Please select photos to upload.');
+      return;
+    }
 
     await onUpload(filesWithLabels);
     handleClose();
@@ -134,6 +142,9 @@ const PhotoUploadModal = ({
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+            {errorMsg && (
+              <div className="mb-3 text-center text-sm text-red-600 font-medium">{errorMsg}</div>
+            )}
             {/* File Input Options */}
             <div className="mb-4 space-y-3">
               <div className="grid grid-cols-2 gap-3">

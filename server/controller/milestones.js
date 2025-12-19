@@ -141,7 +141,7 @@ const getAvailableTransitions = async (req, res) => {
 const transitionMilestone = async (req, res) => {
   try {
     const { ticketId } = req.params;
-    const { targetStage, notes, spareRequestId } = req.body;
+    const { targetStage, notes, spareRequestId, action } = req.body;
     const { id: userId, role: userRole } = req.user;
     const io = req.io;
     const files = req.files; // Uploaded photos
@@ -162,6 +162,7 @@ const transitionMilestone = async (req, res) => {
       notes,
       attachments,
       spareRequestId,
+      action, // Pass action to service layer
     };
 
     const updatedMilestone = await milestoneService.transitionMilestone(
@@ -335,22 +336,17 @@ const updateMilestone = async (req, res) => {
       milestoneData,
       userId
     );
-    const newMilestoneData = await milestoneService.createMilestone(
-      updatedMilestone.ticketId,
-      userId,
-      milestoneData
-    );
 
     // Emit socket event for milestone update
-    if (io && newMilestoneData.ticket) {
+    if (io && updatedMilestone.ticket) {
       const milestoneUpdateData = {
         type: 'milestone-updated',
         ticketId: updatedMilestone.ticketId,
-        ticketCode: newMilestoneData.ticket.ticketCode,
-        milestone: newMilestoneData,
+        ticketCode: updatedMilestone.ticket.ticketCode,
+        milestone: updatedMilestone,
         updatedBy: {
           id: userId,
-          name: newMilestoneData.changer?.name || 'Unknown User'
+          name: updatedMilestone.changer?.name || 'Unknown User'
         },
         timestamp: new Date().toISOString()
       };
@@ -363,7 +359,7 @@ const updateMilestone = async (req, res) => {
 
     res.status(200).json({
       message: "Milestone updated successfully",
-      milestone: newMilestoneData,
+      milestone: updatedMilestone,
     });
   } catch (error) {
     res.status(400).json({

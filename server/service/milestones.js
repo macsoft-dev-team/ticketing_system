@@ -208,6 +208,19 @@ const transitionMilestone = async (
       },
     });
 
+    // Special validation for close_ticket and cancel_spare_and_close actions
+    if (data.action === 'close_ticket' || data.action === 'cancel_spare_and_close') {
+      // Allow MACSOFT_ADMIN unrestricted access, SERVICE_CENTER_TECHNICIAN only if they created the ticket
+      if (userRole !== 'SERVICE_CENTER_TECHNICIAN' && userRole !== 'MACSOFT_ADMIN') {
+        throw new Error('Only service center technicians or MACSOFT admins can perform this action');
+      }
+      
+      // MACSOFT_ADMIN can close any ticket, SERVICE_CENTER_TECHNICIAN can only close tickets they created
+      if (userRole === 'SERVICE_CENTER_TECHNICIAN' && ticket.createdBy !== userId) {
+        throw new Error('Service center technicians can only close tickets they created');
+      }
+    }
+
     // Handle attachments for CURRENT milestone if provided (to satisfy photo gate)
     if (
       currentMilestone &&
@@ -253,6 +266,20 @@ const transitionMilestone = async (
       } catch (spareApprovalError) {
     
         // Continue with milestone creation even if spare approval fails
+      }
+    }
+
+    // Handle special case for cancel_spare_and_close - cancel all spare requests
+    if (data.action === 'cancel_spare_and_close') {
+      try {
+        await spareRequestService.bulkCancelSpareRequestsByTicket(
+          ticket.ticketCode,
+          userId,
+          'Service center technician cancelled spare requests and closed ticket'
+        );
+      } catch (cancelError) {
+        console.error('Error cancelling spare requests:', cancelError);
+        // Continue with milestone creation even if spare cancellation fails
       }
     }
 
@@ -373,6 +400,7 @@ const transitionMilestone = async (
           },
         },
         attachments: true,
+        ticket: true,
       },
     });
     

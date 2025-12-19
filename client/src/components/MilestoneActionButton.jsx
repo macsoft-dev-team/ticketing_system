@@ -51,6 +51,13 @@ const canUserTransitionToStage = (userRole, targetStage) => {
   return allowedRoles ? allowedRoles.includes(userRole) : false;
 };
 
+// Utility function to check if current user created the ticket
+const isTicketCreatedByCurrentUser = (ticketCreatedBy, currentUserId) => {
+  if (!ticketCreatedBy || !currentUserId) return false;
+  const createdById = typeof ticketCreatedBy === 'object' ? ticketCreatedBy.id : ticketCreatedBy;
+  return createdById === currentUserId;
+};
+
 /**
  * Dynamic action button that changes based on current milestone stage
  * Handles milestone transitions and related actions
@@ -65,7 +72,9 @@ const MilestoneActionButton = ({
   className = '',
   disabled = false,
   userRole = null,
-  allMilestones = []
+  allMilestones = [],
+  ticketCreatedBy = null,
+  currentUserId = null
 }) => {
 
   // Define action configurations for each milestone stage
@@ -205,7 +214,17 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'DIAGNOSIS_IN_PROGRESS',
           requiresPhotos: false,
-        }
+        },
+        // Close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
+        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+          title: 'Close Ticket',
+          shortTitle: 'Close',
+          icon: X,
+          color: 'red',
+          action: 'close_ticket',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : [])
       ],
       DIAGNOSIS_IN_PROGRESS: [
         {
@@ -225,7 +244,17 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'REPLACEMENT_IN_PROGRESS',
           requiresPhotos: false,
-        }
+        },
+        // Close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
+        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+          title: 'Close Ticket',
+          shortTitle: 'Close',
+          icon: X,
+          color: 'red',
+          action: 'close_ticket',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : [])
       ],
 
       REPLACEMENT_IN_PROGRESS: (() => {
@@ -234,33 +263,46 @@ const MilestoneActionButton = ({
           milestone => milestone.stage === 'SPARE_REQUESTED' || milestone.stage === 'SPARE_APPROVED'
         );
 
+        const baseActions = [];
+        
         if (hasSpareRequest) {
           // If spares already requested/approved, show completion option
-          return [
-            {
-              title: 'Mark as Repaired',
-              shortTitle: 'Repaired',
-              icon: CheckCircle,
-              color: 'green',
-              action: 'transition',
-              targetStage: 'REPAIRED',
-              requiresPhotos: false,
-            }, 
-          ];
+          baseActions.push({
+            title: 'Mark as Repaired',
+            shortTitle: 'Repaired',
+            icon: CheckCircle,
+            color: 'green',
+            action: 'transition',
+            targetStage: 'REPAIRED',
+            requiresPhotos: false,
+          });
         } else {
           // If no spare request yet, show spare request option
-          return [
-            {
-              title: 'Request Spare Parts',
-              shortTitle: 'Request Spare',
-              icon: Package,
-              color: 'orange',
-              action: 'spare_request',
-              targetStage: 'SPARE_REQUESTED',
-              requiresPhotos: false,
-            }, 
-          ];
+          baseActions.push({
+            title: 'Request Spare Parts',
+            shortTitle: 'Request Spare',
+            icon: Package,
+            color: 'orange',
+            action: 'spare_request',
+            targetStage: 'SPARE_REQUESTED',
+            requiresPhotos: false,
+          });
         }
+
+        // Add close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
+        if (userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId))) {
+          baseActions.push({
+            title: 'Close Ticket',
+            shortTitle: 'Close',
+            icon: X,
+            color: 'red',
+            action: 'close_ticket',
+            targetStage: 'TICKET_CLOSED',
+            requiresPhotos: false,
+          });
+        }
+
+        return baseActions;
       })(),
       SPARE_REQUESTED: [
         // Show add photos button if photos are needed
@@ -271,6 +313,16 @@ const MilestoneActionButton = ({
           color: 'orange',
           action: 'upload_photos',
           requiresPhotos: true,
+        }] : []),
+        // Cancel spare request and close ticket for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
+        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+          title: 'Cancel Spare & Close Ticket',
+          shortTitle: 'Cancel & Close',
+          icon: X,
+          color: 'red',
+          action: 'cancel_spare_and_close',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
         }] : [])
       ],
       SPARE_APPROVED: [
@@ -282,7 +334,17 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'READY_FOR_DISPATCH',
           requiresPhotos: true,
-        }, 
+        },
+        // Cancel spare request and close ticket for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
+        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+          title: 'Cancel Spare & Close Ticket',
+          shortTitle: 'Cancel & Close',
+          icon: X,
+          color: 'red',
+          action: 'cancel_spare_and_close',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : [])
       ],
       REPAIR_IN_PROGRESS: [
         {
@@ -293,7 +355,17 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'REPAIRED',
           requiresPhotos: false,
-        }
+        },
+        // Close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
+        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+          title: 'Close Ticket',
+          shortTitle: 'Close',
+          icon: X,
+          color: 'red',
+          action: 'close_ticket',
+          targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : [])
       ],
       REPAIRED: [
         {
@@ -374,6 +446,11 @@ const MilestoneActionButton = ({
         return canUserTransitionToStage(userRole, config.targetStage);
       }
 
+      // For close_ticket and cancel_spare_and_close actions - MACSOFT_ADMIN has unrestricted access
+      if (config.action === 'close_ticket' || config.action === 'cancel_spare_and_close') {
+        return userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId));
+      }
+
       // For upload_photos and other non-transition actions, allow if user can access current stage
       if (config.action === 'upload_photos') {
         return canUserTransitionToStage(userRole, stage);
@@ -429,6 +506,7 @@ const MilestoneActionButton = ({
     green: 'bg-green-600 hover:bg-green-700',
     emerald: 'bg-emerald-600 hover:bg-emerald-700',
     orange: 'bg-orange-600 hover:bg-orange-700',
+    red: 'bg-red-600 hover:bg-red-700',
     gray: 'bg-gray-400 cursor-not-allowed',
   };
 

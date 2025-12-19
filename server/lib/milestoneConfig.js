@@ -269,7 +269,7 @@ const milestoneStageConfig = [
     order: 15,
     label: "Ticket Closed",
     description: "Ticket permanently closed",
-    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN"],
+    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN", "SERVICE_CENTER_TECHNICIAN"], // Allow service center technicians to close tickets they created
     photoRequired: false,
     isFinal: true,
     notes: "Ticket has been permanently closed",
@@ -345,6 +345,13 @@ function validateMilestoneTransition(
     };
   }
 
+  // Special validation for SERVICE_CENTER_TECHNICIAN closing tickets
+  if (userRole === 'SERVICE_CENTER_TECHNICIAN' && targetStage === 'TICKET_CLOSED') {
+    // This validation is handled in the service layer where we have access to ticket data
+    // Here we just allow the role validation to pass
+    return { valid: true };
+  }
+
   // Check role permission for the TARGET stage
   if (!canRoleTransitionToStage(userRole, targetStage)) {
     return {
@@ -392,12 +399,12 @@ function validateMilestoneTransition(
       ],
       SENT_TO_SERVICE_CENTER: ["SUBMITTED_TO_SERVICE_CENTER"],
       SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
-      RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS"],
-      DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS"],
-      SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED"],
-      SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD"], // Direct completion options after spare approval
+      RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS", "TICKET_CLOSED"], // Allow technicians to close ticket
+      DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS", "TICKET_CLOSED"], // Allow technicians to close ticket
+      SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED", "TICKET_CLOSED"], // Allow technicians to cancel spare and close ticket
+      SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD", "TICKET_CLOSED"], // Allow technicians to cancel spare and close ticket
       SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD"], // Can close or try field clearance after rejection
-      REPAIR_IN_PROGRESS: ["REPAIRED"], // Repair goes directly to repaired
+      REPAIR_IN_PROGRESS: ["REPAIRED", "TICKET_CLOSED"], // Allow technicians to close ticket
       REPLACEMENT_IN_PROGRESS: [
         "SPARE_REQUESTED",
         "REQUEST_CLEARED_AT_FIELD",

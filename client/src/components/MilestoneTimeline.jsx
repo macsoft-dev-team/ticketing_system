@@ -493,7 +493,8 @@ const MilestoneCard = ({
     addToast,
     user,
     allMilestones,
-    ticketStatus
+    ticketStatus,
+    ticketCreatedBy
 }) => {
     const [showDetails, setShowDetails] = useState(isActive);
     const [showTransitionForm, setShowTransitionForm] = useState(false);
@@ -665,6 +666,8 @@ const MilestoneCard = ({
                                         onAction={handleMilestoneAction || defaultMilestoneAction}
                                         userRole={user?.role}
                                         allMilestones={allMilestones}
+                                        ticketCreatedBy={ticketCreatedBy}
+                                        currentUserId={user?.id}
                                     />
                                 )}
                             </div>
@@ -820,7 +823,7 @@ const MilestoneCard = ({
     );
 };
 
-export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMilestoneUpdate, onAction, onUpdateNotes, ticketStatus }) => {
+export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMilestoneUpdate, onAction, onUpdateNotes, ticketStatus, ticketCreatedBy }) => {
     const [milestones, setMilestones] = useState(propMilestones || []);
     const [availableTransitions, setAvailableTransitions] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -831,6 +834,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     const [uploadingPhotos, setUploadingPhotos] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [confirmDialogData, setConfirmDialogData] = useState(null);
+    const [confirmationNotes, setConfirmationNotes] = useState('');
     const [showSpareRequestModal, setShowSpareRequestModal] = useState(false);
     const [pendingSpareTransition, setPendingSpareTransition] = useState(null);
     const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -1456,6 +1460,30 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 currentStage
             });
             setShowConfirmDialog(true);
+        } else if (action === 'close_ticket') {
+            // Handle close ticket action
+            setConfirmDialogData({
+                title: 'Close Ticket',
+                message: 'This will permanently close the ticket at the current stage. This action cannot be undone. Are you sure you want to proceed?',
+                confirmText: 'Close Ticket',
+                action,
+                targetStage: 'TICKET_CLOSED',
+                requiresPhotos: false,
+                currentStage
+            });
+            setShowConfirmDialog(true);
+        } else if (action === 'cancel_spare_and_close') {
+            // Handle cancel spare request and close ticket action
+            setConfirmDialogData({
+                title: 'Cancel Spare Request & Close Ticket',
+                message: 'This will cancel all pending spare requests and permanently close the ticket. This action cannot be undone. Are you sure you want to proceed?',
+                confirmText: 'Cancel & Close',
+                action,
+                targetStage: 'TICKET_CLOSED',
+                requiresPhotos: false,
+                currentStage
+            });
+            setShowConfirmDialog(true);
         } else if (action === 'transition' && targetStage) {
             // Fallback for transitions without specific confirmation messages
             setConfirmDialogData({
@@ -1478,6 +1506,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         const { action, targetStage, isPhotoUpload } = confirmDialogData;
 
         setShowConfirmDialog(false);
+        setConfirmationNotes(''); // Reset notes
 
         if (isPhotoUpload) {
             // Handle photo upload action - create a file input dynamically
@@ -1492,6 +1521,24 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 }
             };
             fileInput.click();
+        } else if (action === 'close_ticket' || action === 'cancel_spare_and_close') {
+            // Handle close ticket or cancel spare and close actions
+            if (onAction) {
+                await onAction({
+                    action,
+                    targetStage: 'TICKET_CLOSED',
+                    requiresPhotos: false,
+                    currentStage: confirmDialogData.currentStage,
+                    notes: confirmationNotes
+                });
+            } else {
+                console.warn('onAction prop not provided for action:', action);
+                addToast({
+                    title: 'Error',
+                    description: 'Action handler not available. Please refresh the page.',
+                    variant: 'error'
+                });
+            }
         } else if (action === 'transition' && targetStage) {
             // Handle milestone transition
             setSelectedTargetStage(targetStage);
@@ -1574,6 +1621,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                             user={user}
                             allMilestones={milestones}
                             ticketStatus={ticketStatus}
+                            ticketCreatedBy={ticketCreatedBy}
                         />
                     );
                 })}
@@ -1819,7 +1867,10 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                     {confirmDialogData.title}
                                 </h3>
                                 <button
-                                    onClick={() => setShowConfirmDialog(false)}
+                                    onClick={() => {
+                                        setShowConfirmDialog(false);
+                                        setConfirmationNotes('');
+                                    }}
                                     className="text-gray-400 hover:text-gray-600"
                                 >
                                     <X className="w-5 h-5" />
@@ -1857,20 +1908,49 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                 )}
                             </div>
 
+                            {/* Notes field for close ticket actions */}
+                            {(confirmDialogData.action === 'close_ticket' || confirmDialogData.action === 'cancel_spare_and_close') && (
+                                <div className="mb-4">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Reason for closing ticket <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        value={confirmationNotes}
+                                        onChange={(e) => setConfirmationNotes(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        rows="3"
+                                        placeholder="Please provide a reason for closing this ticket..."
+                                        required
+                                    />
+                                    {confirmationNotes.trim() === '' && (
+                                        <p className="mt-1 text-sm text-red-600">
+                                            Please provide a reason for closing the ticket
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
                             <div className="flex items-center justify-end gap-3">
                                 <button
-                                    onClick={() => setShowConfirmDialog(false)}
+                                    onClick={() => {
+                                        setShowConfirmDialog(false);
+                                        setConfirmationNotes('');
+                                    }}
                                     className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleConfirmedAction}
-                                    className={`px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2 font-medium ${(confirmDialogData.targetStage === 'REQUEST_CLEARED_AT_FIELD' || confirmDialogData.targetStage === 'FIELD_CLEARANCE_APPROVED')
-                                        ? 'bg-red-600 hover:bg-red-700'
-                                        : confirmDialogData.isPhotoUpload
-                                            ? 'bg-orange-600 hover:bg-orange-700'
-                                            : 'bg-blue-600 hover:bg-blue-700'
+                                    disabled={(confirmDialogData.action === 'close_ticket' || confirmDialogData.action === 'cancel_spare_and_close') && confirmationNotes.trim() === ''}
+                                    className={`px-4 py-2 text-white rounded-lg transition-colors flex items-center gap-2 font-medium ${
+                                        (confirmDialogData.action === 'close_ticket' || confirmDialogData.action === 'cancel_spare_and_close') && confirmationNotes.trim() === ''
+                                            ? 'bg-gray-400 cursor-not-allowed'
+                                            : (confirmDialogData.targetStage === 'REQUEST_CLEARED_AT_FIELD' || confirmDialogData.targetStage === 'FIELD_CLEARANCE_APPROVED')
+                                                ? 'bg-red-600 hover:bg-red-700'
+                                                : confirmDialogData.isPhotoUpload
+                                                    ? 'bg-orange-600 hover:bg-orange-700'
+                                                    : 'bg-blue-600 hover:bg-blue-700'
                                         }`}
                                 >
                                     {confirmDialogData.isPhotoUpload && <Camera className="w-4 h-4" />}
