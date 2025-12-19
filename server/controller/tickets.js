@@ -24,8 +24,15 @@ const getTickets = async (req, res) => {
       id,
       role
     );
+    const _transformTickets = tickets.map(ticket => {
+      return {
+        ...ticket,
+        state: ticket.state?.name || "NEW",
+        selectedDistrict: ticket.selectedDistrict?.name || "UNKNOWN",
+       };
+    });
     res.status(200).json({
-      tickets,
+      tickets: _transformTickets,
       totalPages: Math.ceil(count / take),
       currentPage: parseInt(skip) || 1,
       statusCount,
@@ -41,6 +48,9 @@ const getTicketById = async (req, res) => {
   const userRole = req.user.role;
   try {
     const ticket = await ticketService.getTicketById(parseInt(id), userId, userRole);
+
+    ticket.state = ticket.state?.name || "NEW";
+    ticket.selectedDistrict = ticket.selectedDistrict?.name || "UNKNOWN";
     if (!ticket) {
       return res.status(404).json({ message: "Ticket not found" });
     }

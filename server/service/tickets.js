@@ -85,6 +85,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
           },
           orderBy: { order: "asc" },
         },
+         state: true,
       },
       orderBy: [
         { isBuzzerOn: "desc" }, // Buzzer alert tickets first
@@ -426,6 +427,8 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
             order: "asc",
           },
         },
+        state: true,
+        selectedDistrict: true,
       },
     });
 

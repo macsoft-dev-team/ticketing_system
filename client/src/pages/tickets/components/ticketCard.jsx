@@ -40,7 +40,9 @@ export default function TicketCard({
         category: 'Network',
         createdAt: '2025-01-15',
         updatedAt: '2025-01-15',
-        dueDate: '2025-01-20'
+        dueDate: '2025-01-20',
+        state: '',
+        customerName: '',
     },
     onStatusChange,
     onDelete,
@@ -97,7 +99,7 @@ export default function TicketCard({
 
             // Only update if this message is for the current ticket
             if (messageData.ticketId === localTicket.id) {
- 
+
                 // Update local ticket with new message
                 setLocalTicket(prev => {
                     // Create new message object from socket data
@@ -141,7 +143,7 @@ export default function TicketCard({
 
             // Only update if this message is for the current ticket
             if (messageData.ticketId === localTicket.id) {
- 
+
                 // Update local ticket with new message
                 setLocalTicket(prev => {
                     // Create new message object from socket data
@@ -770,8 +772,8 @@ export default function TicketCard({
                         `}
                     >
                         <div className={`w-2 h-2 rounded-full ${localTicket.status === TICKET_STATUS.OPEN ? 'bg-red-500' :
-                                localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
-                                    'bg-blue-500'
+                            localTicket.status === TICKET_STATUS.IN_PROGRESS ? 'bg-yellow-500' :
+                                'bg-blue-500'
                             }`}></div>
                         {localTicket.status.replace('-', ' ')}
                     </motion.div>
@@ -884,8 +886,8 @@ export default function TicketCard({
                     {/* Last message for open/in-progress tickets */}
                     {shouldShowLastMessageForActiveTickets() && (
                         <div className={`mt-3 p-3 rounded-lg border ${unreadCount > 0
-                                ? 'bg-blue-50 border-blue-200'
-                                : 'bg-slate-50 border-slate-200'
+                            ? 'bg-blue-50 border-blue-200'
+                            : 'bg-slate-50 border-slate-200'
                             }`}>
                             <div className="flex items-center gap-2 mb-2">
                                 <MessageSquare className={`w-4 h-4 ${unreadCount > 0 ? 'text-blue-600' : 'text-slate-600'}`} />
@@ -921,16 +923,36 @@ export default function TicketCard({
 
                 {/* Metadata Grid */}
                 <div className="space-y-3 mt-auto">
+                    {/* Customer Name and State */}
+                    {(localTicket.customerName || localTicket.state) && (
+                        <div className="flex items-center justify-between">
+                            
+                          
+                        </div>
+                    )}
+
                     {/* Assignee and Category */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg flex-1 mr-2">
+                    <div className="flex items-center justify-start flex-wrap gap-2">
+                        <div className="flex items-center gap-2 text-sm flex-1 text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                             <User className="w-4 h-4 text-slate-400" />
                             <span className="truncate font-medium">{localTicket.createdByUser?.name}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
+                    {/*     <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                             <Tag className="w-4 h-4 text-slate-400" />
                             <span className="truncate">{localTicket.category}</span>
-                        </div>
+                        </div> */}
+                        {localTicket.customerName && (
+                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-green-50 px-3 py-2 rounded-lg">
+                                <Tag className="w-4 h-4 text-green-400" />
+                                <span className="truncate">{localTicket.customerName}</span>
+                            </div>
+                        )}
+                        {localTicket.state && (
+                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-green-50 px-3 py-2 rounded-lg">
+                                <Tag className="w-4 h-4 text-green-400" />
+                                <span className="truncate">{localTicket.state}</span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Dates Row */}
