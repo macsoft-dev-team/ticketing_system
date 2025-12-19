@@ -300,6 +300,7 @@ export default function Header() {
                     >
                         <option value="controller">Controller Number</option>
                         <option value="ticket">Ticket Code</option>
+                        <option value="imeinumber">IMEI Number</option>
                     </motion.select>
 
                     {/* Search Input - Desktop */}

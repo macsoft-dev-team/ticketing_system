@@ -117,6 +117,9 @@ const getTickets = async (skip, take, filter, userId, role) => {
         } else if (searchType === 'controller') {
           // Search only in controller number
           where.controllerNo = { contains: s };
+        } else if (searchType === 'imeinumber') {
+          // Search only in IMEI number
+          where.imei = { contains: s };          
         } else {
           // Fallback to search all fields if searchType is not recognized
           where.OR = [
