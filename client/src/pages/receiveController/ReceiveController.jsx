@@ -183,7 +183,7 @@ const ReceiveController = () => {
             take: 50,
             filter: {
                 search: keyword,
-                milestoneStage: 'SENT_TO_SERVICE_CENTER' // Filter by milestone stage
+                milestoneStage: 'SUBMITTED_TO_SERVICE_CENTER' // Filter by milestone stage
             }
         });
         setShowTicketsList(true);
@@ -213,11 +213,7 @@ const ReceiveController = () => {
         setPhotos([]);
         setVideos([]);
         setAudioRecording(null);
-        addToast({
-            title: 'Ticket Selected',
-            description: `Selected ticket ${ticket.ticketCode}`,
-            variant: 'success'
-        });
+ 
     }, [addToast]);
 
     // Add selected ticket to batch after photos are taken
@@ -265,14 +261,8 @@ const ReceiveController = () => {
             // Check if milestone creation was successful
             if (milestoneResult.meta.requestStatus === 'fulfilled') {
                 // Now add ticket to batch
-                await addTicketToBatch(currentBatch.id, searchedTicket.id);
-                
-                addToast({
-                    title: 'Success',
-                    description: `Ticket ${searchedTicket.ticketCode} received at service center and added to batch`,
-                    variant: 'success'
-                });
-                
+                await addTicketToBatch(currentBatch.id, searchedTicket.id);                
+             
                 // Reset form after adding to batch
                 setSearchedTicket(null);
                 setPhotos([]);
@@ -352,7 +342,7 @@ const ReceiveController = () => {
                 take: 50,
                 filter: {
                     search: keyword,
-                    milestoneStage: 'SENT_TO_SERVICE_CENTER' // Filter by milestone stage
+                    milestoneStage: 'SUBMITTED_TO_SERVICE_CENTER' // Filter by milestone stage
                 }
             });
             setShowTicketsList(true);
