@@ -395,10 +395,11 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
           include: {
             sender: true,
             attachments: true,
-            seenBy: {
-              select: {
-                userId: true,
-                seenAt: true,
+            seenBy: { 
+              include: {
+                user: {
+                  select: { id: true, name: true, role: true }
+                }
               },
             },
           },

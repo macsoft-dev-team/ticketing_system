@@ -6,6 +6,7 @@ import MediaCapture from './MediaCapture';
 import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
 import { useToast } from '../../lib/hooks/use-toast';
 import { useSoundManager } from '../../lib/hooks/SoundManager';
+import moment from 'moment';
 
 const TicketClosedView = ({ onViewChat }) => {
   return (
@@ -176,7 +177,7 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
     
     // If date is provided, use it
     if (date) {
-      return `${date} ${timestamp}`;
+      return `${moment(date).format('LLL')}`;
     }
     
     // Otherwise try to format the timestamp
@@ -637,8 +638,8 @@ export const ChatWindow = ({
               key={msg.id || index}
               message={msg.message}
               isOwnMessage={msg.isOwnMessage}
-              timestamp={msg.timestamp}
-              date={msg.date}
+              timestamp={msg.createdAt}
+              date={msg.createdAt}
               avatar={msg.avatar}
               name={msg.senderName}
               attachments={msg.attachments}
