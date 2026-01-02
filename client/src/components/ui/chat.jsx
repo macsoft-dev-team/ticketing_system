@@ -177,7 +177,7 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
     
     // If date is provided, use it
     if (date) {
-      return `${moment(date).format('LLL')}`;
+      return `${moment(date).format('llll')}`;
     }
     
     // Otherwise try to format the timestamp

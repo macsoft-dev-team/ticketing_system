@@ -153,104 +153,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         fetchProjects();
     }, [addToast]);
 
-    // Initialize states with districts data
-    useEffect(() => {
-        const initializeStates = () => {
-            try {
-                setIsLoadingStates(true);
-                // Using the provided states data with embedded districts
-                const statesWithDistricts = [
-                    {
-                        "id": 35,
-                        "name": "Andaman And Nicobar Islands",
-                        "code": "35",
-                        "districts": []
-                    },
-                    {
-                        "id": 28,
-                        "name": "Andhra Pradesh",
-                        "code": "28",
-                        "districts": []
-                    },
-                    {
-                        "id": 12,
-                        "name": "Arunachal Pradesh",
-                        "code": "12",
-                        "districts": [
-                            { "id": 236, "districtName": "Lower Subansiri", "districtCode": 236, "stateCode": 12 },
-                            { "id": 237, "districtName": "Papum Pare", "districtCode": 237, "stateCode": 12 },
-                            { "id": 238, "districtName": "Tawang", "districtCode": 238, "stateCode": 12 },
-                            { "id": 239, "districtName": "Tirap", "districtCode": 239, "stateCode": 12 },
-                            { "id": 240, "districtName": "Upper Siang", "districtCode": 240, "stateCode": 12 },
-                            { "id": 241, "districtName": "Upper Subansiri", "districtCode": 241, "stateCode": 12 },
-                            { "id": 242, "districtName": "West Kameng", "districtCode": 242, "stateCode": 12 },
-                            { "id": 243, "districtName": "West Siang", "districtCode": 243, "stateCode": 12 },
-                            { "id": 678, "districtName": "Namsai", "districtCode": 678, "stateCode": 12 },
-                            { "id": 679, "districtName": "Siang", "districtCode": 679, "stateCode": 12 },
-                            { "id": 719, "districtName": "Lower Siang", "districtCode": 719, "stateCode": 12 },
-                            { "id": 723, "districtName": "Pakke Kessang", "districtCode": 723, "stateCode": 12 },
-                            { "id": 725, "districtName": "Shi Yomi", "districtCode": 725, "stateCode": 12 }
-                        ]
-                    },
-                    {
-                        "id": 18,
-                        "name": "Assam",
-                        "code": "18",
-                        "districts": [
-                            { "id": 280, "districtName": "Barpeta", "districtCode": 280, "stateCode": 18 },
-                            { "id": 281, "districtName": "Bongaigaon", "districtCode": 281, "stateCode": 18 },
-                            { "id": 282, "districtName": "Cachar", "districtCode": 282, "stateCode": 18 },
-                            { "id": 283, "districtName": "Darrang", "districtCode": 283, "stateCode": 18 },
-                            { "id": 284, "districtName": "Dhemaji", "districtCode": 284, "stateCode": 18 },
-                            { "id": 285, "districtName": "Dhubri", "districtCode": 285, "stateCode": 18 },
-                            { "id": 286, "districtName": "Dibrugarh", "districtCode": 286, "stateCode": 18 },
-                            { "id": 287, "districtName": "Goalpara", "districtCode": 287, "stateCode": 18 },
-                            { "id": 288, "districtName": "Golaghat", "districtCode": 288, "stateCode": 18 },
-                            { "id": 289, "districtName": "Hailakandi", "districtCode": 289, "stateCode": 18 },
-                            { "id": 290, "districtName": "Jorhat", "districtCode": 290, "stateCode": 18 },
-                            { "id": 291, "districtName": "Kamrup", "districtCode": 291, "stateCode": 18 },
-                            { "id": 292, "districtName": "Karbi Anglong", "districtCode": 292, "stateCode": 18 },
-                            { "id": 293, "districtName": "Karimganj", "districtCode": 293, "stateCode": 18 },
-                            { "id": 294, "districtName": "Kokrajhar", "districtCode": 294, "stateCode": 18 },
-                            { "id": 295, "districtName": "Lakhimpur", "districtCode": 295, "stateCode": 18 },
-                            { "id": 296, "districtName": "Marigaon", "districtCode": 296, "stateCode": 18 },
-                            { "id": 297, "districtName": "Nagaon", "districtCode": 297, "stateCode": 18 },
-                            { "id": 298, "districtName": "Nalbari", "districtCode": 298, "stateCode": 18 },
-                            { "id": 299, "districtName": "Dima Hasao", "districtCode": 299, "stateCode": 18 },
-                            { "id": 300, "districtName": "Sivasagar", "districtCode": 300, "stateCode": 18 },
-                            { "id": 301, "districtName": "Sonitpur", "districtCode": 301, "stateCode": 18 },
-                            { "id": 302, "districtName": "Tinsukia", "districtCode": 302, "stateCode": 18 },
-                            { "id": 612, "districtName": "Chirang", "districtCode": 612, "stateCode": 18 },
-                            { "id": 616, "districtName": "Baksa", "districtCode": 616, "stateCode": 18 },
-                            { "id": 617, "districtName": "Udalguri", "districtCode": 617, "stateCode": 18 },
-                            { "id": 618, "districtName": "Kamrup Metro", "districtCode": 618, "stateCode": 18 },
-                            { "id": 705, "districtName": "Biswanath", "districtCode": 705, "stateCode": 18 },
-                            { "id": 706, "districtName": "Majuli", "districtCode": 706, "stateCode": 18 },
-                            { "id": 707, "districtName": "South Salmara Mancachar", "districtCode": 707, "stateCode": 18 },
-                            { "id": 708, "districtName": "Charaideo", "districtCode": 708, "stateCode": 18 },
-                            { "id": 709, "districtName": "Hojai", "districtCode": 709, "stateCode": 18 },
-                            { "id": 710, "districtName": "West Karbi Anglong", "districtCode": 710, "stateCode": 18 },
-                            { "id": 739, "districtName": "Bajali", "districtCode": 739, "stateCode": 18 },
-                            { "id": 756, "districtName": "Tamulpur", "districtCode": 756, "stateCode": 18 }
-                        ]
-                    }
-                    // Add more states here - truncated for brevity
-                ];
-                setStates(statesWithDistricts || []);
-            } catch (error) {
-                addToast({
-                    title: "Warning",
-                    description: "Failed to load states. Please refresh the page.",
-                    variant: "warning"
-                });
-                setStates([]);
-            } finally {
-                setIsLoadingStates(false);
-            }
-        };
-
-    }, [addToast]);
-
+ 
     // Auto-populate state information when project is selected
     useEffect(() => {
         const selectedProject = watch('project');
@@ -420,27 +323,26 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
             if (error.message && !error.response) {
                 errorMessage = error.message;
             } else if (error.response?.status === 404) {
-                errorMessage = `Controller ${controllerNumber} not found in LMS system`;
+                errorMessage = `Controller ${controllerNumber} not found in LMS system. You can still create the ticket by filling the required fields manually.`;
             } else if (error.response?.status === 400) {
-                errorMessage = 'Invalid controller number format';
+                errorMessage = 'Invalid controller number format. You can still create the ticket by filling the required fields manually.';
             } else if (error.code === 'NETWORK_ERROR' || !navigator.onLine) {
-                errorMessage = 'Network error - please check your connection';
+                errorMessage = 'Network error - please check your connection. You can still create the ticket by filling the required fields manually.';
             } else if (error.response?.status >= 500) {
-                errorMessage = 'LMS server is temporarily unavailable';
+                errorMessage = 'LMS server is temporarily unavailable. You can still create the ticket by filling the required fields manually.';
             } else if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
+                errorMessage = error.response.data.message + ' You can still create the ticket by filling the required fields manually.';
             }
 
             setControllerError(errorMessage);
-
-            // Clear the auto-filled fields if error occurs
             setValue('imei', '');
             setValue('hp', '');
             setValue('motorHpId', null);
             setValue('motorType', '');
             setValue('project', '');
-            // Don't clear customer name, district, or state as user might have entered them manually
-            // Only clear them if they were auto-filled from the current controller lookup
+            // Keep the controller number but don't clear it
+            setValue('controllerNo', controllerNumber);
+            // Don't clear other fields as they might be manually entered
         } finally {
             setIsFetchingController(false);
         }
@@ -555,7 +457,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 imei: data.imei || '',
                 hp: data.hp || '',
                 motorHpId: data.motorHpId || null,
-                motorType: data.motorType,
+                motorType: data.motorType || '',
                 head: data.head || '',
                 pumpPlacementDepth: data.pumpPlacementDepth || '',
                 cableLength: data.cableLength || '',
@@ -586,9 +488,14 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 }
 
                 // Show success message
+                let successDescription = `Ticket ${result.ticketCode || result.ticketNumber} created successfully.`;
+                if (controllerError && controllerError.includes('not found in LMS')) {
+                    successDescription += ' Note: Controller details could not be fetched from LMS, but the ticket was created with the provided information.';
+                }
+                
                 addToast({
                     title: "Success!",
-                    description: `Ticket ${result.ticketCode || result.ticketNumber} created successfully.`,
+                    description: successDescription,
                     variant: "success"
                 });
 
@@ -758,14 +665,16 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         </p>
                                     )}
                                     {controllerError && (
-                                        <motion.p
+                                        <motion.div
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="text-orange-600 text-sm flex items-center gap-1"
+                                            className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 text-sm"
                                         >
-                                            <AlertCircle className="w-4 h-4" />
-                                            {controllerError}
-                                        </motion.p>
+                                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                            <span className="flex-1">
+                                                {controllerError}
+                                            </span>
+                                        </motion.div>
                                     )}
                                     {controllerNo && controllerNo.length >= 3 && !isFetchingController && !controllerError && watchedValues.imei && (
                                         <motion.div
