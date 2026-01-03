@@ -335,9 +335,10 @@ export default function SpareRequestApproval() {
   };
 
   const getStockStatus = (requested, macsoftAvailable, centerAvailable) => {
-    const totalAvailable = Math.max(macsoftAvailable, centerAvailable || 0);
+    // Only check assigned service center availability (ignore MACSOFT hub)
+    const availableAtCenter = centerAvailable || 0;
     
-    if (totalAvailable >= requested) {
+    if (availableAtCenter >= requested) {
       return { status: 'sufficient', color: 'text-green-600 bg-green-50', icon: CheckCircle };
     } else {
       return { status: 'insufficient', color: 'text-red-600 bg-red-50', icon: AlertTriangle };
@@ -613,16 +614,18 @@ export default function SpareRequestApproval() {
                         </td>
                         <td className="px-3 lg:px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-col space-y-1">
-                            <span className={`inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              item.availableQuantity >= item.requestedQuantity 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {user?.role?.includes('MACSOFT') ? 'MACSOFT' : (user?.centerCode || 'Local')}: {item.availableQuantity}
-                            </span>
-                            {item.centerAvailableQuantity !== undefined && item.requestingCenter && (
-                              <span className="inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {/* Only show assigned service center availability */}
+                            {item.centerAvailableQuantity !== undefined && item.requestingCenter ? (
+                              <span className={`inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                item.centerAvailableQuantity >= item.requestedQuantity 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
                                 {item.requestingCenter}: {item.centerAvailableQuantity}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-1.5 lg:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                N/A
                               </span>
                             )}
                           </div>
@@ -939,24 +942,85 @@ export default function SpareRequestApproval() {
                     Recent Transactions (Last 5)
                   </h4>
                   <div className="divide-y divide-gray-200">
-                    {transactionHistory.map((transaction, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-white">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-2 h-2 rounded-full ${
-                            transaction.transactionType === 'INBOUND' ? 'bg-green-500' : 'bg-red-500'
-                          }`}></div>
-                          <span className="text-sm text-gray-900">
-                            {transaction.transactionType === 'INBOUND' ? 'Added' : 'Issued'} {transaction.items.length > 0 ? transaction.items.reduce((acc, item) => acc + item.quantity, 0) : 0} units
-                          </span>
+                    {transactionHistory.map((transaction, index) => {
+                      const totalQty = transaction.items.length > 0 
+                        ? transaction.items.reduce((acc, item) => acc + item.quantity, 0) 
+                        : 0;
+                      
+                      // Get transaction display info
+                      const getTransactionInfo = (type, items) => {
+                        const condition = items[0]?.condition;
+                        
+                        switch(type) {
+                          case 'TICKET_ISSUE':
+                            return {
+                              dot: 'bg-blue-500',
+                              label: 'Issued New Parts',
+                              detail: `${totalQty} unit(s) - ${condition || 'GOOD'}`,
+                              icon: '→'
+                            };
+                          case 'RETURN':
+                            return {
+                              dot: 'bg-orange-500',
+                              label: 'Returned Defective',
+                              detail: `${totalQty} unit(s) - ${condition || 'DEFECTIVE'}`,
+                              icon: '←'
+                            };
+                          case 'RECEIPT':
+                            return {
+                              dot: 'bg-green-500',
+                              label: 'Received',
+                              detail: `${totalQty} unit(s)`,
+                              icon: '↓'
+                            };
+                          case 'TRANSFER':
+                            return {
+                              dot: 'bg-purple-500',
+                              label: 'Transfer',
+                              detail: `${totalQty} unit(s)`,
+                              icon: '⇄'
+                            };
+                          default:
+                            return {
+                              dot: 'bg-gray-500',
+                              label: type,
+                              detail: `${totalQty} unit(s)`,
+                              icon: '•'
+                            };
+                        }
+                      };
+                      
+                      const info = getTransactionInfo(transaction.transactionType, transaction.items);
+                      
+                      return (
+                        <div key={index} className="flex items-center justify-between p-3 bg-white rounded hover:bg-gray-50 border border-gray-100">
+                          <div className="flex items-center space-x-3">
+                            <div className={`w-3 h-3 rounded-full ${info.dot}`}></div>
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-base">{info.icon}</span>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {info.label}
+                                </span>
+                              </div>
+                              <span className="text-xs text-gray-500">{info.detail}</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(transaction.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(transaction.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
+                  
 
               {/* Warning for insufficient stock */}
               {!selectedSpare.canApprove && (

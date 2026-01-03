@@ -175,15 +175,33 @@ exports.approveSpareRequest = async (req, res) => {
       }
     }
 
-    // Create TICKET_ISSUE transaction
-    const transaction = await inventoryTransactionService.createTransaction(
+    // Create TICKET_ISSUE transaction (new parts going out)
+    const issueTransaction = await inventoryTransactionService.createTransaction(
       {
         transactionType: "TICKET_ISSUE",
         status: "COMPLETED",
         centerCode: ticket.assignedServiceCenter,
         ticketId: ticket.id,
         items: transactionItems,
-        remarks: `Spare request #${spareRequestId} approved`,
+        remarks: `Spare request #${spareRequestId} approved - New parts issued`,
+      },
+      userId
+    );
+
+    // Create RETURN transaction (defective parts coming back)
+    const returnItems = transactionItems.map((item) => ({
+      ...item,
+      condition: "DEFECTIVE", // Track returned parts as defective
+    }));
+
+    const returnTransaction = await inventoryTransactionService.createTransaction(
+      {
+        transactionType: "RETURN",
+        status: "COMPLETED",
+        centerCode: ticket.assignedServiceCenter,
+        ticketId: ticket.id,
+        items: returnItems,
+        remarks: `Spare request #${spareRequestId} approved - Defective parts returned`,
       },
       userId
     );
@@ -209,8 +227,11 @@ exports.approveSpareRequest = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Spare request approved and inventory deducted",
-      transaction,
+      message: "Spare request approved - New parts issued and defective parts tracked",
+      transactions: {
+        issue: issueTransaction,
+        return: returnTransaction,
+      },
     });
   } catch (error) {
     console.error("❌ Approve spare request error:", error);

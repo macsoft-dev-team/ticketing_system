@@ -838,6 +838,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         {...register('pumpPlacementDepth')}
                                         type="number"
                                         step="0.01"
+                                        min="0"
                                         className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.pumpPlacementDepth ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
                                         placeholder="Enter depth in meters"
@@ -863,6 +864,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         {...register('cableLength')}
                                         type="number"
                                         step="0.01"
+                                        min="0"
                                         className={`w-full px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 lg:py-3 border rounded-md xs:rounded-lg text-xs xs:text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.cableLength ? 'border-red-300 bg-red-50' : 'border-gray-300'
                                             }`}
                                         placeholder="Enter length in meters"

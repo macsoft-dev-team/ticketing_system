@@ -75,14 +75,14 @@ async function createSpareRequest(data) {
     
     if (stockCheck.allAvailable) {
       // Service center already has the required items in stock
-      console.log(`ℹ️ All items available at center ${checkCenterCode}. Spare request still created for approval workflow.`);
-    } else {
+/*       console.log(`ℹ️ All items available at center ${checkCenterCode}. Spare request still created for approval workflow.`);
+ */    } else {
       const insufficientItems = stockCheck.insufficientItems.map(item => 
         `${item.product?.name || `Product ${item.productId}`}: Required ${item.requestedQuantity}, Available at ${checkCenterCode}: ${item.availableQuantity}`
       );
       
-      console.warn(`⚠️ Service center ${checkCenterCode} has insufficient inventory:`, insufficientItems);
-      
+/*       console.warn(`⚠️ Service center ${checkCenterCode} has insufficient inventory:`, insufficientItems);
+ */      
       // Create the spare request as items are not available locally
       // This will trigger the approval workflow to get items from MHSEC
     }
@@ -631,7 +631,8 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
       const condition = 'GOOD';
       const conditionField = 'goodQty';
 
-      // First, check if spare is available at the requesting service center
+      // Only check if spare is available at the assigned service center
+      // Do NOT fallback to MHSEC - approval only allowed if locally available
       const centerInventory = await tx.inventory.findUnique({
         where: {
           centerCode_productId: {
@@ -643,36 +644,18 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
 
       const centerAvailableQty = centerInventory?.[conditionField] || 0;
       
-      let fromCenterCode;
-      let inventory;
-      let availableQty;
-      let isLocalApproval = false;
-
-      // If available at requesting center, approve from there
-      if (centerAvailableQty >= spareItem.quantity) {
-        fromCenterCode = toCenterCode;
-        inventory = centerInventory;
-        availableQty = centerAvailableQty;
-        isLocalApproval = true;
-        console.log(`✅ Spare available at requesting center ${toCenterCode}. Approving from local inventory.`);
-      } else {
-        // Otherwise, check MHSEC (MACSOFT HEAD SERVICE CENTER)
-        fromCenterCode = 'MHSEC';
-        inventory = await tx.inventory.findUnique({
-          where: {
-            centerCode_productId: {
-              centerCode: fromCenterCode,
-              productId: spareItem.productId
-            }
-          }
-        });
-        availableQty = inventory?.[conditionField] || 0;
-        console.log(`⚠️ Spare not available at ${toCenterCode}. Checking MHSEC inventory.`);
+      // Check if sufficient quantity available at assigned service center
+      if (centerAvailableQty < spareItem.quantity) {
+        throw new Error(`Insufficient inventory at assigned service center ${toCenterCode}. Available: ${centerAvailableQty}, Required: ${spareItem.quantity}. Spare approval is only allowed when parts are available at the assigned service center.`);
       }
 
-      if (availableQty < spareItem.quantity) {
-        throw new Error(`Insufficient ${condition} inventory. Available at ${fromCenterCode}: ${availableQty}, Required: ${spareItem.quantity}`);
-      }
+      // Approve from assigned service center only
+      const fromCenterCode = toCenterCode;
+      const inventory = centerInventory;
+      const availableQty = centerAvailableQty;
+      const isLocalApproval = true;
+      
+      console.log(`✅ Spare available at assigned service center ${toCenterCode}. Approving from local inventory. Available: ${availableQty}, Required: ${spareItem.quantity}`);
 
       // Deduct inventory from source center
       await tx.inventory.update({
@@ -684,20 +667,17 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         }
       });
 
-      // Create ProductTransaction for DELIVERY or TICKET_ISSUE with items
-      // If local approval (same center), mark as TICKET_ISSUE instead of DELIVERY
-      const transactionType = isLocalApproval ? 'TICKET_ISSUE' : 'DELIVERY';
-      const transactionRemarks = isLocalApproval 
-        ? `Spare request approved from local inventory by ${approverName} (${approverRole}) - Item already available at ${fromCenterCode} - Ticket: ${spareItem.spareRequest.ticketCode} - Product: ${spareItem.product.productCode} - Spare Request Item ID: ${itemId}`
-        : `Spare request approved by ${approverName} (${approverRole}) - Delivery from ${fromCenterCode} to ${toCenterCode} - Ticket: ${spareItem.spareRequest.ticketCode} - Product: ${spareItem.product.productCode} - Spare Request Item ID: ${itemId}`;
+      // Create ProductTransaction for TICKET_ISSUE (always local since we only approve from assigned center)
+      const transactionType = 'TICKET_ISSUE';
+      const transactionRemarks = `Spare request approved from assigned service center by ${approverName} (${approverRole}) - Item available at ${fromCenterCode} - Ticket: ${spareItem.spareRequest.ticketCode} - Product: ${spareItem.product.productCode} - Spare Request Item ID: ${itemId}`;
 
-      const transaction = await tx.productTransaction.create({
+      const issueTransaction = await tx.productTransaction.create({
         data: {
           transactionType: transactionType,
           status: 'COMPLETED',
           centerCode: fromCenterCode,
           fromCenterCode: fromCenterCode,
-          toCenterCode: isLocalApproval ? fromCenterCode : toCenterCode,
+          toCenterCode: fromCenterCode,
           remarks: transactionRemarks,
           createdBy: approvedBy,
           deliveryDate: new Date(),
@@ -713,6 +693,44 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
           items: true
         }
       });
+
+      // Create RETURN transaction for defective parts coming back (always created since we only do local approval)
+      const returnRemarks = `Defective parts returned - Spare request ${itemId} - Ticket: ${spareItem.spareRequest.ticketCode} - Product: ${spareItem.product.productCode} - Approved by ${approverName} (${approverRole})`;
+      
+      const returnTransaction = await tx.productTransaction.create({
+        data: {
+          transactionType: 'RETURN',
+          status: 'COMPLETED',
+          centerCode: fromCenterCode,
+          fromCenterCode: fromCenterCode,
+          toCenterCode: fromCenterCode,
+          remarks: returnRemarks,
+          createdBy: approvedBy,
+          deliveryDate: new Date(),
+          items: {
+            create: {
+              productId: spareItem.productId,
+              condition: 'DEFECTIVE',
+              quantity: spareItem.quantity
+            }
+          }
+        },
+        include: {
+          items: true
+        }
+      });
+
+      // Update inventory to add defective quantity
+      await tx.inventory.update({
+        where: { id: inventory.id },
+        data: {
+          damagedQty: {
+            increment: spareItem.quantity
+          }
+        }
+      });
+
+      console.log(`✅ Created RETURN transaction for defective parts: ${returnTransaction.id}`);
 
       // Update spare request item status
       const updatedItem = await tx.spareRequestItem.update({
@@ -866,10 +884,18 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         }
       });
 
-      return { updatedItem, notification, milestoneTransitionResult, transaction };
+      return { 
+        updatedItem, 
+        notification, 
+        milestoneTransitionResult, 
+        transactions: {
+          issue: issueTransaction,
+          return: returnTransaction
+        }
+      };
     });
 
-    console.log(`✅ Spare request item ${itemId} approved. Inventory deducted from ${result.transaction.fromCenterCode}, Transaction ID: ${result.transaction.id}`);
+    console.log(`✅ Spare request item ${itemId} approved from assigned service center ${result.transactions.issue.fromCenterCode}. Issue Transaction: ${result.transactions.issue.id}, Return Transaction: ${result.transactions.return.id}`);
     return result;
   } catch (error) {
     console.error('❌ Error approving spare request item:', error);

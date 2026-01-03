@@ -1033,8 +1033,9 @@ export default function TicketDashboard() {
   };
 
   const getStockStatus = useCallback((requested, macsoftAvailable, centerAvailable) => {
-    const totalAvailable = Math.max(macsoftAvailable, centerAvailable || 0);
-    if (totalAvailable >= requested) {
+    // Only check assigned service center availability (ignore MACSOFT hub)
+    const availableAtCenter = centerAvailable || 0;
+    if (availableAtCenter >= requested) {
       return {
         status: 'sufficient',
         icon: CheckCircle,
@@ -2267,16 +2268,60 @@ export default function TicketDashboard() {
                       <div className="border-t border-green-200 pt-4">
                         <h5 className="text-xs font-medium text-gray-700 mb-2">Recent Transactions</h5>
                         <div className="space-y-2">
-                          {transactionHistory.map((transaction, index) => (
-                            <div key={index} className="flex items-center justify-between text-xs">
-                              <span className="text-gray-600">
-                                {transaction.transactionType} - {transaction.items.length > 0 ? transaction.items.reduce((acc, item) => acc + item.quantity, 0) : 0} units
-                              </span>
-                              <span className="text-gray-500">
-                                {formatDate(transaction.createdAt)}
-                              </span>
-                            </div>
-                          ))}
+                          {transactionHistory.map((transaction, index) => {
+                            const totalQty = transaction.items.length > 0 
+                              ? transaction.items.reduce((acc, item) => acc + item.quantity, 0) 
+                              : 0;
+                            
+                            // Determine transaction icon and color
+                            const getTransactionStyle = (type) => {
+                              switch(type) {
+                                case 'TICKET_ISSUE':
+                                  return { icon: '📤', color: 'text-blue-600', label: 'Issued (New)' };
+                                case 'RETURN':
+                                  return { icon: '📥', color: 'text-orange-600', label: 'Returned (Defective)' };
+                                case 'RECEIPT':
+                                  return { icon: '📦', color: 'text-green-600', label: 'Received' };
+                                case 'TRANSFER':
+                                  return { icon: '🔄', color: 'text-purple-600', label: 'Transfer' };
+                                default:
+                                  return { icon: '•', color: 'text-gray-600', label: type };
+                              }
+                            };
+                            
+                            const style = getTransactionStyle(transaction.transactionType);
+                            const condition = transaction.items.length > 0 ? transaction.items[0].condition : null;
+                            
+                            return (
+                              <div key={index} className="flex items-center justify-between text-xs p-2 hover:bg-gray-50 rounded">
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-base">{style.icon}</span>
+                                  <div>
+                                    <span className={`font-medium ${style.color}`}>
+                                      {style.label}
+                                    </span>
+                                    <span className="text-gray-600 ml-1">- {totalQty} units</span>
+                                    {condition && (
+                                      <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                                        condition === 'GOOD' 
+                                          ? 'bg-green-100 text-green-800'
+                                          : condition === 'DEFECTIVE'
+                                          ? 'bg-red-100 text-red-800'
+                                          : condition === 'REPAIRABLE'
+                                          ? 'bg-yellow-100 text-yellow-800'
+                                          : 'bg-gray-100 text-gray-800'
+                                      }`}>
+                                        {condition}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <span className="text-gray-500 text-xs">
+                                  {formatDate(transaction.createdAt)}
+                                </span>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
