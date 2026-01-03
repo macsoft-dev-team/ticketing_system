@@ -75,8 +75,7 @@ async function createSpareRequest(data) {
     
     if (stockCheck.allAvailable) {
       // Service center already has the required items in stock
-/*       console.log(`ℹ️ All items available at center ${checkCenterCode}. Spare request still created for approval workflow.`);
- */    } else {
+     } else {
       const insufficientItems = stockCheck.insufficientItems.map(item => 
         `${item.product?.name || `Product ${item.productId}`}: Required ${item.requestedQuantity}, Available at ${checkCenterCode}: ${item.availableQuantity}`
       );
@@ -655,8 +654,7 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
       const availableQty = centerAvailableQty;
       const isLocalApproval = true;
       
-      console.log(`✅ Spare available at assigned service center ${toCenterCode}. Approving from local inventory. Available: ${availableQty}, Required: ${spareItem.quantity}`);
-
+ 
       // Deduct inventory from source center
       await tx.inventory.update({
         where: { id: inventory.id },
@@ -729,8 +727,6 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
           }
         }
       });
-
-      console.log(`✅ Created RETURN transaction for defective parts: ${returnTransaction.id}`);
 
       // Update spare request item status
       const updatedItem = await tx.spareRequestItem.update({
@@ -894,8 +890,6 @@ async function approveSpareRequestItem(itemId, approvedBy, approverName, approve
         }
       };
     });
-
-    console.log(`✅ Spare request item ${itemId} approved from assigned service center ${result.transactions.issue.fromCenterCode}. Issue Transaction: ${result.transactions.issue.id}, Return Transaction: ${result.transactions.return.id}`);
     return result;
   } catch (error) {
     console.error('❌ Error approving spare request item:', error);
