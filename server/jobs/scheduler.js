@@ -7,6 +7,10 @@ const {
   checkPendingCustomerMessages,
   getCandidateTicketsForBuzzer,
 } = require("./buzzerAlerts");
+const {
+  archiveClosedTickets,
+  getCandidateTicketsForArchival,
+} = require("./archiveTickets");
 
 class JobScheduler {
   constructor() {
@@ -61,13 +65,36 @@ class JobScheduler {
     this.jobs.set("buzzerAlerts", buzzerAlertsJob);
     buzzerAlertsJob.start();
 
+    // Schedule archive tickets job to run every 4 hours
+    const archiveTicketsJob = cron.schedule(
+      "0 */4 * * *",
+      async () => {
+        try {
+          console.log("Running scheduled ticket archival job...");
+          const result = await archiveClosedTickets();
+          console.log("Ticket archival job completed:", result);
+        } catch (error) {
+          console.error("Archive tickets job failed:", error);
+        }
+      },
+      {
+        scheduled: false,
+        name: "archiveTickets",
+      }
+    );
+
+    this.jobs.set("archiveTickets", archiveTicketsJob);
+    archiveTicketsJob.start();
+
     // // Schedule a monitoring job to log candidates every 6 hours (optional)
     const monitoringJob = cron.schedule(
       "0 */6 * * *",
       async () => {
          try {
           const candidates = await getCandidateTicketsForClosure();  
-          const buzzerCandidates = await getCandidateTicketsForBuzzer(); 
+          const buzzerCandidates = await getCandidateTicketsForBuzzer();
+          const archiveCandidates = await getCandidateTicketsForArchival();
+          console.log(`Monitoring: ${candidates.length} tickets for closure, ${buzzerCandidates.length} for buzzer, ${archiveCandidates.length} for archival`);
         } catch (error) {
           console.error("Monitoring job failed:", error);
         }
@@ -123,6 +150,21 @@ class JobScheduler {
        return result;
     } catch (error) {
       console.error("Manual buzzer alerts job failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Run archive tickets job manually
+   */
+  async runArchiveTicketsNow() {
+    try {
+      console.log("Running manual ticket archival job...");
+      const result = await archiveClosedTickets();
+      console.log("Manual archival job completed:", result);
+      return result;
+    } catch (error) {
+      console.error("Manual archive tickets job failed:", error);
       throw error;
     }
   }

@@ -12,8 +12,7 @@ const archiveClosedTickets = async () => {
     // Find all closed tickets that don't have backup data yet
     const ticketsToArchive = await prisma.ticket.findMany({
       where: {
-        status: "CLOSED",
-        backupjson: null, // Only archive tickets that haven't been archived yet
+        status: "CLOSED", 
       },
       select: {
         id: true,
@@ -78,8 +77,7 @@ const getCandidateTicketsForArchival = async () => {
   try {
     const tickets = await prisma.ticket.findMany({
       where: {
-        status: "CLOSED",
-        backupjson: null,
+        status: "CLOSED", 
       },
       select: {
         id: true,

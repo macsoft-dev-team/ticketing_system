@@ -111,15 +111,20 @@ const checkPendingCustomerMessages = async (io = null) => {
   try {
      
     // Check if we're within working hours
-    // TEMPORARILY DISABLED FOR TESTING - REMOVE COMMENTS IN PRODUCTION
-    // if (!(await isWithinWorkingHours())) {
-    //   return {
-    //     success: true,
-    //     pendingCount: 0,
-    //     tickets: [],
-    //     skippedReason: 'Outside working hours or holiday'
-    //   };
-    // }
+    const withinWorkingHours = await isWithinWorkingHours();
+    if (!withinWorkingHours) {
+      // Always force buzzer off if not within working hours (including break times)
+      await prisma.ticket.updateMany({
+        where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, isBuzzerOn: true },
+        data: { isBuzzerOn: false }
+      });
+      return {
+        success: true,
+        pendingCount: 0,
+        tickets: [],
+        skippedReason: 'Outside working hours or holiday/break time'
+      };
+    }
     
     // Fetch buzzer alert configuration from database
     let buzzerConfig = await prisma.buzzerAlertConfig.findFirst({
