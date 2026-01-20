@@ -317,7 +317,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
          state: true,
       },
       orderBy: [
-        { isBuzzerOn: "desc" }, // Buzzer alert tickets first
+        { isBuzzerOn: "desc" }, // Buzzer alert tickets first 
         { createdAt: "desc" }    // Then by creation date
       ],
     };

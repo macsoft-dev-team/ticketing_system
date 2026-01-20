@@ -6,6 +6,7 @@ const { login } = require("../middleware/login");
 const { register } = require("../middleware/register");
 const { forgotPassword, verifyResetCode, resetPassword } = require("../middleware/forgotPassword");
 const user = require("./user");
+const templates = require("./templates");
 const ticket = require("./ticket");
 const notification = require("./notification");
 const conversation = require("./conversation");
@@ -65,6 +66,7 @@ router.use("/jobs", authenticate, jobs);
 router.use("/working-hours", authenticate, workingHours);
 router.use("/dashboard", authenticate, dashboard);
 router.use("/buzzer-config", authenticate, buzzerConfig);
+router.use("/templates", authenticate, templates);
 
 // without authentication
 router.use("/states", states);
