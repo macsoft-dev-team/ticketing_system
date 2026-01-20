@@ -484,7 +484,9 @@ export const ChatWindow = ({
   onRefresh = null,
   ticketStatus = null,
   onMarkMessagesAsSeen = null, // New prop for marking messages as seen
-  currentUserId = null // New prop for current user ID
+  currentUserId = null, // New prop for current user ID
+  isArchived = false, // New prop to indicate if data is archived
+  archivedAt = null // New prop for archive timestamp
 }) => {
   const messagesEndRef = useRef(null);
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -517,8 +519,10 @@ export const ChatWindow = ({
     scrollToBottom();
   }, [messages]);
 
-  // Auto-mark messages as seen when they become visible
+  // Auto-mark messages as seen when they become visible (skip for archived/closed tickets)
   useEffect(() => {
+    // Skip marking messages for archived or closed tickets
+    if (isArchived || ticketStatus === 'closed') return;
     if (!onMarkMessagesAsSeen || !currentUserId || !messages.length) return;
 
     const unreadMessages = messages.filter(message =>
@@ -535,7 +539,7 @@ export const ChatWindow = ({
 
       return () => clearTimeout(timeoutId);
     }
-  }, [messages, onMarkMessagesAsSeen, currentUserId]);
+  }, [messages, onMarkMessagesAsSeen, currentUserId, isArchived, ticketStatus]);
 
   // Show closed ticket view if ticket is closed and user hasn't requested to view chat
   if (ticketStatus === 'closed' && !showChatHistory) {
@@ -560,6 +564,14 @@ export const ChatWindow = ({
             {ticketStatus === 'closed' && showChatHistory && (
               <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
                 Ticket Closed
+              </span>
+            )}
+            {isArchived && (
+              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                Archived
               </span>
             )}
           </div>

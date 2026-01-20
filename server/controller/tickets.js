@@ -1,4 +1,9 @@
 const ticketService = require("../service/tickets");
+const jobScheduler = require("../jobs/scheduler");
+const { 
+  archiveTicketById,
+  getCandidateTicketsForArchival 
+} = require("../jobs/archiveTickets");
 
 const getTickets = async (req, res) => {
   try {
@@ -269,6 +274,137 @@ const checkActiveTicketForController = async (req, res) => {
   }
 };
 
+const getArchivedData = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { prisma } = require("../lib/clients");
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        ticketCode: true,
+        status: true,
+        backupjson: true,
+        backupcreatedAt: true,
+        backupurl: true,
+      },
+    });
+
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    if (!ticket.backupjson) {
+      return res.status(404).json({ 
+        message: "No archived data found for this ticket",
+        ticketCode: ticket.ticketCode,
+        status: ticket.status
+      });
+    }
+
+    const archivedData = JSON.parse(ticket.backupjson);
+
+    res.status(200).json({
+      ticketId: ticket.id,
+      ticketCode: ticket.ticketCode,
+      status: ticket.status,
+      backupCreatedAt: ticket.backupcreatedAt,
+      backupUrl: ticket.backupurl,
+      archivedData,
+    });
+  } catch (error) {
+    console.error("Error fetching archived data:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const archiveTicketManually = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Use the background job helper for single ticket
+    const result = await archiveTicketById(parseInt(id));
+    res.status(200).json({
+      message: result.message,
+      success: result.success,
+      ticketCode: result.ticketCode,
+    });
+  } catch (error) {
+    console.error("Error archiving ticket data:", error);
+    res.status(500).json({ 
+      message: "Failed to archive ticket data",
+      error: error.message 
+    });
+  }
+};
+
+/**
+ * Trigger background archival job for all closed tickets
+ */
+const triggerArchivalJob = async (req, res) => {
+  try {
+    // Only allow admins to trigger the job
+    if (req.user.role !== 'MACSOFT_ADMIN' && req.user.role !== 'MACSOFT_HEAD') {
+      return res.status(403).json({ 
+        message: "Only admins can trigger the archival job" 
+      });
+    }
+
+    // Get candidates first to show what will be archived
+    const candidates = await getCandidateTicketsForArchival();
+
+    if (candidates.length === 0) {
+      return res.status(200).json({
+        message: "No closed tickets found for archiving",
+        processed: 0,
+        candidates: [],
+      });
+    }
+
+    // Run the job in the background
+    jobScheduler.runArchiveTicketsNow()
+      .then(result => {
+        console.log("Background archival job completed:", result);
+      })
+      .catch(error => {
+        console.error("Background archival job failed:", error);
+      });
+
+    // Return immediately with candidate info
+    res.status(202).json({
+      message: `Archival job started for ${candidates.length} tickets`,
+      status: "processing",
+      candidates: candidates.slice(0, 10).map(t => t.ticketCode), // Show first 10
+      total: candidates.length,
+    });
+  } catch (error) {
+    console.error("Error triggering archival job:", error);
+    res.status(500).json({ 
+      message: "Failed to trigger archival job",
+      error: error.message 
+    });
+  }
+};
+
+/**
+ * Get list of tickets pending archival
+ */
+const getArchivalCandidates = async (req, res) => {
+  try {
+    const candidates = await getCandidateTicketsForArchival();
+    
+    res.status(200).json({
+      count: candidates.length,
+      tickets: candidates,
+    });
+  } catch (error) {
+    console.error("Error fetching archival candidates:", error);
+    res.status(500).json({ 
+      message: "Failed to fetch archival candidates",
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {
   getTickets,
   createTicket,
@@ -279,4 +415,8 @@ module.exports = {
   searchByControllerNumber,
   searchTickets,
   checkActiveTicketForController,
+  getArchivedData,
+  archiveTicketManually,
+  triggerArchivalJob,
+  getArchivalCandidates,
 };

@@ -107,7 +107,10 @@ const mapTicketData = (apiTicket) => {
     createdBy: apiTicket.createdByUser || null,
     updatedBy: apiTicket.updatedByUser || null,
     messages: apiTicket.messages || [],
-    notifications: apiTicket.notifications || []
+    notifications: apiTicket.notifications || [],
+    // Archive-related fields
+    isArchived: apiTicket.isArchived || false,
+    archivedAt: apiTicket.archivedAt || null,
   };
 };
 
@@ -296,40 +299,7 @@ export default function TicketDashboard() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
 
-  // Use the new conversation hook
-  const {
-    messages,
-    loading: messagesLoading,
-    error: messagesError,
-    isConnected: socketConnected,
-    sendMessage: sendConversationMessage,
-    refreshMessages,
-    // MessageSeen functions
-    markMessagesAsSeen: originalMarkMessagesAsSeen,
-    markMessageAsSeen,
-    getUnreadCount,
-  } = useConversation(ticketId);
-
-  // Wrapper function to mark messages as seen and refresh ticket data
-  const markMessagesAsSeen = useCallback(async (messageIds) => {
-    try {
-      // Only proceed if there are messages to mark
-      if (!messageIds || (Array.isArray(messageIds) && messageIds.length === 0)) {
-        return;
-      }
-
-      // Mark messages as seen
-      const result = await originalMarkMessagesAsSeen(messageIds);
-
-      // Only refresh ticket data if messages were actually marked as seen
-      if (result && result.markedCount > 0) {
-        await fetchTicketById(ticketId);
-      }
-    } catch (error) {
-      console.error('Error marking messages as seen:', error);
-    }
-  }, [originalMarkMessagesAsSeen, fetchTicketById, ticketId]);
-
+  // State declarations MUST come before callbacks that use them
   const [ticketData, setTicketData] = useState({});
   const [isTyping, setIsTyping] = useState(false);
   const [autoCloseTimer, setAutoCloseTimer] = useState(null);
@@ -354,6 +324,46 @@ export default function TicketDashboard() {
   const [inventoryDetails, setInventoryDetails] = useState(null);
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [loadingInventoryDetails, setLoadingInventoryDetails] = useState(false);
+
+  // Use the new conversation hook
+  const {
+    messages,
+    loading: messagesLoading,
+    error: messagesError,
+    isConnected: socketConnected,
+    sendMessage: sendConversationMessage,
+    refreshMessages,
+    // MessageSeen functions
+    markMessagesAsSeen: originalMarkMessagesAsSeen,
+    markMessageAsSeen,
+    getUnreadCount,
+  } = useConversation(ticketId);
+
+  // Wrapper function to mark messages as seen and refresh ticket data
+  const markMessagesAsSeen = useCallback(async (messageIds) => {
+    try {
+      // Skip if ticket is closed or archived
+      if (ticketData?.status === 'closed' || ticketData?.isArchived) {
+        console.log('Skipping mark as seen for closed/archived ticket');
+        return;
+      }
+
+      // Only proceed if there are messages to mark
+      if (!messageIds || (Array.isArray(messageIds) && messageIds.length === 0)) {
+        return;
+      }
+
+      // Mark messages as seen
+      const result = await originalMarkMessagesAsSeen(messageIds);
+
+      // Only refresh ticket data if messages were actually marked as seen
+      if (result && result.markedCount > 0) {
+        await fetchTicketById(ticketId);
+      }
+    } catch (error) {
+      console.error('Error marking messages as seen:', error);
+    }
+  }, [originalMarkMessagesAsSeen, fetchTicketById, ticketId, ticketData?.status, ticketData?.isArchived]);
 
   // Set current ticket ID for socket context (prevents sounds/toasts when user is in this ticket)
   useEffect(() => {
@@ -406,6 +416,17 @@ export default function TicketDashboard() {
 
   const handleSendMessage = useCallback(async (message, attachments) => {
     try {
+      // Prevent sending messages for closed or archived tickets
+      if (ticketData?.status === 'closed' || ticketData?.isArchived) {
+        addToast({
+          title: 'Cannot Send Message',
+          description: 'This ticket is closed. Messages cannot be sent to closed tickets.',
+          variant: 'warning',
+          duration: 5000
+        });
+        return;
+      }
+
       await sendConversationMessage(message, attachments);
       setAutoCloseTimer(null);
     } catch (error) {
@@ -417,7 +438,7 @@ export default function TicketDashboard() {
         duration: 7000
       });
     }
-  }, [sendConversationMessage, addToast, ticketId, user, token]);
+  }, [sendConversationMessage, addToast, ticketId, user, token, ticketData?.status, ticketData?.isArchived]);
 
   const handleSpareRequestSubmit = useCallback(async (formData) => {
     try {
@@ -1282,6 +1303,58 @@ export default function TicketDashboard() {
           </div>
           <div className="flex items-center gap-3">
             <StatusBadge status={ticketData.status} />
+            
+            {/* Archive Button for closed tickets (Admin only) */}
+            {ticketData.status === 'closed' && 
+             (user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={async () => {
+                  try {
+                    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+                    const response = await fetch(`${baseUrl}/tickets/${ticketId}/archive`, {
+                      method: 'POST',
+                      headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                      },
+                    });
+                    
+                    if (!response.ok) {
+                      const error = await response.json();
+                      throw new Error(error.message || 'Failed to archive ticket');
+                    }
+                    
+                    const result = await response.json();
+                    
+                    addToast({
+                      title: 'Ticket Archived',
+                      description: 'Ticket data has been archived successfully. Page will refresh.',
+                      variant: 'success'
+                    });
+                    
+                    // Refresh ticket data to show archived state
+                    setTimeout(() => {
+                      fetchTicketById(ticketId);
+                    }, 1500);
+                  } catch (error) {
+                    addToast({
+                      title: 'Archive Failed',
+                      description: error.message || 'Failed to archive ticket data',
+                      variant: 'error'
+                    });
+                  }
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg text-sm font-medium transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                {ticketData.isArchived ? 'Re-archive' : 'Archive Now'}
+              </motion.button>
+            )}
+            
             {/* Service Center Assignment Button for MACSOFT_SUPPORT, MACSOFT_HEAD, and MACSOFT_ADMIN */}
             {/* Hide button after ticket has been submitted to service center or closed */}
             {(user?.role === 'MACSOFT_SUPPORT' || user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') &&
@@ -1346,6 +1419,72 @@ export default function TicketDashboard() {
                 <FileText className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                 Ticket Details
               </h2>
+              
+              {/* Archived Data Alert */}
+              {ticketData.isArchived && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                >
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900">Archived Data</p>
+                      <p className="text-xs text-blue-700 mt-1">
+                        This ticket was closed and archived. You're viewing historical data.
+                        {ticketData.archivedAt && ` Archived on ${moment(ticketData.archivedAt).format('MMM DD, YYYY [at] h:mm A')}`}
+                      </p>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={async () => {
+                        try {
+                          const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+                          const response = await fetch(`${baseUrl}/tickets/${ticketId}/archive`, {
+                            headers: {
+                              'Authorization': `Bearer ${token}`,
+                            },
+                          });
+                          
+                          if (!response.ok) throw new Error('Failed to fetch archive');
+                          
+                          const data = await response.json();
+                          const blob = new Blob([JSON.stringify(data.archivedData, null, 2)], { type: 'application/json' });
+                          const url = window.URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.download = `${ticketData.ticketCode}_archive.json`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          window.URL.revokeObjectURL(url);
+                          
+                          addToast({
+                            title: 'Archive Downloaded',
+                            description: 'Archived data has been downloaded successfully',
+                            variant: 'success'
+                          });
+                        } catch (error) {
+                          addToast({
+                            title: 'Download Failed',
+                            description: error.message || 'Failed to download archived data',
+                            variant: 'error'
+                          });
+                        }
+                      }}
+                      className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center gap-1.5 whitespace-nowrap"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Download Archive
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+
               <div className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
@@ -2028,6 +2167,8 @@ export default function TicketDashboard() {
             ticketStatus={ticketData.status}
             onMarkMessagesAsSeen={markMessagesAsSeen}
             currentUserId={user?.id}
+            isArchived={ticketData?.isArchived || false}
+            archivedAt={ticketData?.archivedAt || null}
           />
         </motion.div>
       </div>

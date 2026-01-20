@@ -48,11 +48,6 @@ enum TicketStatus {
   CLOSED
 }
 
-enum TransactionType {
-  RECEIPT
-  DELIVERY
-}
-
 enum Role {
   MACSOFT_ADMIN // Global superuser – all access
   MACSOFT_HEAD // Approver – oversees multiple states/centers
@@ -70,6 +65,33 @@ enum Category {
   WIRE
   CONNECTOR
   ENCLOSURE_AND_ACCESSORIES
+}
+
+enum TransactionType {
+  RECEIPT
+  DELIVERY
+  TICKET_ISSUE
+  RETURN
+  TRANSFER
+  ADJUSTMENT
+  REPLACEMENT
+}
+
+enum TransactionStatus {
+  PENDING_APPROVAL // Transfer requested by SSC, waiting for MACSOFT approval
+  APPROVED // Approved by MACSOFT, inventory deducted
+  REJECTED // Rejected by MACSOFT
+  PENDING // Transfer dispatched, waiting to be received
+  RECEIVED
+  COMPLETED
+  CANCELLED
+}
+
+enum InventoryCondition {
+  GOOD
+  DEFECTIVE
+  REPAIRABLE
+  SCRAP
 }
 
 model State {
@@ -95,53 +117,59 @@ model district {
 }
 
 model Organisation {
-  id        Int       @id @default(autoincrement())
-  name      String
-  orgCode   String    @unique
-  email     String    @unique
-  phone     String    @unique
-  address   String?
-  isActive  Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime? @map("deleted_at")
-  project   Project[]
-  users     User[]
-}
-
-model Project {
   id             Int             @id @default(autoincrement())
   name           String
-  projectCode    String          @unique
-  email          String?         @unique
+  orgCode        String          @unique
+  email          String          @unique
+  phone          String          @unique
   address        String?
-  stateId        Int?
   isActive       Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime?       @updatedAt
   deletedAt      DateTime?       @map("deleted_at")
-  ServiceCenter  ServiceCenter[]
-  state          State?          @relation("StateProjects", fields: [stateId], references: [id])
-  organisation   Organisation?   @relation(fields: [organisationId], references: [id])
+  project        Project[]
+  users          User[]
+  serviceCenters ServiceCenter[]
+}
+
+model Project {
+  id             Int           @id @default(autoincrement())
+  name           String
+  projectCode    String        @unique
+  email          String?       @unique
+  address        String?
+  stateId        Int?
+  isActive       Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime?     @updatedAt
+  deletedAt      DateTime?     @map("deleted_at")
+  state          State?        @relation("StateProjects", fields: [stateId], references: [id])
+  organisation   Organisation? @relation(fields: [organisationId], references: [id])
   organisationId Int?
   users          User[]
 }
 
 model ServiceCenter {
-  id                Int       @id @default(autoincrement())
+  id                Int                  @id @default(autoincrement())
   name              String
-  projectCode       String?
-  centerCode        String    @unique
-  email             String    @unique
+  orgCode           String?
+  centerCode        String               @unique
+  email             String               @unique
   address           String?
-  isActive          Boolean   @default(false)
+  isActive          Boolean              @default(false)
+  isMacsoft         Boolean              @default(false) // True for MACSOFT head service center
+  isMacsoftHead     Boolean              @default(false) // True for MACSOFT head office service center
   serviceableStates String? // Comma-separated list of states this center serves
   users             User[]
-  project           Project?  @relation(fields: [projectCode], references: [projectCode])
-  assignedTickets   Ticket[] // Tickets assigned to this service center
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime? @updatedAt
-  deletedAt         DateTime? @map("deleted_at")
+  organisation      Organisation?        @relation(fields: [orgCode], references: [orgCode])
+  assignedTickets   Ticket[]             @relation("TicketforServiceCenter") // Tickets assigned to this service center
+  inventories       Inventory[] // 👈 relation via centerCode
+  transactions      ProductTransaction[]
+  transfersFrom     ProductTransaction[] @relation("TransferFrom")
+  transfersTo       ProductTransaction[] @relation("TransferTo")
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime?            @updatedAt
+  deletedAt         DateTime?            @map("deleted_at")
 }
 
 model User {
@@ -167,6 +195,7 @@ model User {
   spareRequestsCreated   spareRequest[]          @relation("SpareRequestCreated")
   spareRequestsUpdated   spareRequest[]          @relation("SpareRequestUpdated")
   productTransactions    ProductTransaction[]    @relation("ProductTransactionCreated")
+  approvedTransactions   ProductTransaction[]    @relation("ProductTransactionApproved")
   TicketMilestone        TicketMilestone[]
   State                  State?                  @relation("PrimaryState", fields: [stateId], references: [id])
   stateId                Int?
@@ -217,7 +246,7 @@ model Ticket {
   // Relations
   createdByUser       User                 @relation("CreatedTickets", fields: [createdBy], references: [id])
   updatedByUser       User?                @relation("UpdatedTickets", fields: [updatedBy], references: [id])
-  serviceCenter       ServiceCenter?       @relation(fields: [assignedServiceCenter], references: [centerCode])
+  serviceCenter       ServiceCenter?       @relation("TicketforServiceCenter", fields: [assignedServiceCenter], references: [centerCode])
   state               State?               @relation("ticketState", fields: [stateCode], references: [stateCode])
   selectedDistrict    district?            @relation(fields: [districtCode], references: [districtCode])
   motorhp             motorhp?             @relation(fields: [motorHpId], references: [id])
@@ -227,6 +256,9 @@ model Ticket {
   attachments         Attachments[]
   ticketMilestones    TicketMilestone[]
   batchItems          batchItem[]
+  backupjson          String?              @db.LongText
+  backupcreatedAt     DateTime?
+  backupurl           String?
 }
 
 model TicketMilestone {
@@ -308,49 +340,105 @@ model spareRequestItem {
 }
 
 model Product {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  brandName   String?
-  productCode String    @unique
-  category    Category?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  name          String
+  productCode   String    @unique
+  description   String?
+  brandName     String?
+  category      Category?
+  unitOfMeasure Int? // optional, if you want pcs / sets etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  transactions      ProductTransaction[]
-  inventory         Inventory?
-  spareRequestItems spareRequestItem[]
+  inventories            Inventory[]
+  transactions           ProductTransaction[]
+  spareRequestItems      spareRequestItem[]
+  ProductTransactionItem ProductTransactionItem[]
 }
 
 model ProductTransaction {
-  id        Int             @id @default(autoincrement())
-  productId Int
-  type      TransactionType
-  quantity  Int
+  id              Int               @id @default(autoincrement())
+  transactionType TransactionType
+  status          TransactionStatus @default(PENDING)
+
+  // Center information
+  centerCode     String // Current center (for backwards compatibility)
+  fromCenterCode String? // Source center (for TRANSFER)
+  toCenterCode   String? // Destination center (for TRANSFER)
+
+  // Approval workflow (for SSC transfer requests)
+  approvedBy      Int? // MACSOFT admin who approved
+  approvedAt      DateTime? // When approved/rejected
+  rejectionReason String?   @db.Text // If rejected, reason from approver
+
+  invoiceNo    String?
+  billNo       String?
+  receiptDate  DateTime?
+  deliveryDate DateTime?
+  receivedAt   DateTime? // When TRANSFER was received
+
   ticketId  Int?
-  notes     String?
+  remarks   String?  @db.Text
   createdBy Int
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  product       Product @relation(fields: [productId], references: [id])
-  ticket        Ticket? @relation(fields: [ticketId], references: [id])
-  createdByUser User    @relation("ProductTransactionCreated", fields: [createdBy], references: [id])
+  serviceCenter ServiceCenter            @relation(fields: [centerCode], references: [centerCode])
+  fromCenter    ServiceCenter?           @relation("TransferFrom", fields: [fromCenterCode], references: [centerCode])
+  toCenter      ServiceCenter?           @relation("TransferTo", fields: [toCenterCode], references: [centerCode])
+  ticket        Ticket?                  @relation(fields: [ticketId], references: [id])
+  items         ProductTransactionItem[]
+  createdByUser User                     @relation("ProductTransactionCreated", fields: [createdBy], references: [id])
+  approverUser  User?                    @relation("ProductTransactionApproved", fields: [approvedBy], references: [id])
+  Product       Product?                 @relation(fields: [productId], references: [id])
+  productId     Int?
+
+  @@index([centerCode])
+  @@index([fromCenterCode])
+  @@index([toCenterCode])
+  @@index([status])
+  @@index([transactionType])
+}
+
+model ProductTransactionItem {
+  id            Int                @id @default(autoincrement())
+  transactionId Int
+  productId     Int? // Optional for unknown products in RETURN
+  productName   String? // For unknown products
+  condition     InventoryCondition
+  quantity      Int // always positive
+
+  // Relations
+  transaction ProductTransaction @relation(fields: [transactionId], references: [id])
+  product     Product?           @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([transactionId])
 }
 
 model Inventory {
-  id        Int      @id @default(autoincrement())
-  productId Int      @unique
-  quantity  Int      @default(0)
+  id         Int    @id @default(autoincrement())
+  centerCode String
+  productId  Int
+
+  goodQty       Int @default(0)
+  repairableQty Int @default(0)
+  damagedQty    Int @default(0)
+  scrapQty      Int @default(0)
+
   minStock  Int      @default(0)
   maxStock  Int?
   location  String?
   updatedAt DateTime @updatedAt
 
   // Relations
-  product Product @relation(fields: [productId], references: [id])
+  serviceCenter ServiceCenter @relation(fields: [centerCode], references: [centerCode])
+  product       Product       @relation(fields: [productId], references: [id])
+
+  @@unique([centerCode, productId])
 }
 
 model Message {

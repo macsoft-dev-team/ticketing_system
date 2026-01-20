@@ -7,32 +7,38 @@ const {
   canRoleTransitionToStage,
 } = require("../lib/milestoneConfig");
 const spareRequestService = require("./spareRequests");
-const { saveAndBroadcastNotification, createMilestoneNotification } = require("../lib/notificationUtils");
+const {
+  saveAndBroadcastNotification,
+  createMilestoneNotification,
+} = require("../lib/notificationUtils");
 
 // RBAC Socket emission helper for milestone events
 const emitMilestoneEventWithRBAC = (io, eventName, ticketData, eventData) => {
   if (!io || !ticketData) return;
-  
+
   const dataToEmit = eventData;
-  
+
   // Always emit to MACSOFT roles (global access)
-  io.to('role-MACSOFT_ADMIN').emit(eventName, dataToEmit);
-  io.to('role-MACSOFT_HEAD').emit(eventName, dataToEmit);
-  io.to('role-MACSOFT_SUPPORT').emit(eventName, dataToEmit);
-  
+  io.to("role-MACSOFT_ADMIN").emit(eventName, dataToEmit);
+  io.to("role-MACSOFT_HEAD").emit(eventName, dataToEmit);
+  io.to("role-MACSOFT_SUPPORT").emit(eventName, dataToEmit);
+
   // Emit to ticket creator (if they are a field engineer)
   if (ticketData.createdBy) {
     io.to(`notifications-${ticketData.createdBy}`).emit(eventName, dataToEmit);
   }
-  
+
   // Emit to assigned service center
   if (ticketData.assignedServiceCenter) {
-    io.to(`center-${ticketData.assignedServiceCenter}`).emit(eventName, dataToEmit);
+    io.to(`center-${ticketData.assignedServiceCenter}`).emit(
+      eventName,
+      dataToEmit
+    );
   }
-  
+
   // Emit to Customer Service Heads
-  io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
- };
+  io.to("role-CUSTOMER_SERVICE_HEAD").emit(eventName, dataToEmit);
+};
 
 const createMilestone = async (milestoneData, io) => {
   try {
@@ -59,33 +65,38 @@ const createMilestone = async (milestoneData, io) => {
           ...milestone,
           config: milestoneConfig,
         };
-        
+
         const targetRoles = [
-          'MACSOFT_ADMIN',
-          'MACSOFT_HEAD', 
-          'MACSOFT_SUPPORT',
-          'CUSTOMER_SERVICE_HEAD'
+          "MACSOFT_ADMIN",
+          "MACSOFT_HEAD",
+          "MACSOFT_SUPPORT",
+          "CUSTOMER_SERVICE_HEAD",
         ];
-        
+
         const targetUsers = await prisma.user.findMany({
           where: {
             role: { in: targetRoles },
-            id: { not: milestoneData.changedBy }
+            id: { not: milestoneData.changedBy },
           },
-          select: { id: true }
+          select: { id: true },
         });
-        
-        const targetUserIds = targetUsers.map(user => user.id);
-        
+
+        const targetUserIds = targetUsers.map((user) => user.id);
+
         if (targetUserIds.length > 0) {
           const notificationData = createMilestoneNotification(
-            'created',
+            "created",
             milestoneWithConfig,
             milestone.ticket,
             milestoneData.changedBy
           );
-          
-          await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+
+          await saveAndBroadcastNotification(
+            prisma,
+            io,
+            notificationData,
+            targetUserIds
+          );
         }
       }
     } catch (notificationError) {
@@ -100,6 +111,36 @@ const createMilestone = async (milestoneData, io) => {
 
 const getTicketMilestones = async (ticketId) => {
   try {
+    // First check if ticket is archived
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      select: {
+        status: true,
+        backupjson: true,
+      },
+    });
+
+    // If ticket is CLOSED and has archived data, return archived milestones
+    if (ticket && ticket.status === "CLOSED" && ticket.backupjson) {
+      try {
+        const archivedData = JSON.parse(ticket.backupjson);
+        const archivedMilestones = archivedData.milestones || [];
+
+        // Enhance archived milestones with configuration data
+        return archivedMilestones.map((milestone) => {
+          const config = getStageConfig(milestone.stage);
+          return {
+            ...milestone,
+            config,
+          };
+        });
+      } catch (parseError) {
+        console.error("Error parsing archived milestones:", parseError);
+        // Fall through to database query if parsing fails
+      }
+    }
+
+    // For non-archived tickets, fetch from database
     const milestones = await prisma.ticketMilestone.findMany({
       where: { ticketId },
       include: {
@@ -169,6 +210,30 @@ const transitionMilestone = async (
   io = null
 ) => {
   try {
+    // Check if ticket is archived/closed and get ticket info
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      select: {
+        status: true,
+        ticketCode: true,
+        id: true,
+        createdBy: true,
+        stateCode: true,
+        customerName: true,
+        priority: true,
+      },
+    });
+
+    if (!ticket) {
+      throw new Error("Ticket not found");
+    }
+
+    if (ticket.status === "CLOSED") {
+      throw new Error(
+        "Cannot transition milestones on closed/archived tickets"
+      );
+    }
+
     // Get target stage configuration first
     const targetConfig = getStageConfig(targetStage);
 
@@ -188,36 +253,41 @@ const transitionMilestone = async (
     }
 
     // Additional validation for RECEIVED_AT_SERVICE_CENTER
-    if (targetStage === 'RECEIVED_AT_SERVICE_CENTER') {
+    if (targetStage === "RECEIVED_AT_SERVICE_CENTER") {
       // Check if current milestone is SUBMITTED_TO_SERVICE_CENTER (which is the required prerequisite)
-      if (!currentMilestone || currentMilestone.stage !== 'SUBMITTED_TO_SERVICE_CENTER') {
-        throw new Error('Controller must be submitted to service center by field engineer before it can be received');
+      if (
+        !currentMilestone ||
+        currentMilestone.stage !== "SUBMITTED_TO_SERVICE_CENTER"
+      ) {
+        throw new Error(
+          "Controller must be submitted to service center by field engineer before it can be received"
+        );
       }
     }
 
-    // Get ticket for file URL generation and notification targeting
-    const ticket = await prisma.ticket.findUnique({
-      where: { id: ticketId },
-      select: { 
-        ticketCode: true,
-        id: true,
-        createdBy: true,
-        stateCode: true,
-        customerName: true,
-        priority: true,
-      },
-    });
-
     // Special validation for close_ticket and cancel_spare_and_close actions
-    if (data.action === 'close_ticket' || data.action === 'cancel_spare_and_close') {
+    if (
+      data.action === "close_ticket" ||
+      data.action === "cancel_spare_and_close"
+    ) {
       // Allow MACSOFT_ADMIN unrestricted access, SERVICE_CENTER_TECHNICIAN only if they created the ticket
-      if (userRole !== 'SERVICE_CENTER_TECHNICIAN' && userRole !== 'MACSOFT_ADMIN') {
-        throw new Error('Only service center technicians or MACSOFT admins can perform this action');
+      if (
+        userRole !== "SERVICE_CENTER_TECHNICIAN" &&
+        userRole !== "MACSOFT_ADMIN"
+      ) {
+        throw new Error(
+          "Only service center technicians or MACSOFT admins can perform this action"
+        );
       }
-      
+
       // MACSOFT_ADMIN can close any ticket, SERVICE_CENTER_TECHNICIAN can only close tickets they created
-      if (userRole === 'SERVICE_CENTER_TECHNICIAN' && ticket.createdBy !== userId) {
-        throw new Error('Service center technicians can only close tickets they created');
+      if (
+        userRole === "SERVICE_CENTER_TECHNICIAN" &&
+        ticket.createdBy !== userId
+      ) {
+        throw new Error(
+          "Service center technicians can only close tickets they created"
+        );
       }
     }
 
@@ -264,21 +334,20 @@ const transitionMilestone = async (
             userId
           );
       } catch (spareApprovalError) {
-    
         // Continue with milestone creation even if spare approval fails
       }
     }
 
     // Handle special case for cancel_spare_and_close - cancel all spare requests
-    if (data.action === 'cancel_spare_and_close') {
+    if (data.action === "cancel_spare_and_close") {
       try {
         await spareRequestService.bulkCancelSpareRequestsByTicket(
           ticket.ticketCode,
           userId,
-          'Service center technician cancelled spare requests and closed ticket'
+          "Service center technician cancelled spare requests and closed ticket"
         );
       } catch (cancelError) {
-        console.error('Error cancelling spare requests:', cancelError);
+        console.error("Error cancelling spare requests:", cancelError);
         // Continue with milestone creation even if spare cancellation fails
       }
     }
@@ -313,10 +382,13 @@ const transitionMilestone = async (
     // Handle auto-transition to TICKET_CLOSED for DELIVERED_TO_FIELD or FIELD_CLEARANCE_APPROVED
     let finalMilestone = createdMilestone;
     let shouldCreateTicketClosed = false;
-    
-    if (targetStage === 'DELIVERED_TO_FIELD' || targetStage === 'FIELD_CLEARANCE_APPROVED') {
+
+    if (
+      targetStage === "DELIVERED_TO_FIELD" ||
+      targetStage === "FIELD_CLEARANCE_APPROVED"
+    ) {
       shouldCreateTicketClosed = true;
-      
+
       // First mark the current milestone as DONE
       await prisma.ticketMilestone.update({
         where: { id: createdMilestone.id },
@@ -325,13 +397,13 @@ const transitionMilestone = async (
           completedAt: new Date(),
         },
       });
-      
+
       // Create TICKET_CLOSED milestone
-      const ticketClosedConfig = getStageConfig('TICKET_CLOSED');
+      const ticketClosedConfig = getStageConfig("TICKET_CLOSED");
       const ticketClosedMilestone = await prisma.ticketMilestone.create({
         data: {
           ticketId,
-          stage: 'TICKET_CLOSED',
+          stage: "TICKET_CLOSED",
           order: ticketClosedConfig.order,
           status: "DONE",
           startedAt: new Date(),
@@ -353,7 +425,7 @@ const transitionMilestone = async (
           attachments: true,
         },
       });
-      
+
       finalMilestone = ticketClosedMilestone;
     }
 
@@ -379,7 +451,7 @@ const transitionMilestone = async (
     if (targetConfig.isFinal || shouldCreateTicketClosed) {
       await prisma.ticket.update({
         where: { id: ticketId },
-        data: { status: "CLOSED" },
+        data: { status: "CLOSED", isBuzzerOn: false },
       });
     } else if (createdMilestone.order > 1) {
       await prisma.ticket.update({
@@ -403,42 +475,43 @@ const transitionMilestone = async (
         ticket: true,
       },
     });
-    
+
     finalMilestone = milestoneWithAttachments;
 
     // Create and send milestone notification
     try {
       // Use the appropriate config - if we auto-transitioned to TICKET_CLOSED, use that config
-      const configToUse = shouldCreateTicketClosed ? getStageConfig('TICKET_CLOSED') : targetConfig;
+      const configToUse = shouldCreateTicketClosed
+        ? getStageConfig("TICKET_CLOSED")
+        : targetConfig;
       const milestoneWithConfig = {
         ...finalMilestone,
         config: configToUse,
       };
-      
+
       // Determine which users should receive milestone notifications
       // Get users based on roles that should be notified about milestone changes
-      const targetRoles = [
-        'MACSOFT_ADMIN',
-        'MACSOFT_HEAD', 
-        'MACSOFT_SUPPORT',
-      ];
-      
+      const targetRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"];
+
       // For field clearance notifications, notify only the field engineer who raised the ticket
       // and customer service heads assigned to the ticket's state
-      if (targetStage === 'REQUEST_CLEARED_AT_FIELD' || targetStage === 'FIELD_CLEARANCE_APPROVED') {
+      if (
+        targetStage === "REQUEST_CLEARED_AT_FIELD" ||
+        targetStage === "FIELD_CLEARANCE_APPROVED"
+      ) {
         // Build query conditions
         const whereConditions = {
           OR: [
             // Include MACSOFT roles
             { role: { in: targetRoles } },
             // Include the field engineer who created the ticket
-            { 
+            {
               id: ticket.createdBy,
-              role: 'CUSTOMER_FIELD_ENGINEER'
+              role: "CUSTOMER_FIELD_ENGINEER",
             },
           ],
           // Exclude the user who made the transition
-          id: { not: userId }
+          id: { not: userId },
         };
 
         // If ticket has a state, include customer service heads assigned to that state
@@ -446,80 +519,106 @@ const transitionMilestone = async (
         if (ticket.stateCode) {
           const stateInfo = await prisma.state.findUnique({
             where: { stateCode: ticket.stateCode },
-            select: { id: true }
+            select: { id: true },
           });
 
           if (stateInfo) {
             whereConditions.OR.push({
-              role: 'CUSTOMER_SERVICE_HEAD',
+              role: "CUSTOMER_SERVICE_HEAD",
               states: {
                 some: {
-                  id: stateInfo.id
-                }
-              }
+                  id: stateInfo.id,
+                },
+              },
             });
           }
         }
 
         const targetUsers = await prisma.user.findMany({
           where: whereConditions,
-          select: { id: true }
+          select: { id: true },
         });
 
-        const targetUserIds = targetUsers.map(user => user.id);
+        const targetUserIds = targetUsers.map((user) => user.id);
 
         if (targetUserIds.length > 0) {
           const notificationData = createMilestoneNotification(
-            targetConfig.isFinal ? 'completed' : 'stage_changed',
+            targetConfig.isFinal ? "completed" : "stage_changed",
             milestoneWithConfig,
             ticket,
             userId,
             {
               previousStage: currentMilestone?.stage,
-              previousStageLabel: currentMilestone ? getStageConfig(currentMilestone.stage)?.label : null,
+              previousStageLabel: currentMilestone
+                ? getStageConfig(currentMilestone.stage)?.label
+                : null,
               isTransition: true,
-              spareRequestsApproved: targetStage === "SPARE_APPROVED" && spareApprovalResult
+              spareRequestsApproved:
+                targetStage === "SPARE_APPROVED" && spareApprovalResult,
             }
           );
 
-          await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+          await saveAndBroadcastNotification(
+            prisma,
+            io,
+            notificationData,
+            targetUserIds
+          );
         }
       } else {
         // For other stages, use the original notification logic
         // Add CUSTOMER_SERVICE_HEAD to target roles for all other stages
-        targetRoles.push('CUSTOMER_SERVICE_HEAD');
-        
+        targetRoles.push("CUSTOMER_SERVICE_HEAD");
+
         // For service center related stages, notify technicians
-        if (['SUBMITTED_TO_SERVICE_CENTER', 'RECEIVED_AT_SERVICE_CENTER', 'DIAGNOSIS_IN_PROGRESS', 'REPAIR_IN_PROGRESS', 'REPLACEMENT_IN_PROGRESS', 'REPAIRED', 'READY_FOR_DISPATCH'].includes(targetStage)) {
-          targetRoles.push('SERVICE_CENTER_TECHNICIAN');
+        if (
+          [
+            "SUBMITTED_TO_SERVICE_CENTER",
+            "RECEIVED_AT_SERVICE_CENTER",
+            "DIAGNOSIS_IN_PROGRESS",
+            "REPAIR_IN_PROGRESS",
+            "REPLACEMENT_IN_PROGRESS",
+            "REPAIRED",
+            "READY_FOR_DISPATCH",
+          ].includes(targetStage)
+        ) {
+          targetRoles.push("SERVICE_CENTER_TECHNICIAN");
         }
-        
+
         const targetUsers = await prisma.user.findMany({
           where: {
             role: { in: targetRoles },
             // Exclude the user who made the transition
-            id: { not: userId }
+            id: { not: userId },
           },
-          select: { id: true }
+          select: { id: true },
         });
-        
-        const targetUserIds = targetUsers.map(user => user.id);
-        
+
+        const targetUserIds = targetUsers.map((user) => user.id);
+
         if (targetUserIds.length > 0) {
           const notificationData = createMilestoneNotification(
-            targetConfig.isFinal ? 'completed' : 'stage_changed',
+            targetConfig.isFinal ? "completed" : "stage_changed",
             milestoneWithConfig,
             ticket,
             userId,
             {
               previousStage: currentMilestone?.stage,
-              previousStageLabel: currentMilestone ? getStageConfig(currentMilestone.stage)?.label : null,
+              previousStageLabel: currentMilestone
+                ? getStageConfig(currentMilestone.stage)?.label
+                : null,
               isTransition: true,
-              spareRequestsApproved: targetStage === "SPARE_APPROVED" && spareApprovalResult
+              spareRequestsApproved:
+                targetStage === "SPARE_APPROVED" && spareApprovalResult,
             }
           );
 
-          await saveAndBroadcastNotification(prisma, io, notificationData, targetUserIds);
+          await saveAndBroadcastNotification(
+            prisma,
+            io,
+            notificationData,
+            targetUserIds
+          );
         }
       }
     } catch (notificationError) {
@@ -532,9 +631,12 @@ const transitionMilestone = async (
         ticketId,
         milestone: finalMilestone,
         previousStage: currentMilestone?.stage,
-        newStage: shouldCreateTicketClosed ? 'TICKET_CLOSED' : targetStage,
+        newStage: shouldCreateTicketClosed ? "TICKET_CLOSED" : targetStage,
         isTicketClosed: targetConfig.isFinal || shouldCreateTicketClosed,
-        ticketStatus: (targetConfig.isFinal || shouldCreateTicketClosed) ? "CLOSED" : "IN_PROGRESS",
+        ticketStatus:
+          targetConfig.isFinal || shouldCreateTicketClosed
+            ? "CLOSED"
+            : "IN_PROGRESS",
         autoTransitioned: shouldCreateTicketClosed,
         originalTargetStage: shouldCreateTicketClosed ? targetStage : undefined,
       };
@@ -556,13 +658,20 @@ const transitionMilestone = async (
           timestamp: new Date().toISOString(),
           approvalResult: spareApprovalResult,
         };
-        emitMilestoneEventWithRBAC(io, "spare-requests-bulk-approved", ticket, spareEventData);
+        emitMilestoneEventWithRBAC(
+          io,
+          "spare-requests-bulk-approved",
+          ticket,
+          spareEventData
+        );
       }
     }
 
     const result = {
       ...finalMilestone,
-      config: shouldCreateTicketClosed ? getStageConfig('TICKET_CLOSED') : targetConfig,
+      config: shouldCreateTicketClosed
+        ? getStageConfig("TICKET_CLOSED")
+        : targetConfig,
       autoTransitioned: shouldCreateTicketClosed,
       originalTargetStage: shouldCreateTicketClosed ? targetStage : undefined,
     };
@@ -603,6 +712,24 @@ const getAvailableTransitions = async (ticketId, userRole) => {
 
 const updateMilestoneNotes = async (milestoneId, notes, userId) => {
   try {
+    // Check if ticket is archived
+    const milestone = await prisma.ticketMilestone.findUnique({
+      where: { id: milestoneId },
+      include: {
+        ticket: {
+          select: { status: true },
+        },
+      },
+    });
+
+    if (!milestone) {
+      throw new Error("Milestone not found");
+    }
+
+    if (milestone.ticket.status === "CLOSED") {
+      throw new Error("Cannot update notes on closed/archived tickets");
+    }
+
     const updatedMilestone = await prisma.ticketMilestone.update({
       where: { id: milestoneId },
       data: {
@@ -639,36 +766,41 @@ const updateMilestoneNotes = async (milestoneId, notes, userId) => {
     // Create notification for milestone notes update
     try {
       const targetRoles = [
-        'MACSOFT_ADMIN',
-        'MACSOFT_HEAD', 
-        'MACSOFT_SUPPORT',
-        'CUSTOMER_SERVICE_HEAD'
+        "MACSOFT_ADMIN",
+        "MACSOFT_HEAD",
+        "MACSOFT_SUPPORT",
+        "CUSTOMER_SERVICE_HEAD",
       ];
-      
+
       const targetUsers = await prisma.user.findMany({
         where: {
           role: { in: targetRoles },
-          id: { not: userId }
+          id: { not: userId },
         },
-        select: { id: true }
+        select: { id: true },
       });
-      
-      const targetUserIds = targetUsers.map(user => user.id);
-      
+
+      const targetUserIds = targetUsers.map((user) => user.id);
+
       if (targetUserIds.length > 0) {
         const notificationData = createMilestoneNotification(
-          'updated',
+          "updated",
           milestoneWithConfig,
           updatedMilestone.ticket,
           userId,
           {
-            updateType: 'notes',
-            hasNotes: Boolean(notes)
+            updateType: "notes",
+            hasNotes: Boolean(notes),
           }
         );
-        
+
         // Note: We don't have io here, so pass null - notifications will still be saved to DB
-        await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
+        await saveAndBroadcastNotification(
+          prisma,
+          null,
+          notificationData,
+          targetUserIds
+        );
       }
     } catch (notificationError) {
       // Don't throw - notes update should succeed even if notification fails
@@ -698,7 +830,7 @@ const addPhotosToCurrentMilestone = async (
 
     const ticket = await prisma.ticket.findUnique({
       where: { id: ticketId },
-      select: { 
+      select: {
         ticketCode: true,
         id: true,
         customerName: true,
@@ -746,36 +878,41 @@ const addPhotosToCurrentMilestone = async (
     // Create notification for photos added to milestone
     try {
       const targetRoles = [
-        'MACSOFT_ADMIN',
-        'MACSOFT_HEAD', 
-        'MACSOFT_SUPPORT',
-        'CUSTOMER_SERVICE_HEAD'
+        "MACSOFT_ADMIN",
+        "MACSOFT_HEAD",
+        "MACSOFT_SUPPORT",
+        "CUSTOMER_SERVICE_HEAD",
       ];
-      
+
       const targetUsers = await prisma.user.findMany({
         where: {
           role: { in: targetRoles },
-          id: { not: userId }
+          id: { not: userId },
         },
-        select: { id: true }
+        select: { id: true },
       });
-      
-      const targetUserIds = targetUsers.map(user => user.id);
-      
+
+      const targetUserIds = targetUsers.map((user) => user.id);
+
       if (targetUserIds.length > 0) {
         const notificationData = createMilestoneNotification(
-          'updated',
+          "updated",
           milestoneWithConfig,
           ticket,
           userId,
           {
-            updateType: 'photos',
-            photosAdded: attachments.length
+            updateType: "photos",
+            photosAdded: attachments.length,
           }
         );
-        
+
         // Note: We don't have io here, so pass null - notifications will still be saved to DB
-        await saveAndBroadcastNotification(prisma, null, notificationData, targetUserIds);
+        await saveAndBroadcastNotification(
+          prisma,
+          null,
+          notificationData,
+          targetUserIds
+        );
       }
     } catch (notificationError) {
       // Don't throw - photos update should succeed even if notification fails
@@ -789,6 +926,24 @@ const addPhotosToCurrentMilestone = async (
 
 const updateMilestone = async (milestoneId, milestoneData, userId) => {
   try {
+    // Get milestone to check ticket status
+    const milestone = await prisma.ticketMilestone.findUnique({
+      where: { id: milestoneId },
+      include: {
+        ticket: {
+          select: { status: true },
+        },
+      },
+    });
+
+    if (!milestone) {
+      throw new Error("Milestone not found");
+    }
+
+    if (milestone.ticket.status === "CLOSED") {
+      throw new Error("Cannot update milestones on closed/archived tickets");
+    }
+
     // Check if this is a transition action
     if (milestoneData.action === "transition" && milestoneData.targetStage) {
       // This should use transitionMilestone instead
@@ -849,102 +1004,128 @@ const receiveControllerAtServiceCenter = async (
   attachments,
   io
 ) => {
-  const fs = require('fs').promises;
-  const path = require('path');
-  
+  const fs = require("fs").promises;
+  const path = require("path");
+
   try {
     // Find ticket by controller number
     const ticket = await prisma.ticket.findFirst({
       where: {
         controllerNo: {
           contains: controllerNo,
-         }
+        },
       },
       include: {
         ticketMilestones: {
           orderBy: {
-            order: 'asc'
-          }
+            order: "asc",
+          },
         },
         serviceCenter: true,
-      }
+      },
     });
 
     if (!ticket) {
-      throw new Error(`No ticket found with controller number: ${controllerNo}`);
+      throw new Error(
+        `No ticket found with controller number: ${controllerNo}`
+      );
     }
 
     // Check if user has permission to receive at service center
-    if (!canRoleTransitionToStage(userRole, 'RECEIVED_AT_SERVICE_CENTER')) {
-      throw new Error(`Your role (${userRole}) does not have permission to receive controllers`);
+    if (!canRoleTransitionToStage(userRole, "RECEIVED_AT_SERVICE_CENTER")) {
+      throw new Error(
+        `Your role (${userRole}) does not have permission to receive controllers`
+      );
     }
 
     // Validate that controller has been submitted to service center first
     const currentMilestone = ticket.ticketMilestones.find(
-      milestone => milestone.status === 'IN_PROGRESS' || milestone.status === 'BLOCKED'
+      (milestone) =>
+        milestone.status === "IN_PROGRESS" || milestone.status === "BLOCKED"
     );
-    
-    if (!currentMilestone || currentMilestone.stage !== 'SUBMITTED_TO_SERVICE_CENTER') {
-      throw new Error('Controller must be submitted to service center by field engineer before it can be received');
+
+    if (
+      !currentMilestone ||
+      currentMilestone.stage !== "SUBMITTED_TO_SERVICE_CENTER"
+    ) {
+      throw new Error(
+        "Controller must be submitted to service center by field engineer before it can be received"
+      );
     }
 
     // Check if user is from the assigned service center
-    if (userRole === 'SERVICE_CENTER_TECHNICIAN' || userRole === 'CUSTOMER_SERVICE_HEAD') {
+    if (
+      userRole === "SERVICE_CENTER_TECHNICIAN" ||
+      userRole === "CUSTOMER_SERVICE_HEAD"
+    ) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { serviceCenterCode: true },
       });
 
-      if (!user?.serviceCenterCode || ticket.assignedServiceCenter !== user.serviceCenterCode) {
-        throw new Error('This ticket is not assigned to your service center');
+      if (
+        !user?.serviceCenterCode ||
+        ticket.assignedServiceCenter !== user.serviceCenterCode
+      ) {
+        throw new Error("This ticket is not assigned to your service center");
       }
     }
 
     // Validate that photos are provided (mandatory for RECEIVED_AT_SERVICE_CENTER)
     if (!attachments || attachments.length === 0) {
-      throw new Error('Photos are mandatory when receiving controller at service center');
+      throw new Error(
+        "Photos are mandatory when receiving controller at service center"
+      );
     }
 
-    const config = getStageConfig('RECEIVED_AT_SERVICE_CENTER');
+    const config = getStageConfig("RECEIVED_AT_SERVICE_CENTER");
     if (config.minPhotos && attachments.length < config.minPhotos) {
-      throw new Error(`At least ${config.minPhotos} photos are required (${config.requiredPhotos?.join(', ') || 'Controller Front, Controller Bottom, Full View Open, MCB Close Up'})`);
+      throw new Error(
+        `At least ${config.minPhotos} photos are required (${
+          config.requiredPhotos?.join(", ") ||
+          "Controller Front, Controller Bottom, Full View Open, MCB Close Up"
+        })`
+      );
     }
 
     // Move files from temp to proper location
-    const baseDir = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads');
-    const targetDir = path.join(baseDir, ticket.ticketCode, 'milestones');
-    
+    const baseDir =
+      process.env.UPLOAD_DIR || path.join(__dirname, "../../uploads");
+    const targetDir = path.join(baseDir, ticket.ticketCode, "milestones");
+
     // Ensure target directory exists
     await fs.mkdir(targetDir, { recursive: true });
 
     // Move files and update attachment paths
-    const processedAttachments = await Promise.all(attachments.map(async (attachment) => {
-      const sourcePath = attachment.path;
-      const targetPath = path.join(targetDir, attachment.filename);
-      
-      try {
-        await fs.rename(sourcePath, targetPath);
-      } catch (error) {
-        // If rename fails (cross-device), try copy and delete
-        await fs.copyFile(sourcePath, targetPath);
-        await fs.unlink(sourcePath);
-      }
-      
-      return {
-        filename: attachment.filename,
-        originalName: attachment.originalName,
-        mimetype: attachment.mimetype,
-        size: attachment.size,
-        path: targetPath,
-        label: attachment.label, // Preserve the label
-        type: attachment.type    // Preserve the type
-      };
-    }));
+    const processedAttachments = await Promise.all(
+      attachments.map(async (attachment) => {
+        const sourcePath = attachment.path;
+        const targetPath = path.join(targetDir, attachment.filename);
+
+        try {
+          await fs.rename(sourcePath, targetPath);
+        } catch (error) {
+          // If rename fails (cross-device), try copy and delete
+          await fs.copyFile(sourcePath, targetPath);
+          await fs.unlink(sourcePath);
+        }
+
+        return {
+          filename: attachment.filename,
+          originalName: attachment.originalName,
+          mimetype: attachment.mimetype,
+          size: attachment.size,
+          path: targetPath,
+          label: attachment.label, // Preserve the label
+          type: attachment.type, // Preserve the type
+        };
+      })
+    );
 
     // Transition to RECEIVED_AT_SERVICE_CENTER
     const milestone = await transitionMilestone(
       ticket.id,
-      'RECEIVED_AT_SERVICE_CENTER',
+      "RECEIVED_AT_SERVICE_CENTER",
       userId,
       userRole,
       {
