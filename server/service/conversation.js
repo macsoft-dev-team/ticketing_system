@@ -45,6 +45,28 @@ const emitConversationEventWithRBAC = (
 
 const getConversations = async (ticketId) => {
   try {
+    // First check if ticket is archived
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      select: {
+        status: true,
+        backupjson: true,
+      },
+    });
+
+    // If ticket is closed and has archived data, return archived messages
+    if (ticket && ticket.status === "CLOSED" && ticket.backupjson) {
+      try {
+        const archivedData = JSON.parse(ticket.backupjson);
+        // Return archived messages with proper structure
+        return archivedData.messages || [];
+      } catch (parseError) {
+        console.error("Error parsing archived messages:", parseError);
+        // Fall through to normal query if parsing fails
+      }
+    }
+
+    // For non-archived tickets, fetch from database
     const conversations = await prisma.message.findMany({
       where: { ticketId: ticketId },
       include: {

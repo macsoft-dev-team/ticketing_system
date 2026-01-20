@@ -133,18 +133,18 @@ model Organisation {
 }
 
 model Project {
-  id             Int             @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
   name           String
-  projectCode    String          @unique
-  email          String?         @unique
+  projectCode    String        @unique
+  email          String?       @unique
   address        String?
   stateId        Int?
-  isActive       Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime?       @updatedAt
-  deletedAt      DateTime?       @map("deleted_at")
-  state          State?          @relation("StateProjects", fields: [stateId], references: [id])
-  organisation   Organisation?   @relation(fields: [organisationId], references: [id])
+  isActive       Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime?     @updatedAt
+  deletedAt      DateTime?     @map("deleted_at")
+  state          State?        @relation("StateProjects", fields: [stateId], references: [id])
+  organisation   Organisation? @relation(fields: [organisationId], references: [id])
   organisationId Int?
   users          User[]
 }
@@ -256,6 +256,9 @@ model Ticket {
   attachments         Attachments[]
   ticketMilestones    TicketMilestone[]
   batchItems          batchItem[]
+  backupjson          String?              @db.LongText
+  backupcreatedAt     DateTime?
+  backupurl           String?
 }
 
 model TicketMilestone {
@@ -366,9 +369,9 @@ model ProductTransaction {
   toCenterCode   String? // Destination center (for TRANSFER)
 
   // Approval workflow (for SSC transfer requests)
-  approvedBy     Int? // MACSOFT admin who approved
-  approvedAt     DateTime? // When approved/rejected
-  rejectionReason String?  @db.Text // If rejected, reason from approver
+  approvedBy      Int? // MACSOFT admin who approved
+  approvedAt      DateTime? // When approved/rejected
+  rejectionReason String?   @db.Text // If rejected, reason from approver
 
   invoiceNo    String?
   billNo       String?

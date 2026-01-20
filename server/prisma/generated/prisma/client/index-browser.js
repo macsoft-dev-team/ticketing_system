@@ -163,11 +163,13 @@ exports.Prisma.ProjectScalarFieldEnum = {
 exports.Prisma.ServiceCenterScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  projectCode: 'projectCode',
+  orgCode: 'orgCode',
   centerCode: 'centerCode',
   email: 'email',
   address: 'address',
   isActive: 'isActive',
+  isMacsoft: 'isMacsoft',
+  isMacsoftHead: 'isMacsoftHead',
   serviceableStates: 'serviceableStates',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -223,7 +225,10 @@ exports.Prisma.TicketScalarFieldEnum = {
   projectName: 'projectName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  backupjson: 'backupjson',
+  backupcreatedAt: 'backupcreatedAt',
+  backupurl: 'backupurl'
 };
 
 exports.Prisma.TicketMilestoneScalarFieldEnum = {
@@ -280,30 +285,55 @@ exports.Prisma.SpareRequestItemScalarFieldEnum = {
 exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  productCode: 'productCode',
   description: 'description',
   brandName: 'brandName',
-  productCode: 'productCode',
   category: 'category',
+  unitOfMeasure: 'unitOfMeasure',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ProductTransactionScalarFieldEnum = {
   id: 'id',
-  productId: 'productId',
-  type: 'type',
-  quantity: 'quantity',
+  transactionType: 'transactionType',
+  status: 'status',
+  centerCode: 'centerCode',
+  fromCenterCode: 'fromCenterCode',
+  toCenterCode: 'toCenterCode',
+  approvedBy: 'approvedBy',
+  approvedAt: 'approvedAt',
+  rejectionReason: 'rejectionReason',
+  invoiceNo: 'invoiceNo',
+  billNo: 'billNo',
+  receiptDate: 'receiptDate',
+  deliveryDate: 'deliveryDate',
+  receivedAt: 'receivedAt',
   ticketId: 'ticketId',
-  notes: 'notes',
+  remarks: 'remarks',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  productId: 'productId'
+};
+
+exports.Prisma.ProductTransactionItemScalarFieldEnum = {
+  id: 'id',
+  transactionId: 'transactionId',
+  productId: 'productId',
+  productName: 'productName',
+  condition: 'condition',
+  quantity: 'quantity'
 };
 
 exports.Prisma.InventoryScalarFieldEnum = {
   id: 'id',
+  centerCode: 'centerCode',
   productId: 'productId',
-  quantity: 'quantity',
+  goodQty: 'goodQty',
+  repairableQty: 'repairableQty',
+  damagedQty: 'damagedQty',
+  scrapQty: 'scrapQty',
   minStock: 'minStock',
   maxStock: 'maxStock',
   location: 'location',
@@ -473,7 +503,7 @@ exports.Prisma.ProjectOrderByRelevanceFieldEnum = {
 
 exports.Prisma.ServiceCenterOrderByRelevanceFieldEnum = {
   name: 'name',
-  projectCode: 'projectCode',
+  orgCode: 'orgCode',
   centerCode: 'centerCode',
   email: 'email',
   address: 'address',
@@ -511,7 +541,9 @@ exports.Prisma.TicketOrderByRelevanceFieldEnum = {
   cableLength: 'cableLength',
   assignedServiceCenter: 'assignedServiceCenter',
   code: 'code',
-  projectName: 'projectName'
+  projectName: 'projectName',
+  backupjson: 'backupjson',
+  backupurl: 'backupurl'
 };
 
 exports.Prisma.TicketMilestoneOrderByRelevanceFieldEnum = {
@@ -537,16 +569,27 @@ exports.Prisma.spareRequestItemOrderByRelevanceFieldEnum = {
 
 exports.Prisma.ProductOrderByRelevanceFieldEnum = {
   name: 'name',
+  productCode: 'productCode',
   description: 'description',
-  brandName: 'brandName',
-  productCode: 'productCode'
+  brandName: 'brandName'
 };
 
 exports.Prisma.ProductTransactionOrderByRelevanceFieldEnum = {
-  notes: 'notes'
+  centerCode: 'centerCode',
+  fromCenterCode: 'fromCenterCode',
+  toCenterCode: 'toCenterCode',
+  rejectionReason: 'rejectionReason',
+  invoiceNo: 'invoiceNo',
+  billNo: 'billNo',
+  remarks: 'remarks'
+};
+
+exports.Prisma.ProductTransactionItemOrderByRelevanceFieldEnum = {
+  productName: 'productName'
 };
 
 exports.Prisma.InventoryOrderByRelevanceFieldEnum = {
+  centerCode: 'centerCode',
   location: 'location'
 };
 
@@ -645,7 +688,29 @@ exports.Category = exports.$Enums.Category = {
 
 exports.TransactionType = exports.$Enums.TransactionType = {
   RECEIPT: 'RECEIPT',
-  DELIVERY: 'DELIVERY'
+  DELIVERY: 'DELIVERY',
+  TICKET_ISSUE: 'TICKET_ISSUE',
+  RETURN: 'RETURN',
+  TRANSFER: 'TRANSFER',
+  ADJUSTMENT: 'ADJUSTMENT',
+  REPLACEMENT: 'REPLACEMENT'
+};
+
+exports.TransactionStatus = exports.$Enums.TransactionStatus = {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PENDING: 'PENDING',
+  RECEIVED: 'RECEIVED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.InventoryCondition = exports.$Enums.InventoryCondition = {
+  GOOD: 'GOOD',
+  DEFECTIVE: 'DEFECTIVE',
+  REPAIRABLE: 'REPAIRABLE',
+  SCRAP: 'SCRAP'
 };
 
 exports.batchType = exports.$Enums.batchType = {
@@ -673,6 +738,7 @@ exports.Prisma.ModelName = {
   spareRequestItem: 'spareRequestItem',
   Product: 'Product',
   ProductTransaction: 'ProductTransaction',
+  ProductTransactionItem: 'ProductTransactionItem',
   Inventory: 'Inventory',
   Message: 'Message',
   MessageSeen: 'MessageSeen',

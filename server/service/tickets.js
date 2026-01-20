@@ -13,6 +13,235 @@ const { getStageConfig } = require("../lib/milestoneConfig");
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * Archive ticket data to JSON when ticket is closed
+ * Fetches all related data (messages, MessageSeen, notifications, NotificationRecipient)
+ * and stores it as JSON in the ticket's backupjson field
+ */
+const archiveTicketData = async (ticketId) => {
+  try {
+    // Fetch all ticket data with relations
+    const ticketData = await prisma.ticket.findUnique({
+      where: { id: ticketId },
+      include: {
+        messages: {
+          include: {
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
+            seenBy: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    phone: true,
+                    role: true,
+                  },
+                },
+              },
+            },
+            attachments: true,
+          },
+        },
+        notifications: {
+          include: {
+            recipients: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    phone: true,
+                    role: true,
+                  },
+                },
+              },
+            },
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
+          },
+        },
+        ticketMilestones: {
+          include: {
+            changer: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+                role: true,
+              },
+            },
+            attachments: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
+      },
+    });
+
+    if (!ticketData) {
+      throw new Error("Ticket not found for archiving");
+    }
+
+    // Prepare archive data
+    const archiveData = {
+      archivedAt: new Date().toISOString(),
+      ticketId: ticketData.id,
+      ticketCode: ticketData.ticketCode,
+      messages: ticketData.messages.map((msg) => ({
+        id: msg.id,
+        content: msg.content,
+        createdAt: msg.createdAt,
+        sender: msg.sender,
+        attachments: msg.attachments,
+        seenBy: msg.seenBy.map((seen) => ({
+          id: seen.id,
+          seenAt: seen.seenAt,
+          user: seen.user,
+        })),
+      })),
+      notifications: ticketData.notifications.map((notif) => ({
+        id: notif.id,
+        title: notif.title,
+        description: notif.description,
+        type: notif.type,
+        createdAt: notif.createdAt,
+        createdBy: notif.createdBy,
+        recipients: notif.recipients.map((recipient) => ({
+          id: recipient.id,
+          seen: recipient.seen,
+          seenAt: recipient.seenAt,
+          user: recipient.user,
+        })),
+      })),
+      milestones: ticketData.ticketMilestones.map((milestone) => ({
+        id: milestone.id,
+        stage: milestone.stage,
+        status: milestone.status,
+        order: milestone.order,
+        description: milestone.description,
+        allowedRoles: milestone.allowedRoles,
+        startedAt: milestone.startedAt,
+        completedAt: milestone.completedAt,
+        eta: milestone.eta,
+        slaDueAt: milestone.slaDueAt,
+        photoRequired: milestone.photoRequired,
+        notes: milestone.notes,
+        createdAt: milestone.createdAt,
+        updatedAt: milestone.updatedAt,
+        changedBy: milestone.changer,
+        attachments: milestone.attachments.map((att) => ({
+          id: att.id,
+          fileName: att.fileName,
+          fileType: att.fileType,
+          fileSize: att.fileSize,
+          fileUrl: att.fileUrl,
+          createdAt: att.createdAt,
+        })),
+      })),
+    };
+
+    // Convert to JSON string
+    const backupJson = JSON.stringify(archiveData, null, 2);
+
+    // Optionally save to file
+    const ticketDir = ensureTicketDirectory(ticketData.ticketCode);
+    const backupFilePath = path.join(ticketDir, `archive_${Date.now()}.json`);
+    fs.writeFileSync(backupFilePath, backupJson, "utf8");
+
+    // Update ticket with backup JSON and metadata
+    await prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        backupjson: backupJson,
+        backupcreatedAt: new Date(),
+        backupurl: backupFilePath,
+      },
+    });
+
+    // Delete the archived data
+    // First delete MessageSeen records
+    const messageIds = ticketData.messages.map((msg) => msg.id);
+    if (messageIds.length > 0) {
+      await prisma.messageSeen.deleteMany({
+        where: {
+          messageId: { in: messageIds },
+        },
+      });
+    }
+
+    // Delete NotificationRecipient records
+    const notificationIds = ticketData.notifications.map((notif) => notif.id);
+    if (notificationIds.length > 0) {
+      await prisma.notificationRecipient.deleteMany({
+        where: {
+          notificationId: { in: notificationIds },
+        },
+      });
+    }
+
+    // Delete Notifications
+    if (notificationIds.length > 0) {
+      await prisma.notification.deleteMany({
+        where: {
+          id: { in: notificationIds },
+        },
+      });
+    }
+
+    // Delete Messages
+    if (messageIds.length > 0) {
+      await prisma.message.deleteMany({
+        where: {
+          id: { in: messageIds },
+        },
+      });
+    }
+
+    // Delete milestone attachments (must be done before deleting milestones due to foreign key)
+    const milestoneIds = ticketData.ticketMilestones.map((m) => m.id);
+    if (milestoneIds.length > 0) {
+      await prisma.attachments.deleteMany({
+        where: {
+          milestoneId: { in: milestoneIds },
+        },
+      });
+    }
+
+    // Delete all milestones for the ticket
+    if (milestoneIds.length > 0) {
+      await prisma.ticketMilestone.deleteMany({
+        where: {
+          ticketId: ticketId,
+        },
+      });
+    }
+
+    console.log(`Successfully archived and cleaned ticket ${ticketData.ticketCode}`);
+    return {
+      success: true,
+      backupFilePath,
+      archivedData: archiveData,
+    };
+  } catch (error) {
+    console.error("Error archiving ticket data:", error);
+    throw error;
+  }
+};
+
 // RBAC Socket emission helper
 const emitTicketEventWithRBAC = (io, eventName, ticketData, eventData = null) => {
   if (!io || !ticketData) return;
@@ -378,6 +607,78 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
     }
     // For MACSOFT_ADMIN, MACSOFT_HEAD, MACSOFT_SUPPORT -> no additional filters (global access)
 
+    // First, check if ticket is closed and has archived data
+    const ticketStatus = await prisma.ticket.findFirst({
+      where,
+      select: {
+        id: true,
+        status: true,
+        backupjson: true,
+        backupcreatedAt: true,
+        backupurl: true,
+      },
+    });
+
+    if (!ticketStatus) {
+      throw new Error("Ticket not found or access denied");
+    }
+
+    // If ticket is CLOSED and has archived data, return the archived data
+    if (ticketStatus.status === "CLOSED" && ticketStatus.backupjson) {
+      try {
+        const archivedData = JSON.parse(ticketStatus.backupjson);
+        
+        // Fetch basic ticket info and merge with archived data
+        const basicTicket = await prisma.ticket.findFirst({
+          where,
+          include: {
+            createdByUser: true,
+            updatedByUser: true,
+            serviceCenter: {
+              select: {
+                id: true,
+                name: true,
+                centerCode: true,
+                address: true,
+              },
+            },
+            attachments: true,
+            ticketMilestones: {
+              include: {
+                changer: {
+                  select: {
+                    id: true,
+                    name: true,
+                    role: true,
+                  },
+                },
+                attachments: true,
+              },
+              orderBy: {
+                order: "asc",
+              },
+            },
+            state: true,
+            selectedDistrict: true,
+          },
+        });
+
+        // Return ticket with archived messages, notifications, and milestones
+        return {
+          ...basicTicket,
+          messages: archivedData.messages || [],
+          notifications: archivedData.notifications || [],
+          ticketMilestones: archivedData.milestones || [],
+          isArchived: true,
+          archivedAt: archivedData.archivedAt,
+        };
+      } catch (parseError) {
+        console.error("Error parsing archived data:", parseError);
+        // If parsing fails, fall through to normal query
+      }
+    }
+
+    // For non-closed tickets or tickets without archived data, fetch normally
     const ticket = await prisma.ticket.findFirst({
       where,
       include: {
@@ -437,7 +738,10 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
       throw new Error("Ticket not found or access denied");
     }
 
-    return ticket;
+    return {
+      ...ticket,
+      isArchived: false,
+    };
   } catch (error) {
     throw error;
   }
@@ -999,6 +1303,18 @@ const updateTicket = async (
         updatedBy: userId,
       },
     });
+    
+    // Archive ticket data if closing
+    if (status === "CLOSED") {
+      try {
+        await archiveTicketData(ticketId);
+        console.log(`Ticket ${ticketId} data archived successfully`);
+      } catch (archiveError) {
+        console.error(`Failed to archive ticket ${ticketId}:`, archiveError);
+        // Continue with the flow even if archiving fails
+      }
+    }
+    
     // Create update conversation message
     const conversation = await prisma.message.create({
       data: {
@@ -1112,6 +1428,18 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
       where: { id: ticketId },
       data: { status: status },
     });
+    
+    // Archive ticket data if closing
+    if (status === "CLOSED") {
+      try {
+        await archiveTicketData(ticketId);
+        console.log(`Ticket ${ticketId} data archived successfully`);
+      } catch (archiveError) {
+        console.error(`Failed to archive ticket ${ticketId}:`, archiveError);
+        // Continue with the flow even if archiving fails
+      }
+    }
+    
     // Determine action based on status change
     let action = "updated";
     if (status === "CLOSED") {
@@ -1475,4 +1803,5 @@ module.exports = {
   searchByControllerNumber,
   searchTickets,
   checkActiveTicketForController,
+  archiveTicketData,
 };

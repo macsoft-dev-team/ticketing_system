@@ -79,6 +79,11 @@ export type Product = $Result.DefaultSelection<Prisma.$ProductPayload>
  */
 export type ProductTransaction = $Result.DefaultSelection<Prisma.$ProductTransactionPayload>
 /**
+ * Model ProductTransactionItem
+ * 
+ */
+export type ProductTransactionItem = $Result.DefaultSelection<Prisma.$ProductTransactionItemPayload>
+/**
  * Model Inventory
  * 
  */
@@ -196,14 +201,6 @@ export const TicketStatus: {
 export type TicketStatus = (typeof TicketStatus)[keyof typeof TicketStatus]
 
 
-export const TransactionType: {
-  RECEIPT: 'RECEIPT',
-  DELIVERY: 'DELIVERY'
-};
-
-export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
-
-
 export const Role: {
   MACSOFT_ADMIN: 'MACSOFT_ADMIN',
   MACSOFT_HEAD: 'MACSOFT_HEAD',
@@ -227,6 +224,42 @@ export const Category: {
 };
 
 export type Category = (typeof Category)[keyof typeof Category]
+
+
+export const TransactionType: {
+  RECEIPT: 'RECEIPT',
+  DELIVERY: 'DELIVERY',
+  TICKET_ISSUE: 'TICKET_ISSUE',
+  RETURN: 'RETURN',
+  TRANSFER: 'TRANSFER',
+  ADJUSTMENT: 'ADJUSTMENT',
+  REPLACEMENT: 'REPLACEMENT'
+};
+
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
+
+
+export const TransactionStatus: {
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PENDING: 'PENDING',
+  RECEIVED: 'RECEIVED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus]
+
+
+export const InventoryCondition: {
+  GOOD: 'GOOD',
+  DEFECTIVE: 'DEFECTIVE',
+  REPAIRABLE: 'REPAIRABLE',
+  SCRAP: 'SCRAP'
+};
+
+export type InventoryCondition = (typeof InventoryCondition)[keyof typeof InventoryCondition]
 
 
 export const batchType: {
@@ -259,10 +292,6 @@ export type TicketStatus = $Enums.TicketStatus
 
 export const TicketStatus: typeof $Enums.TicketStatus
 
-export type TransactionType = $Enums.TransactionType
-
-export const TransactionType: typeof $Enums.TransactionType
-
 export type Role = $Enums.Role
 
 export const Role: typeof $Enums.Role
@@ -270,6 +299,18 @@ export const Role: typeof $Enums.Role
 export type Category = $Enums.Category
 
 export const Category: typeof $Enums.Category
+
+export type TransactionType = $Enums.TransactionType
+
+export const TransactionType: typeof $Enums.TransactionType
+
+export type TransactionStatus = $Enums.TransactionStatus
+
+export const TransactionStatus: typeof $Enums.TransactionStatus
+
+export type InventoryCondition = $Enums.InventoryCondition
+
+export const InventoryCondition: typeof $Enums.InventoryCondition
 
 export type batchType = $Enums.batchType
 
@@ -526,6 +567,16 @@ export class PrismaClient<
     * ```
     */
   get productTransaction(): Prisma.ProductTransactionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.productTransactionItem`: Exposes CRUD operations for the **ProductTransactionItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProductTransactionItems
+    * const productTransactionItems = await prisma.productTransactionItem.findMany()
+    * ```
+    */
+  get productTransactionItem(): Prisma.ProductTransactionItemDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.inventory`: Exposes CRUD operations for the **Inventory** model.
@@ -1119,6 +1170,7 @@ export namespace Prisma {
     spareRequestItem: 'spareRequestItem',
     Product: 'Product',
     ProductTransaction: 'ProductTransaction',
+    ProductTransactionItem: 'ProductTransactionItem',
     Inventory: 'Inventory',
     Message: 'Message',
     MessageSeen: 'MessageSeen',
@@ -1151,7 +1203,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp" | "workingHours" | "breakTime" | "officeHoliday" | "buzzerAlertConfig"
+      modelProps: "state" | "district" | "organisation" | "project" | "serviceCenter" | "user" | "ticket" | "ticketMilestone" | "attachments" | "spareRequest" | "spareRequestItem" | "product" | "productTransaction" | "productTransactionItem" | "inventory" | "message" | "messageSeen" | "notification" | "notificationRecipient" | "ticketSequence" | "batch" | "batchItem" | "settings" | "motorhp" | "workingHours" | "breakTime" | "officeHoliday" | "buzzerAlertConfig"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2010,6 +2062,72 @@ export namespace Prisma {
           count: {
             args: Prisma.ProductTransactionCountArgs<ExtArgs>
             result: $Utils.Optional<ProductTransactionCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProductTransactionItem: {
+        payload: Prisma.$ProductTransactionItemPayload<ExtArgs>
+        fields: Prisma.ProductTransactionItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProductTransactionItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProductTransactionItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>
+          }
+          findFirst: {
+            args: Prisma.ProductTransactionItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProductTransactionItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>
+          }
+          findMany: {
+            args: Prisma.ProductTransactionItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>[]
+          }
+          create: {
+            args: Prisma.ProductTransactionItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>
+          }
+          createMany: {
+            args: Prisma.ProductTransactionItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ProductTransactionItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>
+          }
+          update: {
+            args: Prisma.ProductTransactionItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProductTransactionItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProductTransactionItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ProductTransactionItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProductTransactionItemPayload>
+          }
+          aggregate: {
+            args: Prisma.ProductTransactionItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProductTransactionItem>
+          }
+          groupBy: {
+            args: Prisma.ProductTransactionItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProductTransactionItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProductTransactionItemCountArgs<ExtArgs>
+            result: $Utils.Optional<ProductTransactionItemCountAggregateOutputType> | number
           }
         }
       }
@@ -3046,6 +3164,7 @@ export namespace Prisma {
     spareRequestItem?: spareRequestItemOmit
     product?: ProductOmit
     productTransaction?: ProductTransactionOmit
+    productTransactionItem?: ProductTransactionItemOmit
     inventory?: InventoryOmit
     message?: MessageOmit
     messageSeen?: MessageSeenOmit
@@ -3240,11 +3359,13 @@ export namespace Prisma {
   export type OrganisationCountOutputType = {
     project: number
     users: number
+    serviceCenters: number
   }
 
   export type OrganisationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | OrganisationCountOutputTypeCountProjectArgs
     users?: boolean | OrganisationCountOutputTypeCountUsersArgs
+    serviceCenters?: boolean | OrganisationCountOutputTypeCountServiceCentersArgs
   }
 
   // Custom InputTypes
@@ -3272,18 +3393,23 @@ export namespace Prisma {
     where?: UserWhereInput
   }
 
+  /**
+   * OrganisationCountOutputType without action
+   */
+  export type OrganisationCountOutputTypeCountServiceCentersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ServiceCenterWhereInput
+  }
+
 
   /**
    * Count Type ProjectCountOutputType
    */
 
   export type ProjectCountOutputType = {
-    ServiceCenter: number
     users: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    ServiceCenter?: boolean | ProjectCountOutputTypeCountServiceCenterArgs
     users?: boolean | ProjectCountOutputTypeCountUsersArgs
   }
 
@@ -3301,13 +3427,6 @@ export namespace Prisma {
   /**
    * ProjectCountOutputType without action
    */
-  export type ProjectCountOutputTypeCountServiceCenterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ServiceCenterWhereInput
-  }
-
-  /**
-   * ProjectCountOutputType without action
-   */
   export type ProjectCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
   }
@@ -3320,11 +3439,19 @@ export namespace Prisma {
   export type ServiceCenterCountOutputType = {
     users: number
     assignedTickets: number
+    inventories: number
+    transactions: number
+    transfersFrom: number
+    transfersTo: number
   }
 
   export type ServiceCenterCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | ServiceCenterCountOutputTypeCountUsersArgs
     assignedTickets?: boolean | ServiceCenterCountOutputTypeCountAssignedTicketsArgs
+    inventories?: boolean | ServiceCenterCountOutputTypeCountInventoriesArgs
+    transactions?: boolean | ServiceCenterCountOutputTypeCountTransactionsArgs
+    transfersFrom?: boolean | ServiceCenterCountOutputTypeCountTransfersFromArgs
+    transfersTo?: boolean | ServiceCenterCountOutputTypeCountTransfersToArgs
   }
 
   // Custom InputTypes
@@ -3352,6 +3479,34 @@ export namespace Prisma {
     where?: TicketWhereInput
   }
 
+  /**
+   * ServiceCenterCountOutputType without action
+   */
+  export type ServiceCenterCountOutputTypeCountInventoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InventoryWhereInput
+  }
+
+  /**
+   * ServiceCenterCountOutputType without action
+   */
+  export type ServiceCenterCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionWhereInput
+  }
+
+  /**
+   * ServiceCenterCountOutputType without action
+   */
+  export type ServiceCenterCountOutputTypeCountTransfersFromArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionWhereInput
+  }
+
+  /**
+   * ServiceCenterCountOutputType without action
+   */
+  export type ServiceCenterCountOutputTypeCountTransfersToArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionWhereInput
+  }
+
 
   /**
    * Count Type UserCountOutputType
@@ -3367,6 +3522,7 @@ export namespace Prisma {
     spareRequestsCreated: number
     spareRequestsUpdated: number
     productTransactions: number
+    approvedTransactions: number
     TicketMilestone: number
     states: number
     createdBatches: number
@@ -3383,6 +3539,7 @@ export namespace Prisma {
     spareRequestsCreated?: boolean | UserCountOutputTypeCountSpareRequestsCreatedArgs
     spareRequestsUpdated?: boolean | UserCountOutputTypeCountSpareRequestsUpdatedArgs
     productTransactions?: boolean | UserCountOutputTypeCountProductTransactionsArgs
+    approvedTransactions?: boolean | UserCountOutputTypeCountApprovedTransactionsArgs
     TicketMilestone?: boolean | UserCountOutputTypeCountTicketMilestoneArgs
     states?: boolean | UserCountOutputTypeCountStatesArgs
     createdBatches?: boolean | UserCountOutputTypeCountCreatedBatchesArgs
@@ -3460,6 +3617,13 @@ export namespace Prisma {
    * UserCountOutputType without action
    */
   export type UserCountOutputTypeCountProductTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountApprovedTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ProductTransactionWhereInput
   }
 
@@ -3635,13 +3799,17 @@ export namespace Prisma {
    */
 
   export type ProductCountOutputType = {
+    inventories: number
     transactions: number
     spareRequestItems: number
+    ProductTransactionItem: number
   }
 
   export type ProductCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    inventories?: boolean | ProductCountOutputTypeCountInventoriesArgs
     transactions?: boolean | ProductCountOutputTypeCountTransactionsArgs
     spareRequestItems?: boolean | ProductCountOutputTypeCountSpareRequestItemsArgs
+    ProductTransactionItem?: boolean | ProductCountOutputTypeCountProductTransactionItemArgs
   }
 
   // Custom InputTypes
@@ -3658,6 +3826,13 @@ export namespace Prisma {
   /**
    * ProductCountOutputType without action
    */
+  export type ProductCountOutputTypeCountInventoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InventoryWhereInput
+  }
+
+  /**
+   * ProductCountOutputType without action
+   */
   export type ProductCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ProductTransactionWhereInput
   }
@@ -3667,6 +3842,44 @@ export namespace Prisma {
    */
   export type ProductCountOutputTypeCountSpareRequestItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: spareRequestItemWhereInput
+  }
+
+  /**
+   * ProductCountOutputType without action
+   */
+  export type ProductCountOutputTypeCountProductTransactionItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionItemWhereInput
+  }
+
+
+  /**
+   * Count Type ProductTransactionCountOutputType
+   */
+
+  export type ProductTransactionCountOutputType = {
+    items: number
+  }
+
+  export type ProductTransactionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | ProductTransactionCountOutputTypeCountItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ProductTransactionCountOutputType without action
+   */
+  export type ProductTransactionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionCountOutputType
+     */
+    select?: ProductTransactionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ProductTransactionCountOutputType without action
+   */
+  export type ProductTransactionCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionItemWhereInput
   }
 
 
@@ -6125,6 +6338,7 @@ export namespace Prisma {
     deletedAt?: boolean
     project?: boolean | Organisation$projectArgs<ExtArgs>
     users?: boolean | Organisation$usersArgs<ExtArgs>
+    serviceCenters?: boolean | Organisation$serviceCentersArgs<ExtArgs>
     _count?: boolean | OrganisationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["organisation"]>
 
@@ -6147,6 +6361,7 @@ export namespace Prisma {
   export type OrganisationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | Organisation$projectArgs<ExtArgs>
     users?: boolean | Organisation$usersArgs<ExtArgs>
+    serviceCenters?: boolean | Organisation$serviceCentersArgs<ExtArgs>
     _count?: boolean | OrganisationCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -6155,6 +6370,7 @@ export namespace Prisma {
     objects: {
       project: Prisma.$ProjectPayload<ExtArgs>[]
       users: Prisma.$UserPayload<ExtArgs>[]
+      serviceCenters: Prisma.$ServiceCenterPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -6509,6 +6725,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     project<T extends Organisation$projectArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$projectArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     users<T extends Organisation$usersArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    serviceCenters<T extends Organisation$serviceCentersArgs<ExtArgs> = {}>(args?: Subset<T, Organisation$serviceCentersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6939,6 +7156,30 @@ export namespace Prisma {
   }
 
   /**
+   * Organisation.serviceCenters
+   */
+  export type Organisation$serviceCentersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ServiceCenter
+     */
+    select?: ServiceCenterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ServiceCenter
+     */
+    omit?: ServiceCenterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ServiceCenterInclude<ExtArgs> | null
+    where?: ServiceCenterWhereInput
+    orderBy?: ServiceCenterOrderByWithRelationInput | ServiceCenterOrderByWithRelationInput[]
+    cursor?: ServiceCenterWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ServiceCenterScalarFieldEnum | ServiceCenterScalarFieldEnum[]
+  }
+
+  /**
    * Organisation without action
    */
   export type OrganisationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7211,7 +7452,6 @@ export namespace Prisma {
     updatedAt?: boolean
     deletedAt?: boolean
     organisationId?: boolean
-    ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
     state?: boolean | Project$stateArgs<ExtArgs>
     organisation?: boolean | Project$organisationArgs<ExtArgs>
     users?: boolean | Project$usersArgs<ExtArgs>
@@ -7236,7 +7476,6 @@ export namespace Prisma {
 
   export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "projectCode" | "email" | "address" | "stateId" | "isActive" | "createdAt" | "updatedAt" | "deletedAt" | "organisationId", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    ServiceCenter?: boolean | Project$ServiceCenterArgs<ExtArgs>
     state?: boolean | Project$stateArgs<ExtArgs>
     organisation?: boolean | Project$organisationArgs<ExtArgs>
     users?: boolean | Project$usersArgs<ExtArgs>
@@ -7246,7 +7485,6 @@ export namespace Prisma {
   export type $ProjectPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Project"
     objects: {
-      ServiceCenter: Prisma.$ServiceCenterPayload<ExtArgs>[]
       state: Prisma.$StatePayload<ExtArgs> | null
       organisation: Prisma.$OrganisationPayload<ExtArgs> | null
       users: Prisma.$UserPayload<ExtArgs>[]
@@ -7603,7 +7841,6 @@ export namespace Prisma {
    */
   export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    ServiceCenter<T extends Project$ServiceCenterArgs<ExtArgs> = {}>(args?: Subset<T, Project$ServiceCenterArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     state<T extends Project$stateArgs<ExtArgs> = {}>(args?: Subset<T, Project$stateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     organisation<T extends Project$organisationArgs<ExtArgs> = {}>(args?: Subset<T, Project$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     users<T extends Project$usersArgs<ExtArgs> = {}>(args?: Subset<T, Project$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7990,30 +8227,6 @@ export namespace Prisma {
   }
 
   /**
-   * Project.ServiceCenter
-   */
-  export type Project$ServiceCenterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ServiceCenter
-     */
-    select?: ServiceCenterSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the ServiceCenter
-     */
-    omit?: ServiceCenterOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ServiceCenterInclude<ExtArgs> | null
-    where?: ServiceCenterWhereInput
-    orderBy?: ServiceCenterOrderByWithRelationInput | ServiceCenterOrderByWithRelationInput[]
-    cursor?: ServiceCenterWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ServiceCenterScalarFieldEnum | ServiceCenterScalarFieldEnum[]
-  }
-
-  /**
    * Project.state
    */
   export type Project$stateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8117,11 +8330,13 @@ export namespace Prisma {
   export type ServiceCenterMinAggregateOutputType = {
     id: number | null
     name: string | null
-    projectCode: string | null
+    orgCode: string | null
     centerCode: string | null
     email: string | null
     address: string | null
     isActive: boolean | null
+    isMacsoft: boolean | null
+    isMacsoftHead: boolean | null
     serviceableStates: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -8131,11 +8346,13 @@ export namespace Prisma {
   export type ServiceCenterMaxAggregateOutputType = {
     id: number | null
     name: string | null
-    projectCode: string | null
+    orgCode: string | null
     centerCode: string | null
     email: string | null
     address: string | null
     isActive: boolean | null
+    isMacsoft: boolean | null
+    isMacsoftHead: boolean | null
     serviceableStates: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -8145,11 +8362,13 @@ export namespace Prisma {
   export type ServiceCenterCountAggregateOutputType = {
     id: number
     name: number
-    projectCode: number
+    orgCode: number
     centerCode: number
     email: number
     address: number
     isActive: number
+    isMacsoft: number
+    isMacsoftHead: number
     serviceableStates: number
     createdAt: number
     updatedAt: number
@@ -8169,11 +8388,13 @@ export namespace Prisma {
   export type ServiceCenterMinAggregateInputType = {
     id?: true
     name?: true
-    projectCode?: true
+    orgCode?: true
     centerCode?: true
     email?: true
     address?: true
     isActive?: true
+    isMacsoft?: true
+    isMacsoftHead?: true
     serviceableStates?: true
     createdAt?: true
     updatedAt?: true
@@ -8183,11 +8404,13 @@ export namespace Prisma {
   export type ServiceCenterMaxAggregateInputType = {
     id?: true
     name?: true
-    projectCode?: true
+    orgCode?: true
     centerCode?: true
     email?: true
     address?: true
     isActive?: true
+    isMacsoft?: true
+    isMacsoftHead?: true
     serviceableStates?: true
     createdAt?: true
     updatedAt?: true
@@ -8197,11 +8420,13 @@ export namespace Prisma {
   export type ServiceCenterCountAggregateInputType = {
     id?: true
     name?: true
-    projectCode?: true
+    orgCode?: true
     centerCode?: true
     email?: true
     address?: true
     isActive?: true
+    isMacsoft?: true
+    isMacsoftHead?: true
     serviceableStates?: true
     createdAt?: true
     updatedAt?: true
@@ -8298,11 +8523,13 @@ export namespace Prisma {
   export type ServiceCenterGroupByOutputType = {
     id: number
     name: string
-    projectCode: string | null
+    orgCode: string | null
     centerCode: string
     email: string
     address: string | null
     isActive: boolean
+    isMacsoft: boolean
+    isMacsoftHead: boolean
     serviceableStates: string | null
     createdAt: Date
     updatedAt: Date | null
@@ -8331,18 +8558,24 @@ export namespace Prisma {
   export type ServiceCenterSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    projectCode?: boolean
+    orgCode?: boolean
     centerCode?: boolean
     email?: boolean
     address?: boolean
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
     users?: boolean | ServiceCenter$usersArgs<ExtArgs>
-    project?: boolean | ServiceCenter$projectArgs<ExtArgs>
+    organisation?: boolean | ServiceCenter$organisationArgs<ExtArgs>
     assignedTickets?: boolean | ServiceCenter$assignedTicketsArgs<ExtArgs>
+    inventories?: boolean | ServiceCenter$inventoriesArgs<ExtArgs>
+    transactions?: boolean | ServiceCenter$transactionsArgs<ExtArgs>
+    transfersFrom?: boolean | ServiceCenter$transfersFromArgs<ExtArgs>
+    transfersTo?: boolean | ServiceCenter$transfersToArgs<ExtArgs>
     _count?: boolean | ServiceCenterCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["serviceCenter"]>
 
@@ -8351,22 +8584,28 @@ export namespace Prisma {
   export type ServiceCenterSelectScalar = {
     id?: boolean
     name?: boolean
-    projectCode?: boolean
+    orgCode?: boolean
     centerCode?: boolean
     email?: boolean
     address?: boolean
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
   }
 
-  export type ServiceCenterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "projectCode" | "centerCode" | "email" | "address" | "isActive" | "serviceableStates" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["serviceCenter"]>
+  export type ServiceCenterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "orgCode" | "centerCode" | "email" | "address" | "isActive" | "isMacsoft" | "isMacsoftHead" | "serviceableStates" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["serviceCenter"]>
   export type ServiceCenterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     users?: boolean | ServiceCenter$usersArgs<ExtArgs>
-    project?: boolean | ServiceCenter$projectArgs<ExtArgs>
+    organisation?: boolean | ServiceCenter$organisationArgs<ExtArgs>
     assignedTickets?: boolean | ServiceCenter$assignedTicketsArgs<ExtArgs>
+    inventories?: boolean | ServiceCenter$inventoriesArgs<ExtArgs>
+    transactions?: boolean | ServiceCenter$transactionsArgs<ExtArgs>
+    transfersFrom?: boolean | ServiceCenter$transfersFromArgs<ExtArgs>
+    transfersTo?: boolean | ServiceCenter$transfersToArgs<ExtArgs>
     _count?: boolean | ServiceCenterCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8374,17 +8613,23 @@ export namespace Prisma {
     name: "ServiceCenter"
     objects: {
       users: Prisma.$UserPayload<ExtArgs>[]
-      project: Prisma.$ProjectPayload<ExtArgs> | null
+      organisation: Prisma.$OrganisationPayload<ExtArgs> | null
       assignedTickets: Prisma.$TicketPayload<ExtArgs>[]
+      inventories: Prisma.$InventoryPayload<ExtArgs>[]
+      transactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
+      transfersFrom: Prisma.$ProductTransactionPayload<ExtArgs>[]
+      transfersTo: Prisma.$ProductTransactionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       name: string
-      projectCode: string | null
+      orgCode: string | null
       centerCode: string
       email: string
       address: string | null
       isActive: boolean
+      isMacsoft: boolean
+      isMacsoftHead: boolean
       serviceableStates: string | null
       createdAt: Date
       updatedAt: Date | null
@@ -8730,8 +8975,12 @@ export namespace Prisma {
   export interface Prisma__ServiceCenterClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     users<T extends ServiceCenter$usersArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    project<T extends ServiceCenter$projectArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    organisation<T extends ServiceCenter$organisationArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$organisationArgs<ExtArgs>>): Prisma__OrganisationClient<$Result.GetResult<Prisma.$OrganisationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     assignedTickets<T extends ServiceCenter$assignedTicketsArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$assignedTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    inventories<T extends ServiceCenter$inventoriesArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$inventoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    transactions<T extends ServiceCenter$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    transfersFrom<T extends ServiceCenter$transfersFromArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$transfersFromArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    transfersTo<T extends ServiceCenter$transfersToArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenter$transfersToArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8763,11 +9012,13 @@ export namespace Prisma {
   interface ServiceCenterFieldRefs {
     readonly id: FieldRef<"ServiceCenter", 'Int'>
     readonly name: FieldRef<"ServiceCenter", 'String'>
-    readonly projectCode: FieldRef<"ServiceCenter", 'String'>
+    readonly orgCode: FieldRef<"ServiceCenter", 'String'>
     readonly centerCode: FieldRef<"ServiceCenter", 'String'>
     readonly email: FieldRef<"ServiceCenter", 'String'>
     readonly address: FieldRef<"ServiceCenter", 'String'>
     readonly isActive: FieldRef<"ServiceCenter", 'Boolean'>
+    readonly isMacsoft: FieldRef<"ServiceCenter", 'Boolean'>
+    readonly isMacsoftHead: FieldRef<"ServiceCenter", 'Boolean'>
     readonly serviceableStates: FieldRef<"ServiceCenter", 'String'>
     readonly createdAt: FieldRef<"ServiceCenter", 'DateTime'>
     readonly updatedAt: FieldRef<"ServiceCenter", 'DateTime'>
@@ -9139,22 +9390,22 @@ export namespace Prisma {
   }
 
   /**
-   * ServiceCenter.project
+   * ServiceCenter.organisation
    */
-  export type ServiceCenter$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type ServiceCenter$organisationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Project
+     * Select specific fields to fetch from the Organisation
      */
-    select?: ProjectSelect<ExtArgs> | null
+    select?: OrganisationSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Project
+     * Omit specific fields from the Organisation
      */
-    omit?: ProjectOmit<ExtArgs> | null
+    omit?: OrganisationOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ProjectInclude<ExtArgs> | null
-    where?: ProjectWhereInput
+    include?: OrganisationInclude<ExtArgs> | null
+    where?: OrganisationWhereInput
   }
 
   /**
@@ -9179,6 +9430,102 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TicketScalarFieldEnum | TicketScalarFieldEnum[]
+  }
+
+  /**
+   * ServiceCenter.inventories
+   */
+  export type ServiceCenter$inventoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Inventory
+     */
+    select?: InventorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Inventory
+     */
+    omit?: InventoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryInclude<ExtArgs> | null
+    where?: InventoryWhereInput
+    orderBy?: InventoryOrderByWithRelationInput | InventoryOrderByWithRelationInput[]
+    cursor?: InventoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InventoryScalarFieldEnum | InventoryScalarFieldEnum[]
+  }
+
+  /**
+   * ServiceCenter.transactions
+   */
+  export type ServiceCenter$transactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransaction
+     */
+    select?: ProductTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransaction
+     */
+    omit?: ProductTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionInclude<ExtArgs> | null
+    where?: ProductTransactionWhereInput
+    orderBy?: ProductTransactionOrderByWithRelationInput | ProductTransactionOrderByWithRelationInput[]
+    cursor?: ProductTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductTransactionScalarFieldEnum | ProductTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * ServiceCenter.transfersFrom
+   */
+  export type ServiceCenter$transfersFromArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransaction
+     */
+    select?: ProductTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransaction
+     */
+    omit?: ProductTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionInclude<ExtArgs> | null
+    where?: ProductTransactionWhereInput
+    orderBy?: ProductTransactionOrderByWithRelationInput | ProductTransactionOrderByWithRelationInput[]
+    cursor?: ProductTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductTransactionScalarFieldEnum | ProductTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * ServiceCenter.transfersTo
+   */
+  export type ServiceCenter$transfersToArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransaction
+     */
+    select?: ProductTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransaction
+     */
+    omit?: ProductTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionInclude<ExtArgs> | null
+    where?: ProductTransactionWhereInput
+    orderBy?: ProductTransactionOrderByWithRelationInput | ProductTransactionOrderByWithRelationInput[]
+    cursor?: ProductTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductTransactionScalarFieldEnum | ProductTransactionScalarFieldEnum[]
   }
 
   /**
@@ -9484,6 +9831,7 @@ export namespace Prisma {
     spareRequestsCreated?: boolean | User$spareRequestsCreatedArgs<ExtArgs>
     spareRequestsUpdated?: boolean | User$spareRequestsUpdatedArgs<ExtArgs>
     productTransactions?: boolean | User$productTransactionsArgs<ExtArgs>
+    approvedTransactions?: boolean | User$approvedTransactionsArgs<ExtArgs>
     TicketMilestone?: boolean | User$TicketMilestoneArgs<ExtArgs>
     State?: boolean | User$StateArgs<ExtArgs>
     states?: boolean | User$statesArgs<ExtArgs>
@@ -9525,6 +9873,7 @@ export namespace Prisma {
     spareRequestsCreated?: boolean | User$spareRequestsCreatedArgs<ExtArgs>
     spareRequestsUpdated?: boolean | User$spareRequestsUpdatedArgs<ExtArgs>
     productTransactions?: boolean | User$productTransactionsArgs<ExtArgs>
+    approvedTransactions?: boolean | User$approvedTransactionsArgs<ExtArgs>
     TicketMilestone?: boolean | User$TicketMilestoneArgs<ExtArgs>
     State?: boolean | User$StateArgs<ExtArgs>
     states?: boolean | User$statesArgs<ExtArgs>
@@ -9548,6 +9897,7 @@ export namespace Prisma {
       spareRequestsCreated: Prisma.$spareRequestPayload<ExtArgs>[]
       spareRequestsUpdated: Prisma.$spareRequestPayload<ExtArgs>[]
       productTransactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
+      approvedTransactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
       TicketMilestone: Prisma.$TicketMilestonePayload<ExtArgs>[]
       State: Prisma.$StatePayload<ExtArgs> | null
       states: Prisma.$StatePayload<ExtArgs>[]
@@ -9921,6 +10271,7 @@ export namespace Prisma {
     spareRequestsCreated<T extends User$spareRequestsCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$spareRequestsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$spareRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     spareRequestsUpdated<T extends User$spareRequestsUpdatedArgs<ExtArgs> = {}>(args?: Subset<T, User$spareRequestsUpdatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$spareRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     productTransactions<T extends User$productTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$productTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    approvedTransactions<T extends User$approvedTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, User$approvedTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     TicketMilestone<T extends User$TicketMilestoneArgs<ExtArgs> = {}>(args?: Subset<T, User$TicketMilestoneArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TicketMilestonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     State<T extends User$StateArgs<ExtArgs> = {}>(args?: Subset<T, User$StateArgs<ExtArgs>>): Prisma__StateClient<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     states<T extends User$statesArgs<ExtArgs> = {}>(args?: Subset<T, User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -10549,6 +10900,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.approvedTransactions
+   */
+  export type User$approvedTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransaction
+     */
+    select?: ProductTransactionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransaction
+     */
+    omit?: ProductTransactionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionInclude<ExtArgs> | null
+    where?: ProductTransactionWhereInput
+    orderBy?: ProductTransactionOrderByWithRelationInput | ProductTransactionOrderByWithRelationInput[]
+    cursor?: ProductTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductTransactionScalarFieldEnum | ProductTransactionScalarFieldEnum[]
+  }
+
+  /**
    * User.TicketMilestone
    */
   export type User$TicketMilestoneArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10781,6 +11156,9 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
+    backupjson: string | null
+    backupcreatedAt: Date | null
+    backupurl: string | null
   }
 
   export type TicketMaxAggregateOutputType = {
@@ -10816,6 +11194,9 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
+    backupjson: string | null
+    backupcreatedAt: Date | null
+    backupurl: string | null
   }
 
   export type TicketCountAggregateOutputType = {
@@ -10851,6 +11232,9 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     deletedAt: number
+    backupjson: number
+    backupcreatedAt: number
+    backupurl: number
     _all: number
   }
 
@@ -10904,6 +11288,9 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
+    backupjson?: true
+    backupcreatedAt?: true
+    backupurl?: true
   }
 
   export type TicketMaxAggregateInputType = {
@@ -10939,6 +11326,9 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
+    backupjson?: true
+    backupcreatedAt?: true
+    backupurl?: true
   }
 
   export type TicketCountAggregateInputType = {
@@ -10974,6 +11364,9 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
+    backupjson?: true
+    backupcreatedAt?: true
+    backupurl?: true
     _all?: true
   }
 
@@ -11096,6 +11489,9 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
+    backupjson: string | null
+    backupcreatedAt: Date | null
+    backupurl: string | null
     _count: TicketCountAggregateOutputType | null
     _avg: TicketAvgAggregateOutputType | null
     _sum: TicketSumAggregateOutputType | null
@@ -11150,6 +11546,9 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
+    backupjson?: boolean
+    backupcreatedAt?: boolean
+    backupurl?: boolean
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
     serviceCenter?: boolean | Ticket$serviceCenterArgs<ExtArgs>
@@ -11200,9 +11599,12 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
+    backupjson?: boolean
+    backupcreatedAt?: boolean
+    backupurl?: boolean
   }
 
-  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "districtCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "pumpPlacementDepth" | "cableLength" | "isBuzzerOn" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["ticket"]>
+  export type TicketOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ticketCode" | "description" | "customerName" | "controllerNo" | "farmerName" | "imei" | "hp" | "motorHpId" | "head" | "motorType" | "stateCode" | "districtCode" | "district" | "village" | "block" | "complaintType" | "faultCode" | "faultType" | "status" | "priority" | "pumpPlacementDepth" | "cableLength" | "isBuzzerOn" | "assignedServiceCenter" | "createdBy" | "updatedBy" | "code" | "projectName" | "createdAt" | "updatedAt" | "deletedAt" | "backupjson" | "backupcreatedAt" | "backupurl", ExtArgs["result"]["ticket"]>
   export type TicketInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
     updatedByUser?: boolean | Ticket$updatedByUserArgs<ExtArgs>
@@ -11268,6 +11670,9 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       deletedAt: Date | null
+      backupjson: string | null
+      backupcreatedAt: Date | null
+      backupurl: string | null
     }, ExtArgs["result"]["ticket"]>
     composites: {}
   }
@@ -11681,6 +12086,9 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Ticket", 'DateTime'>
     readonly updatedAt: FieldRef<"Ticket", 'DateTime'>
     readonly deletedAt: FieldRef<"Ticket", 'DateTime'>
+    readonly backupjson: FieldRef<"Ticket", 'String'>
+    readonly backupcreatedAt: FieldRef<"Ticket", 'DateTime'>
+    readonly backupurl: FieldRef<"Ticket", 'String'>
   }
     
 
@@ -16579,19 +16987,22 @@ export namespace Prisma {
 
   export type ProductAvgAggregateOutputType = {
     id: number | null
+    unitOfMeasure: number | null
   }
 
   export type ProductSumAggregateOutputType = {
     id: number | null
+    unitOfMeasure: number | null
   }
 
   export type ProductMinAggregateOutputType = {
     id: number | null
     name: string | null
+    productCode: string | null
     description: string | null
     brandName: string | null
-    productCode: string | null
     category: $Enums.Category | null
+    unitOfMeasure: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -16599,10 +17010,11 @@ export namespace Prisma {
   export type ProductMaxAggregateOutputType = {
     id: number | null
     name: string | null
+    productCode: string | null
     description: string | null
     brandName: string | null
-    productCode: string | null
     category: $Enums.Category | null
+    unitOfMeasure: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -16610,10 +17022,11 @@ export namespace Prisma {
   export type ProductCountAggregateOutputType = {
     id: number
     name: number
+    productCode: number
     description: number
     brandName: number
-    productCode: number
     category: number
+    unitOfMeasure: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -16622,19 +17035,22 @@ export namespace Prisma {
 
   export type ProductAvgAggregateInputType = {
     id?: true
+    unitOfMeasure?: true
   }
 
   export type ProductSumAggregateInputType = {
     id?: true
+    unitOfMeasure?: true
   }
 
   export type ProductMinAggregateInputType = {
     id?: true
     name?: true
+    productCode?: true
     description?: true
     brandName?: true
-    productCode?: true
     category?: true
+    unitOfMeasure?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -16642,10 +17058,11 @@ export namespace Prisma {
   export type ProductMaxAggregateInputType = {
     id?: true
     name?: true
+    productCode?: true
     description?: true
     brandName?: true
-    productCode?: true
     category?: true
+    unitOfMeasure?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -16653,10 +17070,11 @@ export namespace Prisma {
   export type ProductCountAggregateInputType = {
     id?: true
     name?: true
+    productCode?: true
     description?: true
     brandName?: true
-    productCode?: true
     category?: true
+    unitOfMeasure?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -16751,10 +17169,11 @@ export namespace Prisma {
   export type ProductGroupByOutputType = {
     id: number
     name: string
+    productCode: string
     description: string | null
     brandName: string | null
-    productCode: string
     category: $Enums.Category | null
+    unitOfMeasure: number | null
     createdAt: Date
     updatedAt: Date
     _count: ProductCountAggregateOutputType | null
@@ -16781,15 +17200,17 @@ export namespace Prisma {
   export type ProductSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    productCode?: boolean
     description?: boolean
     brandName?: boolean
-    productCode?: boolean
     category?: boolean
+    unitOfMeasure?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    inventories?: boolean | Product$inventoriesArgs<ExtArgs>
     transactions?: boolean | Product$transactionsArgs<ExtArgs>
-    inventory?: boolean | Product$inventoryArgs<ExtArgs>
     spareRequestItems?: boolean | Product$spareRequestItemsArgs<ExtArgs>
+    ProductTransactionItem?: boolean | Product$ProductTransactionItemArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["product"]>
 
@@ -16798,36 +17219,40 @@ export namespace Prisma {
   export type ProductSelectScalar = {
     id?: boolean
     name?: boolean
+    productCode?: boolean
     description?: boolean
     brandName?: boolean
-    productCode?: boolean
     category?: boolean
+    unitOfMeasure?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "brandName" | "productCode" | "category" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "productCode" | "description" | "brandName" | "category" | "unitOfMeasure" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    inventories?: boolean | Product$inventoriesArgs<ExtArgs>
     transactions?: boolean | Product$transactionsArgs<ExtArgs>
-    inventory?: boolean | Product$inventoryArgs<ExtArgs>
     spareRequestItems?: boolean | Product$spareRequestItemsArgs<ExtArgs>
+    ProductTransactionItem?: boolean | Product$ProductTransactionItemArgs<ExtArgs>
     _count?: boolean | ProductCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $ProductPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Product"
     objects: {
+      inventories: Prisma.$InventoryPayload<ExtArgs>[]
       transactions: Prisma.$ProductTransactionPayload<ExtArgs>[]
-      inventory: Prisma.$InventoryPayload<ExtArgs> | null
       spareRequestItems: Prisma.$spareRequestItemPayload<ExtArgs>[]
+      ProductTransactionItem: Prisma.$ProductTransactionItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       name: string
+      productCode: string
       description: string | null
       brandName: string | null
-      productCode: string
       category: $Enums.Category | null
+      unitOfMeasure: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["product"]>
@@ -17170,9 +17595,10 @@ export namespace Prisma {
    */
   export interface Prisma__ProductClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    inventories<T extends Product$inventoriesArgs<ExtArgs> = {}>(args?: Subset<T, Product$inventoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     transactions<T extends Product$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, Product$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    inventory<T extends Product$inventoryArgs<ExtArgs> = {}>(args?: Subset<T, Product$inventoryArgs<ExtArgs>>): Prisma__InventoryClient<$Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     spareRequestItems<T extends Product$spareRequestItemsArgs<ExtArgs> = {}>(args?: Subset<T, Product$spareRequestItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$spareRequestItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ProductTransactionItem<T extends Product$ProductTransactionItemArgs<ExtArgs> = {}>(args?: Subset<T, Product$ProductTransactionItemArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17204,10 +17630,11 @@ export namespace Prisma {
   interface ProductFieldRefs {
     readonly id: FieldRef<"Product", 'Int'>
     readonly name: FieldRef<"Product", 'String'>
+    readonly productCode: FieldRef<"Product", 'String'>
     readonly description: FieldRef<"Product", 'String'>
     readonly brandName: FieldRef<"Product", 'String'>
-    readonly productCode: FieldRef<"Product", 'String'>
     readonly category: FieldRef<"Product", 'Category'>
+    readonly unitOfMeasure: FieldRef<"Product", 'Int'>
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly updatedAt: FieldRef<"Product", 'DateTime'>
   }
@@ -17553,6 +17980,30 @@ export namespace Prisma {
   }
 
   /**
+   * Product.inventories
+   */
+  export type Product$inventoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Inventory
+     */
+    select?: InventorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Inventory
+     */
+    omit?: InventoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryInclude<ExtArgs> | null
+    where?: InventoryWhereInput
+    orderBy?: InventoryOrderByWithRelationInput | InventoryOrderByWithRelationInput[]
+    cursor?: InventoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: InventoryScalarFieldEnum | InventoryScalarFieldEnum[]
+  }
+
+  /**
    * Product.transactions
    */
   export type Product$transactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -17577,25 +18028,6 @@ export namespace Prisma {
   }
 
   /**
-   * Product.inventory
-   */
-  export type Product$inventoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Inventory
-     */
-    select?: InventorySelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Inventory
-     */
-    omit?: InventoryOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InventoryInclude<ExtArgs> | null
-    where?: InventoryWhereInput
-  }
-
-  /**
    * Product.spareRequestItems
    */
   export type Product$spareRequestItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -17617,6 +18049,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SpareRequestItemScalarFieldEnum | SpareRequestItemScalarFieldEnum[]
+  }
+
+  /**
+   * Product.ProductTransactionItem
+   */
+  export type Product$ProductTransactionItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    where?: ProductTransactionItemWhereInput
+    orderBy?: ProductTransactionItemOrderByWithRelationInput | ProductTransactionItemOrderByWithRelationInput[]
+    cursor?: ProductTransactionItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductTransactionItemScalarFieldEnum | ProductTransactionItemScalarFieldEnum[]
   }
 
   /**
@@ -17652,108 +18108,174 @@ export namespace Prisma {
 
   export type ProductTransactionAvgAggregateOutputType = {
     id: number | null
-    productId: number | null
-    quantity: number | null
+    approvedBy: number | null
     ticketId: number | null
     createdBy: number | null
+    productId: number | null
   }
 
   export type ProductTransactionSumAggregateOutputType = {
     id: number | null
-    productId: number | null
-    quantity: number | null
+    approvedBy: number | null
     ticketId: number | null
     createdBy: number | null
+    productId: number | null
   }
 
   export type ProductTransactionMinAggregateOutputType = {
     id: number | null
-    productId: number | null
-    type: $Enums.TransactionType | null
-    quantity: number | null
+    transactionType: $Enums.TransactionType | null
+    status: $Enums.TransactionStatus | null
+    centerCode: string | null
+    fromCenterCode: string | null
+    toCenterCode: string | null
+    approvedBy: number | null
+    approvedAt: Date | null
+    rejectionReason: string | null
+    invoiceNo: string | null
+    billNo: string | null
+    receiptDate: Date | null
+    deliveryDate: Date | null
+    receivedAt: Date | null
     ticketId: number | null
-    notes: string | null
+    remarks: string | null
     createdBy: number | null
     createdAt: Date | null
     updatedAt: Date | null
+    productId: number | null
   }
 
   export type ProductTransactionMaxAggregateOutputType = {
     id: number | null
-    productId: number | null
-    type: $Enums.TransactionType | null
-    quantity: number | null
+    transactionType: $Enums.TransactionType | null
+    status: $Enums.TransactionStatus | null
+    centerCode: string | null
+    fromCenterCode: string | null
+    toCenterCode: string | null
+    approvedBy: number | null
+    approvedAt: Date | null
+    rejectionReason: string | null
+    invoiceNo: string | null
+    billNo: string | null
+    receiptDate: Date | null
+    deliveryDate: Date | null
+    receivedAt: Date | null
     ticketId: number | null
-    notes: string | null
+    remarks: string | null
     createdBy: number | null
     createdAt: Date | null
     updatedAt: Date | null
+    productId: number | null
   }
 
   export type ProductTransactionCountAggregateOutputType = {
     id: number
-    productId: number
-    type: number
-    quantity: number
+    transactionType: number
+    status: number
+    centerCode: number
+    fromCenterCode: number
+    toCenterCode: number
+    approvedBy: number
+    approvedAt: number
+    rejectionReason: number
+    invoiceNo: number
+    billNo: number
+    receiptDate: number
+    deliveryDate: number
+    receivedAt: number
     ticketId: number
-    notes: number
+    remarks: number
     createdBy: number
     createdAt: number
     updatedAt: number
+    productId: number
     _all: number
   }
 
 
   export type ProductTransactionAvgAggregateInputType = {
     id?: true
-    productId?: true
-    quantity?: true
+    approvedBy?: true
     ticketId?: true
     createdBy?: true
+    productId?: true
   }
 
   export type ProductTransactionSumAggregateInputType = {
     id?: true
-    productId?: true
-    quantity?: true
+    approvedBy?: true
     ticketId?: true
     createdBy?: true
+    productId?: true
   }
 
   export type ProductTransactionMinAggregateInputType = {
     id?: true
-    productId?: true
-    type?: true
-    quantity?: true
+    transactionType?: true
+    status?: true
+    centerCode?: true
+    fromCenterCode?: true
+    toCenterCode?: true
+    approvedBy?: true
+    approvedAt?: true
+    rejectionReason?: true
+    invoiceNo?: true
+    billNo?: true
+    receiptDate?: true
+    deliveryDate?: true
+    receivedAt?: true
     ticketId?: true
-    notes?: true
+    remarks?: true
     createdBy?: true
     createdAt?: true
     updatedAt?: true
+    productId?: true
   }
 
   export type ProductTransactionMaxAggregateInputType = {
     id?: true
-    productId?: true
-    type?: true
-    quantity?: true
+    transactionType?: true
+    status?: true
+    centerCode?: true
+    fromCenterCode?: true
+    toCenterCode?: true
+    approvedBy?: true
+    approvedAt?: true
+    rejectionReason?: true
+    invoiceNo?: true
+    billNo?: true
+    receiptDate?: true
+    deliveryDate?: true
+    receivedAt?: true
     ticketId?: true
-    notes?: true
+    remarks?: true
     createdBy?: true
     createdAt?: true
     updatedAt?: true
+    productId?: true
   }
 
   export type ProductTransactionCountAggregateInputType = {
     id?: true
-    productId?: true
-    type?: true
-    quantity?: true
+    transactionType?: true
+    status?: true
+    centerCode?: true
+    fromCenterCode?: true
+    toCenterCode?: true
+    approvedBy?: true
+    approvedAt?: true
+    rejectionReason?: true
+    invoiceNo?: true
+    billNo?: true
+    receiptDate?: true
+    deliveryDate?: true
+    receivedAt?: true
     ticketId?: true
-    notes?: true
+    remarks?: true
     createdBy?: true
     createdAt?: true
     updatedAt?: true
+    productId?: true
     _all?: true
   }
 
@@ -17845,14 +18367,25 @@ export namespace Prisma {
 
   export type ProductTransactionGroupByOutputType = {
     id: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode: string | null
+    toCenterCode: string | null
+    approvedBy: number | null
+    approvedAt: Date | null
+    rejectionReason: string | null
+    invoiceNo: string | null
+    billNo: string | null
+    receiptDate: Date | null
+    deliveryDate: Date | null
+    receivedAt: Date | null
     ticketId: number | null
-    notes: string | null
+    remarks: string | null
     createdBy: number
     createdAt: Date
     updatedAt: Date
+    productId: number | null
     _count: ProductTransactionCountAggregateOutputType | null
     _avg: ProductTransactionAvgAggregateOutputType | null
     _sum: ProductTransactionSumAggregateOutputType | null
@@ -17876,57 +18409,107 @@ export namespace Prisma {
 
   export type ProductTransactionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    productId?: boolean
-    type?: boolean
-    quantity?: boolean
+    transactionType?: boolean
+    status?: boolean
+    centerCode?: boolean
+    fromCenterCode?: boolean
+    toCenterCode?: boolean
+    approvedBy?: boolean
+    approvedAt?: boolean
+    rejectionReason?: boolean
+    invoiceNo?: boolean
+    billNo?: boolean
+    receiptDate?: boolean
+    deliveryDate?: boolean
+    receivedAt?: boolean
     ticketId?: boolean
-    notes?: boolean
+    remarks?: boolean
     createdBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    product?: boolean | ProductDefaultArgs<ExtArgs>
+    productId?: boolean
+    serviceCenter?: boolean | ServiceCenterDefaultArgs<ExtArgs>
+    fromCenter?: boolean | ProductTransaction$fromCenterArgs<ExtArgs>
+    toCenter?: boolean | ProductTransaction$toCenterArgs<ExtArgs>
     ticket?: boolean | ProductTransaction$ticketArgs<ExtArgs>
+    items?: boolean | ProductTransaction$itemsArgs<ExtArgs>
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
+    approverUser?: boolean | ProductTransaction$approverUserArgs<ExtArgs>
+    Product?: boolean | ProductTransaction$ProductArgs<ExtArgs>
+    _count?: boolean | ProductTransactionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["productTransaction"]>
 
 
 
   export type ProductTransactionSelectScalar = {
     id?: boolean
-    productId?: boolean
-    type?: boolean
-    quantity?: boolean
+    transactionType?: boolean
+    status?: boolean
+    centerCode?: boolean
+    fromCenterCode?: boolean
+    toCenterCode?: boolean
+    approvedBy?: boolean
+    approvedAt?: boolean
+    rejectionReason?: boolean
+    invoiceNo?: boolean
+    billNo?: boolean
+    receiptDate?: boolean
+    deliveryDate?: boolean
+    receivedAt?: boolean
     ticketId?: boolean
-    notes?: boolean
+    remarks?: boolean
     createdBy?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    productId?: boolean
   }
 
-  export type ProductTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "type" | "quantity" | "ticketId" | "notes" | "createdBy" | "createdAt" | "updatedAt", ExtArgs["result"]["productTransaction"]>
+  export type ProductTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "transactionType" | "status" | "centerCode" | "fromCenterCode" | "toCenterCode" | "approvedBy" | "approvedAt" | "rejectionReason" | "invoiceNo" | "billNo" | "receiptDate" | "deliveryDate" | "receivedAt" | "ticketId" | "remarks" | "createdBy" | "createdAt" | "updatedAt" | "productId", ExtArgs["result"]["productTransaction"]>
   export type ProductTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    product?: boolean | ProductDefaultArgs<ExtArgs>
+    serviceCenter?: boolean | ServiceCenterDefaultArgs<ExtArgs>
+    fromCenter?: boolean | ProductTransaction$fromCenterArgs<ExtArgs>
+    toCenter?: boolean | ProductTransaction$toCenterArgs<ExtArgs>
     ticket?: boolean | ProductTransaction$ticketArgs<ExtArgs>
+    items?: boolean | ProductTransaction$itemsArgs<ExtArgs>
     createdByUser?: boolean | UserDefaultArgs<ExtArgs>
+    approverUser?: boolean | ProductTransaction$approverUserArgs<ExtArgs>
+    Product?: boolean | ProductTransaction$ProductArgs<ExtArgs>
+    _count?: boolean | ProductTransactionCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $ProductTransactionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ProductTransaction"
     objects: {
-      product: Prisma.$ProductPayload<ExtArgs>
+      serviceCenter: Prisma.$ServiceCenterPayload<ExtArgs>
+      fromCenter: Prisma.$ServiceCenterPayload<ExtArgs> | null
+      toCenter: Prisma.$ServiceCenterPayload<ExtArgs> | null
       ticket: Prisma.$TicketPayload<ExtArgs> | null
+      items: Prisma.$ProductTransactionItemPayload<ExtArgs>[]
       createdByUser: Prisma.$UserPayload<ExtArgs>
+      approverUser: Prisma.$UserPayload<ExtArgs> | null
+      Product: Prisma.$ProductPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      productId: number
-      type: $Enums.TransactionType
-      quantity: number
+      transactionType: $Enums.TransactionType
+      status: $Enums.TransactionStatus
+      centerCode: string
+      fromCenterCode: string | null
+      toCenterCode: string | null
+      approvedBy: number | null
+      approvedAt: Date | null
+      rejectionReason: string | null
+      invoiceNo: string | null
+      billNo: string | null
+      receiptDate: Date | null
+      deliveryDate: Date | null
+      receivedAt: Date | null
       ticketId: number | null
-      notes: string | null
+      remarks: string | null
       createdBy: number
       createdAt: Date
       updatedAt: Date
+      productId: number | null
     }, ExtArgs["result"]["productTransaction"]>
     composites: {}
   }
@@ -18267,9 +18850,14 @@ export namespace Prisma {
    */
   export interface Prisma__ProductTransactionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    serviceCenter<T extends ServiceCenterDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenterDefaultArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    fromCenter<T extends ProductTransaction$fromCenterArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransaction$fromCenterArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    toCenter<T extends ProductTransaction$toCenterArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransaction$toCenterArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     ticket<T extends ProductTransaction$ticketArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransaction$ticketArgs<ExtArgs>>): Prisma__TicketClient<$Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    items<T extends ProductTransaction$itemsArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransaction$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     createdByUser<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    approverUser<T extends ProductTransaction$approverUserArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransaction$approverUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    Product<T extends ProductTransaction$ProductArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransaction$ProductArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18300,14 +18888,25 @@ export namespace Prisma {
    */
   interface ProductTransactionFieldRefs {
     readonly id: FieldRef<"ProductTransaction", 'Int'>
-    readonly productId: FieldRef<"ProductTransaction", 'Int'>
-    readonly type: FieldRef<"ProductTransaction", 'TransactionType'>
-    readonly quantity: FieldRef<"ProductTransaction", 'Int'>
+    readonly transactionType: FieldRef<"ProductTransaction", 'TransactionType'>
+    readonly status: FieldRef<"ProductTransaction", 'TransactionStatus'>
+    readonly centerCode: FieldRef<"ProductTransaction", 'String'>
+    readonly fromCenterCode: FieldRef<"ProductTransaction", 'String'>
+    readonly toCenterCode: FieldRef<"ProductTransaction", 'String'>
+    readonly approvedBy: FieldRef<"ProductTransaction", 'Int'>
+    readonly approvedAt: FieldRef<"ProductTransaction", 'DateTime'>
+    readonly rejectionReason: FieldRef<"ProductTransaction", 'String'>
+    readonly invoiceNo: FieldRef<"ProductTransaction", 'String'>
+    readonly billNo: FieldRef<"ProductTransaction", 'String'>
+    readonly receiptDate: FieldRef<"ProductTransaction", 'DateTime'>
+    readonly deliveryDate: FieldRef<"ProductTransaction", 'DateTime'>
+    readonly receivedAt: FieldRef<"ProductTransaction", 'DateTime'>
     readonly ticketId: FieldRef<"ProductTransaction", 'Int'>
-    readonly notes: FieldRef<"ProductTransaction", 'String'>
+    readonly remarks: FieldRef<"ProductTransaction", 'String'>
     readonly createdBy: FieldRef<"ProductTransaction", 'Int'>
     readonly createdAt: FieldRef<"ProductTransaction", 'DateTime'>
     readonly updatedAt: FieldRef<"ProductTransaction", 'DateTime'>
+    readonly productId: FieldRef<"ProductTransaction", 'Int'>
   }
     
 
@@ -18651,6 +19250,44 @@ export namespace Prisma {
   }
 
   /**
+   * ProductTransaction.fromCenter
+   */
+  export type ProductTransaction$fromCenterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ServiceCenter
+     */
+    select?: ServiceCenterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ServiceCenter
+     */
+    omit?: ServiceCenterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ServiceCenterInclude<ExtArgs> | null
+    where?: ServiceCenterWhereInput
+  }
+
+  /**
+   * ProductTransaction.toCenter
+   */
+  export type ProductTransaction$toCenterArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ServiceCenter
+     */
+    select?: ServiceCenterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ServiceCenter
+     */
+    omit?: ServiceCenterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ServiceCenterInclude<ExtArgs> | null
+    where?: ServiceCenterWhereInput
+  }
+
+  /**
    * ProductTransaction.ticket
    */
   export type ProductTransaction$ticketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -18667,6 +19304,68 @@ export namespace Prisma {
      */
     include?: TicketInclude<ExtArgs> | null
     where?: TicketWhereInput
+  }
+
+  /**
+   * ProductTransaction.items
+   */
+  export type ProductTransaction$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    where?: ProductTransactionItemWhereInput
+    orderBy?: ProductTransactionItemOrderByWithRelationInput | ProductTransactionItemOrderByWithRelationInput[]
+    cursor?: ProductTransactionItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProductTransactionItemScalarFieldEnum | ProductTransactionItemScalarFieldEnum[]
+  }
+
+  /**
+   * ProductTransaction.approverUser
+   */
+  export type ProductTransaction$approverUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * ProductTransaction.Product
+   */
+  export type ProductTransaction$ProductArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Product
+     */
+    select?: ProductSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Product
+     */
+    omit?: ProductOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductInclude<ExtArgs> | null
+    where?: ProductWhereInput
   }
 
   /**
@@ -18689,6 +19388,1015 @@ export namespace Prisma {
 
 
   /**
+   * Model ProductTransactionItem
+   */
+
+  export type AggregateProductTransactionItem = {
+    _count: ProductTransactionItemCountAggregateOutputType | null
+    _avg: ProductTransactionItemAvgAggregateOutputType | null
+    _sum: ProductTransactionItemSumAggregateOutputType | null
+    _min: ProductTransactionItemMinAggregateOutputType | null
+    _max: ProductTransactionItemMaxAggregateOutputType | null
+  }
+
+  export type ProductTransactionItemAvgAggregateOutputType = {
+    id: number | null
+    transactionId: number | null
+    productId: number | null
+    quantity: number | null
+  }
+
+  export type ProductTransactionItemSumAggregateOutputType = {
+    id: number | null
+    transactionId: number | null
+    productId: number | null
+    quantity: number | null
+  }
+
+  export type ProductTransactionItemMinAggregateOutputType = {
+    id: number | null
+    transactionId: number | null
+    productId: number | null
+    productName: string | null
+    condition: $Enums.InventoryCondition | null
+    quantity: number | null
+  }
+
+  export type ProductTransactionItemMaxAggregateOutputType = {
+    id: number | null
+    transactionId: number | null
+    productId: number | null
+    productName: string | null
+    condition: $Enums.InventoryCondition | null
+    quantity: number | null
+  }
+
+  export type ProductTransactionItemCountAggregateOutputType = {
+    id: number
+    transactionId: number
+    productId: number
+    productName: number
+    condition: number
+    quantity: number
+    _all: number
+  }
+
+
+  export type ProductTransactionItemAvgAggregateInputType = {
+    id?: true
+    transactionId?: true
+    productId?: true
+    quantity?: true
+  }
+
+  export type ProductTransactionItemSumAggregateInputType = {
+    id?: true
+    transactionId?: true
+    productId?: true
+    quantity?: true
+  }
+
+  export type ProductTransactionItemMinAggregateInputType = {
+    id?: true
+    transactionId?: true
+    productId?: true
+    productName?: true
+    condition?: true
+    quantity?: true
+  }
+
+  export type ProductTransactionItemMaxAggregateInputType = {
+    id?: true
+    transactionId?: true
+    productId?: true
+    productName?: true
+    condition?: true
+    quantity?: true
+  }
+
+  export type ProductTransactionItemCountAggregateInputType = {
+    id?: true
+    transactionId?: true
+    productId?: true
+    productName?: true
+    condition?: true
+    quantity?: true
+    _all?: true
+  }
+
+  export type ProductTransactionItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductTransactionItem to aggregate.
+     */
+    where?: ProductTransactionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductTransactionItems to fetch.
+     */
+    orderBy?: ProductTransactionItemOrderByWithRelationInput | ProductTransactionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProductTransactionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductTransactionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductTransactionItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProductTransactionItems
+    **/
+    _count?: true | ProductTransactionItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ProductTransactionItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ProductTransactionItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProductTransactionItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProductTransactionItemMaxAggregateInputType
+  }
+
+  export type GetProductTransactionItemAggregateType<T extends ProductTransactionItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateProductTransactionItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProductTransactionItem[P]>
+      : GetScalarType<T[P], AggregateProductTransactionItem[P]>
+  }
+
+
+
+
+  export type ProductTransactionItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProductTransactionItemWhereInput
+    orderBy?: ProductTransactionItemOrderByWithAggregationInput | ProductTransactionItemOrderByWithAggregationInput[]
+    by: ProductTransactionItemScalarFieldEnum[] | ProductTransactionItemScalarFieldEnum
+    having?: ProductTransactionItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProductTransactionItemCountAggregateInputType | true
+    _avg?: ProductTransactionItemAvgAggregateInputType
+    _sum?: ProductTransactionItemSumAggregateInputType
+    _min?: ProductTransactionItemMinAggregateInputType
+    _max?: ProductTransactionItemMaxAggregateInputType
+  }
+
+  export type ProductTransactionItemGroupByOutputType = {
+    id: number
+    transactionId: number
+    productId: number | null
+    productName: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+    _count: ProductTransactionItemCountAggregateOutputType | null
+    _avg: ProductTransactionItemAvgAggregateOutputType | null
+    _sum: ProductTransactionItemSumAggregateOutputType | null
+    _min: ProductTransactionItemMinAggregateOutputType | null
+    _max: ProductTransactionItemMaxAggregateOutputType | null
+  }
+
+  type GetProductTransactionItemGroupByPayload<T extends ProductTransactionItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProductTransactionItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProductTransactionItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProductTransactionItemGroupByOutputType[P]>
+            : GetScalarType<T[P], ProductTransactionItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProductTransactionItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    transactionId?: boolean
+    productId?: boolean
+    productName?: boolean
+    condition?: boolean
+    quantity?: boolean
+    transaction?: boolean | ProductTransactionDefaultArgs<ExtArgs>
+    product?: boolean | ProductTransactionItem$productArgs<ExtArgs>
+  }, ExtArgs["result"]["productTransactionItem"]>
+
+
+
+  export type ProductTransactionItemSelectScalar = {
+    id?: boolean
+    transactionId?: boolean
+    productId?: boolean
+    productName?: boolean
+    condition?: boolean
+    quantity?: boolean
+  }
+
+  export type ProductTransactionItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "transactionId" | "productId" | "productName" | "condition" | "quantity", ExtArgs["result"]["productTransactionItem"]>
+  export type ProductTransactionItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    transaction?: boolean | ProductTransactionDefaultArgs<ExtArgs>
+    product?: boolean | ProductTransactionItem$productArgs<ExtArgs>
+  }
+
+  export type $ProductTransactionItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProductTransactionItem"
+    objects: {
+      transaction: Prisma.$ProductTransactionPayload<ExtArgs>
+      product: Prisma.$ProductPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      transactionId: number
+      productId: number | null
+      productName: string | null
+      condition: $Enums.InventoryCondition
+      quantity: number
+    }, ExtArgs["result"]["productTransactionItem"]>
+    composites: {}
+  }
+
+  type ProductTransactionItemGetPayload<S extends boolean | null | undefined | ProductTransactionItemDefaultArgs> = $Result.GetResult<Prisma.$ProductTransactionItemPayload, S>
+
+  type ProductTransactionItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProductTransactionItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProductTransactionItemCountAggregateInputType | true
+    }
+
+  export interface ProductTransactionItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProductTransactionItem'], meta: { name: 'ProductTransactionItem' } }
+    /**
+     * Find zero or one ProductTransactionItem that matches the filter.
+     * @param {ProductTransactionItemFindUniqueArgs} args - Arguments to find a ProductTransactionItem
+     * @example
+     * // Get one ProductTransactionItem
+     * const productTransactionItem = await prisma.productTransactionItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProductTransactionItemFindUniqueArgs>(args: SelectSubset<T, ProductTransactionItemFindUniqueArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProductTransactionItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProductTransactionItemFindUniqueOrThrowArgs} args - Arguments to find a ProductTransactionItem
+     * @example
+     * // Get one ProductTransactionItem
+     * const productTransactionItem = await prisma.productTransactionItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProductTransactionItemFindUniqueOrThrowArgs>(args: SelectSubset<T, ProductTransactionItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductTransactionItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemFindFirstArgs} args - Arguments to find a ProductTransactionItem
+     * @example
+     * // Get one ProductTransactionItem
+     * const productTransactionItem = await prisma.productTransactionItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProductTransactionItemFindFirstArgs>(args?: SelectSubset<T, ProductTransactionItemFindFirstArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProductTransactionItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemFindFirstOrThrowArgs} args - Arguments to find a ProductTransactionItem
+     * @example
+     * // Get one ProductTransactionItem
+     * const productTransactionItem = await prisma.productTransactionItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProductTransactionItemFindFirstOrThrowArgs>(args?: SelectSubset<T, ProductTransactionItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProductTransactionItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProductTransactionItems
+     * const productTransactionItems = await prisma.productTransactionItem.findMany()
+     * 
+     * // Get first 10 ProductTransactionItems
+     * const productTransactionItems = await prisma.productTransactionItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const productTransactionItemWithIdOnly = await prisma.productTransactionItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProductTransactionItemFindManyArgs>(args?: SelectSubset<T, ProductTransactionItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProductTransactionItem.
+     * @param {ProductTransactionItemCreateArgs} args - Arguments to create a ProductTransactionItem.
+     * @example
+     * // Create one ProductTransactionItem
+     * const ProductTransactionItem = await prisma.productTransactionItem.create({
+     *   data: {
+     *     // ... data to create a ProductTransactionItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProductTransactionItemCreateArgs>(args: SelectSubset<T, ProductTransactionItemCreateArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProductTransactionItems.
+     * @param {ProductTransactionItemCreateManyArgs} args - Arguments to create many ProductTransactionItems.
+     * @example
+     * // Create many ProductTransactionItems
+     * const productTransactionItem = await prisma.productTransactionItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProductTransactionItemCreateManyArgs>(args?: SelectSubset<T, ProductTransactionItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ProductTransactionItem.
+     * @param {ProductTransactionItemDeleteArgs} args - Arguments to delete one ProductTransactionItem.
+     * @example
+     * // Delete one ProductTransactionItem
+     * const ProductTransactionItem = await prisma.productTransactionItem.delete({
+     *   where: {
+     *     // ... filter to delete one ProductTransactionItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProductTransactionItemDeleteArgs>(args: SelectSubset<T, ProductTransactionItemDeleteArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProductTransactionItem.
+     * @param {ProductTransactionItemUpdateArgs} args - Arguments to update one ProductTransactionItem.
+     * @example
+     * // Update one ProductTransactionItem
+     * const productTransactionItem = await prisma.productTransactionItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProductTransactionItemUpdateArgs>(args: SelectSubset<T, ProductTransactionItemUpdateArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProductTransactionItems.
+     * @param {ProductTransactionItemDeleteManyArgs} args - Arguments to filter ProductTransactionItems to delete.
+     * @example
+     * // Delete a few ProductTransactionItems
+     * const { count } = await prisma.productTransactionItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProductTransactionItemDeleteManyArgs>(args?: SelectSubset<T, ProductTransactionItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProductTransactionItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProductTransactionItems
+     * const productTransactionItem = await prisma.productTransactionItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProductTransactionItemUpdateManyArgs>(args: SelectSubset<T, ProductTransactionItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ProductTransactionItem.
+     * @param {ProductTransactionItemUpsertArgs} args - Arguments to update or create a ProductTransactionItem.
+     * @example
+     * // Update or create a ProductTransactionItem
+     * const productTransactionItem = await prisma.productTransactionItem.upsert({
+     *   create: {
+     *     // ... data to create a ProductTransactionItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProductTransactionItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProductTransactionItemUpsertArgs>(args: SelectSubset<T, ProductTransactionItemUpsertArgs<ExtArgs>>): Prisma__ProductTransactionItemClient<$Result.GetResult<Prisma.$ProductTransactionItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProductTransactionItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemCountArgs} args - Arguments to filter ProductTransactionItems to count.
+     * @example
+     * // Count the number of ProductTransactionItems
+     * const count = await prisma.productTransactionItem.count({
+     *   where: {
+     *     // ... the filter for the ProductTransactionItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProductTransactionItemCountArgs>(
+      args?: Subset<T, ProductTransactionItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProductTransactionItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProductTransactionItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProductTransactionItemAggregateArgs>(args: Subset<T, ProductTransactionItemAggregateArgs>): Prisma.PrismaPromise<GetProductTransactionItemAggregateType<T>>
+
+    /**
+     * Group by ProductTransactionItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProductTransactionItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProductTransactionItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProductTransactionItemGroupByArgs['orderBy'] }
+        : { orderBy?: ProductTransactionItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProductTransactionItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProductTransactionItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProductTransactionItem model
+   */
+  readonly fields: ProductTransactionItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProductTransactionItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProductTransactionItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    transaction<T extends ProductTransactionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransactionDefaultArgs<ExtArgs>>): Prisma__ProductTransactionClient<$Result.GetResult<Prisma.$ProductTransactionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    product<T extends ProductTransactionItem$productArgs<ExtArgs> = {}>(args?: Subset<T, ProductTransactionItem$productArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProductTransactionItem model
+   */
+  interface ProductTransactionItemFieldRefs {
+    readonly id: FieldRef<"ProductTransactionItem", 'Int'>
+    readonly transactionId: FieldRef<"ProductTransactionItem", 'Int'>
+    readonly productId: FieldRef<"ProductTransactionItem", 'Int'>
+    readonly productName: FieldRef<"ProductTransactionItem", 'String'>
+    readonly condition: FieldRef<"ProductTransactionItem", 'InventoryCondition'>
+    readonly quantity: FieldRef<"ProductTransactionItem", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProductTransactionItem findUnique
+   */
+  export type ProductTransactionItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductTransactionItem to fetch.
+     */
+    where: ProductTransactionItemWhereUniqueInput
+  }
+
+  /**
+   * ProductTransactionItem findUniqueOrThrow
+   */
+  export type ProductTransactionItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductTransactionItem to fetch.
+     */
+    where: ProductTransactionItemWhereUniqueInput
+  }
+
+  /**
+   * ProductTransactionItem findFirst
+   */
+  export type ProductTransactionItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductTransactionItem to fetch.
+     */
+    where?: ProductTransactionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductTransactionItems to fetch.
+     */
+    orderBy?: ProductTransactionItemOrderByWithRelationInput | ProductTransactionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductTransactionItems.
+     */
+    cursor?: ProductTransactionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductTransactionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductTransactionItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductTransactionItems.
+     */
+    distinct?: ProductTransactionItemScalarFieldEnum | ProductTransactionItemScalarFieldEnum[]
+  }
+
+  /**
+   * ProductTransactionItem findFirstOrThrow
+   */
+  export type ProductTransactionItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductTransactionItem to fetch.
+     */
+    where?: ProductTransactionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductTransactionItems to fetch.
+     */
+    orderBy?: ProductTransactionItemOrderByWithRelationInput | ProductTransactionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProductTransactionItems.
+     */
+    cursor?: ProductTransactionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductTransactionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductTransactionItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProductTransactionItems.
+     */
+    distinct?: ProductTransactionItemScalarFieldEnum | ProductTransactionItemScalarFieldEnum[]
+  }
+
+  /**
+   * ProductTransactionItem findMany
+   */
+  export type ProductTransactionItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which ProductTransactionItems to fetch.
+     */
+    where?: ProductTransactionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProductTransactionItems to fetch.
+     */
+    orderBy?: ProductTransactionItemOrderByWithRelationInput | ProductTransactionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProductTransactionItems.
+     */
+    cursor?: ProductTransactionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProductTransactionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProductTransactionItems.
+     */
+    skip?: number
+    distinct?: ProductTransactionItemScalarFieldEnum | ProductTransactionItemScalarFieldEnum[]
+  }
+
+  /**
+   * ProductTransactionItem create
+   */
+  export type ProductTransactionItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ProductTransactionItem.
+     */
+    data: XOR<ProductTransactionItemCreateInput, ProductTransactionItemUncheckedCreateInput>
+  }
+
+  /**
+   * ProductTransactionItem createMany
+   */
+  export type ProductTransactionItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProductTransactionItems.
+     */
+    data: ProductTransactionItemCreateManyInput | ProductTransactionItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProductTransactionItem update
+   */
+  export type ProductTransactionItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ProductTransactionItem.
+     */
+    data: XOR<ProductTransactionItemUpdateInput, ProductTransactionItemUncheckedUpdateInput>
+    /**
+     * Choose, which ProductTransactionItem to update.
+     */
+    where: ProductTransactionItemWhereUniqueInput
+  }
+
+  /**
+   * ProductTransactionItem updateMany
+   */
+  export type ProductTransactionItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProductTransactionItems.
+     */
+    data: XOR<ProductTransactionItemUpdateManyMutationInput, ProductTransactionItemUncheckedUpdateManyInput>
+    /**
+     * Filter which ProductTransactionItems to update
+     */
+    where?: ProductTransactionItemWhereInput
+    /**
+     * Limit how many ProductTransactionItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductTransactionItem upsert
+   */
+  export type ProductTransactionItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ProductTransactionItem to update in case it exists.
+     */
+    where: ProductTransactionItemWhereUniqueInput
+    /**
+     * In case the ProductTransactionItem found by the `where` argument doesn't exist, create a new ProductTransactionItem with this data.
+     */
+    create: XOR<ProductTransactionItemCreateInput, ProductTransactionItemUncheckedCreateInput>
+    /**
+     * In case the ProductTransactionItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProductTransactionItemUpdateInput, ProductTransactionItemUncheckedUpdateInput>
+  }
+
+  /**
+   * ProductTransactionItem delete
+   */
+  export type ProductTransactionItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+    /**
+     * Filter which ProductTransactionItem to delete.
+     */
+    where: ProductTransactionItemWhereUniqueInput
+  }
+
+  /**
+   * ProductTransactionItem deleteMany
+   */
+  export type ProductTransactionItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProductTransactionItems to delete
+     */
+    where?: ProductTransactionItemWhereInput
+    /**
+     * Limit how many ProductTransactionItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProductTransactionItem.product
+   */
+  export type ProductTransactionItem$productArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Product
+     */
+    select?: ProductSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Product
+     */
+    omit?: ProductOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductInclude<ExtArgs> | null
+    where?: ProductWhereInput
+  }
+
+  /**
+   * ProductTransactionItem without action
+   */
+  export type ProductTransactionItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProductTransactionItem
+     */
+    select?: ProductTransactionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProductTransactionItem
+     */
+    omit?: ProductTransactionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProductTransactionItemInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Inventory
    */
 
@@ -18703,7 +20411,10 @@ export namespace Prisma {
   export type InventoryAvgAggregateOutputType = {
     id: number | null
     productId: number | null
-    quantity: number | null
+    goodQty: number | null
+    repairableQty: number | null
+    damagedQty: number | null
+    scrapQty: number | null
     minStock: number | null
     maxStock: number | null
   }
@@ -18711,15 +20422,22 @@ export namespace Prisma {
   export type InventorySumAggregateOutputType = {
     id: number | null
     productId: number | null
-    quantity: number | null
+    goodQty: number | null
+    repairableQty: number | null
+    damagedQty: number | null
+    scrapQty: number | null
     minStock: number | null
     maxStock: number | null
   }
 
   export type InventoryMinAggregateOutputType = {
     id: number | null
+    centerCode: string | null
     productId: number | null
-    quantity: number | null
+    goodQty: number | null
+    repairableQty: number | null
+    damagedQty: number | null
+    scrapQty: number | null
     minStock: number | null
     maxStock: number | null
     location: string | null
@@ -18728,8 +20446,12 @@ export namespace Prisma {
 
   export type InventoryMaxAggregateOutputType = {
     id: number | null
+    centerCode: string | null
     productId: number | null
-    quantity: number | null
+    goodQty: number | null
+    repairableQty: number | null
+    damagedQty: number | null
+    scrapQty: number | null
     minStock: number | null
     maxStock: number | null
     location: string | null
@@ -18738,8 +20460,12 @@ export namespace Prisma {
 
   export type InventoryCountAggregateOutputType = {
     id: number
+    centerCode: number
     productId: number
-    quantity: number
+    goodQty: number
+    repairableQty: number
+    damagedQty: number
+    scrapQty: number
     minStock: number
     maxStock: number
     location: number
@@ -18751,7 +20477,10 @@ export namespace Prisma {
   export type InventoryAvgAggregateInputType = {
     id?: true
     productId?: true
-    quantity?: true
+    goodQty?: true
+    repairableQty?: true
+    damagedQty?: true
+    scrapQty?: true
     minStock?: true
     maxStock?: true
   }
@@ -18759,15 +20488,22 @@ export namespace Prisma {
   export type InventorySumAggregateInputType = {
     id?: true
     productId?: true
-    quantity?: true
+    goodQty?: true
+    repairableQty?: true
+    damagedQty?: true
+    scrapQty?: true
     minStock?: true
     maxStock?: true
   }
 
   export type InventoryMinAggregateInputType = {
     id?: true
+    centerCode?: true
     productId?: true
-    quantity?: true
+    goodQty?: true
+    repairableQty?: true
+    damagedQty?: true
+    scrapQty?: true
     minStock?: true
     maxStock?: true
     location?: true
@@ -18776,8 +20512,12 @@ export namespace Prisma {
 
   export type InventoryMaxAggregateInputType = {
     id?: true
+    centerCode?: true
     productId?: true
-    quantity?: true
+    goodQty?: true
+    repairableQty?: true
+    damagedQty?: true
+    scrapQty?: true
     minStock?: true
     maxStock?: true
     location?: true
@@ -18786,8 +20526,12 @@ export namespace Prisma {
 
   export type InventoryCountAggregateInputType = {
     id?: true
+    centerCode?: true
     productId?: true
-    quantity?: true
+    goodQty?: true
+    repairableQty?: true
+    damagedQty?: true
+    scrapQty?: true
     minStock?: true
     maxStock?: true
     location?: true
@@ -18883,8 +20627,12 @@ export namespace Prisma {
 
   export type InventoryGroupByOutputType = {
     id: number
+    centerCode: string
     productId: number
-    quantity: number
+    goodQty: number
+    repairableQty: number
+    damagedQty: number
+    scrapQty: number
     minStock: number
     maxStock: number | null
     location: string | null
@@ -18912,12 +20660,17 @@ export namespace Prisma {
 
   export type InventorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    centerCode?: boolean
     productId?: boolean
-    quantity?: boolean
+    goodQty?: boolean
+    repairableQty?: boolean
+    damagedQty?: boolean
+    scrapQty?: boolean
     minStock?: boolean
     maxStock?: boolean
     location?: boolean
     updatedAt?: boolean
+    serviceCenter?: boolean | ServiceCenterDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["inventory"]>
 
@@ -18925,28 +20678,38 @@ export namespace Prisma {
 
   export type InventorySelectScalar = {
     id?: boolean
+    centerCode?: boolean
     productId?: boolean
-    quantity?: boolean
+    goodQty?: boolean
+    repairableQty?: boolean
+    damagedQty?: boolean
+    scrapQty?: boolean
     minStock?: boolean
     maxStock?: boolean
     location?: boolean
     updatedAt?: boolean
   }
 
-  export type InventoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "productId" | "quantity" | "minStock" | "maxStock" | "location" | "updatedAt", ExtArgs["result"]["inventory"]>
+  export type InventoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "centerCode" | "productId" | "goodQty" | "repairableQty" | "damagedQty" | "scrapQty" | "minStock" | "maxStock" | "location" | "updatedAt", ExtArgs["result"]["inventory"]>
   export type InventoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    serviceCenter?: boolean | ServiceCenterDefaultArgs<ExtArgs>
     product?: boolean | ProductDefaultArgs<ExtArgs>
   }
 
   export type $InventoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Inventory"
     objects: {
+      serviceCenter: Prisma.$ServiceCenterPayload<ExtArgs>
       product: Prisma.$ProductPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
+      centerCode: string
       productId: number
-      quantity: number
+      goodQty: number
+      repairableQty: number
+      damagedQty: number
+      scrapQty: number
       minStock: number
       maxStock: number | null
       location: string | null
@@ -19291,6 +21054,7 @@ export namespace Prisma {
    */
   export interface Prisma__InventoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    serviceCenter<T extends ServiceCenterDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ServiceCenterDefaultArgs<ExtArgs>>): Prisma__ServiceCenterClient<$Result.GetResult<Prisma.$ServiceCenterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     product<T extends ProductDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductDefaultArgs<ExtArgs>>): Prisma__ProductClient<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -19322,8 +21086,12 @@ export namespace Prisma {
    */
   interface InventoryFieldRefs {
     readonly id: FieldRef<"Inventory", 'Int'>
+    readonly centerCode: FieldRef<"Inventory", 'String'>
     readonly productId: FieldRef<"Inventory", 'Int'>
-    readonly quantity: FieldRef<"Inventory", 'Int'>
+    readonly goodQty: FieldRef<"Inventory", 'Int'>
+    readonly repairableQty: FieldRef<"Inventory", 'Int'>
+    readonly damagedQty: FieldRef<"Inventory", 'Int'>
+    readonly scrapQty: FieldRef<"Inventory", 'Int'>
     readonly minStock: FieldRef<"Inventory", 'Int'>
     readonly maxStock: FieldRef<"Inventory", 'Int'>
     readonly location: FieldRef<"Inventory", 'String'>
@@ -32625,11 +34393,13 @@ export namespace Prisma {
   export const ServiceCenterScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    projectCode: 'projectCode',
+    orgCode: 'orgCode',
     centerCode: 'centerCode',
     email: 'email',
     address: 'address',
     isActive: 'isActive',
+    isMacsoft: 'isMacsoft',
+    isMacsoftHead: 'isMacsoftHead',
     serviceableStates: 'serviceableStates',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -32691,7 +34461,10 @@ export namespace Prisma {
     projectName: 'projectName',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    deletedAt: 'deletedAt'
+    deletedAt: 'deletedAt',
+    backupjson: 'backupjson',
+    backupcreatedAt: 'backupcreatedAt',
+    backupurl: 'backupurl'
   };
 
   export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
@@ -32763,10 +34536,11 @@ export namespace Prisma {
   export const ProductScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    productCode: 'productCode',
     description: 'description',
     brandName: 'brandName',
-    productCode: 'productCode',
     category: 'category',
+    unitOfMeasure: 'unitOfMeasure',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -32776,23 +34550,50 @@ export namespace Prisma {
 
   export const ProductTransactionScalarFieldEnum: {
     id: 'id',
-    productId: 'productId',
-    type: 'type',
-    quantity: 'quantity',
+    transactionType: 'transactionType',
+    status: 'status',
+    centerCode: 'centerCode',
+    fromCenterCode: 'fromCenterCode',
+    toCenterCode: 'toCenterCode',
+    approvedBy: 'approvedBy',
+    approvedAt: 'approvedAt',
+    rejectionReason: 'rejectionReason',
+    invoiceNo: 'invoiceNo',
+    billNo: 'billNo',
+    receiptDate: 'receiptDate',
+    deliveryDate: 'deliveryDate',
+    receivedAt: 'receivedAt',
     ticketId: 'ticketId',
-    notes: 'notes',
+    remarks: 'remarks',
     createdBy: 'createdBy',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    productId: 'productId'
   };
 
   export type ProductTransactionScalarFieldEnum = (typeof ProductTransactionScalarFieldEnum)[keyof typeof ProductTransactionScalarFieldEnum]
 
 
+  export const ProductTransactionItemScalarFieldEnum: {
+    id: 'id',
+    transactionId: 'transactionId',
+    productId: 'productId',
+    productName: 'productName',
+    condition: 'condition',
+    quantity: 'quantity'
+  };
+
+  export type ProductTransactionItemScalarFieldEnum = (typeof ProductTransactionItemScalarFieldEnum)[keyof typeof ProductTransactionItemScalarFieldEnum]
+
+
   export const InventoryScalarFieldEnum: {
     id: 'id',
+    centerCode: 'centerCode',
     productId: 'productId',
-    quantity: 'quantity',
+    goodQty: 'goodQty',
+    repairableQty: 'repairableQty',
+    damagedQty: 'damagedQty',
+    scrapQty: 'scrapQty',
     minStock: 'minStock',
     maxStock: 'maxStock',
     location: 'location',
@@ -33022,7 +34823,7 @@ export namespace Prisma {
 
   export const ServiceCenterOrderByRelevanceFieldEnum: {
     name: 'name',
-    projectCode: 'projectCode',
+    orgCode: 'orgCode',
     centerCode: 'centerCode',
     email: 'email',
     address: 'address',
@@ -33066,7 +34867,9 @@ export namespace Prisma {
     cableLength: 'cableLength',
     assignedServiceCenter: 'assignedServiceCenter',
     code: 'code',
-    projectName: 'projectName'
+    projectName: 'projectName',
+    backupjson: 'backupjson',
+    backupurl: 'backupurl'
   };
 
   export type TicketOrderByRelevanceFieldEnum = (typeof TicketOrderByRelevanceFieldEnum)[keyof typeof TicketOrderByRelevanceFieldEnum]
@@ -33107,22 +34910,36 @@ export namespace Prisma {
 
   export const ProductOrderByRelevanceFieldEnum: {
     name: 'name',
+    productCode: 'productCode',
     description: 'description',
-    brandName: 'brandName',
-    productCode: 'productCode'
+    brandName: 'brandName'
   };
 
   export type ProductOrderByRelevanceFieldEnum = (typeof ProductOrderByRelevanceFieldEnum)[keyof typeof ProductOrderByRelevanceFieldEnum]
 
 
   export const ProductTransactionOrderByRelevanceFieldEnum: {
-    notes: 'notes'
+    centerCode: 'centerCode',
+    fromCenterCode: 'fromCenterCode',
+    toCenterCode: 'toCenterCode',
+    rejectionReason: 'rejectionReason',
+    invoiceNo: 'invoiceNo',
+    billNo: 'billNo',
+    remarks: 'remarks'
   };
 
   export type ProductTransactionOrderByRelevanceFieldEnum = (typeof ProductTransactionOrderByRelevanceFieldEnum)[keyof typeof ProductTransactionOrderByRelevanceFieldEnum]
 
 
+  export const ProductTransactionItemOrderByRelevanceFieldEnum: {
+    productName: 'productName'
+  };
+
+  export type ProductTransactionItemOrderByRelevanceFieldEnum = (typeof ProductTransactionItemOrderByRelevanceFieldEnum)[keyof typeof ProductTransactionItemOrderByRelevanceFieldEnum]
+
+
   export const InventoryOrderByRelevanceFieldEnum: {
+    centerCode: 'centerCode',
     location: 'location'
   };
 
@@ -33269,6 +35086,20 @@ export namespace Prisma {
    * Reference to a field of type 'TransactionType'
    */
   export type EnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'TransactionStatus'
+   */
+  export type EnumTransactionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TransactionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'InventoryCondition'
+   */
+  export type EnumInventoryConditionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryCondition'>
     
 
 
@@ -33428,6 +35259,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
     project?: ProjectListRelationFilter
     users?: UserListRelationFilter
+    serviceCenters?: ServiceCenterListRelationFilter
   }
 
   export type OrganisationOrderByWithRelationInput = {
@@ -33443,6 +35275,7 @@ export namespace Prisma {
     deletedAt?: SortOrderInput | SortOrder
     project?: ProjectOrderByRelationAggregateInput
     users?: UserOrderByRelationAggregateInput
+    serviceCenters?: ServiceCenterOrderByRelationAggregateInput
     _relevance?: OrganisationOrderByRelevanceInput
   }
 
@@ -33462,6 +35295,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"Organisation"> | Date | string | null
     project?: ProjectListRelationFilter
     users?: UserListRelationFilter
+    serviceCenters?: ServiceCenterListRelationFilter
   }, "id" | "orgCode" | "email" | "phone">
 
   export type OrganisationOrderByWithAggregationInput = {
@@ -33513,7 +35347,6 @@ export namespace Prisma {
     updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
-    ServiceCenter?: ServiceCenterListRelationFilter
     state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
     users?: UserListRelationFilter
@@ -33531,7 +35364,6 @@ export namespace Prisma {
     updatedAt?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     organisationId?: SortOrderInput | SortOrder
-    ServiceCenter?: ServiceCenterOrderByRelationAggregateInput
     state?: StateOrderByWithRelationInput
     organisation?: OrganisationOrderByWithRelationInput
     users?: UserOrderByRelationAggregateInput
@@ -33553,7 +35385,6 @@ export namespace Prisma {
     updatedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
     organisationId?: IntNullableFilter<"Project"> | number | null
-    ServiceCenter?: ServiceCenterListRelationFilter
     state?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
     users?: UserListRelationFilter
@@ -33601,35 +35432,47 @@ export namespace Prisma {
     NOT?: ServiceCenterWhereInput | ServiceCenterWhereInput[]
     id?: IntFilter<"ServiceCenter"> | number
     name?: StringFilter<"ServiceCenter"> | string
-    projectCode?: StringNullableFilter<"ServiceCenter"> | string | null
+    orgCode?: StringNullableFilter<"ServiceCenter"> | string | null
     centerCode?: StringFilter<"ServiceCenter"> | string
     email?: StringFilter<"ServiceCenter"> | string
     address?: StringNullableFilter<"ServiceCenter"> | string | null
     isActive?: BoolFilter<"ServiceCenter"> | boolean
+    isMacsoft?: BoolFilter<"ServiceCenter"> | boolean
+    isMacsoftHead?: BoolFilter<"ServiceCenter"> | boolean
     serviceableStates?: StringNullableFilter<"ServiceCenter"> | string | null
     createdAt?: DateTimeFilter<"ServiceCenter"> | Date | string
     updatedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
     users?: UserListRelationFilter
-    project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
+    organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
     assignedTickets?: TicketListRelationFilter
+    inventories?: InventoryListRelationFilter
+    transactions?: ProductTransactionListRelationFilter
+    transfersFrom?: ProductTransactionListRelationFilter
+    transfersTo?: ProductTransactionListRelationFilter
   }
 
   export type ServiceCenterOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    projectCode?: SortOrderInput | SortOrder
+    orgCode?: SortOrderInput | SortOrder
     centerCode?: SortOrder
     email?: SortOrder
     address?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    isMacsoft?: SortOrder
+    isMacsoftHead?: SortOrder
     serviceableStates?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     users?: UserOrderByRelationAggregateInput
-    project?: ProjectOrderByWithRelationInput
+    organisation?: OrganisationOrderByWithRelationInput
     assignedTickets?: TicketOrderByRelationAggregateInput
+    inventories?: InventoryOrderByRelationAggregateInput
+    transactions?: ProductTransactionOrderByRelationAggregateInput
+    transfersFrom?: ProductTransactionOrderByRelationAggregateInput
+    transfersTo?: ProductTransactionOrderByRelationAggregateInput
     _relevance?: ServiceCenterOrderByRelevanceInput
   }
 
@@ -33641,26 +35484,34 @@ export namespace Prisma {
     OR?: ServiceCenterWhereInput[]
     NOT?: ServiceCenterWhereInput | ServiceCenterWhereInput[]
     name?: StringFilter<"ServiceCenter"> | string
-    projectCode?: StringNullableFilter<"ServiceCenter"> | string | null
+    orgCode?: StringNullableFilter<"ServiceCenter"> | string | null
     address?: StringNullableFilter<"ServiceCenter"> | string | null
     isActive?: BoolFilter<"ServiceCenter"> | boolean
+    isMacsoft?: BoolFilter<"ServiceCenter"> | boolean
+    isMacsoftHead?: BoolFilter<"ServiceCenter"> | boolean
     serviceableStates?: StringNullableFilter<"ServiceCenter"> | string | null
     createdAt?: DateTimeFilter<"ServiceCenter"> | Date | string
     updatedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
     deletedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
     users?: UserListRelationFilter
-    project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
+    organisation?: XOR<OrganisationNullableScalarRelationFilter, OrganisationWhereInput> | null
     assignedTickets?: TicketListRelationFilter
+    inventories?: InventoryListRelationFilter
+    transactions?: ProductTransactionListRelationFilter
+    transfersFrom?: ProductTransactionListRelationFilter
+    transfersTo?: ProductTransactionListRelationFilter
   }, "id" | "centerCode" | "email">
 
   export type ServiceCenterOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    projectCode?: SortOrderInput | SortOrder
+    orgCode?: SortOrderInput | SortOrder
     centerCode?: SortOrder
     email?: SortOrder
     address?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    isMacsoft?: SortOrder
+    isMacsoftHead?: SortOrder
     serviceableStates?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrderInput | SortOrder
@@ -33678,11 +35529,13 @@ export namespace Prisma {
     NOT?: ServiceCenterScalarWhereWithAggregatesInput | ServiceCenterScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"ServiceCenter"> | number
     name?: StringWithAggregatesFilter<"ServiceCenter"> | string
-    projectCode?: StringNullableWithAggregatesFilter<"ServiceCenter"> | string | null
+    orgCode?: StringNullableWithAggregatesFilter<"ServiceCenter"> | string | null
     centerCode?: StringWithAggregatesFilter<"ServiceCenter"> | string
     email?: StringWithAggregatesFilter<"ServiceCenter"> | string
     address?: StringNullableWithAggregatesFilter<"ServiceCenter"> | string | null
     isActive?: BoolWithAggregatesFilter<"ServiceCenter"> | boolean
+    isMacsoft?: BoolWithAggregatesFilter<"ServiceCenter"> | boolean
+    isMacsoftHead?: BoolWithAggregatesFilter<"ServiceCenter"> | boolean
     serviceableStates?: StringNullableWithAggregatesFilter<"ServiceCenter"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ServiceCenter"> | Date | string
     updatedAt?: DateTimeNullableWithAggregatesFilter<"ServiceCenter"> | Date | string | null
@@ -33717,6 +35570,7 @@ export namespace Prisma {
     spareRequestsCreated?: SpareRequestListRelationFilter
     spareRequestsUpdated?: SpareRequestListRelationFilter
     productTransactions?: ProductTransactionListRelationFilter
+    approvedTransactions?: ProductTransactionListRelationFilter
     TicketMilestone?: TicketMilestoneListRelationFilter
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     states?: StateListRelationFilter
@@ -33751,6 +35605,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestOrderByRelationAggregateInput
     spareRequestsUpdated?: spareRequestOrderByRelationAggregateInput
     productTransactions?: ProductTransactionOrderByRelationAggregateInput
+    approvedTransactions?: ProductTransactionOrderByRelationAggregateInput
     TicketMilestone?: TicketMilestoneOrderByRelationAggregateInput
     State?: StateOrderByWithRelationInput
     states?: StateOrderByRelationAggregateInput
@@ -33789,6 +35644,7 @@ export namespace Prisma {
     spareRequestsCreated?: SpareRequestListRelationFilter
     spareRequestsUpdated?: SpareRequestListRelationFilter
     productTransactions?: ProductTransactionListRelationFilter
+    approvedTransactions?: ProductTransactionListRelationFilter
     TicketMilestone?: TicketMilestoneListRelationFilter
     State?: XOR<StateNullableScalarRelationFilter, StateWhereInput> | null
     states?: StateListRelationFilter
@@ -33876,6 +35732,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+    backupjson?: StringNullableFilter<"Ticket"> | string | null
+    backupcreatedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+    backupurl?: StringNullableFilter<"Ticket"> | string | null
     createdByUser?: XOR<UserScalarRelationFilter, UserWhereInput>
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
@@ -33923,6 +35782,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
+    backupjson?: SortOrderInput | SortOrder
+    backupcreatedAt?: SortOrderInput | SortOrder
+    backupurl?: SortOrderInput | SortOrder
     createdByUser?: UserOrderByWithRelationInput
     updatedByUser?: UserOrderByWithRelationInput
     serviceCenter?: ServiceCenterOrderByWithRelationInput
@@ -33974,6 +35836,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+    backupjson?: StringNullableFilter<"Ticket"> | string | null
+    backupcreatedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+    backupurl?: StringNullableFilter<"Ticket"> | string | null
     createdByUser?: XOR<UserScalarRelationFilter, UserWhereInput>
     updatedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     serviceCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
@@ -34021,6 +35886,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
+    backupjson?: SortOrderInput | SortOrder
+    backupcreatedAt?: SortOrderInput | SortOrder
+    backupurl?: SortOrderInput | SortOrder
     _count?: TicketCountOrderByAggregateInput
     _avg?: TicketAvgOrderByAggregateInput
     _max?: TicketMaxOrderByAggregateInput
@@ -34064,6 +35932,9 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Ticket"> | Date | string | null
+    backupjson?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
+    backupcreatedAt?: DateTimeNullableWithAggregatesFilter<"Ticket"> | Date | string | null
+    backupurl?: StringNullableWithAggregatesFilter<"Ticket"> | string | null
   }
 
   export type TicketMilestoneWhereInput = {
@@ -34421,29 +36292,33 @@ export namespace Prisma {
     NOT?: ProductWhereInput | ProductWhereInput[]
     id?: IntFilter<"Product"> | number
     name?: StringFilter<"Product"> | string
+    productCode?: StringFilter<"Product"> | string
     description?: StringNullableFilter<"Product"> | string | null
     brandName?: StringNullableFilter<"Product"> | string | null
-    productCode?: StringFilter<"Product"> | string
     category?: EnumCategoryNullableFilter<"Product"> | $Enums.Category | null
+    unitOfMeasure?: IntNullableFilter<"Product"> | number | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
+    inventories?: InventoryListRelationFilter
     transactions?: ProductTransactionListRelationFilter
-    inventory?: XOR<InventoryNullableScalarRelationFilter, InventoryWhereInput> | null
     spareRequestItems?: SpareRequestItemListRelationFilter
+    ProductTransactionItem?: ProductTransactionItemListRelationFilter
   }
 
   export type ProductOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
+    productCode?: SortOrder
     description?: SortOrderInput | SortOrder
     brandName?: SortOrderInput | SortOrder
-    productCode?: SortOrder
     category?: SortOrderInput | SortOrder
+    unitOfMeasure?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    inventories?: InventoryOrderByRelationAggregateInput
     transactions?: ProductTransactionOrderByRelationAggregateInput
-    inventory?: InventoryOrderByWithRelationInput
     spareRequestItems?: spareRequestItemOrderByRelationAggregateInput
+    ProductTransactionItem?: ProductTransactionItemOrderByRelationAggregateInput
     _relevance?: ProductOrderByRelevanceInput
   }
 
@@ -34457,20 +36332,23 @@ export namespace Prisma {
     description?: StringNullableFilter<"Product"> | string | null
     brandName?: StringNullableFilter<"Product"> | string | null
     category?: EnumCategoryNullableFilter<"Product"> | $Enums.Category | null
+    unitOfMeasure?: IntNullableFilter<"Product"> | number | null
     createdAt?: DateTimeFilter<"Product"> | Date | string
     updatedAt?: DateTimeFilter<"Product"> | Date | string
+    inventories?: InventoryListRelationFilter
     transactions?: ProductTransactionListRelationFilter
-    inventory?: XOR<InventoryNullableScalarRelationFilter, InventoryWhereInput> | null
     spareRequestItems?: SpareRequestItemListRelationFilter
+    ProductTransactionItem?: ProductTransactionItemListRelationFilter
   }, "id" | "productCode">
 
   export type ProductOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
+    productCode?: SortOrder
     description?: SortOrderInput | SortOrder
     brandName?: SortOrderInput | SortOrder
-    productCode?: SortOrder
     category?: SortOrderInput | SortOrder
+    unitOfMeasure?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProductCountOrderByAggregateInput
@@ -34486,10 +36364,11 @@ export namespace Prisma {
     NOT?: ProductScalarWhereWithAggregatesInput | ProductScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Product"> | number
     name?: StringWithAggregatesFilter<"Product"> | string
+    productCode?: StringWithAggregatesFilter<"Product"> | string
     description?: StringNullableWithAggregatesFilter<"Product"> | string | null
     brandName?: StringNullableWithAggregatesFilter<"Product"> | string | null
-    productCode?: StringWithAggregatesFilter<"Product"> | string
     category?: EnumCategoryNullableWithAggregatesFilter<"Product"> | $Enums.Category | null
+    unitOfMeasure?: IntNullableWithAggregatesFilter<"Product"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
   }
@@ -34499,32 +36378,64 @@ export namespace Prisma {
     OR?: ProductTransactionWhereInput[]
     NOT?: ProductTransactionWhereInput | ProductTransactionWhereInput[]
     id?: IntFilter<"ProductTransaction"> | number
-    productId?: IntFilter<"ProductTransaction"> | number
-    type?: EnumTransactionTypeFilter<"ProductTransaction"> | $Enums.TransactionType
-    quantity?: IntFilter<"ProductTransaction"> | number
+    transactionType?: EnumTransactionTypeFilter<"ProductTransaction"> | $Enums.TransactionType
+    status?: EnumTransactionStatusFilter<"ProductTransaction"> | $Enums.TransactionStatus
+    centerCode?: StringFilter<"ProductTransaction"> | string
+    fromCenterCode?: StringNullableFilter<"ProductTransaction"> | string | null
+    toCenterCode?: StringNullableFilter<"ProductTransaction"> | string | null
+    approvedBy?: IntNullableFilter<"ProductTransaction"> | number | null
+    approvedAt?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    rejectionReason?: StringNullableFilter<"ProductTransaction"> | string | null
+    invoiceNo?: StringNullableFilter<"ProductTransaction"> | string | null
+    billNo?: StringNullableFilter<"ProductTransaction"> | string | null
+    receiptDate?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    deliveryDate?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    receivedAt?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
     ticketId?: IntNullableFilter<"ProductTransaction"> | number | null
-    notes?: StringNullableFilter<"ProductTransaction"> | string | null
+    remarks?: StringNullableFilter<"ProductTransaction"> | string | null
     createdBy?: IntFilter<"ProductTransaction"> | number
     createdAt?: DateTimeFilter<"ProductTransaction"> | Date | string
     updatedAt?: DateTimeFilter<"ProductTransaction"> | Date | string
-    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    productId?: IntNullableFilter<"ProductTransaction"> | number | null
+    serviceCenter?: XOR<ServiceCenterScalarRelationFilter, ServiceCenterWhereInput>
+    fromCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
+    toCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     ticket?: XOR<TicketNullableScalarRelationFilter, TicketWhereInput> | null
+    items?: ProductTransactionItemListRelationFilter
     createdByUser?: XOR<UserScalarRelationFilter, UserWhereInput>
+    approverUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    Product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
   }
 
   export type ProductTransactionOrderByWithRelationInput = {
     id?: SortOrder
-    productId?: SortOrder
-    type?: SortOrder
-    quantity?: SortOrder
+    transactionType?: SortOrder
+    status?: SortOrder
+    centerCode?: SortOrder
+    fromCenterCode?: SortOrderInput | SortOrder
+    toCenterCode?: SortOrderInput | SortOrder
+    approvedBy?: SortOrderInput | SortOrder
+    approvedAt?: SortOrderInput | SortOrder
+    rejectionReason?: SortOrderInput | SortOrder
+    invoiceNo?: SortOrderInput | SortOrder
+    billNo?: SortOrderInput | SortOrder
+    receiptDate?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    receivedAt?: SortOrderInput | SortOrder
     ticketId?: SortOrderInput | SortOrder
-    notes?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    product?: ProductOrderByWithRelationInput
+    productId?: SortOrderInput | SortOrder
+    serviceCenter?: ServiceCenterOrderByWithRelationInput
+    fromCenter?: ServiceCenterOrderByWithRelationInput
+    toCenter?: ServiceCenterOrderByWithRelationInput
     ticket?: TicketOrderByWithRelationInput
+    items?: ProductTransactionItemOrderByRelationAggregateInput
     createdByUser?: UserOrderByWithRelationInput
+    approverUser?: UserOrderByWithRelationInput
+    Product?: ProductOrderByWithRelationInput
     _relevance?: ProductTransactionOrderByRelevanceInput
   }
 
@@ -34533,29 +36444,56 @@ export namespace Prisma {
     AND?: ProductTransactionWhereInput | ProductTransactionWhereInput[]
     OR?: ProductTransactionWhereInput[]
     NOT?: ProductTransactionWhereInput | ProductTransactionWhereInput[]
-    productId?: IntFilter<"ProductTransaction"> | number
-    type?: EnumTransactionTypeFilter<"ProductTransaction"> | $Enums.TransactionType
-    quantity?: IntFilter<"ProductTransaction"> | number
+    transactionType?: EnumTransactionTypeFilter<"ProductTransaction"> | $Enums.TransactionType
+    status?: EnumTransactionStatusFilter<"ProductTransaction"> | $Enums.TransactionStatus
+    centerCode?: StringFilter<"ProductTransaction"> | string
+    fromCenterCode?: StringNullableFilter<"ProductTransaction"> | string | null
+    toCenterCode?: StringNullableFilter<"ProductTransaction"> | string | null
+    approvedBy?: IntNullableFilter<"ProductTransaction"> | number | null
+    approvedAt?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    rejectionReason?: StringNullableFilter<"ProductTransaction"> | string | null
+    invoiceNo?: StringNullableFilter<"ProductTransaction"> | string | null
+    billNo?: StringNullableFilter<"ProductTransaction"> | string | null
+    receiptDate?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    deliveryDate?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    receivedAt?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
     ticketId?: IntNullableFilter<"ProductTransaction"> | number | null
-    notes?: StringNullableFilter<"ProductTransaction"> | string | null
+    remarks?: StringNullableFilter<"ProductTransaction"> | string | null
     createdBy?: IntFilter<"ProductTransaction"> | number
     createdAt?: DateTimeFilter<"ProductTransaction"> | Date | string
     updatedAt?: DateTimeFilter<"ProductTransaction"> | Date | string
-    product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
+    productId?: IntNullableFilter<"ProductTransaction"> | number | null
+    serviceCenter?: XOR<ServiceCenterScalarRelationFilter, ServiceCenterWhereInput>
+    fromCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
+    toCenter?: XOR<ServiceCenterNullableScalarRelationFilter, ServiceCenterWhereInput> | null
     ticket?: XOR<TicketNullableScalarRelationFilter, TicketWhereInput> | null
+    items?: ProductTransactionItemListRelationFilter
     createdByUser?: XOR<UserScalarRelationFilter, UserWhereInput>
+    approverUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    Product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
   }, "id">
 
   export type ProductTransactionOrderByWithAggregationInput = {
     id?: SortOrder
-    productId?: SortOrder
-    type?: SortOrder
-    quantity?: SortOrder
+    transactionType?: SortOrder
+    status?: SortOrder
+    centerCode?: SortOrder
+    fromCenterCode?: SortOrderInput | SortOrder
+    toCenterCode?: SortOrderInput | SortOrder
+    approvedBy?: SortOrderInput | SortOrder
+    approvedAt?: SortOrderInput | SortOrder
+    rejectionReason?: SortOrderInput | SortOrder
+    invoiceNo?: SortOrderInput | SortOrder
+    billNo?: SortOrderInput | SortOrder
+    receiptDate?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
+    receivedAt?: SortOrderInput | SortOrder
     ticketId?: SortOrderInput | SortOrder
-    notes?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    productId?: SortOrderInput | SortOrder
     _count?: ProductTransactionCountOrderByAggregateInput
     _avg?: ProductTransactionAvgOrderByAggregateInput
     _max?: ProductTransactionMaxOrderByAggregateInput
@@ -34568,14 +36506,91 @@ export namespace Prisma {
     OR?: ProductTransactionScalarWhereWithAggregatesInput[]
     NOT?: ProductTransactionScalarWhereWithAggregatesInput | ProductTransactionScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"ProductTransaction"> | number
-    productId?: IntWithAggregatesFilter<"ProductTransaction"> | number
-    type?: EnumTransactionTypeWithAggregatesFilter<"ProductTransaction"> | $Enums.TransactionType
-    quantity?: IntWithAggregatesFilter<"ProductTransaction"> | number
+    transactionType?: EnumTransactionTypeWithAggregatesFilter<"ProductTransaction"> | $Enums.TransactionType
+    status?: EnumTransactionStatusWithAggregatesFilter<"ProductTransaction"> | $Enums.TransactionStatus
+    centerCode?: StringWithAggregatesFilter<"ProductTransaction"> | string
+    fromCenterCode?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
+    toCenterCode?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
+    approvedBy?: IntNullableWithAggregatesFilter<"ProductTransaction"> | number | null
+    approvedAt?: DateTimeNullableWithAggregatesFilter<"ProductTransaction"> | Date | string | null
+    rejectionReason?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
+    invoiceNo?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
+    billNo?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
+    receiptDate?: DateTimeNullableWithAggregatesFilter<"ProductTransaction"> | Date | string | null
+    deliveryDate?: DateTimeNullableWithAggregatesFilter<"ProductTransaction"> | Date | string | null
+    receivedAt?: DateTimeNullableWithAggregatesFilter<"ProductTransaction"> | Date | string | null
     ticketId?: IntNullableWithAggregatesFilter<"ProductTransaction"> | number | null
-    notes?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
+    remarks?: StringNullableWithAggregatesFilter<"ProductTransaction"> | string | null
     createdBy?: IntWithAggregatesFilter<"ProductTransaction"> | number
     createdAt?: DateTimeWithAggregatesFilter<"ProductTransaction"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ProductTransaction"> | Date | string
+    productId?: IntNullableWithAggregatesFilter<"ProductTransaction"> | number | null
+  }
+
+  export type ProductTransactionItemWhereInput = {
+    AND?: ProductTransactionItemWhereInput | ProductTransactionItemWhereInput[]
+    OR?: ProductTransactionItemWhereInput[]
+    NOT?: ProductTransactionItemWhereInput | ProductTransactionItemWhereInput[]
+    id?: IntFilter<"ProductTransactionItem"> | number
+    transactionId?: IntFilter<"ProductTransactionItem"> | number
+    productId?: IntNullableFilter<"ProductTransactionItem"> | number | null
+    productName?: StringNullableFilter<"ProductTransactionItem"> | string | null
+    condition?: EnumInventoryConditionFilter<"ProductTransactionItem"> | $Enums.InventoryCondition
+    quantity?: IntFilter<"ProductTransactionItem"> | number
+    transaction?: XOR<ProductTransactionScalarRelationFilter, ProductTransactionWhereInput>
+    product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
+  }
+
+  export type ProductTransactionItemOrderByWithRelationInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrderInput | SortOrder
+    productName?: SortOrderInput | SortOrder
+    condition?: SortOrder
+    quantity?: SortOrder
+    transaction?: ProductTransactionOrderByWithRelationInput
+    product?: ProductOrderByWithRelationInput
+    _relevance?: ProductTransactionItemOrderByRelevanceInput
+  }
+
+  export type ProductTransactionItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: ProductTransactionItemWhereInput | ProductTransactionItemWhereInput[]
+    OR?: ProductTransactionItemWhereInput[]
+    NOT?: ProductTransactionItemWhereInput | ProductTransactionItemWhereInput[]
+    transactionId?: IntFilter<"ProductTransactionItem"> | number
+    productId?: IntNullableFilter<"ProductTransactionItem"> | number | null
+    productName?: StringNullableFilter<"ProductTransactionItem"> | string | null
+    condition?: EnumInventoryConditionFilter<"ProductTransactionItem"> | $Enums.InventoryCondition
+    quantity?: IntFilter<"ProductTransactionItem"> | number
+    transaction?: XOR<ProductTransactionScalarRelationFilter, ProductTransactionWhereInput>
+    product?: XOR<ProductNullableScalarRelationFilter, ProductWhereInput> | null
+  }, "id">
+
+  export type ProductTransactionItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrderInput | SortOrder
+    productName?: SortOrderInput | SortOrder
+    condition?: SortOrder
+    quantity?: SortOrder
+    _count?: ProductTransactionItemCountOrderByAggregateInput
+    _avg?: ProductTransactionItemAvgOrderByAggregateInput
+    _max?: ProductTransactionItemMaxOrderByAggregateInput
+    _min?: ProductTransactionItemMinOrderByAggregateInput
+    _sum?: ProductTransactionItemSumOrderByAggregateInput
+  }
+
+  export type ProductTransactionItemScalarWhereWithAggregatesInput = {
+    AND?: ProductTransactionItemScalarWhereWithAggregatesInput | ProductTransactionItemScalarWhereWithAggregatesInput[]
+    OR?: ProductTransactionItemScalarWhereWithAggregatesInput[]
+    NOT?: ProductTransactionItemScalarWhereWithAggregatesInput | ProductTransactionItemScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ProductTransactionItem"> | number
+    transactionId?: IntWithAggregatesFilter<"ProductTransactionItem"> | number
+    productId?: IntNullableWithAggregatesFilter<"ProductTransactionItem"> | number | null
+    productName?: StringNullableWithAggregatesFilter<"ProductTransactionItem"> | string | null
+    condition?: EnumInventoryConditionWithAggregatesFilter<"ProductTransactionItem"> | $Enums.InventoryCondition
+    quantity?: IntWithAggregatesFilter<"ProductTransactionItem"> | number
   }
 
   export type InventoryWhereInput = {
@@ -34583,45 +36598,65 @@ export namespace Prisma {
     OR?: InventoryWhereInput[]
     NOT?: InventoryWhereInput | InventoryWhereInput[]
     id?: IntFilter<"Inventory"> | number
+    centerCode?: StringFilter<"Inventory"> | string
     productId?: IntFilter<"Inventory"> | number
-    quantity?: IntFilter<"Inventory"> | number
+    goodQty?: IntFilter<"Inventory"> | number
+    repairableQty?: IntFilter<"Inventory"> | number
+    damagedQty?: IntFilter<"Inventory"> | number
+    scrapQty?: IntFilter<"Inventory"> | number
     minStock?: IntFilter<"Inventory"> | number
     maxStock?: IntNullableFilter<"Inventory"> | number | null
     location?: StringNullableFilter<"Inventory"> | string | null
     updatedAt?: DateTimeFilter<"Inventory"> | Date | string
+    serviceCenter?: XOR<ServiceCenterScalarRelationFilter, ServiceCenterWhereInput>
     product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
   }
 
   export type InventoryOrderByWithRelationInput = {
     id?: SortOrder
+    centerCode?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrderInput | SortOrder
     location?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
+    serviceCenter?: ServiceCenterOrderByWithRelationInput
     product?: ProductOrderByWithRelationInput
     _relevance?: InventoryOrderByRelevanceInput
   }
 
   export type InventoryWhereUniqueInput = Prisma.AtLeast<{
     id?: number
-    productId?: number
+    centerCode_productId?: InventoryCenterCodeProductIdCompoundUniqueInput
     AND?: InventoryWhereInput | InventoryWhereInput[]
     OR?: InventoryWhereInput[]
     NOT?: InventoryWhereInput | InventoryWhereInput[]
-    quantity?: IntFilter<"Inventory"> | number
+    centerCode?: StringFilter<"Inventory"> | string
+    productId?: IntFilter<"Inventory"> | number
+    goodQty?: IntFilter<"Inventory"> | number
+    repairableQty?: IntFilter<"Inventory"> | number
+    damagedQty?: IntFilter<"Inventory"> | number
+    scrapQty?: IntFilter<"Inventory"> | number
     minStock?: IntFilter<"Inventory"> | number
     maxStock?: IntNullableFilter<"Inventory"> | number | null
     location?: StringNullableFilter<"Inventory"> | string | null
     updatedAt?: DateTimeFilter<"Inventory"> | Date | string
+    serviceCenter?: XOR<ServiceCenterScalarRelationFilter, ServiceCenterWhereInput>
     product?: XOR<ProductScalarRelationFilter, ProductWhereInput>
-  }, "id" | "productId">
+  }, "id" | "centerCode_productId">
 
   export type InventoryOrderByWithAggregationInput = {
     id?: SortOrder
+    centerCode?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrderInput | SortOrder
     location?: SortOrderInput | SortOrder
@@ -34638,8 +36673,12 @@ export namespace Prisma {
     OR?: InventoryScalarWhereWithAggregatesInput[]
     NOT?: InventoryScalarWhereWithAggregatesInput | InventoryScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Inventory"> | number
+    centerCode?: StringWithAggregatesFilter<"Inventory"> | string
     productId?: IntWithAggregatesFilter<"Inventory"> | number
-    quantity?: IntWithAggregatesFilter<"Inventory"> | number
+    goodQty?: IntWithAggregatesFilter<"Inventory"> | number
+    repairableQty?: IntWithAggregatesFilter<"Inventory"> | number
+    damagedQty?: IntWithAggregatesFilter<"Inventory"> | number
+    scrapQty?: IntWithAggregatesFilter<"Inventory"> | number
     minStock?: IntWithAggregatesFilter<"Inventory"> | number
     maxStock?: IntNullableWithAggregatesFilter<"Inventory"> | number | null
     location?: StringNullableWithAggregatesFilter<"Inventory"> | string | null
@@ -35651,6 +37690,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     project?: ProjectCreateNestedManyWithoutOrganisationInput
     users?: UserCreateNestedManyWithoutOrganisationInput
+    serviceCenters?: ServiceCenterCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateInput = {
@@ -35666,6 +37706,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     project?: ProjectUncheckedCreateNestedManyWithoutOrganisationInput
     users?: UserUncheckedCreateNestedManyWithoutOrganisationInput
+    serviceCenters?: ServiceCenterUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUpdateInput = {
@@ -35680,6 +37721,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUpdateManyWithoutOrganisationNestedInput
     users?: UserUpdateManyWithoutOrganisationNestedInput
+    serviceCenters?: ServiceCenterUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateInput = {
@@ -35695,6 +37737,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
     users?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
+    serviceCenters?: ServiceCenterUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationCreateManyInput = {
@@ -35744,7 +37787,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
     state?: StateCreateNestedOneWithoutProjectsInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
     users?: UserCreateNestedManyWithoutProjectInput
@@ -35762,7 +37804,6 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     organisationId?: number | null
-    ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
     users?: UserUncheckedCreateNestedManyWithoutProjectInput
   }
 
@@ -35775,7 +37816,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
     state?: StateUpdateOneWithoutProjectsNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
     users?: UserUpdateManyWithoutProjectNestedInput
@@ -35793,7 +37833,6 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     organisationId?: NullableIntFieldUpdateOperationsInput | number | null
-    ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
     users?: UserUncheckedUpdateManyWithoutProjectNestedInput
   }
 
@@ -35842,29 +37881,41 @@ export namespace Prisma {
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     users?: UserCreateNestedManyWithoutServiceCenterInput
-    project?: ProjectCreateNestedOneWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
     assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
   }
 
   export type ServiceCenterUncheckedCreateInput = {
     id?: number
     name: string
-    projectCode?: string | null
+    orgCode?: string | null
     centerCode: string
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
     assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
   }
 
   export type ServiceCenterUpdateInput = {
@@ -35873,39 +37924,53 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUpdateManyWithoutServiceCenterNestedInput
-    project?: ProjectUpdateOneWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
     assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
   }
 
   export type ServiceCenterUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     centerCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
     assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
   }
 
   export type ServiceCenterCreateManyInput = {
     id?: number
     name: string
-    projectCode?: string | null
+    orgCode?: string | null
     centerCode: string
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
@@ -35918,6 +37983,8 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35927,11 +37994,13 @@ export namespace Prisma {
   export type ServiceCenterUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     centerCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35958,6 +38027,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -35991,6 +38061,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -36017,6 +38088,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -36050,6 +38122,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -36128,6 +38201,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -36175,6 +38251,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -36209,6 +38288,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -36256,6 +38338,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -36297,6 +38382,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
   }
 
   export type TicketUpdateManyMutationInput = {
@@ -36325,6 +38413,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUncheckedUpdateManyInput = {
@@ -36360,6 +38451,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketMilestoneCreateInput = {
@@ -36708,75 +38802,85 @@ export namespace Prisma {
 
   export type ProductCreateInput = {
     name: string
+    productCode: string
     description?: string | null
     brandName?: string | null
-    productCode: string
     category?: $Enums.Category | null
+    unitOfMeasure?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    inventories?: InventoryCreateNestedManyWithoutProductInput
     transactions?: ProductTransactionCreateNestedManyWithoutProductInput
-    inventory?: InventoryCreateNestedOneWithoutProductInput
     spareRequestItems?: spareRequestItemCreateNestedManyWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateInput = {
     id?: number
     name: string
+    productCode: string
     description?: string | null
     brandName?: string | null
-    productCode: string
     category?: $Enums.Category | null
+    unitOfMeasure?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    inventories?: InventoryUncheckedCreateNestedManyWithoutProductInput
     transactions?: ProductTransactionUncheckedCreateNestedManyWithoutProductInput
-    inventory?: InventoryUncheckedCreateNestedOneWithoutProductInput
     spareRequestItems?: spareRequestItemUncheckedCreateNestedManyWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUpdateManyWithoutProductNestedInput
     transactions?: ProductTransactionUpdateManyWithoutProductNestedInput
-    inventory?: InventoryUpdateOneWithoutProductNestedInput
     spareRequestItems?: spareRequestItemUpdateManyWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUncheckedUpdateManyWithoutProductNestedInput
     transactions?: ProductTransactionUncheckedUpdateManyWithoutProductNestedInput
-    inventory?: InventoryUncheckedUpdateOneWithoutProductNestedInput
     spareRequestItems?: spareRequestItemUncheckedUpdateManyWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
   export type ProductCreateManyInput = {
     id?: number
     name: string
+    productCode: string
     description?: string | null
     brandName?: string | null
-    productCode: string
     category?: $Enums.Category | null
+    unitOfMeasure?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type ProductUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -36784,105 +38888,249 @@ export namespace Prisma {
   export type ProductUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ProductTransactionCreateInput = {
-    type: $Enums.TransactionType
-    quantity: number
-    notes?: string | null
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    product: ProductCreateNestedOneWithoutTransactionsInput
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
     ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
     createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
   }
 
   export type ProductTransactionUncheckedCreateInput = {
     id?: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
     ticketId?: number | null
-    notes?: string | null
+    remarks?: string | null
     createdBy: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
   }
 
   export type ProductTransactionUpdateInput = {
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneRequiredWithoutTransactionsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
     ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
     createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
   }
 
   export type ProductTransactionCreateManyInput = {
     id?: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
     ticketId?: number | null
-    notes?: string | null
+    remarks?: string | null
     createdBy: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    productId?: number | null
   }
 
   export type ProductTransactionUpdateManyMutationInput = {
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ProductTransactionUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type ProductTransactionItemCreateInput = {
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+    transaction: ProductTransactionCreateNestedOneWithoutItemsInput
+    product?: ProductCreateNestedOneWithoutProductTransactionItemInput
+  }
+
+  export type ProductTransactionItemUncheckedCreateInput = {
+    id?: number
+    transactionId: number
+    productId?: number | null
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+  }
+
+  export type ProductTransactionItemUpdateInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+    transaction?: ProductTransactionUpdateOneRequiredWithoutItemsNestedInput
+    product?: ProductUpdateOneWithoutProductTransactionItemNestedInput
+  }
+
+  export type ProductTransactionItemUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ProductTransactionItemCreateManyInput = {
+    id?: number
+    transactionId: number
+    productId?: number | null
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+  }
+
+  export type ProductTransactionItemUpdateManyMutationInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ProductTransactionItemUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionId?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
   }
 
   export type InventoryCreateInput = {
-    quantity?: number
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
     minStock?: number
     maxStock?: number | null
     location?: string | null
     updatedAt?: Date | string
-    product: ProductCreateNestedOneWithoutInventoryInput
+    serviceCenter: ServiceCenterCreateNestedOneWithoutInventoriesInput
+    product: ProductCreateNestedOneWithoutInventoriesInput
   }
 
   export type InventoryUncheckedCreateInput = {
     id?: number
+    centerCode: string
     productId: number
-    quantity?: number
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
     minStock?: number
     maxStock?: number | null
     location?: string | null
@@ -36890,18 +39138,26 @@ export namespace Prisma {
   }
 
   export type InventoryUpdateInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
     minStock?: IntFieldUpdateOperationsInput | number
     maxStock?: NullableIntFieldUpdateOperationsInput | number | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneRequiredWithoutInventoryNestedInput
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutInventoriesNestedInput
+    product?: ProductUpdateOneRequiredWithoutInventoriesNestedInput
   }
 
   export type InventoryUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
+    centerCode?: StringFieldUpdateOperationsInput | string
     productId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
     minStock?: IntFieldUpdateOperationsInput | number
     maxStock?: NullableIntFieldUpdateOperationsInput | number | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36910,8 +39166,12 @@ export namespace Prisma {
 
   export type InventoryCreateManyInput = {
     id?: number
+    centerCode: string
     productId: number
-    quantity?: number
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
     minStock?: number
     maxStock?: number | null
     location?: string | null
@@ -36919,7 +39179,10 @@ export namespace Prisma {
   }
 
   export type InventoryUpdateManyMutationInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
     minStock?: IntFieldUpdateOperationsInput | number
     maxStock?: NullableIntFieldUpdateOperationsInput | number | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36928,8 +39191,12 @@ export namespace Prisma {
 
   export type InventoryUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    centerCode?: StringFieldUpdateOperationsInput | string
     productId?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
     minStock?: IntFieldUpdateOperationsInput | number
     maxStock?: NullableIntFieldUpdateOperationsInput | number | null
     location?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38038,6 +40305,16 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type ServiceCenterListRelationFilter = {
+    every?: ServiceCenterWhereInput
+    some?: ServiceCenterWhereInput
+    none?: ServiceCenterWhereInput
+  }
+
+  export type ServiceCenterOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type OrganisationOrderByRelevanceInput = {
     fields: OrganisationOrderByRelevanceFieldEnum | OrganisationOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -38138,12 +40415,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type ServiceCenterListRelationFilter = {
-    every?: ServiceCenterWhereInput
-    some?: ServiceCenterWhereInput
-    none?: ServiceCenterWhereInput
-  }
-
   export type StateNullableScalarRelationFilter = {
     is?: StateWhereInput | null
     isNot?: StateWhereInput | null
@@ -38152,10 +40423,6 @@ export namespace Prisma {
   export type OrganisationNullableScalarRelationFilter = {
     is?: OrganisationWhereInput | null
     isNot?: OrganisationWhereInput | null
-  }
-
-  export type ServiceCenterOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type ProjectOrderByRelevanceInput = {
@@ -38234,9 +40501,24 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type ProjectNullableScalarRelationFilter = {
-    is?: ProjectWhereInput | null
-    isNot?: ProjectWhereInput | null
+  export type InventoryListRelationFilter = {
+    every?: InventoryWhereInput
+    some?: InventoryWhereInput
+    none?: InventoryWhereInput
+  }
+
+  export type ProductTransactionListRelationFilter = {
+    every?: ProductTransactionWhereInput
+    some?: ProductTransactionWhereInput
+    none?: ProductTransactionWhereInput
+  }
+
+  export type InventoryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProductTransactionOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ServiceCenterOrderByRelevanceInput = {
@@ -38248,11 +40530,13 @@ export namespace Prisma {
   export type ServiceCenterCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    projectCode?: SortOrder
+    orgCode?: SortOrder
     centerCode?: SortOrder
     email?: SortOrder
     address?: SortOrder
     isActive?: SortOrder
+    isMacsoft?: SortOrder
+    isMacsoftHead?: SortOrder
     serviceableStates?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -38266,11 +40550,13 @@ export namespace Prisma {
   export type ServiceCenterMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    projectCode?: SortOrder
+    orgCode?: SortOrder
     centerCode?: SortOrder
     email?: SortOrder
     address?: SortOrder
     isActive?: SortOrder
+    isMacsoft?: SortOrder
+    isMacsoftHead?: SortOrder
     serviceableStates?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -38280,11 +40566,13 @@ export namespace Prisma {
   export type ServiceCenterMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    projectCode?: SortOrder
+    orgCode?: SortOrder
     centerCode?: SortOrder
     email?: SortOrder
     address?: SortOrder
     isActive?: SortOrder
+    isMacsoft?: SortOrder
+    isMacsoftHead?: SortOrder
     serviceableStates?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -38337,12 +40625,6 @@ export namespace Prisma {
     none?: spareRequestWhereInput
   }
 
-  export type ProductTransactionListRelationFilter = {
-    every?: ProductTransactionWhereInput
-    some?: ProductTransactionWhereInput
-    none?: ProductTransactionWhereInput
-  }
-
   export type TicketMilestoneListRelationFilter = {
     every?: TicketMilestoneWhereInput
     some?: TicketMilestoneWhereInput
@@ -38353,6 +40635,11 @@ export namespace Prisma {
     every?: StateWhereInput
     some?: StateWhereInput
     none?: StateWhereInput
+  }
+
+  export type ProjectNullableScalarRelationFilter = {
+    is?: ProjectWhereInput | null
+    isNot?: ProjectWhereInput | null
   }
 
   export type BatchListRelationFilter = {
@@ -38378,10 +40665,6 @@ export namespace Prisma {
   }
 
   export type spareRequestOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type ProductTransactionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -38565,6 +40848,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+    backupjson?: SortOrder
+    backupcreatedAt?: SortOrder
+    backupurl?: SortOrder
   }
 
   export type TicketAvgOrderByAggregateInput = {
@@ -38608,6 +40894,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+    backupjson?: SortOrder
+    backupcreatedAt?: SortOrder
+    backupurl?: SortOrder
   }
 
   export type TicketMinOrderByAggregateInput = {
@@ -38643,6 +40932,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
+    backupjson?: SortOrder
+    backupcreatedAt?: SortOrder
+    backupurl?: SortOrder
   }
 
   export type TicketSumOrderByAggregateInput = {
@@ -38990,9 +41282,14 @@ export namespace Prisma {
     not?: NestedEnumCategoryNullableFilter<$PrismaModel> | $Enums.Category | null
   }
 
-  export type InventoryNullableScalarRelationFilter = {
-    is?: InventoryWhereInput | null
-    isNot?: InventoryWhereInput | null
+  export type ProductTransactionItemListRelationFilter = {
+    every?: ProductTransactionItemWhereInput
+    some?: ProductTransactionItemWhereInput
+    none?: ProductTransactionItemWhereInput
+  }
+
+  export type ProductTransactionItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ProductOrderByRelevanceInput = {
@@ -39004,25 +41301,28 @@ export namespace Prisma {
   export type ProductCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    productCode?: SortOrder
     description?: SortOrder
     brandName?: SortOrder
-    productCode?: SortOrder
     category?: SortOrder
+    unitOfMeasure?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProductAvgOrderByAggregateInput = {
     id?: SortOrder
+    unitOfMeasure?: SortOrder
   }
 
   export type ProductMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    productCode?: SortOrder
     description?: SortOrder
     brandName?: SortOrder
-    productCode?: SortOrder
     category?: SortOrder
+    unitOfMeasure?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -39030,16 +41330,18 @@ export namespace Prisma {
   export type ProductMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    productCode?: SortOrder
     description?: SortOrder
     brandName?: SortOrder
-    productCode?: SortOrder
     category?: SortOrder
+    unitOfMeasure?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ProductSumOrderByAggregateInput = {
     id?: SortOrder
+    unitOfMeasure?: SortOrder
   }
 
   export type EnumCategoryNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -39059,6 +41361,23 @@ export namespace Prisma {
     not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
+  export type EnumTransactionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionStatus | EnumTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionStatus[]
+    notIn?: $Enums.TransactionStatus[]
+    not?: NestedEnumTransactionStatusFilter<$PrismaModel> | $Enums.TransactionStatus
+  }
+
+  export type ServiceCenterScalarRelationFilter = {
+    is?: ServiceCenterWhereInput
+    isNot?: ServiceCenterWhereInput
+  }
+
+  export type ProductNullableScalarRelationFilter = {
+    is?: ProductWhereInput | null
+    isNot?: ProductWhereInput | null
+  }
+
   export type ProductTransactionOrderByRelevanceInput = {
     fields: ProductTransactionOrderByRelevanceFieldEnum | ProductTransactionOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -39067,54 +41386,87 @@ export namespace Prisma {
 
   export type ProductTransactionCountOrderByAggregateInput = {
     id?: SortOrder
-    productId?: SortOrder
-    type?: SortOrder
-    quantity?: SortOrder
+    transactionType?: SortOrder
+    status?: SortOrder
+    centerCode?: SortOrder
+    fromCenterCode?: SortOrder
+    toCenterCode?: SortOrder
+    approvedBy?: SortOrder
+    approvedAt?: SortOrder
+    rejectionReason?: SortOrder
+    invoiceNo?: SortOrder
+    billNo?: SortOrder
+    receiptDate?: SortOrder
+    deliveryDate?: SortOrder
+    receivedAt?: SortOrder
     ticketId?: SortOrder
-    notes?: SortOrder
+    remarks?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    productId?: SortOrder
   }
 
   export type ProductTransactionAvgOrderByAggregateInput = {
     id?: SortOrder
-    productId?: SortOrder
-    quantity?: SortOrder
+    approvedBy?: SortOrder
     ticketId?: SortOrder
     createdBy?: SortOrder
+    productId?: SortOrder
   }
 
   export type ProductTransactionMaxOrderByAggregateInput = {
     id?: SortOrder
-    productId?: SortOrder
-    type?: SortOrder
-    quantity?: SortOrder
+    transactionType?: SortOrder
+    status?: SortOrder
+    centerCode?: SortOrder
+    fromCenterCode?: SortOrder
+    toCenterCode?: SortOrder
+    approvedBy?: SortOrder
+    approvedAt?: SortOrder
+    rejectionReason?: SortOrder
+    invoiceNo?: SortOrder
+    billNo?: SortOrder
+    receiptDate?: SortOrder
+    deliveryDate?: SortOrder
+    receivedAt?: SortOrder
     ticketId?: SortOrder
-    notes?: SortOrder
+    remarks?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    productId?: SortOrder
   }
 
   export type ProductTransactionMinOrderByAggregateInput = {
     id?: SortOrder
-    productId?: SortOrder
-    type?: SortOrder
-    quantity?: SortOrder
+    transactionType?: SortOrder
+    status?: SortOrder
+    centerCode?: SortOrder
+    fromCenterCode?: SortOrder
+    toCenterCode?: SortOrder
+    approvedBy?: SortOrder
+    approvedAt?: SortOrder
+    rejectionReason?: SortOrder
+    invoiceNo?: SortOrder
+    billNo?: SortOrder
+    receiptDate?: SortOrder
+    deliveryDate?: SortOrder
+    receivedAt?: SortOrder
     ticketId?: SortOrder
-    notes?: SortOrder
+    remarks?: SortOrder
     createdBy?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    productId?: SortOrder
   }
 
   export type ProductTransactionSumOrderByAggregateInput = {
     id?: SortOrder
-    productId?: SortOrder
-    quantity?: SortOrder
+    approvedBy?: SortOrder
     ticketId?: SortOrder
     createdBy?: SortOrder
+    productId?: SortOrder
   }
 
   export type EnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -39127,16 +41479,104 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type EnumTransactionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionStatus | EnumTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionStatus[]
+    notIn?: $Enums.TransactionStatus[]
+    not?: NestedEnumTransactionStatusWithAggregatesFilter<$PrismaModel> | $Enums.TransactionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTransactionStatusFilter<$PrismaModel>
+    _max?: NestedEnumTransactionStatusFilter<$PrismaModel>
+  }
+
+  export type EnumInventoryConditionFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryCondition | EnumInventoryConditionFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryCondition[]
+    notIn?: $Enums.InventoryCondition[]
+    not?: NestedEnumInventoryConditionFilter<$PrismaModel> | $Enums.InventoryCondition
+  }
+
+  export type ProductTransactionScalarRelationFilter = {
+    is?: ProductTransactionWhereInput
+    isNot?: ProductTransactionWhereInput
+  }
+
+  export type ProductTransactionItemOrderByRelevanceInput = {
+    fields: ProductTransactionItemOrderByRelevanceFieldEnum | ProductTransactionItemOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ProductTransactionItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    condition?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type ProductTransactionItemAvgOrderByAggregateInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type ProductTransactionItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    condition?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type ProductTransactionItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrder
+    productName?: SortOrder
+    condition?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type ProductTransactionItemSumOrderByAggregateInput = {
+    id?: SortOrder
+    transactionId?: SortOrder
+    productId?: SortOrder
+    quantity?: SortOrder
+  }
+
+  export type EnumInventoryConditionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryCondition | EnumInventoryConditionFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryCondition[]
+    notIn?: $Enums.InventoryCondition[]
+    not?: NestedEnumInventoryConditionWithAggregatesFilter<$PrismaModel> | $Enums.InventoryCondition
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInventoryConditionFilter<$PrismaModel>
+    _max?: NestedEnumInventoryConditionFilter<$PrismaModel>
+  }
+
   export type InventoryOrderByRelevanceInput = {
     fields: InventoryOrderByRelevanceFieldEnum | InventoryOrderByRelevanceFieldEnum[]
     sort: SortOrder
     search: string
   }
 
+  export type InventoryCenterCodeProductIdCompoundUniqueInput = {
+    centerCode: string
+    productId: number
+  }
+
   export type InventoryCountOrderByAggregateInput = {
     id?: SortOrder
+    centerCode?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrder
     location?: SortOrder
@@ -39146,15 +41586,22 @@ export namespace Prisma {
   export type InventoryAvgOrderByAggregateInput = {
     id?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrder
   }
 
   export type InventoryMaxOrderByAggregateInput = {
     id?: SortOrder
+    centerCode?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrder
     location?: SortOrder
@@ -39163,8 +41610,12 @@ export namespace Prisma {
 
   export type InventoryMinOrderByAggregateInput = {
     id?: SortOrder
+    centerCode?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrder
     location?: SortOrder
@@ -39174,7 +41625,10 @@ export namespace Prisma {
   export type InventorySumOrderByAggregateInput = {
     id?: SortOrder
     productId?: SortOrder
-    quantity?: SortOrder
+    goodQty?: SortOrder
+    repairableQty?: SortOrder
+    damagedQty?: SortOrder
+    scrapQty?: SortOrder
     minStock?: SortOrder
     maxStock?: SortOrder
   }
@@ -40156,6 +42610,13 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
+  export type ServiceCenterCreateNestedManyWithoutOrganisationInput = {
+    create?: XOR<ServiceCenterCreateWithoutOrganisationInput, ServiceCenterUncheckedCreateWithoutOrganisationInput> | ServiceCenterCreateWithoutOrganisationInput[] | ServiceCenterUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutOrganisationInput | ServiceCenterCreateOrConnectWithoutOrganisationInput[]
+    createMany?: ServiceCenterCreateManyOrganisationInputEnvelope
+    connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+  }
+
   export type ProjectUncheckedCreateNestedManyWithoutOrganisationInput = {
     create?: XOR<ProjectCreateWithoutOrganisationInput, ProjectUncheckedCreateWithoutOrganisationInput> | ProjectCreateWithoutOrganisationInput[] | ProjectUncheckedCreateWithoutOrganisationInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutOrganisationInput | ProjectCreateOrConnectWithoutOrganisationInput[]
@@ -40168,6 +42629,13 @@ export namespace Prisma {
     connectOrCreate?: UserCreateOrConnectWithoutOrganisationInput | UserCreateOrConnectWithoutOrganisationInput[]
     createMany?: UserCreateManyOrganisationInputEnvelope
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type ServiceCenterUncheckedCreateNestedManyWithoutOrganisationInput = {
+    create?: XOR<ServiceCenterCreateWithoutOrganisationInput, ServiceCenterUncheckedCreateWithoutOrganisationInput> | ServiceCenterCreateWithoutOrganisationInput[] | ServiceCenterUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutOrganisationInput | ServiceCenterCreateOrConnectWithoutOrganisationInput[]
+    createMany?: ServiceCenterCreateManyOrganisationInputEnvelope
+    connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -40210,6 +42678,20 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
+  export type ServiceCenterUpdateManyWithoutOrganisationNestedInput = {
+    create?: XOR<ServiceCenterCreateWithoutOrganisationInput, ServiceCenterUncheckedCreateWithoutOrganisationInput> | ServiceCenterCreateWithoutOrganisationInput[] | ServiceCenterUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutOrganisationInput | ServiceCenterCreateOrConnectWithoutOrganisationInput[]
+    upsert?: ServiceCenterUpsertWithWhereUniqueWithoutOrganisationInput | ServiceCenterUpsertWithWhereUniqueWithoutOrganisationInput[]
+    createMany?: ServiceCenterCreateManyOrganisationInputEnvelope
+    set?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    disconnect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    delete?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    update?: ServiceCenterUpdateWithWhereUniqueWithoutOrganisationInput | ServiceCenterUpdateWithWhereUniqueWithoutOrganisationInput[]
+    updateMany?: ServiceCenterUpdateManyWithWhereWithoutOrganisationInput | ServiceCenterUpdateManyWithWhereWithoutOrganisationInput[]
+    deleteMany?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
+  }
+
   export type ProjectUncheckedUpdateManyWithoutOrganisationNestedInput = {
     create?: XOR<ProjectCreateWithoutOrganisationInput, ProjectUncheckedCreateWithoutOrganisationInput> | ProjectCreateWithoutOrganisationInput[] | ProjectUncheckedCreateWithoutOrganisationInput[]
     connectOrCreate?: ProjectCreateOrConnectWithoutOrganisationInput | ProjectCreateOrConnectWithoutOrganisationInput[]
@@ -40238,11 +42720,18 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
-  export type ServiceCenterCreateNestedManyWithoutProjectInput = {
-    create?: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput> | ServiceCenterCreateWithoutProjectInput[] | ServiceCenterUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: ServiceCenterCreateOrConnectWithoutProjectInput | ServiceCenterCreateOrConnectWithoutProjectInput[]
-    createMany?: ServiceCenterCreateManyProjectInputEnvelope
+  export type ServiceCenterUncheckedUpdateManyWithoutOrganisationNestedInput = {
+    create?: XOR<ServiceCenterCreateWithoutOrganisationInput, ServiceCenterUncheckedCreateWithoutOrganisationInput> | ServiceCenterCreateWithoutOrganisationInput[] | ServiceCenterUncheckedCreateWithoutOrganisationInput[]
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutOrganisationInput | ServiceCenterCreateOrConnectWithoutOrganisationInput[]
+    upsert?: ServiceCenterUpsertWithWhereUniqueWithoutOrganisationInput | ServiceCenterUpsertWithWhereUniqueWithoutOrganisationInput[]
+    createMany?: ServiceCenterCreateManyOrganisationInputEnvelope
+    set?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    disconnect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    delete?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
     connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
+    update?: ServiceCenterUpdateWithWhereUniqueWithoutOrganisationInput | ServiceCenterUpdateWithWhereUniqueWithoutOrganisationInput[]
+    updateMany?: ServiceCenterUpdateManyWithWhereWithoutOrganisationInput | ServiceCenterUpdateManyWithWhereWithoutOrganisationInput[]
+    deleteMany?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
   }
 
   export type StateCreateNestedOneWithoutProjectsInput = {
@@ -40264,32 +42753,11 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
-  export type ServiceCenterUncheckedCreateNestedManyWithoutProjectInput = {
-    create?: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput> | ServiceCenterCreateWithoutProjectInput[] | ServiceCenterUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: ServiceCenterCreateOrConnectWithoutProjectInput | ServiceCenterCreateOrConnectWithoutProjectInput[]
-    createMany?: ServiceCenterCreateManyProjectInputEnvelope
-    connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-  }
-
   export type UserUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput> | UserCreateWithoutProjectInput[] | UserUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: UserCreateOrConnectWithoutProjectInput | UserCreateOrConnectWithoutProjectInput[]
     createMany?: UserCreateManyProjectInputEnvelope
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-  }
-
-  export type ServiceCenterUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput> | ServiceCenterCreateWithoutProjectInput[] | ServiceCenterUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: ServiceCenterCreateOrConnectWithoutProjectInput | ServiceCenterCreateOrConnectWithoutProjectInput[]
-    upsert?: ServiceCenterUpsertWithWhereUniqueWithoutProjectInput | ServiceCenterUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: ServiceCenterCreateManyProjectInputEnvelope
-    set?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    disconnect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    delete?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    update?: ServiceCenterUpdateWithWhereUniqueWithoutProjectInput | ServiceCenterUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: ServiceCenterUpdateManyWithWhereWithoutProjectInput | ServiceCenterUpdateManyWithWhereWithoutProjectInput[]
-    deleteMany?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
   }
 
   export type StateUpdateOneWithoutProjectsNestedInput = {
@@ -40334,20 +42802,6 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput = {
-    create?: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput> | ServiceCenterCreateWithoutProjectInput[] | ServiceCenterUncheckedCreateWithoutProjectInput[]
-    connectOrCreate?: ServiceCenterCreateOrConnectWithoutProjectInput | ServiceCenterCreateOrConnectWithoutProjectInput[]
-    upsert?: ServiceCenterUpsertWithWhereUniqueWithoutProjectInput | ServiceCenterUpsertWithWhereUniqueWithoutProjectInput[]
-    createMany?: ServiceCenterCreateManyProjectInputEnvelope
-    set?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    disconnect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    delete?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    connect?: ServiceCenterWhereUniqueInput | ServiceCenterWhereUniqueInput[]
-    update?: ServiceCenterUpdateWithWhereUniqueWithoutProjectInput | ServiceCenterUpdateWithWhereUniqueWithoutProjectInput[]
-    updateMany?: ServiceCenterUpdateManyWithWhereWithoutProjectInput | ServiceCenterUpdateManyWithWhereWithoutProjectInput[]
-    deleteMany?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
-  }
-
   export type UserUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<UserCreateWithoutProjectInput, UserUncheckedCreateWithoutProjectInput> | UserCreateWithoutProjectInput[] | UserUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: UserCreateOrConnectWithoutProjectInput | UserCreateOrConnectWithoutProjectInput[]
@@ -40369,10 +42823,10 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
-  export type ProjectCreateNestedOneWithoutServiceCenterInput = {
-    create?: XOR<ProjectCreateWithoutServiceCenterInput, ProjectUncheckedCreateWithoutServiceCenterInput>
-    connectOrCreate?: ProjectCreateOrConnectWithoutServiceCenterInput
-    connect?: ProjectWhereUniqueInput
+  export type OrganisationCreateNestedOneWithoutServiceCentersInput = {
+    create?: XOR<OrganisationCreateWithoutServiceCentersInput, OrganisationUncheckedCreateWithoutServiceCentersInput>
+    connectOrCreate?: OrganisationCreateOrConnectWithoutServiceCentersInput
+    connect?: OrganisationWhereUniqueInput
   }
 
   export type TicketCreateNestedManyWithoutServiceCenterInput = {
@@ -40380,6 +42834,34 @@ export namespace Prisma {
     connectOrCreate?: TicketCreateOrConnectWithoutServiceCenterInput | TicketCreateOrConnectWithoutServiceCenterInput[]
     createMany?: TicketCreateManyServiceCenterInputEnvelope
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
+  }
+
+  export type InventoryCreateNestedManyWithoutServiceCenterInput = {
+    create?: XOR<InventoryCreateWithoutServiceCenterInput, InventoryUncheckedCreateWithoutServiceCenterInput> | InventoryCreateWithoutServiceCenterInput[] | InventoryUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutServiceCenterInput | InventoryCreateOrConnectWithoutServiceCenterInput[]
+    createMany?: InventoryCreateManyServiceCenterInputEnvelope
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+  }
+
+  export type ProductTransactionCreateNestedManyWithoutServiceCenterInput = {
+    create?: XOR<ProductTransactionCreateWithoutServiceCenterInput, ProductTransactionUncheckedCreateWithoutServiceCenterInput> | ProductTransactionCreateWithoutServiceCenterInput[] | ProductTransactionUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutServiceCenterInput | ProductTransactionCreateOrConnectWithoutServiceCenterInput[]
+    createMany?: ProductTransactionCreateManyServiceCenterInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
+  export type ProductTransactionCreateNestedManyWithoutFromCenterInput = {
+    create?: XOR<ProductTransactionCreateWithoutFromCenterInput, ProductTransactionUncheckedCreateWithoutFromCenterInput> | ProductTransactionCreateWithoutFromCenterInput[] | ProductTransactionUncheckedCreateWithoutFromCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutFromCenterInput | ProductTransactionCreateOrConnectWithoutFromCenterInput[]
+    createMany?: ProductTransactionCreateManyFromCenterInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
+  export type ProductTransactionCreateNestedManyWithoutToCenterInput = {
+    create?: XOR<ProductTransactionCreateWithoutToCenterInput, ProductTransactionUncheckedCreateWithoutToCenterInput> | ProductTransactionCreateWithoutToCenterInput[] | ProductTransactionUncheckedCreateWithoutToCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutToCenterInput | ProductTransactionCreateOrConnectWithoutToCenterInput[]
+    createMany?: ProductTransactionCreateManyToCenterInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
   }
 
   export type UserUncheckedCreateNestedManyWithoutServiceCenterInput = {
@@ -40396,6 +42878,34 @@ export namespace Prisma {
     connect?: TicketWhereUniqueInput | TicketWhereUniqueInput[]
   }
 
+  export type InventoryUncheckedCreateNestedManyWithoutServiceCenterInput = {
+    create?: XOR<InventoryCreateWithoutServiceCenterInput, InventoryUncheckedCreateWithoutServiceCenterInput> | InventoryCreateWithoutServiceCenterInput[] | InventoryUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutServiceCenterInput | InventoryCreateOrConnectWithoutServiceCenterInput[]
+    createMany?: InventoryCreateManyServiceCenterInputEnvelope
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+  }
+
+  export type ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput = {
+    create?: XOR<ProductTransactionCreateWithoutServiceCenterInput, ProductTransactionUncheckedCreateWithoutServiceCenterInput> | ProductTransactionCreateWithoutServiceCenterInput[] | ProductTransactionUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutServiceCenterInput | ProductTransactionCreateOrConnectWithoutServiceCenterInput[]
+    createMany?: ProductTransactionCreateManyServiceCenterInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
+  export type ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput = {
+    create?: XOR<ProductTransactionCreateWithoutFromCenterInput, ProductTransactionUncheckedCreateWithoutFromCenterInput> | ProductTransactionCreateWithoutFromCenterInput[] | ProductTransactionUncheckedCreateWithoutFromCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutFromCenterInput | ProductTransactionCreateOrConnectWithoutFromCenterInput[]
+    createMany?: ProductTransactionCreateManyFromCenterInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
+  export type ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput = {
+    create?: XOR<ProductTransactionCreateWithoutToCenterInput, ProductTransactionUncheckedCreateWithoutToCenterInput> | ProductTransactionCreateWithoutToCenterInput[] | ProductTransactionUncheckedCreateWithoutToCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutToCenterInput | ProductTransactionCreateOrConnectWithoutToCenterInput[]
+    createMany?: ProductTransactionCreateManyToCenterInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
   export type UserUpdateManyWithoutServiceCenterNestedInput = {
     create?: XOR<UserCreateWithoutServiceCenterInput, UserUncheckedCreateWithoutServiceCenterInput> | UserCreateWithoutServiceCenterInput[] | UserUncheckedCreateWithoutServiceCenterInput[]
     connectOrCreate?: UserCreateOrConnectWithoutServiceCenterInput | UserCreateOrConnectWithoutServiceCenterInput[]
@@ -40410,14 +42920,14 @@ export namespace Prisma {
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
-  export type ProjectUpdateOneWithoutServiceCenterNestedInput = {
-    create?: XOR<ProjectCreateWithoutServiceCenterInput, ProjectUncheckedCreateWithoutServiceCenterInput>
-    connectOrCreate?: ProjectCreateOrConnectWithoutServiceCenterInput
-    upsert?: ProjectUpsertWithoutServiceCenterInput
-    disconnect?: ProjectWhereInput | boolean
-    delete?: ProjectWhereInput | boolean
-    connect?: ProjectWhereUniqueInput
-    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutServiceCenterInput, ProjectUpdateWithoutServiceCenterInput>, ProjectUncheckedUpdateWithoutServiceCenterInput>
+  export type OrganisationUpdateOneWithoutServiceCentersNestedInput = {
+    create?: XOR<OrganisationCreateWithoutServiceCentersInput, OrganisationUncheckedCreateWithoutServiceCentersInput>
+    connectOrCreate?: OrganisationCreateOrConnectWithoutServiceCentersInput
+    upsert?: OrganisationUpsertWithoutServiceCentersInput
+    disconnect?: OrganisationWhereInput | boolean
+    delete?: OrganisationWhereInput | boolean
+    connect?: OrganisationWhereUniqueInput
+    update?: XOR<XOR<OrganisationUpdateToOneWithWhereWithoutServiceCentersInput, OrganisationUpdateWithoutServiceCentersInput>, OrganisationUncheckedUpdateWithoutServiceCentersInput>
   }
 
   export type TicketUpdateManyWithoutServiceCenterNestedInput = {
@@ -40432,6 +42942,62 @@ export namespace Prisma {
     update?: TicketUpdateWithWhereUniqueWithoutServiceCenterInput | TicketUpdateWithWhereUniqueWithoutServiceCenterInput[]
     updateMany?: TicketUpdateManyWithWhereWithoutServiceCenterInput | TicketUpdateManyWithWhereWithoutServiceCenterInput[]
     deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
+  export type InventoryUpdateManyWithoutServiceCenterNestedInput = {
+    create?: XOR<InventoryCreateWithoutServiceCenterInput, InventoryUncheckedCreateWithoutServiceCenterInput> | InventoryCreateWithoutServiceCenterInput[] | InventoryUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutServiceCenterInput | InventoryCreateOrConnectWithoutServiceCenterInput[]
+    upsert?: InventoryUpsertWithWhereUniqueWithoutServiceCenterInput | InventoryUpsertWithWhereUniqueWithoutServiceCenterInput[]
+    createMany?: InventoryCreateManyServiceCenterInputEnvelope
+    set?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    disconnect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    delete?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    update?: InventoryUpdateWithWhereUniqueWithoutServiceCenterInput | InventoryUpdateWithWhereUniqueWithoutServiceCenterInput[]
+    updateMany?: InventoryUpdateManyWithWhereWithoutServiceCenterInput | InventoryUpdateManyWithWhereWithoutServiceCenterInput[]
+    deleteMany?: InventoryScalarWhereInput | InventoryScalarWhereInput[]
+  }
+
+  export type ProductTransactionUpdateManyWithoutServiceCenterNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutServiceCenterInput, ProductTransactionUncheckedCreateWithoutServiceCenterInput> | ProductTransactionCreateWithoutServiceCenterInput[] | ProductTransactionUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutServiceCenterInput | ProductTransactionCreateOrConnectWithoutServiceCenterInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutServiceCenterInput | ProductTransactionUpsertWithWhereUniqueWithoutServiceCenterInput[]
+    createMany?: ProductTransactionCreateManyServiceCenterInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutServiceCenterInput | ProductTransactionUpdateWithWhereUniqueWithoutServiceCenterInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutServiceCenterInput | ProductTransactionUpdateManyWithWhereWithoutServiceCenterInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+  }
+
+  export type ProductTransactionUpdateManyWithoutFromCenterNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutFromCenterInput, ProductTransactionUncheckedCreateWithoutFromCenterInput> | ProductTransactionCreateWithoutFromCenterInput[] | ProductTransactionUncheckedCreateWithoutFromCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutFromCenterInput | ProductTransactionCreateOrConnectWithoutFromCenterInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutFromCenterInput | ProductTransactionUpsertWithWhereUniqueWithoutFromCenterInput[]
+    createMany?: ProductTransactionCreateManyFromCenterInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutFromCenterInput | ProductTransactionUpdateWithWhereUniqueWithoutFromCenterInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutFromCenterInput | ProductTransactionUpdateManyWithWhereWithoutFromCenterInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+  }
+
+  export type ProductTransactionUpdateManyWithoutToCenterNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutToCenterInput, ProductTransactionUncheckedCreateWithoutToCenterInput> | ProductTransactionCreateWithoutToCenterInput[] | ProductTransactionUncheckedCreateWithoutToCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutToCenterInput | ProductTransactionCreateOrConnectWithoutToCenterInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutToCenterInput | ProductTransactionUpsertWithWhereUniqueWithoutToCenterInput[]
+    createMany?: ProductTransactionCreateManyToCenterInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutToCenterInput | ProductTransactionUpdateWithWhereUniqueWithoutToCenterInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutToCenterInput | ProductTransactionUpdateManyWithWhereWithoutToCenterInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
   }
 
   export type UserUncheckedUpdateManyWithoutServiceCenterNestedInput = {
@@ -40460,6 +43026,62 @@ export namespace Prisma {
     update?: TicketUpdateWithWhereUniqueWithoutServiceCenterInput | TicketUpdateWithWhereUniqueWithoutServiceCenterInput[]
     updateMany?: TicketUpdateManyWithWhereWithoutServiceCenterInput | TicketUpdateManyWithWhereWithoutServiceCenterInput[]
     deleteMany?: TicketScalarWhereInput | TicketScalarWhereInput[]
+  }
+
+  export type InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput = {
+    create?: XOR<InventoryCreateWithoutServiceCenterInput, InventoryUncheckedCreateWithoutServiceCenterInput> | InventoryCreateWithoutServiceCenterInput[] | InventoryUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutServiceCenterInput | InventoryCreateOrConnectWithoutServiceCenterInput[]
+    upsert?: InventoryUpsertWithWhereUniqueWithoutServiceCenterInput | InventoryUpsertWithWhereUniqueWithoutServiceCenterInput[]
+    createMany?: InventoryCreateManyServiceCenterInputEnvelope
+    set?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    disconnect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    delete?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    update?: InventoryUpdateWithWhereUniqueWithoutServiceCenterInput | InventoryUpdateWithWhereUniqueWithoutServiceCenterInput[]
+    updateMany?: InventoryUpdateManyWithWhereWithoutServiceCenterInput | InventoryUpdateManyWithWhereWithoutServiceCenterInput[]
+    deleteMany?: InventoryScalarWhereInput | InventoryScalarWhereInput[]
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutServiceCenterInput, ProductTransactionUncheckedCreateWithoutServiceCenterInput> | ProductTransactionCreateWithoutServiceCenterInput[] | ProductTransactionUncheckedCreateWithoutServiceCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutServiceCenterInput | ProductTransactionCreateOrConnectWithoutServiceCenterInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutServiceCenterInput | ProductTransactionUpsertWithWhereUniqueWithoutServiceCenterInput[]
+    createMany?: ProductTransactionCreateManyServiceCenterInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutServiceCenterInput | ProductTransactionUpdateWithWhereUniqueWithoutServiceCenterInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutServiceCenterInput | ProductTransactionUpdateManyWithWhereWithoutServiceCenterInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutFromCenterInput, ProductTransactionUncheckedCreateWithoutFromCenterInput> | ProductTransactionCreateWithoutFromCenterInput[] | ProductTransactionUncheckedCreateWithoutFromCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutFromCenterInput | ProductTransactionCreateOrConnectWithoutFromCenterInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutFromCenterInput | ProductTransactionUpsertWithWhereUniqueWithoutFromCenterInput[]
+    createMany?: ProductTransactionCreateManyFromCenterInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutFromCenterInput | ProductTransactionUpdateWithWhereUniqueWithoutFromCenterInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutFromCenterInput | ProductTransactionUpdateManyWithWhereWithoutFromCenterInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutToCenterInput, ProductTransactionUncheckedCreateWithoutToCenterInput> | ProductTransactionCreateWithoutToCenterInput[] | ProductTransactionUncheckedCreateWithoutToCenterInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutToCenterInput | ProductTransactionCreateOrConnectWithoutToCenterInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutToCenterInput | ProductTransactionUpsertWithWhereUniqueWithoutToCenterInput[]
+    createMany?: ProductTransactionCreateManyToCenterInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutToCenterInput | ProductTransactionUpdateWithWhereUniqueWithoutToCenterInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutToCenterInput | ProductTransactionUpdateManyWithWhereWithoutToCenterInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
   }
 
   export type ServiceCenterCreateNestedOneWithoutUsersInput = {
@@ -40528,6 +43150,13 @@ export namespace Prisma {
     create?: XOR<ProductTransactionCreateWithoutCreatedByUserInput, ProductTransactionUncheckedCreateWithoutCreatedByUserInput> | ProductTransactionCreateWithoutCreatedByUserInput[] | ProductTransactionUncheckedCreateWithoutCreatedByUserInput[]
     connectOrCreate?: ProductTransactionCreateOrConnectWithoutCreatedByUserInput | ProductTransactionCreateOrConnectWithoutCreatedByUserInput[]
     createMany?: ProductTransactionCreateManyCreatedByUserInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
+  export type ProductTransactionCreateNestedManyWithoutApproverUserInput = {
+    create?: XOR<ProductTransactionCreateWithoutApproverUserInput, ProductTransactionUncheckedCreateWithoutApproverUserInput> | ProductTransactionCreateWithoutApproverUserInput[] | ProductTransactionUncheckedCreateWithoutApproverUserInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutApproverUserInput | ProductTransactionCreateOrConnectWithoutApproverUserInput[]
+    createMany?: ProductTransactionCreateManyApproverUserInputEnvelope
     connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
   }
 
@@ -40636,6 +43265,13 @@ export namespace Prisma {
     create?: XOR<ProductTransactionCreateWithoutCreatedByUserInput, ProductTransactionUncheckedCreateWithoutCreatedByUserInput> | ProductTransactionCreateWithoutCreatedByUserInput[] | ProductTransactionUncheckedCreateWithoutCreatedByUserInput[]
     connectOrCreate?: ProductTransactionCreateOrConnectWithoutCreatedByUserInput | ProductTransactionCreateOrConnectWithoutCreatedByUserInput[]
     createMany?: ProductTransactionCreateManyCreatedByUserInputEnvelope
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+  }
+
+  export type ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput = {
+    create?: XOR<ProductTransactionCreateWithoutApproverUserInput, ProductTransactionUncheckedCreateWithoutApproverUserInput> | ProductTransactionCreateWithoutApproverUserInput[] | ProductTransactionUncheckedCreateWithoutApproverUserInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutApproverUserInput | ProductTransactionCreateOrConnectWithoutApproverUserInput[]
+    createMany?: ProductTransactionCreateManyApproverUserInputEnvelope
     connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
   }
 
@@ -40803,6 +43439,20 @@ export namespace Prisma {
     connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
     update?: ProductTransactionUpdateWithWhereUniqueWithoutCreatedByUserInput | ProductTransactionUpdateWithWhereUniqueWithoutCreatedByUserInput[]
     updateMany?: ProductTransactionUpdateManyWithWhereWithoutCreatedByUserInput | ProductTransactionUpdateManyWithWhereWithoutCreatedByUserInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+  }
+
+  export type ProductTransactionUpdateManyWithoutApproverUserNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutApproverUserInput, ProductTransactionUncheckedCreateWithoutApproverUserInput> | ProductTransactionCreateWithoutApproverUserInput[] | ProductTransactionUncheckedCreateWithoutApproverUserInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutApproverUserInput | ProductTransactionCreateOrConnectWithoutApproverUserInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutApproverUserInput | ProductTransactionUpsertWithWhereUniqueWithoutApproverUserInput[]
+    createMany?: ProductTransactionCreateManyApproverUserInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutApproverUserInput | ProductTransactionUpdateWithWhereUniqueWithoutApproverUserInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutApproverUserInput | ProductTransactionUpdateManyWithWhereWithoutApproverUserInput[]
     deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
   }
 
@@ -41014,6 +43664,20 @@ export namespace Prisma {
     connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
     update?: ProductTransactionUpdateWithWhereUniqueWithoutCreatedByUserInput | ProductTransactionUpdateWithWhereUniqueWithoutCreatedByUserInput[]
     updateMany?: ProductTransactionUpdateManyWithWhereWithoutCreatedByUserInput | ProductTransactionUpdateManyWithWhereWithoutCreatedByUserInput[]
+    deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutApproverUserInput, ProductTransactionUncheckedCreateWithoutApproverUserInput> | ProductTransactionCreateWithoutApproverUserInput[] | ProductTransactionUncheckedCreateWithoutApproverUserInput[]
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutApproverUserInput | ProductTransactionCreateOrConnectWithoutApproverUserInput[]
+    upsert?: ProductTransactionUpsertWithWhereUniqueWithoutApproverUserInput | ProductTransactionUpsertWithWhereUniqueWithoutApproverUserInput[]
+    createMany?: ProductTransactionCreateManyApproverUserInputEnvelope
+    set?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    disconnect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    delete?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
+    update?: ProductTransactionUpdateWithWhereUniqueWithoutApproverUserInput | ProductTransactionUpdateWithWhereUniqueWithoutApproverUserInput[]
+    updateMany?: ProductTransactionUpdateManyWithWhereWithoutApproverUserInput | ProductTransactionUpdateManyWithWhereWithoutApproverUserInput[]
     deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
   }
 
@@ -41654,17 +44318,18 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutSpareRequestItemsInput, ProductUpdateWithoutSpareRequestItemsInput>, ProductUncheckedUpdateWithoutSpareRequestItemsInput>
   }
 
+  export type InventoryCreateNestedManyWithoutProductInput = {
+    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput> | InventoryCreateWithoutProductInput[] | InventoryUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput | InventoryCreateOrConnectWithoutProductInput[]
+    createMany?: InventoryCreateManyProductInputEnvelope
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+  }
+
   export type ProductTransactionCreateNestedManyWithoutProductInput = {
     create?: XOR<ProductTransactionCreateWithoutProductInput, ProductTransactionUncheckedCreateWithoutProductInput> | ProductTransactionCreateWithoutProductInput[] | ProductTransactionUncheckedCreateWithoutProductInput[]
     connectOrCreate?: ProductTransactionCreateOrConnectWithoutProductInput | ProductTransactionCreateOrConnectWithoutProductInput[]
     createMany?: ProductTransactionCreateManyProductInputEnvelope
     connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
-  }
-
-  export type InventoryCreateNestedOneWithoutProductInput = {
-    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
-    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput
-    connect?: InventoryWhereUniqueInput
   }
 
   export type spareRequestItemCreateNestedManyWithoutProductInput = {
@@ -41674,17 +44339,25 @@ export namespace Prisma {
     connect?: spareRequestItemWhereUniqueInput | spareRequestItemWhereUniqueInput[]
   }
 
+  export type ProductTransactionItemCreateNestedManyWithoutProductInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutProductInput, ProductTransactionItemUncheckedCreateWithoutProductInput> | ProductTransactionItemCreateWithoutProductInput[] | ProductTransactionItemUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutProductInput | ProductTransactionItemCreateOrConnectWithoutProductInput[]
+    createMany?: ProductTransactionItemCreateManyProductInputEnvelope
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+  }
+
+  export type InventoryUncheckedCreateNestedManyWithoutProductInput = {
+    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput> | InventoryCreateWithoutProductInput[] | InventoryUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput | InventoryCreateOrConnectWithoutProductInput[]
+    createMany?: InventoryCreateManyProductInputEnvelope
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+  }
+
   export type ProductTransactionUncheckedCreateNestedManyWithoutProductInput = {
     create?: XOR<ProductTransactionCreateWithoutProductInput, ProductTransactionUncheckedCreateWithoutProductInput> | ProductTransactionCreateWithoutProductInput[] | ProductTransactionUncheckedCreateWithoutProductInput[]
     connectOrCreate?: ProductTransactionCreateOrConnectWithoutProductInput | ProductTransactionCreateOrConnectWithoutProductInput[]
     createMany?: ProductTransactionCreateManyProductInputEnvelope
     connect?: ProductTransactionWhereUniqueInput | ProductTransactionWhereUniqueInput[]
-  }
-
-  export type InventoryUncheckedCreateNestedOneWithoutProductInput = {
-    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
-    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput
-    connect?: InventoryWhereUniqueInput
   }
 
   export type spareRequestItemUncheckedCreateNestedManyWithoutProductInput = {
@@ -41694,8 +44367,29 @@ export namespace Prisma {
     connect?: spareRequestItemWhereUniqueInput | spareRequestItemWhereUniqueInput[]
   }
 
+  export type ProductTransactionItemUncheckedCreateNestedManyWithoutProductInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutProductInput, ProductTransactionItemUncheckedCreateWithoutProductInput> | ProductTransactionItemCreateWithoutProductInput[] | ProductTransactionItemUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutProductInput | ProductTransactionItemCreateOrConnectWithoutProductInput[]
+    createMany?: ProductTransactionItemCreateManyProductInputEnvelope
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+  }
+
   export type NullableEnumCategoryFieldUpdateOperationsInput = {
     set?: $Enums.Category | null
+  }
+
+  export type InventoryUpdateManyWithoutProductNestedInput = {
+    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput> | InventoryCreateWithoutProductInput[] | InventoryUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput | InventoryCreateOrConnectWithoutProductInput[]
+    upsert?: InventoryUpsertWithWhereUniqueWithoutProductInput | InventoryUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: InventoryCreateManyProductInputEnvelope
+    set?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    disconnect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    delete?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    update?: InventoryUpdateWithWhereUniqueWithoutProductInput | InventoryUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: InventoryUpdateManyWithWhereWithoutProductInput | InventoryUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: InventoryScalarWhereInput | InventoryScalarWhereInput[]
   }
 
   export type ProductTransactionUpdateManyWithoutProductNestedInput = {
@@ -41712,16 +44406,6 @@ export namespace Prisma {
     deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
   }
 
-  export type InventoryUpdateOneWithoutProductNestedInput = {
-    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
-    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput
-    upsert?: InventoryUpsertWithoutProductInput
-    disconnect?: InventoryWhereInput | boolean
-    delete?: InventoryWhereInput | boolean
-    connect?: InventoryWhereUniqueInput
-    update?: XOR<XOR<InventoryUpdateToOneWithWhereWithoutProductInput, InventoryUpdateWithoutProductInput>, InventoryUncheckedUpdateWithoutProductInput>
-  }
-
   export type spareRequestItemUpdateManyWithoutProductNestedInput = {
     create?: XOR<spareRequestItemCreateWithoutProductInput, spareRequestItemUncheckedCreateWithoutProductInput> | spareRequestItemCreateWithoutProductInput[] | spareRequestItemUncheckedCreateWithoutProductInput[]
     connectOrCreate?: spareRequestItemCreateOrConnectWithoutProductInput | spareRequestItemCreateOrConnectWithoutProductInput[]
@@ -41734,6 +44418,34 @@ export namespace Prisma {
     update?: spareRequestItemUpdateWithWhereUniqueWithoutProductInput | spareRequestItemUpdateWithWhereUniqueWithoutProductInput[]
     updateMany?: spareRequestItemUpdateManyWithWhereWithoutProductInput | spareRequestItemUpdateManyWithWhereWithoutProductInput[]
     deleteMany?: spareRequestItemScalarWhereInput | spareRequestItemScalarWhereInput[]
+  }
+
+  export type ProductTransactionItemUpdateManyWithoutProductNestedInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutProductInput, ProductTransactionItemUncheckedCreateWithoutProductInput> | ProductTransactionItemCreateWithoutProductInput[] | ProductTransactionItemUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutProductInput | ProductTransactionItemCreateOrConnectWithoutProductInput[]
+    upsert?: ProductTransactionItemUpsertWithWhereUniqueWithoutProductInput | ProductTransactionItemUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: ProductTransactionItemCreateManyProductInputEnvelope
+    set?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    disconnect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    delete?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    update?: ProductTransactionItemUpdateWithWhereUniqueWithoutProductInput | ProductTransactionItemUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: ProductTransactionItemUpdateManyWithWhereWithoutProductInput | ProductTransactionItemUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: ProductTransactionItemScalarWhereInput | ProductTransactionItemScalarWhereInput[]
+  }
+
+  export type InventoryUncheckedUpdateManyWithoutProductNestedInput = {
+    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput> | InventoryCreateWithoutProductInput[] | InventoryUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput | InventoryCreateOrConnectWithoutProductInput[]
+    upsert?: InventoryUpsertWithWhereUniqueWithoutProductInput | InventoryUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: InventoryCreateManyProductInputEnvelope
+    set?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    disconnect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    delete?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    connect?: InventoryWhereUniqueInput | InventoryWhereUniqueInput[]
+    update?: InventoryUpdateWithWhereUniqueWithoutProductInput | InventoryUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: InventoryUpdateManyWithWhereWithoutProductInput | InventoryUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: InventoryScalarWhereInput | InventoryScalarWhereInput[]
   }
 
   export type ProductTransactionUncheckedUpdateManyWithoutProductNestedInput = {
@@ -41750,16 +44462,6 @@ export namespace Prisma {
     deleteMany?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
   }
 
-  export type InventoryUncheckedUpdateOneWithoutProductNestedInput = {
-    create?: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
-    connectOrCreate?: InventoryCreateOrConnectWithoutProductInput
-    upsert?: InventoryUpsertWithoutProductInput
-    disconnect?: InventoryWhereInput | boolean
-    delete?: InventoryWhereInput | boolean
-    connect?: InventoryWhereUniqueInput
-    update?: XOR<XOR<InventoryUpdateToOneWithWhereWithoutProductInput, InventoryUpdateWithoutProductInput>, InventoryUncheckedUpdateWithoutProductInput>
-  }
-
   export type spareRequestItemUncheckedUpdateManyWithoutProductNestedInput = {
     create?: XOR<spareRequestItemCreateWithoutProductInput, spareRequestItemUncheckedCreateWithoutProductInput> | spareRequestItemCreateWithoutProductInput[] | spareRequestItemUncheckedCreateWithoutProductInput[]
     connectOrCreate?: spareRequestItemCreateOrConnectWithoutProductInput | spareRequestItemCreateOrConnectWithoutProductInput[]
@@ -41774,10 +44476,36 @@ export namespace Prisma {
     deleteMany?: spareRequestItemScalarWhereInput | spareRequestItemScalarWhereInput[]
   }
 
-  export type ProductCreateNestedOneWithoutTransactionsInput = {
-    create?: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutTransactionsInput
-    connect?: ProductWhereUniqueInput
+  export type ProductTransactionItemUncheckedUpdateManyWithoutProductNestedInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutProductInput, ProductTransactionItemUncheckedCreateWithoutProductInput> | ProductTransactionItemCreateWithoutProductInput[] | ProductTransactionItemUncheckedCreateWithoutProductInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutProductInput | ProductTransactionItemCreateOrConnectWithoutProductInput[]
+    upsert?: ProductTransactionItemUpsertWithWhereUniqueWithoutProductInput | ProductTransactionItemUpsertWithWhereUniqueWithoutProductInput[]
+    createMany?: ProductTransactionItemCreateManyProductInputEnvelope
+    set?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    disconnect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    delete?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    update?: ProductTransactionItemUpdateWithWhereUniqueWithoutProductInput | ProductTransactionItemUpdateWithWhereUniqueWithoutProductInput[]
+    updateMany?: ProductTransactionItemUpdateManyWithWhereWithoutProductInput | ProductTransactionItemUpdateManyWithWhereWithoutProductInput[]
+    deleteMany?: ProductTransactionItemScalarWhereInput | ProductTransactionItemScalarWhereInput[]
+  }
+
+  export type ServiceCenterCreateNestedOneWithoutTransactionsInput = {
+    create?: XOR<ServiceCenterCreateWithoutTransactionsInput, ServiceCenterUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutTransactionsInput
+    connect?: ServiceCenterWhereUniqueInput
+  }
+
+  export type ServiceCenterCreateNestedOneWithoutTransfersFromInput = {
+    create?: XOR<ServiceCenterCreateWithoutTransfersFromInput, ServiceCenterUncheckedCreateWithoutTransfersFromInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutTransfersFromInput
+    connect?: ServiceCenterWhereUniqueInput
+  }
+
+  export type ServiceCenterCreateNestedOneWithoutTransfersToInput = {
+    create?: XOR<ServiceCenterCreateWithoutTransfersToInput, ServiceCenterUncheckedCreateWithoutTransfersToInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutTransfersToInput
+    connect?: ServiceCenterWhereUniqueInput
   }
 
   export type TicketCreateNestedOneWithoutProductTransactionsInput = {
@@ -41786,22 +44514,72 @@ export namespace Prisma {
     connect?: TicketWhereUniqueInput
   }
 
+  export type ProductTransactionItemCreateNestedManyWithoutTransactionInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutTransactionInput, ProductTransactionItemUncheckedCreateWithoutTransactionInput> | ProductTransactionItemCreateWithoutTransactionInput[] | ProductTransactionItemUncheckedCreateWithoutTransactionInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutTransactionInput | ProductTransactionItemCreateOrConnectWithoutTransactionInput[]
+    createMany?: ProductTransactionItemCreateManyTransactionInputEnvelope
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+  }
+
   export type UserCreateNestedOneWithoutProductTransactionsInput = {
     create?: XOR<UserCreateWithoutProductTransactionsInput, UserUncheckedCreateWithoutProductTransactionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutProductTransactionsInput
     connect?: UserWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutApprovedTransactionsInput = {
+    create?: XOR<UserCreateWithoutApprovedTransactionsInput, UserUncheckedCreateWithoutApprovedTransactionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApprovedTransactionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ProductCreateNestedOneWithoutTransactionsInput = {
+    create?: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutTransactionsInput
+    connect?: ProductWhereUniqueInput
+  }
+
+  export type ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutTransactionInput, ProductTransactionItemUncheckedCreateWithoutTransactionInput> | ProductTransactionItemCreateWithoutTransactionInput[] | ProductTransactionItemUncheckedCreateWithoutTransactionInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutTransactionInput | ProductTransactionItemCreateOrConnectWithoutTransactionInput[]
+    createMany?: ProductTransactionItemCreateManyTransactionInputEnvelope
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+  }
+
   export type EnumTransactionTypeFieldUpdateOperationsInput = {
     set?: $Enums.TransactionType
   }
 
-  export type ProductUpdateOneRequiredWithoutTransactionsNestedInput = {
-    create?: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutTransactionsInput
-    upsert?: ProductUpsertWithoutTransactionsInput
-    connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutTransactionsInput, ProductUpdateWithoutTransactionsInput>, ProductUncheckedUpdateWithoutTransactionsInput>
+  export type EnumTransactionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.TransactionStatus
+  }
+
+  export type ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput = {
+    create?: XOR<ServiceCenterCreateWithoutTransactionsInput, ServiceCenterUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutTransactionsInput
+    upsert?: ServiceCenterUpsertWithoutTransactionsInput
+    connect?: ServiceCenterWhereUniqueInput
+    update?: XOR<XOR<ServiceCenterUpdateToOneWithWhereWithoutTransactionsInput, ServiceCenterUpdateWithoutTransactionsInput>, ServiceCenterUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type ServiceCenterUpdateOneWithoutTransfersFromNestedInput = {
+    create?: XOR<ServiceCenterCreateWithoutTransfersFromInput, ServiceCenterUncheckedCreateWithoutTransfersFromInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutTransfersFromInput
+    upsert?: ServiceCenterUpsertWithoutTransfersFromInput
+    disconnect?: ServiceCenterWhereInput | boolean
+    delete?: ServiceCenterWhereInput | boolean
+    connect?: ServiceCenterWhereUniqueInput
+    update?: XOR<XOR<ServiceCenterUpdateToOneWithWhereWithoutTransfersFromInput, ServiceCenterUpdateWithoutTransfersFromInput>, ServiceCenterUncheckedUpdateWithoutTransfersFromInput>
+  }
+
+  export type ServiceCenterUpdateOneWithoutTransfersToNestedInput = {
+    create?: XOR<ServiceCenterCreateWithoutTransfersToInput, ServiceCenterUncheckedCreateWithoutTransfersToInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutTransfersToInput
+    upsert?: ServiceCenterUpsertWithoutTransfersToInput
+    disconnect?: ServiceCenterWhereInput | boolean
+    delete?: ServiceCenterWhereInput | boolean
+    connect?: ServiceCenterWhereUniqueInput
+    update?: XOR<XOR<ServiceCenterUpdateToOneWithWhereWithoutTransfersToInput, ServiceCenterUpdateWithoutTransfersToInput>, ServiceCenterUncheckedUpdateWithoutTransfersToInput>
   }
 
   export type TicketUpdateOneWithoutProductTransactionsNestedInput = {
@@ -41814,6 +44592,20 @@ export namespace Prisma {
     update?: XOR<XOR<TicketUpdateToOneWithWhereWithoutProductTransactionsInput, TicketUpdateWithoutProductTransactionsInput>, TicketUncheckedUpdateWithoutProductTransactionsInput>
   }
 
+  export type ProductTransactionItemUpdateManyWithoutTransactionNestedInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutTransactionInput, ProductTransactionItemUncheckedCreateWithoutTransactionInput> | ProductTransactionItemCreateWithoutTransactionInput[] | ProductTransactionItemUncheckedCreateWithoutTransactionInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutTransactionInput | ProductTransactionItemCreateOrConnectWithoutTransactionInput[]
+    upsert?: ProductTransactionItemUpsertWithWhereUniqueWithoutTransactionInput | ProductTransactionItemUpsertWithWhereUniqueWithoutTransactionInput[]
+    createMany?: ProductTransactionItemCreateManyTransactionInputEnvelope
+    set?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    disconnect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    delete?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    update?: ProductTransactionItemUpdateWithWhereUniqueWithoutTransactionInput | ProductTransactionItemUpdateWithWhereUniqueWithoutTransactionInput[]
+    updateMany?: ProductTransactionItemUpdateManyWithWhereWithoutTransactionInput | ProductTransactionItemUpdateManyWithWhereWithoutTransactionInput[]
+    deleteMany?: ProductTransactionItemScalarWhereInput | ProductTransactionItemScalarWhereInput[]
+  }
+
   export type UserUpdateOneRequiredWithoutProductTransactionsNestedInput = {
     create?: XOR<UserCreateWithoutProductTransactionsInput, UserUncheckedCreateWithoutProductTransactionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutProductTransactionsInput
@@ -41822,18 +44614,100 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProductTransactionsInput, UserUpdateWithoutProductTransactionsInput>, UserUncheckedUpdateWithoutProductTransactionsInput>
   }
 
-  export type ProductCreateNestedOneWithoutInventoryInput = {
-    create?: XOR<ProductCreateWithoutInventoryInput, ProductUncheckedCreateWithoutInventoryInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutInventoryInput
+  export type UserUpdateOneWithoutApprovedTransactionsNestedInput = {
+    create?: XOR<UserCreateWithoutApprovedTransactionsInput, UserUncheckedCreateWithoutApprovedTransactionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApprovedTransactionsInput
+    upsert?: UserUpsertWithoutApprovedTransactionsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApprovedTransactionsInput, UserUpdateWithoutApprovedTransactionsInput>, UserUncheckedUpdateWithoutApprovedTransactionsInput>
+  }
+
+  export type ProductUpdateOneWithoutTransactionsNestedInput = {
+    create?: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutTransactionsInput
+    upsert?: ProductUpsertWithoutTransactionsInput
+    disconnect?: ProductWhereInput | boolean
+    delete?: ProductWhereInput | boolean
+    connect?: ProductWhereUniqueInput
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutTransactionsInput, ProductUpdateWithoutTransactionsInput>, ProductUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput = {
+    create?: XOR<ProductTransactionItemCreateWithoutTransactionInput, ProductTransactionItemUncheckedCreateWithoutTransactionInput> | ProductTransactionItemCreateWithoutTransactionInput[] | ProductTransactionItemUncheckedCreateWithoutTransactionInput[]
+    connectOrCreate?: ProductTransactionItemCreateOrConnectWithoutTransactionInput | ProductTransactionItemCreateOrConnectWithoutTransactionInput[]
+    upsert?: ProductTransactionItemUpsertWithWhereUniqueWithoutTransactionInput | ProductTransactionItemUpsertWithWhereUniqueWithoutTransactionInput[]
+    createMany?: ProductTransactionItemCreateManyTransactionInputEnvelope
+    set?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    disconnect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    delete?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    connect?: ProductTransactionItemWhereUniqueInput | ProductTransactionItemWhereUniqueInput[]
+    update?: ProductTransactionItemUpdateWithWhereUniqueWithoutTransactionInput | ProductTransactionItemUpdateWithWhereUniqueWithoutTransactionInput[]
+    updateMany?: ProductTransactionItemUpdateManyWithWhereWithoutTransactionInput | ProductTransactionItemUpdateManyWithWhereWithoutTransactionInput[]
+    deleteMany?: ProductTransactionItemScalarWhereInput | ProductTransactionItemScalarWhereInput[]
+  }
+
+  export type ProductTransactionCreateNestedOneWithoutItemsInput = {
+    create?: XOR<ProductTransactionCreateWithoutItemsInput, ProductTransactionUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutItemsInput
+    connect?: ProductTransactionWhereUniqueInput
+  }
+
+  export type ProductCreateNestedOneWithoutProductTransactionItemInput = {
+    create?: XOR<ProductCreateWithoutProductTransactionItemInput, ProductUncheckedCreateWithoutProductTransactionItemInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutProductTransactionItemInput
     connect?: ProductWhereUniqueInput
   }
 
-  export type ProductUpdateOneRequiredWithoutInventoryNestedInput = {
-    create?: XOR<ProductCreateWithoutInventoryInput, ProductUncheckedCreateWithoutInventoryInput>
-    connectOrCreate?: ProductCreateOrConnectWithoutInventoryInput
-    upsert?: ProductUpsertWithoutInventoryInput
+  export type EnumInventoryConditionFieldUpdateOperationsInput = {
+    set?: $Enums.InventoryCondition
+  }
+
+  export type ProductTransactionUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<ProductTransactionCreateWithoutItemsInput, ProductTransactionUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: ProductTransactionCreateOrConnectWithoutItemsInput
+    upsert?: ProductTransactionUpsertWithoutItemsInput
+    connect?: ProductTransactionWhereUniqueInput
+    update?: XOR<XOR<ProductTransactionUpdateToOneWithWhereWithoutItemsInput, ProductTransactionUpdateWithoutItemsInput>, ProductTransactionUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type ProductUpdateOneWithoutProductTransactionItemNestedInput = {
+    create?: XOR<ProductCreateWithoutProductTransactionItemInput, ProductUncheckedCreateWithoutProductTransactionItemInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutProductTransactionItemInput
+    upsert?: ProductUpsertWithoutProductTransactionItemInput
+    disconnect?: ProductWhereInput | boolean
+    delete?: ProductWhereInput | boolean
     connect?: ProductWhereUniqueInput
-    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutInventoryInput, ProductUpdateWithoutInventoryInput>, ProductUncheckedUpdateWithoutInventoryInput>
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutProductTransactionItemInput, ProductUpdateWithoutProductTransactionItemInput>, ProductUncheckedUpdateWithoutProductTransactionItemInput>
+  }
+
+  export type ServiceCenterCreateNestedOneWithoutInventoriesInput = {
+    create?: XOR<ServiceCenterCreateWithoutInventoriesInput, ServiceCenterUncheckedCreateWithoutInventoriesInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutInventoriesInput
+    connect?: ServiceCenterWhereUniqueInput
+  }
+
+  export type ProductCreateNestedOneWithoutInventoriesInput = {
+    create?: XOR<ProductCreateWithoutInventoriesInput, ProductUncheckedCreateWithoutInventoriesInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutInventoriesInput
+    connect?: ProductWhereUniqueInput
+  }
+
+  export type ServiceCenterUpdateOneRequiredWithoutInventoriesNestedInput = {
+    create?: XOR<ServiceCenterCreateWithoutInventoriesInput, ServiceCenterUncheckedCreateWithoutInventoriesInput>
+    connectOrCreate?: ServiceCenterCreateOrConnectWithoutInventoriesInput
+    upsert?: ServiceCenterUpsertWithoutInventoriesInput
+    connect?: ServiceCenterWhereUniqueInput
+    update?: XOR<XOR<ServiceCenterUpdateToOneWithWhereWithoutInventoriesInput, ServiceCenterUpdateWithoutInventoriesInput>, ServiceCenterUncheckedUpdateWithoutInventoriesInput>
+  }
+
+  export type ProductUpdateOneRequiredWithoutInventoriesNestedInput = {
+    create?: XOR<ProductCreateWithoutInventoriesInput, ProductUncheckedCreateWithoutInventoriesInput>
+    connectOrCreate?: ProductCreateOrConnectWithoutInventoriesInput
+    upsert?: ProductUpsertWithoutInventoriesInput
+    connect?: ProductWhereUniqueInput
+    update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutInventoriesInput, ProductUpdateWithoutInventoriesInput>, ProductUncheckedUpdateWithoutInventoriesInput>
   }
 
   export type UserCreateNestedOneWithoutMessagesInput = {
@@ -42602,6 +45476,13 @@ export namespace Prisma {
     not?: NestedEnumTransactionTypeFilter<$PrismaModel> | $Enums.TransactionType
   }
 
+  export type NestedEnumTransactionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionStatus | EnumTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionStatus[]
+    notIn?: $Enums.TransactionStatus[]
+    not?: NestedEnumTransactionStatusFilter<$PrismaModel> | $Enums.TransactionStatus
+  }
+
   export type NestedEnumTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.TransactionType | EnumTransactionTypeFieldRefInput<$PrismaModel>
     in?: $Enums.TransactionType[]
@@ -42610,6 +45491,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTransactionTypeFilter<$PrismaModel>
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTransactionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TransactionStatus | EnumTransactionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TransactionStatus[]
+    notIn?: $Enums.TransactionStatus[]
+    not?: NestedEnumTransactionStatusWithAggregatesFilter<$PrismaModel> | $Enums.TransactionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTransactionStatusFilter<$PrismaModel>
+    _max?: NestedEnumTransactionStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInventoryConditionFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryCondition | EnumInventoryConditionFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryCondition[]
+    notIn?: $Enums.InventoryCondition[]
+    not?: NestedEnumInventoryConditionFilter<$PrismaModel> | $Enums.InventoryCondition
+  }
+
+  export type NestedEnumInventoryConditionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryCondition | EnumInventoryConditionFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryCondition[]
+    notIn?: $Enums.InventoryCondition[]
+    not?: NestedEnumInventoryConditionWithAggregatesFilter<$PrismaModel> | $Enums.InventoryCondition
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInventoryConditionFilter<$PrismaModel>
+    _max?: NestedEnumInventoryConditionFilter<$PrismaModel>
   }
 
   export type NestedEnumbatchTypeNullableFilter<$PrismaModel = never> = {
@@ -42682,6 +45590,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
@@ -42713,6 +45622,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -42749,6 +45659,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
@@ -42781,6 +45692,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
     updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
@@ -42800,7 +45712,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
     users?: UserCreateNestedManyWithoutProjectInput
   }
@@ -42816,7 +45727,6 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     organisationId?: number | null
-    ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
     users?: UserUncheckedCreateNestedManyWithoutProjectInput
   }
 
@@ -42856,6 +45766,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -42901,6 +45814,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -43079,6 +45995,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Ticket"> | Date | string
     updatedAt?: DateTimeFilter<"Ticket"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+    backupjson?: StringNullableFilter<"Ticket"> | string | null
+    backupcreatedAt?: DateTimeNullableFilter<"Ticket"> | Date | string | null
+    backupurl?: StringNullableFilter<"Ticket"> | string | null
   }
 
   export type districtUpsertWithWhereUniqueWithoutStateInput = {
@@ -43157,6 +46076,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -43202,6 +46124,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -43275,7 +46200,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
     state?: StateCreateNestedOneWithoutProjectsInput
     users?: UserCreateNestedManyWithoutProjectInput
   }
@@ -43291,7 +46215,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
     users?: UserUncheckedCreateNestedManyWithoutProjectInput
   }
 
@@ -43325,6 +46248,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -43356,6 +46280,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -43369,6 +46294,57 @@ export namespace Prisma {
 
   export type UserCreateManyOrganisationInputEnvelope = {
     data: UserCreateManyOrganisationInput | UserCreateManyOrganisationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ServiceCenterCreateWithoutOrganisationInput = {
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserCreateNestedManyWithoutServiceCenterInput
+    assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterUncheckedCreateWithoutOrganisationInput = {
+    id?: number
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
+    assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterCreateOrConnectWithoutOrganisationInput = {
+    where: ServiceCenterWhereUniqueInput
+    create: XOR<ServiceCenterCreateWithoutOrganisationInput, ServiceCenterUncheckedCreateWithoutOrganisationInput>
+  }
+
+  export type ServiceCenterCreateManyOrganisationInputEnvelope = {
+    data: ServiceCenterCreateManyOrganisationInput | ServiceCenterCreateManyOrganisationInput[]
     skipDuplicates?: boolean
   }
 
@@ -43404,43 +46380,39 @@ export namespace Prisma {
     data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutOrganisationInput>
   }
 
-  export type ServiceCenterCreateWithoutProjectInput = {
-    name: string
-    centerCode: string
-    email: string
-    address?: string | null
-    isActive?: boolean
-    serviceableStates?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string | null
-    deletedAt?: Date | string | null
-    users?: UserCreateNestedManyWithoutServiceCenterInput
-    assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
-  }
-
-  export type ServiceCenterUncheckedCreateWithoutProjectInput = {
-    id?: number
-    name: string
-    centerCode: string
-    email: string
-    address?: string | null
-    isActive?: boolean
-    serviceableStates?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string | null
-    deletedAt?: Date | string | null
-    users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
-    assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
-  }
-
-  export type ServiceCenterCreateOrConnectWithoutProjectInput = {
+  export type ServiceCenterUpsertWithWhereUniqueWithoutOrganisationInput = {
     where: ServiceCenterWhereUniqueInput
-    create: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput>
+    update: XOR<ServiceCenterUpdateWithoutOrganisationInput, ServiceCenterUncheckedUpdateWithoutOrganisationInput>
+    create: XOR<ServiceCenterCreateWithoutOrganisationInput, ServiceCenterUncheckedCreateWithoutOrganisationInput>
   }
 
-  export type ServiceCenterCreateManyProjectInputEnvelope = {
-    data: ServiceCenterCreateManyProjectInput | ServiceCenterCreateManyProjectInput[]
-    skipDuplicates?: boolean
+  export type ServiceCenterUpdateWithWhereUniqueWithoutOrganisationInput = {
+    where: ServiceCenterWhereUniqueInput
+    data: XOR<ServiceCenterUpdateWithoutOrganisationInput, ServiceCenterUncheckedUpdateWithoutOrganisationInput>
+  }
+
+  export type ServiceCenterUpdateManyWithWhereWithoutOrganisationInput = {
+    where: ServiceCenterScalarWhereInput
+    data: XOR<ServiceCenterUpdateManyMutationInput, ServiceCenterUncheckedUpdateManyWithoutOrganisationInput>
+  }
+
+  export type ServiceCenterScalarWhereInput = {
+    AND?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
+    OR?: ServiceCenterScalarWhereInput[]
+    NOT?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
+    id?: IntFilter<"ServiceCenter"> | number
+    name?: StringFilter<"ServiceCenter"> | string
+    orgCode?: StringNullableFilter<"ServiceCenter"> | string | null
+    centerCode?: StringFilter<"ServiceCenter"> | string
+    email?: StringFilter<"ServiceCenter"> | string
+    address?: StringNullableFilter<"ServiceCenter"> | string | null
+    isActive?: BoolFilter<"ServiceCenter"> | boolean
+    isMacsoft?: BoolFilter<"ServiceCenter"> | boolean
+    isMacsoftHead?: BoolFilter<"ServiceCenter"> | boolean
+    serviceableStates?: StringNullableFilter<"ServiceCenter"> | string | null
+    createdAt?: DateTimeFilter<"ServiceCenter"> | Date | string
+    updatedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
+    deletedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
   }
 
   export type StateCreateWithoutProjectsInput = {
@@ -43478,6 +46450,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     users?: UserCreateNestedManyWithoutOrganisationInput
+    serviceCenters?: ServiceCenterCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateWithoutProjectInput = {
@@ -43492,6 +46465,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     users?: UserUncheckedCreateNestedManyWithoutOrganisationInput
+    serviceCenters?: ServiceCenterUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationCreateOrConnectWithoutProjectInput = {
@@ -43519,6 +46493,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -43550,6 +46525,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -43564,39 +46540,6 @@ export namespace Prisma {
   export type UserCreateManyProjectInputEnvelope = {
     data: UserCreateManyProjectInput | UserCreateManyProjectInput[]
     skipDuplicates?: boolean
-  }
-
-  export type ServiceCenterUpsertWithWhereUniqueWithoutProjectInput = {
-    where: ServiceCenterWhereUniqueInput
-    update: XOR<ServiceCenterUpdateWithoutProjectInput, ServiceCenterUncheckedUpdateWithoutProjectInput>
-    create: XOR<ServiceCenterCreateWithoutProjectInput, ServiceCenterUncheckedCreateWithoutProjectInput>
-  }
-
-  export type ServiceCenterUpdateWithWhereUniqueWithoutProjectInput = {
-    where: ServiceCenterWhereUniqueInput
-    data: XOR<ServiceCenterUpdateWithoutProjectInput, ServiceCenterUncheckedUpdateWithoutProjectInput>
-  }
-
-  export type ServiceCenterUpdateManyWithWhereWithoutProjectInput = {
-    where: ServiceCenterScalarWhereInput
-    data: XOR<ServiceCenterUpdateManyMutationInput, ServiceCenterUncheckedUpdateManyWithoutProjectInput>
-  }
-
-  export type ServiceCenterScalarWhereInput = {
-    AND?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
-    OR?: ServiceCenterScalarWhereInput[]
-    NOT?: ServiceCenterScalarWhereInput | ServiceCenterScalarWhereInput[]
-    id?: IntFilter<"ServiceCenter"> | number
-    name?: StringFilter<"ServiceCenter"> | string
-    projectCode?: StringNullableFilter<"ServiceCenter"> | string | null
-    centerCode?: StringFilter<"ServiceCenter"> | string
-    email?: StringFilter<"ServiceCenter"> | string
-    address?: StringNullableFilter<"ServiceCenter"> | string | null
-    isActive?: BoolFilter<"ServiceCenter"> | boolean
-    serviceableStates?: StringNullableFilter<"ServiceCenter"> | string | null
-    createdAt?: DateTimeFilter<"ServiceCenter"> | Date | string
-    updatedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
-    deletedAt?: DateTimeNullableFilter<"ServiceCenter"> | Date | string | null
   }
 
   export type StateUpsertWithoutProjectsInput = {
@@ -43651,6 +46594,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUpdateManyWithoutOrganisationNestedInput
+    serviceCenters?: ServiceCenterUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateWithoutProjectInput = {
@@ -43665,6 +46609,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
+    serviceCenters?: ServiceCenterUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type UserUpsertWithWhereUniqueWithoutProjectInput = {
@@ -43702,6 +46647,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -43734,6 +46680,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -43750,38 +46697,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type ProjectCreateWithoutServiceCenterInput = {
+  export type OrganisationCreateWithoutServiceCentersInput = {
     name: string
-    projectCode: string
-    email?: string | null
+    orgCode: string
+    email: string
+    phone: string
     address?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    state?: StateCreateNestedOneWithoutProjectsInput
-    organisation?: OrganisationCreateNestedOneWithoutProjectInput
-    users?: UserCreateNestedManyWithoutProjectInput
+    project?: ProjectCreateNestedManyWithoutOrganisationInput
+    users?: UserCreateNestedManyWithoutOrganisationInput
   }
 
-  export type ProjectUncheckedCreateWithoutServiceCenterInput = {
+  export type OrganisationUncheckedCreateWithoutServiceCentersInput = {
     id?: number
     name: string
-    projectCode: string
-    email?: string | null
+    orgCode: string
+    email: string
+    phone: string
     address?: string | null
-    stateId?: number | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    organisationId?: number | null
-    users?: UserUncheckedCreateNestedManyWithoutProjectInput
+    project?: ProjectUncheckedCreateNestedManyWithoutOrganisationInput
+    users?: UserUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
-  export type ProjectCreateOrConnectWithoutServiceCenterInput = {
-    where: ProjectWhereUniqueInput
-    create: XOR<ProjectCreateWithoutServiceCenterInput, ProjectUncheckedCreateWithoutServiceCenterInput>
+  export type OrganisationCreateOrConnectWithoutServiceCentersInput = {
+    where: OrganisationWhereUniqueInput
+    create: XOR<OrganisationCreateWithoutServiceCentersInput, OrganisationUncheckedCreateWithoutServiceCentersInput>
   }
 
   export type TicketCreateWithoutServiceCenterInput = {
@@ -43810,6 +46757,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
@@ -43855,6 +46805,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -43870,6 +46823,206 @@ export namespace Prisma {
 
   export type TicketCreateManyServiceCenterInputEnvelope = {
     data: TicketCreateManyServiceCenterInput | TicketCreateManyServiceCenterInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InventoryCreateWithoutServiceCenterInput = {
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
+    minStock?: number
+    maxStock?: number | null
+    location?: string | null
+    updatedAt?: Date | string
+    product: ProductCreateNestedOneWithoutInventoriesInput
+  }
+
+  export type InventoryUncheckedCreateWithoutServiceCenterInput = {
+    id?: number
+    productId: number
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
+    minStock?: number
+    maxStock?: number | null
+    location?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type InventoryCreateOrConnectWithoutServiceCenterInput = {
+    where: InventoryWhereUniqueInput
+    create: XOR<InventoryCreateWithoutServiceCenterInput, InventoryUncheckedCreateWithoutServiceCenterInput>
+  }
+
+  export type InventoryCreateManyServiceCenterInputEnvelope = {
+    data: InventoryCreateManyServiceCenterInput | InventoryCreateManyServiceCenterInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProductTransactionCreateWithoutServiceCenterInput = {
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
+    ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
+    createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type ProductTransactionUncheckedCreateWithoutServiceCenterInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
+  }
+
+  export type ProductTransactionCreateOrConnectWithoutServiceCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    create: XOR<ProductTransactionCreateWithoutServiceCenterInput, ProductTransactionUncheckedCreateWithoutServiceCenterInput>
+  }
+
+  export type ProductTransactionCreateManyServiceCenterInputEnvelope = {
+    data: ProductTransactionCreateManyServiceCenterInput | ProductTransactionCreateManyServiceCenterInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProductTransactionCreateWithoutFromCenterInput = {
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
+    ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
+    createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type ProductTransactionUncheckedCreateWithoutFromCenterInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
+  }
+
+  export type ProductTransactionCreateOrConnectWithoutFromCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    create: XOR<ProductTransactionCreateWithoutFromCenterInput, ProductTransactionUncheckedCreateWithoutFromCenterInput>
+  }
+
+  export type ProductTransactionCreateManyFromCenterInputEnvelope = {
+    data: ProductTransactionCreateManyFromCenterInput | ProductTransactionCreateManyFromCenterInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProductTransactionCreateWithoutToCenterInput = {
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
+    createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type ProductTransactionUncheckedCreateWithoutToCenterInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
+  }
+
+  export type ProductTransactionCreateOrConnectWithoutToCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    create: XOR<ProductTransactionCreateWithoutToCenterInput, ProductTransactionUncheckedCreateWithoutToCenterInput>
+  }
+
+  export type ProductTransactionCreateManyToCenterInputEnvelope = {
+    data: ProductTransactionCreateManyToCenterInput | ProductTransactionCreateManyToCenterInput[]
     skipDuplicates?: boolean
   }
 
@@ -43889,44 +47042,44 @@ export namespace Prisma {
     data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutServiceCenterInput>
   }
 
-  export type ProjectUpsertWithoutServiceCenterInput = {
-    update: XOR<ProjectUpdateWithoutServiceCenterInput, ProjectUncheckedUpdateWithoutServiceCenterInput>
-    create: XOR<ProjectCreateWithoutServiceCenterInput, ProjectUncheckedCreateWithoutServiceCenterInput>
-    where?: ProjectWhereInput
+  export type OrganisationUpsertWithoutServiceCentersInput = {
+    update: XOR<OrganisationUpdateWithoutServiceCentersInput, OrganisationUncheckedUpdateWithoutServiceCentersInput>
+    create: XOR<OrganisationCreateWithoutServiceCentersInput, OrganisationUncheckedCreateWithoutServiceCentersInput>
+    where?: OrganisationWhereInput
   }
 
-  export type ProjectUpdateToOneWithWhereWithoutServiceCenterInput = {
-    where?: ProjectWhereInput
-    data: XOR<ProjectUpdateWithoutServiceCenterInput, ProjectUncheckedUpdateWithoutServiceCenterInput>
+  export type OrganisationUpdateToOneWithWhereWithoutServiceCentersInput = {
+    where?: OrganisationWhereInput
+    data: XOR<OrganisationUpdateWithoutServiceCentersInput, OrganisationUncheckedUpdateWithoutServiceCentersInput>
   }
 
-  export type ProjectUpdateWithoutServiceCenterInput = {
+  export type OrganisationUpdateWithoutServiceCentersInput = {
     name?: StringFieldUpdateOperationsInput | string
-    projectCode?: StringFieldUpdateOperationsInput | string
-    email?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    state?: StateUpdateOneWithoutProjectsNestedInput
-    organisation?: OrganisationUpdateOneWithoutProjectNestedInput
-    users?: UserUpdateManyWithoutProjectNestedInput
+    project?: ProjectUpdateManyWithoutOrganisationNestedInput
+    users?: UserUpdateManyWithoutOrganisationNestedInput
   }
 
-  export type ProjectUncheckedUpdateWithoutServiceCenterInput = {
+  export type OrganisationUncheckedUpdateWithoutServiceCentersInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    projectCode?: StringFieldUpdateOperationsInput | string
-    email?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
-    stateId?: NullableIntFieldUpdateOperationsInput | number | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    organisationId?: NullableIntFieldUpdateOperationsInput | number | null
-    users?: UserUncheckedUpdateManyWithoutProjectNestedInput
+    project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
+    users?: UserUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type TicketUpsertWithWhereUniqueWithoutServiceCenterInput = {
@@ -43945,33 +47098,152 @@ export namespace Prisma {
     data: XOR<TicketUpdateManyMutationInput, TicketUncheckedUpdateManyWithoutServiceCenterInput>
   }
 
+  export type InventoryUpsertWithWhereUniqueWithoutServiceCenterInput = {
+    where: InventoryWhereUniqueInput
+    update: XOR<InventoryUpdateWithoutServiceCenterInput, InventoryUncheckedUpdateWithoutServiceCenterInput>
+    create: XOR<InventoryCreateWithoutServiceCenterInput, InventoryUncheckedCreateWithoutServiceCenterInput>
+  }
+
+  export type InventoryUpdateWithWhereUniqueWithoutServiceCenterInput = {
+    where: InventoryWhereUniqueInput
+    data: XOR<InventoryUpdateWithoutServiceCenterInput, InventoryUncheckedUpdateWithoutServiceCenterInput>
+  }
+
+  export type InventoryUpdateManyWithWhereWithoutServiceCenterInput = {
+    where: InventoryScalarWhereInput
+    data: XOR<InventoryUpdateManyMutationInput, InventoryUncheckedUpdateManyWithoutServiceCenterInput>
+  }
+
+  export type InventoryScalarWhereInput = {
+    AND?: InventoryScalarWhereInput | InventoryScalarWhereInput[]
+    OR?: InventoryScalarWhereInput[]
+    NOT?: InventoryScalarWhereInput | InventoryScalarWhereInput[]
+    id?: IntFilter<"Inventory"> | number
+    centerCode?: StringFilter<"Inventory"> | string
+    productId?: IntFilter<"Inventory"> | number
+    goodQty?: IntFilter<"Inventory"> | number
+    repairableQty?: IntFilter<"Inventory"> | number
+    damagedQty?: IntFilter<"Inventory"> | number
+    scrapQty?: IntFilter<"Inventory"> | number
+    minStock?: IntFilter<"Inventory"> | number
+    maxStock?: IntNullableFilter<"Inventory"> | number | null
+    location?: StringNullableFilter<"Inventory"> | string | null
+    updatedAt?: DateTimeFilter<"Inventory"> | Date | string
+  }
+
+  export type ProductTransactionUpsertWithWhereUniqueWithoutServiceCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    update: XOR<ProductTransactionUpdateWithoutServiceCenterInput, ProductTransactionUncheckedUpdateWithoutServiceCenterInput>
+    create: XOR<ProductTransactionCreateWithoutServiceCenterInput, ProductTransactionUncheckedCreateWithoutServiceCenterInput>
+  }
+
+  export type ProductTransactionUpdateWithWhereUniqueWithoutServiceCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    data: XOR<ProductTransactionUpdateWithoutServiceCenterInput, ProductTransactionUncheckedUpdateWithoutServiceCenterInput>
+  }
+
+  export type ProductTransactionUpdateManyWithWhereWithoutServiceCenterInput = {
+    where: ProductTransactionScalarWhereInput
+    data: XOR<ProductTransactionUpdateManyMutationInput, ProductTransactionUncheckedUpdateManyWithoutServiceCenterInput>
+  }
+
+  export type ProductTransactionScalarWhereInput = {
+    AND?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+    OR?: ProductTransactionScalarWhereInput[]
+    NOT?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
+    id?: IntFilter<"ProductTransaction"> | number
+    transactionType?: EnumTransactionTypeFilter<"ProductTransaction"> | $Enums.TransactionType
+    status?: EnumTransactionStatusFilter<"ProductTransaction"> | $Enums.TransactionStatus
+    centerCode?: StringFilter<"ProductTransaction"> | string
+    fromCenterCode?: StringNullableFilter<"ProductTransaction"> | string | null
+    toCenterCode?: StringNullableFilter<"ProductTransaction"> | string | null
+    approvedBy?: IntNullableFilter<"ProductTransaction"> | number | null
+    approvedAt?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    rejectionReason?: StringNullableFilter<"ProductTransaction"> | string | null
+    invoiceNo?: StringNullableFilter<"ProductTransaction"> | string | null
+    billNo?: StringNullableFilter<"ProductTransaction"> | string | null
+    receiptDate?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    deliveryDate?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    receivedAt?: DateTimeNullableFilter<"ProductTransaction"> | Date | string | null
+    ticketId?: IntNullableFilter<"ProductTransaction"> | number | null
+    remarks?: StringNullableFilter<"ProductTransaction"> | string | null
+    createdBy?: IntFilter<"ProductTransaction"> | number
+    createdAt?: DateTimeFilter<"ProductTransaction"> | Date | string
+    updatedAt?: DateTimeFilter<"ProductTransaction"> | Date | string
+    productId?: IntNullableFilter<"ProductTransaction"> | number | null
+  }
+
+  export type ProductTransactionUpsertWithWhereUniqueWithoutFromCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    update: XOR<ProductTransactionUpdateWithoutFromCenterInput, ProductTransactionUncheckedUpdateWithoutFromCenterInput>
+    create: XOR<ProductTransactionCreateWithoutFromCenterInput, ProductTransactionUncheckedCreateWithoutFromCenterInput>
+  }
+
+  export type ProductTransactionUpdateWithWhereUniqueWithoutFromCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    data: XOR<ProductTransactionUpdateWithoutFromCenterInput, ProductTransactionUncheckedUpdateWithoutFromCenterInput>
+  }
+
+  export type ProductTransactionUpdateManyWithWhereWithoutFromCenterInput = {
+    where: ProductTransactionScalarWhereInput
+    data: XOR<ProductTransactionUpdateManyMutationInput, ProductTransactionUncheckedUpdateManyWithoutFromCenterInput>
+  }
+
+  export type ProductTransactionUpsertWithWhereUniqueWithoutToCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    update: XOR<ProductTransactionUpdateWithoutToCenterInput, ProductTransactionUncheckedUpdateWithoutToCenterInput>
+    create: XOR<ProductTransactionCreateWithoutToCenterInput, ProductTransactionUncheckedCreateWithoutToCenterInput>
+  }
+
+  export type ProductTransactionUpdateWithWhereUniqueWithoutToCenterInput = {
+    where: ProductTransactionWhereUniqueInput
+    data: XOR<ProductTransactionUpdateWithoutToCenterInput, ProductTransactionUncheckedUpdateWithoutToCenterInput>
+  }
+
+  export type ProductTransactionUpdateManyWithWhereWithoutToCenterInput = {
+    where: ProductTransactionScalarWhereInput
+    data: XOR<ProductTransactionUpdateManyMutationInput, ProductTransactionUncheckedUpdateManyWithoutToCenterInput>
+  }
+
   export type ServiceCenterCreateWithoutUsersInput = {
     name: string
     centerCode: string
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    project?: ProjectCreateNestedOneWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
     assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
   }
 
   export type ServiceCenterUncheckedCreateWithoutUsersInput = {
     id?: number
     name: string
-    projectCode?: string | null
+    orgCode?: string | null
     centerCode: string
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
   }
 
   export type ServiceCenterCreateOrConnectWithoutUsersInput = {
@@ -44005,6 +47277,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
@@ -44050,6 +47325,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -44094,6 +47372,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
     state?: StateCreateNestedOneWithoutTicketsInput
@@ -44139,6 +47420,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -44320,24 +47604,48 @@ export namespace Prisma {
   }
 
   export type ProductTransactionCreateWithoutCreatedByUserInput = {
-    type: $Enums.TransactionType
-    quantity: number
-    notes?: string | null
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    product: ProductCreateNestedOneWithoutTransactionsInput
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
     ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
   }
 
   export type ProductTransactionUncheckedCreateWithoutCreatedByUserInput = {
     id?: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
     ticketId?: number | null
-    notes?: string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
   }
 
   export type ProductTransactionCreateOrConnectWithoutCreatedByUserInput = {
@@ -44347,6 +47655,61 @@ export namespace Prisma {
 
   export type ProductTransactionCreateManyCreatedByUserInputEnvelope = {
     data: ProductTransactionCreateManyCreatedByUserInput | ProductTransactionCreateManyCreatedByUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProductTransactionCreateWithoutApproverUserInput = {
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
+    ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
+    createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type ProductTransactionUncheckedCreateWithoutApproverUserInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
+  }
+
+  export type ProductTransactionCreateOrConnectWithoutApproverUserInput = {
+    where: ProductTransactionWhereUniqueInput
+    create: XOR<ProductTransactionCreateWithoutApproverUserInput, ProductTransactionUncheckedCreateWithoutApproverUserInput>
+  }
+
+  export type ProductTransactionCreateManyApproverUserInputEnvelope = {
+    data: ProductTransactionCreateManyApproverUserInput | ProductTransactionCreateManyApproverUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -44454,7 +47817,6 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
-    ServiceCenter?: ServiceCenterCreateNestedManyWithoutProjectInput
     state?: StateCreateNestedOneWithoutProjectsInput
     organisation?: OrganisationCreateNestedOneWithoutProjectInput
   }
@@ -44471,7 +47833,6 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     organisationId?: number | null
-    ServiceCenter?: ServiceCenterUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutUsersInput = {
@@ -44490,6 +47851,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     project?: ProjectCreateNestedManyWithoutOrganisationInput
+    serviceCenters?: ServiceCenterCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationUncheckedCreateWithoutUsersInput = {
@@ -44504,6 +47866,7 @@ export namespace Prisma {
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     project?: ProjectUncheckedCreateNestedManyWithoutOrganisationInput
+    serviceCenters?: ServiceCenterUncheckedCreateNestedManyWithoutOrganisationInput
   }
 
   export type OrganisationCreateOrConnectWithoutUsersInput = {
@@ -44590,27 +47953,39 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    project?: ProjectUpdateOneWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
     assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
   }
 
   export type ServiceCenterUncheckedUpdateWithoutUsersInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     centerCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
   }
 
   export type TicketUpsertWithWhereUniqueWithoutCreatedByUserInput = {
@@ -44816,19 +48191,20 @@ export namespace Prisma {
     data: XOR<ProductTransactionUpdateManyMutationInput, ProductTransactionUncheckedUpdateManyWithoutCreatedByUserInput>
   }
 
-  export type ProductTransactionScalarWhereInput = {
-    AND?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
-    OR?: ProductTransactionScalarWhereInput[]
-    NOT?: ProductTransactionScalarWhereInput | ProductTransactionScalarWhereInput[]
-    id?: IntFilter<"ProductTransaction"> | number
-    productId?: IntFilter<"ProductTransaction"> | number
-    type?: EnumTransactionTypeFilter<"ProductTransaction"> | $Enums.TransactionType
-    quantity?: IntFilter<"ProductTransaction"> | number
-    ticketId?: IntNullableFilter<"ProductTransaction"> | number | null
-    notes?: StringNullableFilter<"ProductTransaction"> | string | null
-    createdBy?: IntFilter<"ProductTransaction"> | number
-    createdAt?: DateTimeFilter<"ProductTransaction"> | Date | string
-    updatedAt?: DateTimeFilter<"ProductTransaction"> | Date | string
+  export type ProductTransactionUpsertWithWhereUniqueWithoutApproverUserInput = {
+    where: ProductTransactionWhereUniqueInput
+    update: XOR<ProductTransactionUpdateWithoutApproverUserInput, ProductTransactionUncheckedUpdateWithoutApproverUserInput>
+    create: XOR<ProductTransactionCreateWithoutApproverUserInput, ProductTransactionUncheckedCreateWithoutApproverUserInput>
+  }
+
+  export type ProductTransactionUpdateWithWhereUniqueWithoutApproverUserInput = {
+    where: ProductTransactionWhereUniqueInput
+    data: XOR<ProductTransactionUpdateWithoutApproverUserInput, ProductTransactionUncheckedUpdateWithoutApproverUserInput>
+  }
+
+  export type ProductTransactionUpdateManyWithWhereWithoutApproverUserInput = {
+    where: ProductTransactionScalarWhereInput
+    data: XOR<ProductTransactionUpdateManyMutationInput, ProductTransactionUncheckedUpdateManyWithoutApproverUserInput>
   }
 
   export type TicketMilestoneUpsertWithWhereUniqueWithoutChangerInput = {
@@ -44944,7 +48320,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
     state?: StateUpdateOneWithoutProjectsNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
   }
@@ -44961,7 +48336,6 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     organisationId?: NullableIntFieldUpdateOperationsInput | number | null
-    ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type OrganisationUpsertWithoutUsersInput = {
@@ -44986,6 +48360,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUpdateManyWithoutOrganisationNestedInput
+    serviceCenters?: ServiceCenterUpdateManyWithoutOrganisationNestedInput
   }
 
   export type OrganisationUncheckedUpdateWithoutUsersInput = {
@@ -45000,6 +48375,7 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUncheckedUpdateManyWithoutOrganisationNestedInput
+    serviceCenters?: ServiceCenterUncheckedUpdateManyWithoutOrganisationNestedInput
   }
 
   export type batchUpsertWithWhereUniqueWithoutCreatorInput = {
@@ -45067,6 +48443,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -45099,6 +48476,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -45129,6 +48507,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -45161,6 +48540,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -45178,27 +48558,39 @@ export namespace Prisma {
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     users?: UserCreateNestedManyWithoutServiceCenterInput
-    project?: ProjectCreateNestedOneWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
   }
 
   export type ServiceCenterUncheckedCreateWithoutAssignedTicketsInput = {
     id?: number
     name: string
-    projectCode?: string | null
+    orgCode?: string | null
     centerCode: string
     email: string
     address?: string | null
     isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
     serviceableStates?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string | null
     deletedAt?: Date | string | null
     users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
   }
 
   export type ServiceCenterCreateOrConnectWithoutAssignedTicketsInput = {
@@ -45333,24 +48725,48 @@ export namespace Prisma {
   }
 
   export type ProductTransactionCreateWithoutTicketInput = {
-    type: $Enums.TransactionType
-    quantity: number
-    notes?: string | null
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    product: ProductCreateNestedOneWithoutTransactionsInput
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
     createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
   }
 
   export type ProductTransactionUncheckedCreateWithoutTicketInput = {
     id?: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
-    notes?: string | null
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdBy: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    productId?: number | null
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
   }
 
   export type ProductTransactionCreateOrConnectWithoutTicketInput = {
@@ -45494,6 +48910,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -45526,6 +48943,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -45562,6 +48980,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -45594,6 +49013,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -45617,27 +49037,39 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUpdateManyWithoutServiceCenterNestedInput
-    project?: ProjectUpdateOneWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
   }
 
   export type ServiceCenterUncheckedUpdateWithoutAssignedTicketsInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
     centerCode?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     address?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
     serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
   }
 
   export type StateUpsertWithoutTicketsInput = {
@@ -45872,6 +49304,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -45918,6 +49353,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -45950,6 +49388,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
     project?: ProjectCreateNestedOneWithoutUsersInput
@@ -45982,6 +49421,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
     updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
@@ -46060,6 +49500,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -46106,6 +49549,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -46144,6 +49590,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
@@ -46176,6 +49623,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
     updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
@@ -46289,6 +49737,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -46335,6 +49786,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -46462,6 +49916,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -46508,6 +49965,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -46534,6 +49994,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -46566,6 +50027,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -46596,6 +50058,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -46628,6 +50091,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -46696,6 +50160,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -46728,6 +50193,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -46764,6 +50230,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -46796,6 +50263,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -46857,27 +50325,31 @@ export namespace Prisma {
 
   export type ProductCreateWithoutSpareRequestItemsInput = {
     name: string
+    productCode: string
     description?: string | null
     brandName?: string | null
-    productCode: string
     category?: $Enums.Category | null
+    unitOfMeasure?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    inventories?: InventoryCreateNestedManyWithoutProductInput
     transactions?: ProductTransactionCreateNestedManyWithoutProductInput
-    inventory?: InventoryCreateNestedOneWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemCreateNestedManyWithoutProductInput
   }
 
   export type ProductUncheckedCreateWithoutSpareRequestItemsInput = {
     id?: number
     name: string
+    productCode: string
     description?: string | null
     brandName?: string | null
-    productCode: string
     category?: $Enums.Category | null
+    unitOfMeasure?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    inventories?: InventoryUncheckedCreateNestedManyWithoutProductInput
     transactions?: ProductTransactionUncheckedCreateNestedManyWithoutProductInput
-    inventory?: InventoryUncheckedCreateNestedOneWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedCreateNestedManyWithoutProductInput
   }
 
   export type ProductCreateOrConnectWithoutSpareRequestItemsInput = {
@@ -46928,48 +50400,111 @@ export namespace Prisma {
 
   export type ProductUpdateWithoutSpareRequestItemsInput = {
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUpdateManyWithoutProductNestedInput
     transactions?: ProductTransactionUpdateManyWithoutProductNestedInput
-    inventory?: InventoryUpdateOneWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUpdateManyWithoutProductNestedInput
   }
 
   export type ProductUncheckedUpdateWithoutSpareRequestItemsInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUncheckedUpdateManyWithoutProductNestedInput
     transactions?: ProductTransactionUncheckedUpdateManyWithoutProductNestedInput
-    inventory?: InventoryUncheckedUpdateOneWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type InventoryCreateWithoutProductInput = {
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
+    minStock?: number
+    maxStock?: number | null
+    location?: string | null
+    updatedAt?: Date | string
+    serviceCenter: ServiceCenterCreateNestedOneWithoutInventoriesInput
+  }
+
+  export type InventoryUncheckedCreateWithoutProductInput = {
+    id?: number
+    centerCode: string
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
+    minStock?: number
+    maxStock?: number | null
+    location?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type InventoryCreateOrConnectWithoutProductInput = {
+    where: InventoryWhereUniqueInput
+    create: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
+  }
+
+  export type InventoryCreateManyProductInputEnvelope = {
+    data: InventoryCreateManyProductInput | InventoryCreateManyProductInput[]
+    skipDuplicates?: boolean
   }
 
   export type ProductTransactionCreateWithoutProductInput = {
-    type: $Enums.TransactionType
-    quantity: number
-    notes?: string | null
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
     ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    items?: ProductTransactionItemCreateNestedManyWithoutTransactionInput
     createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
   }
 
   export type ProductTransactionUncheckedCreateWithoutProductInput = {
     id?: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
     ticketId?: number | null
-    notes?: string | null
+    remarks?: string | null
     createdBy: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    items?: ProductTransactionItemUncheckedCreateNestedManyWithoutTransactionInput
   }
 
   export type ProductTransactionCreateOrConnectWithoutProductInput = {
@@ -46980,28 +50515,6 @@ export namespace Prisma {
   export type ProductTransactionCreateManyProductInputEnvelope = {
     data: ProductTransactionCreateManyProductInput | ProductTransactionCreateManyProductInput[]
     skipDuplicates?: boolean
-  }
-
-  export type InventoryCreateWithoutProductInput = {
-    quantity?: number
-    minStock?: number
-    maxStock?: number | null
-    location?: string | null
-    updatedAt?: Date | string
-  }
-
-  export type InventoryUncheckedCreateWithoutProductInput = {
-    id?: number
-    quantity?: number
-    minStock?: number
-    maxStock?: number | null
-    location?: string | null
-    updatedAt?: Date | string
-  }
-
-  export type InventoryCreateOrConnectWithoutProductInput = {
-    where: InventoryWhereUniqueInput
-    create: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
   }
 
   export type spareRequestItemCreateWithoutProductInput = {
@@ -47031,6 +50544,47 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ProductTransactionItemCreateWithoutProductInput = {
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+    transaction: ProductTransactionCreateNestedOneWithoutItemsInput
+  }
+
+  export type ProductTransactionItemUncheckedCreateWithoutProductInput = {
+    id?: number
+    transactionId: number
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+  }
+
+  export type ProductTransactionItemCreateOrConnectWithoutProductInput = {
+    where: ProductTransactionItemWhereUniqueInput
+    create: XOR<ProductTransactionItemCreateWithoutProductInput, ProductTransactionItemUncheckedCreateWithoutProductInput>
+  }
+
+  export type ProductTransactionItemCreateManyProductInputEnvelope = {
+    data: ProductTransactionItemCreateManyProductInput | ProductTransactionItemCreateManyProductInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type InventoryUpsertWithWhereUniqueWithoutProductInput = {
+    where: InventoryWhereUniqueInput
+    update: XOR<InventoryUpdateWithoutProductInput, InventoryUncheckedUpdateWithoutProductInput>
+    create: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
+  }
+
+  export type InventoryUpdateWithWhereUniqueWithoutProductInput = {
+    where: InventoryWhereUniqueInput
+    data: XOR<InventoryUpdateWithoutProductInput, InventoryUncheckedUpdateWithoutProductInput>
+  }
+
+  export type InventoryUpdateManyWithWhereWithoutProductInput = {
+    where: InventoryScalarWhereInput
+    data: XOR<InventoryUpdateManyMutationInput, InventoryUncheckedUpdateManyWithoutProductInput>
+  }
+
   export type ProductTransactionUpsertWithWhereUniqueWithoutProductInput = {
     where: ProductTransactionWhereUniqueInput
     update: XOR<ProductTransactionUpdateWithoutProductInput, ProductTransactionUncheckedUpdateWithoutProductInput>
@@ -47045,34 +50599,6 @@ export namespace Prisma {
   export type ProductTransactionUpdateManyWithWhereWithoutProductInput = {
     where: ProductTransactionScalarWhereInput
     data: XOR<ProductTransactionUpdateManyMutationInput, ProductTransactionUncheckedUpdateManyWithoutProductInput>
-  }
-
-  export type InventoryUpsertWithoutProductInput = {
-    update: XOR<InventoryUpdateWithoutProductInput, InventoryUncheckedUpdateWithoutProductInput>
-    create: XOR<InventoryCreateWithoutProductInput, InventoryUncheckedCreateWithoutProductInput>
-    where?: InventoryWhereInput
-  }
-
-  export type InventoryUpdateToOneWithWhereWithoutProductInput = {
-    where?: InventoryWhereInput
-    data: XOR<InventoryUpdateWithoutProductInput, InventoryUncheckedUpdateWithoutProductInput>
-  }
-
-  export type InventoryUpdateWithoutProductInput = {
-    quantity?: IntFieldUpdateOperationsInput | number
-    minStock?: IntFieldUpdateOperationsInput | number
-    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type InventoryUncheckedUpdateWithoutProductInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    quantity?: IntFieldUpdateOperationsInput | number
-    minStock?: IntFieldUpdateOperationsInput | number
-    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
-    location?: NullableStringFieldUpdateOperationsInput | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type spareRequestItemUpsertWithWhereUniqueWithoutProductInput = {
@@ -47091,34 +50617,170 @@ export namespace Prisma {
     data: XOR<spareRequestItemUpdateManyMutationInput, spareRequestItemUncheckedUpdateManyWithoutProductInput>
   }
 
-  export type ProductCreateWithoutTransactionsInput = {
-    name: string
-    description?: string | null
-    brandName?: string | null
-    productCode: string
-    category?: $Enums.Category | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    inventory?: InventoryCreateNestedOneWithoutProductInput
-    spareRequestItems?: spareRequestItemCreateNestedManyWithoutProductInput
+  export type ProductTransactionItemUpsertWithWhereUniqueWithoutProductInput = {
+    where: ProductTransactionItemWhereUniqueInput
+    update: XOR<ProductTransactionItemUpdateWithoutProductInput, ProductTransactionItemUncheckedUpdateWithoutProductInput>
+    create: XOR<ProductTransactionItemCreateWithoutProductInput, ProductTransactionItemUncheckedCreateWithoutProductInput>
   }
 
-  export type ProductUncheckedCreateWithoutTransactionsInput = {
+  export type ProductTransactionItemUpdateWithWhereUniqueWithoutProductInput = {
+    where: ProductTransactionItemWhereUniqueInput
+    data: XOR<ProductTransactionItemUpdateWithoutProductInput, ProductTransactionItemUncheckedUpdateWithoutProductInput>
+  }
+
+  export type ProductTransactionItemUpdateManyWithWhereWithoutProductInput = {
+    where: ProductTransactionItemScalarWhereInput
+    data: XOR<ProductTransactionItemUpdateManyMutationInput, ProductTransactionItemUncheckedUpdateManyWithoutProductInput>
+  }
+
+  export type ProductTransactionItemScalarWhereInput = {
+    AND?: ProductTransactionItemScalarWhereInput | ProductTransactionItemScalarWhereInput[]
+    OR?: ProductTransactionItemScalarWhereInput[]
+    NOT?: ProductTransactionItemScalarWhereInput | ProductTransactionItemScalarWhereInput[]
+    id?: IntFilter<"ProductTransactionItem"> | number
+    transactionId?: IntFilter<"ProductTransactionItem"> | number
+    productId?: IntNullableFilter<"ProductTransactionItem"> | number | null
+    productName?: StringNullableFilter<"ProductTransactionItem"> | string | null
+    condition?: EnumInventoryConditionFilter<"ProductTransactionItem"> | $Enums.InventoryCondition
+    quantity?: IntFilter<"ProductTransactionItem"> | number
+  }
+
+  export type ServiceCenterCreateWithoutTransactionsInput = {
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserCreateNestedManyWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
+    assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterUncheckedCreateWithoutTransactionsInput = {
     id?: number
     name: string
-    description?: string | null
-    brandName?: string | null
-    productCode: string
-    category?: $Enums.Category | null
+    orgCode?: string | null
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
     createdAt?: Date | string
-    updatedAt?: Date | string
-    inventory?: InventoryUncheckedCreateNestedOneWithoutProductInput
-    spareRequestItems?: spareRequestItemUncheckedCreateNestedManyWithoutProductInput
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
+    assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
   }
 
-  export type ProductCreateOrConnectWithoutTransactionsInput = {
-    where: ProductWhereUniqueInput
-    create: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
+  export type ServiceCenterCreateOrConnectWithoutTransactionsInput = {
+    where: ServiceCenterWhereUniqueInput
+    create: XOR<ServiceCenterCreateWithoutTransactionsInput, ServiceCenterUncheckedCreateWithoutTransactionsInput>
+  }
+
+  export type ServiceCenterCreateWithoutTransfersFromInput = {
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserCreateNestedManyWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
+    assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterUncheckedCreateWithoutTransfersFromInput = {
+    id?: number
+    name: string
+    orgCode?: string | null
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
+    assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterCreateOrConnectWithoutTransfersFromInput = {
+    where: ServiceCenterWhereUniqueInput
+    create: XOR<ServiceCenterCreateWithoutTransfersFromInput, ServiceCenterUncheckedCreateWithoutTransfersFromInput>
+  }
+
+  export type ServiceCenterCreateWithoutTransfersToInput = {
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserCreateNestedManyWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
+    assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+  }
+
+  export type ServiceCenterUncheckedCreateWithoutTransfersToInput = {
+    id?: number
+    name: string
+    orgCode?: string | null
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
+    assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    inventories?: InventoryUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+  }
+
+  export type ServiceCenterCreateOrConnectWithoutTransfersToInput = {
+    where: ServiceCenterWhereUniqueInput
+    create: XOR<ServiceCenterCreateWithoutTransfersToInput, ServiceCenterUncheckedCreateWithoutTransfersToInput>
   }
 
   export type TicketCreateWithoutProductTransactionsInput = {
@@ -47147,6 +50809,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -47193,6 +50858,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
@@ -47203,6 +50871,31 @@ export namespace Prisma {
   export type TicketCreateOrConnectWithoutProductTransactionsInput = {
     where: TicketWhereUniqueInput
     create: XOR<TicketCreateWithoutProductTransactionsInput, TicketUncheckedCreateWithoutProductTransactionsInput>
+  }
+
+  export type ProductTransactionItemCreateWithoutTransactionInput = {
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+    product?: ProductCreateNestedOneWithoutProductTransactionItemInput
+  }
+
+  export type ProductTransactionItemUncheckedCreateWithoutTransactionInput = {
+    id?: number
+    productId?: number | null
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+  }
+
+  export type ProductTransactionItemCreateOrConnectWithoutTransactionInput = {
+    where: ProductTransactionItemWhereUniqueInput
+    create: XOR<ProductTransactionItemCreateWithoutTransactionInput, ProductTransactionItemUncheckedCreateWithoutTransactionInput>
+  }
+
+  export type ProductTransactionItemCreateManyTransactionInputEnvelope = {
+    data: ProductTransactionItemCreateManyTransactionInput | ProductTransactionItemCreateManyTransactionInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserCreateWithoutProductTransactionsInput = {
@@ -47224,6 +50917,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -47256,6 +50950,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -47267,40 +50962,258 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutProductTransactionsInput, UserUncheckedCreateWithoutProductTransactionsInput>
   }
 
-  export type ProductUpsertWithoutTransactionsInput = {
-    update: XOR<ProductUpdateWithoutTransactionsInput, ProductUncheckedUpdateWithoutTransactionsInput>
+  export type UserCreateWithoutApprovedTransactionsInput = {
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    serviceCenter?: ServiceCenterCreateNestedOneWithoutUsersInput
+    createdTickets?: TicketCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
+    State?: StateCreateNestedOneWithoutPrimaryUsersInput
+    states?: StateCreateNestedManyWithoutUsersInput
+    project?: ProjectCreateNestedOneWithoutUsersInput
+    organisation?: OrganisationCreateNestedOneWithoutUsersInput
+    createdBatches?: batchCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchCreateNestedManyWithoutUpdaterInput
+  }
+
+  export type UserUncheckedCreateWithoutApprovedTransactionsInput = {
+    id?: number
+    name: string
+    phone: string
+    password: string
+    role?: $Enums.Role | null
+    centerCode?: string | null
+    lastLogin?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    isActive?: boolean
+    stateId?: number | null
+    projectCode?: string | null
+    orgCode?: string | null
+    createdTickets?: TicketUncheckedCreateNestedManyWithoutCreatedByUserInput
+    updatedTickets?: TicketUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSenderInput
+    messageSeens?: MessageSeenUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutCreatedByInput
+    notificationRecipients?: NotificationRecipientUncheckedCreateNestedManyWithoutUserInput
+    spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+    spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
+    productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
+    states?: StateUncheckedCreateNestedManyWithoutUsersInput
+    createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
+    updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
+  }
+
+  export type UserCreateOrConnectWithoutApprovedTransactionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutApprovedTransactionsInput, UserUncheckedCreateWithoutApprovedTransactionsInput>
+  }
+
+  export type ProductCreateWithoutTransactionsInput = {
+    name: string
+    productCode: string
+    description?: string | null
+    brandName?: string | null
+    category?: $Enums.Category | null
+    unitOfMeasure?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inventories?: InventoryCreateNestedManyWithoutProductInput
+    spareRequestItems?: spareRequestItemCreateNestedManyWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutTransactionsInput = {
+    id?: number
+    name: string
+    productCode: string
+    description?: string | null
+    brandName?: string | null
+    category?: $Enums.Category | null
+    unitOfMeasure?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inventories?: InventoryUncheckedCreateNestedManyWithoutProductInput
+    spareRequestItems?: spareRequestItemUncheckedCreateNestedManyWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutTransactionsInput = {
+    where: ProductWhereUniqueInput
     create: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
-    where?: ProductWhereInput
   }
 
-  export type ProductUpdateToOneWithWhereWithoutTransactionsInput = {
-    where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutTransactionsInput, ProductUncheckedUpdateWithoutTransactionsInput>
+  export type ServiceCenterUpsertWithoutTransactionsInput = {
+    update: XOR<ServiceCenterUpdateWithoutTransactionsInput, ServiceCenterUncheckedUpdateWithoutTransactionsInput>
+    create: XOR<ServiceCenterCreateWithoutTransactionsInput, ServiceCenterUncheckedCreateWithoutTransactionsInput>
+    where?: ServiceCenterWhereInput
   }
 
-  export type ProductUpdateWithoutTransactionsInput = {
+  export type ServiceCenterUpdateToOneWithWhereWithoutTransactionsInput = {
+    where?: ServiceCenterWhereInput
+    data: XOR<ServiceCenterUpdateWithoutTransactionsInput, ServiceCenterUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type ServiceCenterUpdateWithoutTransactionsInput = {
     name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
-    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inventory?: InventoryUpdateOneWithoutProductNestedInput
-    spareRequestItems?: spareRequestItemUpdateManyWithoutProductNestedInput
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUpdateManyWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
+    assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
   }
 
-  export type ProductUncheckedUpdateWithoutTransactionsInput = {
+  export type ServiceCenterUncheckedUpdateWithoutTransactionsInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
-    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    inventory?: InventoryUncheckedUpdateOneWithoutProductNestedInput
-    spareRequestItems?: spareRequestItemUncheckedUpdateManyWithoutProductNestedInput
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+    assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ServiceCenterUpsertWithoutTransfersFromInput = {
+    update: XOR<ServiceCenterUpdateWithoutTransfersFromInput, ServiceCenterUncheckedUpdateWithoutTransfersFromInput>
+    create: XOR<ServiceCenterCreateWithoutTransfersFromInput, ServiceCenterUncheckedCreateWithoutTransfersFromInput>
+    where?: ServiceCenterWhereInput
+  }
+
+  export type ServiceCenterUpdateToOneWithWhereWithoutTransfersFromInput = {
+    where?: ServiceCenterWhereInput
+    data: XOR<ServiceCenterUpdateWithoutTransfersFromInput, ServiceCenterUncheckedUpdateWithoutTransfersFromInput>
+  }
+
+  export type ServiceCenterUpdateWithoutTransfersFromInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUpdateManyWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
+    assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ServiceCenterUncheckedUpdateWithoutTransfersFromInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+    assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ServiceCenterUpsertWithoutTransfersToInput = {
+    update: XOR<ServiceCenterUpdateWithoutTransfersToInput, ServiceCenterUncheckedUpdateWithoutTransfersToInput>
+    create: XOR<ServiceCenterCreateWithoutTransfersToInput, ServiceCenterUncheckedCreateWithoutTransfersToInput>
+    where?: ServiceCenterWhereInput
+  }
+
+  export type ServiceCenterUpdateToOneWithWhereWithoutTransfersToInput = {
+    where?: ServiceCenterWhereInput
+    data: XOR<ServiceCenterUpdateWithoutTransfersToInput, ServiceCenterUncheckedUpdateWithoutTransfersToInput>
+  }
+
+  export type ServiceCenterUpdateWithoutTransfersToInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUpdateManyWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
+    assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+  }
+
+  export type ServiceCenterUncheckedUpdateWithoutTransfersToInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+    assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
   }
 
   export type TicketUpsertWithoutProductTransactionsInput = {
@@ -47340,6 +51253,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -47386,11 +51302,30 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
     ticketMilestones?: TicketMilestoneUncheckedUpdateManyWithoutTicketNestedInput
     batchItems?: batchItemUncheckedUpdateManyWithoutTicketNestedInput
+  }
+
+  export type ProductTransactionItemUpsertWithWhereUniqueWithoutTransactionInput = {
+    where: ProductTransactionItemWhereUniqueInput
+    update: XOR<ProductTransactionItemUpdateWithoutTransactionInput, ProductTransactionItemUncheckedUpdateWithoutTransactionInput>
+    create: XOR<ProductTransactionItemCreateWithoutTransactionInput, ProductTransactionItemUncheckedCreateWithoutTransactionInput>
+  }
+
+  export type ProductTransactionItemUpdateWithWhereUniqueWithoutTransactionInput = {
+    where: ProductTransactionItemWhereUniqueInput
+    data: XOR<ProductTransactionItemUpdateWithoutTransactionInput, ProductTransactionItemUncheckedUpdateWithoutTransactionInput>
+  }
+
+  export type ProductTransactionItemUpdateManyWithWhereWithoutTransactionInput = {
+    where: ProductTransactionItemScalarWhereInput
+    data: XOR<ProductTransactionItemUpdateManyMutationInput, ProductTransactionItemUncheckedUpdateManyWithoutTransactionInput>
   }
 
   export type UserUpsertWithoutProductTransactionsInput = {
@@ -47423,6 +51358,7 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -47455,76 +51391,473 @@ export namespace Prisma {
     notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
     updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
   }
 
-  export type ProductCreateWithoutInventoryInput = {
-    name: string
-    description?: string | null
-    brandName?: string | null
-    productCode: string
-    category?: $Enums.Category | null
+  export type UserUpsertWithoutApprovedTransactionsInput = {
+    update: XOR<UserUpdateWithoutApprovedTransactionsInput, UserUncheckedUpdateWithoutApprovedTransactionsInput>
+    create: XOR<UserCreateWithoutApprovedTransactionsInput, UserUncheckedCreateWithoutApprovedTransactionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutApprovedTransactionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutApprovedTransactionsInput, UserUncheckedUpdateWithoutApprovedTransactionsInput>
+  }
+
+  export type UserUpdateWithoutApprovedTransactionsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    serviceCenter?: ServiceCenterUpdateOneWithoutUsersNestedInput
+    createdTickets?: TicketUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
+    State?: StateUpdateOneWithoutPrimaryUsersNestedInput
+    states?: StateUpdateManyWithoutUsersNestedInput
+    project?: ProjectUpdateOneWithoutUsersNestedInput
+    organisation?: OrganisationUpdateOneWithoutUsersNestedInput
+    createdBatches?: batchUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUpdateManyWithoutUpdaterNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutApprovedTransactionsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: NullableEnumRoleFieldUpdateOperationsInput | $Enums.Role | null
+    centerCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    stateId?: NullableIntFieldUpdateOperationsInput | number | null
+    projectCode?: NullableStringFieldUpdateOperationsInput | string | null
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    createdTickets?: TicketUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    updatedTickets?: TicketUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSenderNestedInput
+    messageSeens?: MessageSeenUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutCreatedByNestedInput
+    notificationRecipients?: NotificationRecipientUncheckedUpdateManyWithoutUserNestedInput
+    spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
+    productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
+    states?: StateUncheckedUpdateManyWithoutUsersNestedInput
+    createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
+    updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
+  }
+
+  export type ProductUpsertWithoutTransactionsInput = {
+    update: XOR<ProductUpdateWithoutTransactionsInput, ProductUncheckedUpdateWithoutTransactionsInput>
+    create: XOR<ProductCreateWithoutTransactionsInput, ProductUncheckedCreateWithoutTransactionsInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutTransactionsInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutTransactionsInput, ProductUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type ProductUpdateWithoutTransactionsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUpdateManyWithoutProductNestedInput
+    spareRequestItems?: spareRequestItemUpdateManyWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutTransactionsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUncheckedUpdateManyWithoutProductNestedInput
+    spareRequestItems?: spareRequestItemUncheckedUpdateManyWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductTransactionCreateWithoutItemsInput = {
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    serviceCenter: ServiceCenterCreateNestedOneWithoutTransactionsInput
+    fromCenter?: ServiceCenterCreateNestedOneWithoutTransfersFromInput
+    toCenter?: ServiceCenterCreateNestedOneWithoutTransfersToInput
+    ticket?: TicketCreateNestedOneWithoutProductTransactionsInput
+    createdByUser: UserCreateNestedOneWithoutProductTransactionsInput
+    approverUser?: UserCreateNestedOneWithoutApprovedTransactionsInput
+    Product?: ProductCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type ProductTransactionUncheckedCreateWithoutItemsInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+  }
+
+  export type ProductTransactionCreateOrConnectWithoutItemsInput = {
+    where: ProductTransactionWhereUniqueInput
+    create: XOR<ProductTransactionCreateWithoutItemsInput, ProductTransactionUncheckedCreateWithoutItemsInput>
+  }
+
+  export type ProductCreateWithoutProductTransactionItemInput = {
+    name: string
+    productCode: string
+    description?: string | null
+    brandName?: string | null
+    category?: $Enums.Category | null
+    unitOfMeasure?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inventories?: InventoryCreateNestedManyWithoutProductInput
     transactions?: ProductTransactionCreateNestedManyWithoutProductInput
     spareRequestItems?: spareRequestItemCreateNestedManyWithoutProductInput
   }
 
-  export type ProductUncheckedCreateWithoutInventoryInput = {
+  export type ProductUncheckedCreateWithoutProductTransactionItemInput = {
     id?: number
     name: string
+    productCode: string
     description?: string | null
     brandName?: string | null
-    productCode: string
     category?: $Enums.Category | null
+    unitOfMeasure?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    inventories?: InventoryUncheckedCreateNestedManyWithoutProductInput
     transactions?: ProductTransactionUncheckedCreateNestedManyWithoutProductInput
     spareRequestItems?: spareRequestItemUncheckedCreateNestedManyWithoutProductInput
   }
 
-  export type ProductCreateOrConnectWithoutInventoryInput = {
+  export type ProductCreateOrConnectWithoutProductTransactionItemInput = {
     where: ProductWhereUniqueInput
-    create: XOR<ProductCreateWithoutInventoryInput, ProductUncheckedCreateWithoutInventoryInput>
+    create: XOR<ProductCreateWithoutProductTransactionItemInput, ProductUncheckedCreateWithoutProductTransactionItemInput>
   }
 
-  export type ProductUpsertWithoutInventoryInput = {
-    update: XOR<ProductUpdateWithoutInventoryInput, ProductUncheckedUpdateWithoutInventoryInput>
-    create: XOR<ProductCreateWithoutInventoryInput, ProductUncheckedCreateWithoutInventoryInput>
-    where?: ProductWhereInput
+  export type ProductTransactionUpsertWithoutItemsInput = {
+    update: XOR<ProductTransactionUpdateWithoutItemsInput, ProductTransactionUncheckedUpdateWithoutItemsInput>
+    create: XOR<ProductTransactionCreateWithoutItemsInput, ProductTransactionUncheckedCreateWithoutItemsInput>
+    where?: ProductTransactionWhereInput
   }
 
-  export type ProductUpdateToOneWithWhereWithoutInventoryInput = {
-    where?: ProductWhereInput
-    data: XOR<ProductUpdateWithoutInventoryInput, ProductUncheckedUpdateWithoutInventoryInput>
+  export type ProductTransactionUpdateToOneWithWhereWithoutItemsInput = {
+    where?: ProductTransactionWhereInput
+    data: XOR<ProductTransactionUpdateWithoutItemsInput, ProductTransactionUncheckedUpdateWithoutItemsInput>
   }
 
-  export type ProductUpdateWithoutInventoryInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
-    brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
-    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+  export type ProductTransactionUpdateWithoutItemsInput = {
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
+    ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateWithoutItemsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type ProductUpsertWithoutProductTransactionItemInput = {
+    update: XOR<ProductUpdateWithoutProductTransactionItemInput, ProductUncheckedUpdateWithoutProductTransactionItemInput>
+    create: XOR<ProductCreateWithoutProductTransactionItemInput, ProductUncheckedCreateWithoutProductTransactionItemInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutProductTransactionItemInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutProductTransactionItemInput, ProductUncheckedUpdateWithoutProductTransactionItemInput>
+  }
+
+  export type ProductUpdateWithoutProductTransactionItemInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUpdateManyWithoutProductNestedInput
     transactions?: ProductTransactionUpdateManyWithoutProductNestedInput
     spareRequestItems?: spareRequestItemUpdateManyWithoutProductNestedInput
   }
 
-  export type ProductUncheckedUpdateWithoutInventoryInput = {
+  export type ProductUncheckedUpdateWithoutProductTransactionItemInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     brandName?: NullableStringFieldUpdateOperationsInput | string | null
-    productCode?: StringFieldUpdateOperationsInput | string
     category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inventories?: InventoryUncheckedUpdateManyWithoutProductNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutProductNestedInput
+    spareRequestItems?: spareRequestItemUncheckedUpdateManyWithoutProductNestedInput
+  }
+
+  export type ServiceCenterCreateWithoutInventoriesInput = {
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserCreateNestedManyWithoutServiceCenterInput
+    organisation?: OrganisationCreateNestedOneWithoutServiceCentersInput
+    assignedTickets?: TicketCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterUncheckedCreateWithoutInventoriesInput = {
+    id?: number
+    name: string
+    orgCode?: string | null
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+    users?: UserUncheckedCreateNestedManyWithoutServiceCenterInput
+    assignedTickets?: TicketUncheckedCreateNestedManyWithoutServiceCenterInput
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutServiceCenterInput
+    transfersFrom?: ProductTransactionUncheckedCreateNestedManyWithoutFromCenterInput
+    transfersTo?: ProductTransactionUncheckedCreateNestedManyWithoutToCenterInput
+  }
+
+  export type ServiceCenterCreateOrConnectWithoutInventoriesInput = {
+    where: ServiceCenterWhereUniqueInput
+    create: XOR<ServiceCenterCreateWithoutInventoriesInput, ServiceCenterUncheckedCreateWithoutInventoriesInput>
+  }
+
+  export type ProductCreateWithoutInventoriesInput = {
+    name: string
+    productCode: string
+    description?: string | null
+    brandName?: string | null
+    category?: $Enums.Category | null
+    unitOfMeasure?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transactions?: ProductTransactionCreateNestedManyWithoutProductInput
+    spareRequestItems?: spareRequestItemCreateNestedManyWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductUncheckedCreateWithoutInventoriesInput = {
+    id?: number
+    name: string
+    productCode: string
+    description?: string | null
+    brandName?: string | null
+    category?: $Enums.Category | null
+    unitOfMeasure?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transactions?: ProductTransactionUncheckedCreateNestedManyWithoutProductInput
+    spareRequestItems?: spareRequestItemUncheckedCreateNestedManyWithoutProductInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedCreateNestedManyWithoutProductInput
+  }
+
+  export type ProductCreateOrConnectWithoutInventoriesInput = {
+    where: ProductWhereUniqueInput
+    create: XOR<ProductCreateWithoutInventoriesInput, ProductUncheckedCreateWithoutInventoriesInput>
+  }
+
+  export type ServiceCenterUpsertWithoutInventoriesInput = {
+    update: XOR<ServiceCenterUpdateWithoutInventoriesInput, ServiceCenterUncheckedUpdateWithoutInventoriesInput>
+    create: XOR<ServiceCenterCreateWithoutInventoriesInput, ServiceCenterUncheckedCreateWithoutInventoriesInput>
+    where?: ServiceCenterWhereInput
+  }
+
+  export type ServiceCenterUpdateToOneWithWhereWithoutInventoriesInput = {
+    where?: ServiceCenterWhereInput
+    data: XOR<ServiceCenterUpdateWithoutInventoriesInput, ServiceCenterUncheckedUpdateWithoutInventoriesInput>
+  }
+
+  export type ServiceCenterUpdateWithoutInventoriesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUpdateManyWithoutServiceCenterNestedInput
+    organisation?: OrganisationUpdateOneWithoutServiceCentersNestedInput
+    assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ServiceCenterUncheckedUpdateWithoutInventoriesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    orgCode?: NullableStringFieldUpdateOperationsInput | string | null
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+    assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ProductUpsertWithoutInventoriesInput = {
+    update: XOR<ProductUpdateWithoutInventoriesInput, ProductUncheckedUpdateWithoutInventoriesInput>
+    create: XOR<ProductCreateWithoutInventoriesInput, ProductUncheckedCreateWithoutInventoriesInput>
+    where?: ProductWhereInput
+  }
+
+  export type ProductUpdateToOneWithWhereWithoutInventoriesInput = {
+    where?: ProductWhereInput
+    data: XOR<ProductUpdateWithoutInventoriesInput, ProductUncheckedUpdateWithoutInventoriesInput>
+  }
+
+  export type ProductUpdateWithoutInventoriesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: ProductTransactionUpdateManyWithoutProductNestedInput
+    spareRequestItems?: spareRequestItemUpdateManyWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUpdateManyWithoutProductNestedInput
+  }
+
+  export type ProductUncheckedUpdateWithoutInventoriesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    productCode?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    brandName?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: NullableEnumCategoryFieldUpdateOperationsInput | $Enums.Category | null
+    unitOfMeasure?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     transactions?: ProductTransactionUncheckedUpdateManyWithoutProductNestedInput
     spareRequestItems?: spareRequestItemUncheckedUpdateManyWithoutProductNestedInput
+    ProductTransactionItem?: ProductTransactionItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
   export type UserCreateWithoutMessagesInput = {
@@ -47546,6 +51879,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -47578,6 +51912,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -47615,6 +51950,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -47661,6 +51999,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
@@ -47786,6 +52127,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -47818,6 +52160,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -47861,6 +52204,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -47907,6 +52253,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
@@ -48005,6 +52354,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -48037,6 +52387,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -48108,6 +52459,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -48140,6 +52492,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -48189,6 +52542,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -48221,6 +52575,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -48258,6 +52613,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -48304,6 +52662,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
     attachments?: AttachmentsUncheckedCreateNestedManyWithoutTicketInput
@@ -48399,6 +52760,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -48431,6 +52793,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -48474,6 +52837,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -48520,6 +52886,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
     attachments?: AttachmentsUncheckedUpdateManyWithoutTicketNestedInput
@@ -48588,6 +52957,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -48620,6 +52990,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -48693,6 +53064,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -48725,6 +53097,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -48774,6 +53147,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -48806,6 +53180,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     updatedBatches?: batchUncheckedCreateNestedManyWithoutUpdaterInput
@@ -48836,6 +53211,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneCreateNestedManyWithoutChangerInput
     State?: StateCreateNestedOneWithoutPrimaryUsersInput
     states?: StateCreateNestedManyWithoutUsersInput
@@ -48868,6 +53244,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
     spareRequestsUpdated?: spareRequestUncheckedCreateNestedManyWithoutUpdatedByUserInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutCreatedByUserInput
+    approvedTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutApproverUserInput
     TicketMilestone?: TicketMilestoneUncheckedCreateNestedManyWithoutChangerInput
     states?: StateUncheckedCreateNestedManyWithoutUsersInput
     createdBatches?: batchUncheckedCreateNestedManyWithoutCreatorInput
@@ -48925,6 +53302,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -48957,6 +53335,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
@@ -48993,6 +53372,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -49025,6 +53405,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -49082,6 +53463,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -49128,6 +53512,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -49209,6 +53596,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -49255,6 +53645,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -49288,6 +53681,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     createdByUser: UserCreateNestedOneWithoutCreatedTicketsInput
     updatedByUser?: UserCreateNestedOneWithoutUpdatedTicketsInput
     serviceCenter?: ServiceCenterCreateNestedOneWithoutAssignedTicketsInput
@@ -49333,6 +53729,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
     messages?: MessageUncheckedCreateNestedManyWithoutTicketInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutTicketInput
     productTransactions?: ProductTransactionUncheckedCreateNestedManyWithoutTicketInput
@@ -49428,6 +53827,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
   }
 
   export type districtCreateManyStateInput = {
@@ -49456,6 +53858,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
@@ -49487,6 +53890,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -49529,6 +53933,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     project?: ProjectUpdateOneWithoutUsersNestedInput
@@ -49561,6 +53966,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
     updatedBatches?: batchUncheckedUpdateManyWithoutUpdaterNestedInput
@@ -49592,7 +53998,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
     organisation?: OrganisationUpdateOneWithoutProjectNestedInput
     users?: UserUpdateManyWithoutProjectNestedInput
   }
@@ -49608,7 +54013,6 @@ export namespace Prisma {
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     organisationId?: NullableIntFieldUpdateOperationsInput | number | null
-    ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
     users?: UserUncheckedUpdateManyWithoutProjectNestedInput
   }
 
@@ -49651,6 +54055,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -49696,6 +54103,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -49736,6 +54146,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type districtUpdateWithoutStateInput = {
@@ -49789,6 +54202,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
   }
 
   export type TicketUpdateWithoutSelectedDistrictInput = {
@@ -49817,6 +54233,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -49862,6 +54281,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -49902,6 +54324,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ProjectCreateManyOrganisationInput = {
@@ -49933,6 +54358,21 @@ export namespace Prisma {
     projectCode?: string | null
   }
 
+  export type ServiceCenterCreateManyOrganisationInput = {
+    id?: number
+    name: string
+    centerCode: string
+    email: string
+    address?: string | null
+    isActive?: boolean
+    isMacsoft?: boolean
+    isMacsoftHead?: boolean
+    serviceableStates?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string | null
+    deletedAt?: Date | string | null
+  }
+
   export type ProjectUpdateWithoutOrganisationInput = {
     name?: StringFieldUpdateOperationsInput | string
     projectCode?: StringFieldUpdateOperationsInput | string
@@ -49942,7 +54382,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    ServiceCenter?: ServiceCenterUpdateManyWithoutProjectNestedInput
     state?: StateUpdateOneWithoutProjectsNestedInput
     users?: UserUpdateManyWithoutProjectNestedInput
   }
@@ -49958,7 +54397,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    ServiceCenter?: ServiceCenterUncheckedUpdateManyWithoutProjectNestedInput
     users?: UserUncheckedUpdateManyWithoutProjectNestedInput
   }
 
@@ -49995,6 +54433,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -50026,6 +54465,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -50048,17 +54488,60 @@ export namespace Prisma {
     projectCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type ServiceCenterCreateManyProjectInput = {
-    id?: number
-    name: string
-    centerCode: string
-    email: string
-    address?: string | null
-    isActive?: boolean
-    serviceableStates?: string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string | null
-    deletedAt?: Date | string | null
+  export type ServiceCenterUpdateWithoutOrganisationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUpdateManyWithoutServiceCenterNestedInput
+    assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ServiceCenterUncheckedUpdateWithoutOrganisationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
+    assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
+    inventories?: InventoryUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transactions?: ProductTransactionUncheckedUpdateManyWithoutServiceCenterNestedInput
+    transfersFrom?: ProductTransactionUncheckedUpdateManyWithoutFromCenterNestedInput
+    transfersTo?: ProductTransactionUncheckedUpdateManyWithoutToCenterNestedInput
+  }
+
+  export type ServiceCenterUncheckedUpdateManyWithoutOrganisationInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    centerCode?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoft?: BoolFieldUpdateOperationsInput | boolean
+    isMacsoftHead?: BoolFieldUpdateOperationsInput | boolean
+    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserCreateManyProjectInput = {
@@ -50075,48 +54558,6 @@ export namespace Prisma {
     isActive?: boolean
     stateId?: number | null
     orgCode?: string | null
-  }
-
-  export type ServiceCenterUpdateWithoutProjectInput = {
-    name?: StringFieldUpdateOperationsInput | string
-    centerCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    users?: UserUpdateManyWithoutServiceCenterNestedInput
-    assignedTickets?: TicketUpdateManyWithoutServiceCenterNestedInput
-  }
-
-  export type ServiceCenterUncheckedUpdateWithoutProjectInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    centerCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    users?: UserUncheckedUpdateManyWithoutServiceCenterNestedInput
-    assignedTickets?: TicketUncheckedUpdateManyWithoutServiceCenterNestedInput
-  }
-
-  export type ServiceCenterUncheckedUpdateManyWithoutProjectInput = {
-    id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
-    centerCode?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    serviceableStates?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUpdateWithoutProjectInput = {
@@ -50139,6 +54580,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -50170,6 +54612,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -50240,6 +54683,88 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
+  }
+
+  export type InventoryCreateManyServiceCenterInput = {
+    id?: number
+    productId: number
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
+    minStock?: number
+    maxStock?: number | null
+    location?: string | null
+    updatedAt?: Date | string
+  }
+
+  export type ProductTransactionCreateManyServiceCenterInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+  }
+
+  export type ProductTransactionCreateManyFromCenterInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
+  }
+
+  export type ProductTransactionCreateManyToCenterInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
   }
 
   export type UserUpdateWithoutServiceCenterInput = {
@@ -50261,6 +54786,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUpdateManyWithoutChangerNestedInput
     State?: StateUpdateOneWithoutPrimaryUsersNestedInput
     states?: StateUpdateManyWithoutUsersNestedInput
@@ -50293,6 +54819,7 @@ export namespace Prisma {
     spareRequestsCreated?: spareRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
     spareRequestsUpdated?: spareRequestUncheckedUpdateManyWithoutUpdatedByUserNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutCreatedByUserNestedInput
+    approvedTransactions?: ProductTransactionUncheckedUpdateManyWithoutApproverUserNestedInput
     TicketMilestone?: TicketMilestoneUncheckedUpdateManyWithoutChangerNestedInput
     states?: StateUncheckedUpdateManyWithoutUsersNestedInput
     createdBatches?: batchUncheckedUpdateManyWithoutCreatorNestedInput
@@ -50341,6 +54868,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
@@ -50386,6 +54916,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -50426,6 +54959,248 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type InventoryUpdateWithoutServiceCenterInput = {
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
+    minStock?: IntFieldUpdateOperationsInput | number
+    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    product?: ProductUpdateOneRequiredWithoutInventoriesNestedInput
+  }
+
+  export type InventoryUncheckedUpdateWithoutServiceCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productId?: IntFieldUpdateOperationsInput | number
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
+    minStock?: IntFieldUpdateOperationsInput | number
+    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InventoryUncheckedUpdateManyWithoutServiceCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productId?: IntFieldUpdateOperationsInput | number
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
+    minStock?: IntFieldUpdateOperationsInput | number
+    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductTransactionUpdateWithoutServiceCenterInput = {
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
+    ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateWithoutServiceCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutServiceCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type ProductTransactionUpdateWithoutFromCenterInput = {
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
+    ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateWithoutFromCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutFromCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type ProductTransactionUpdateWithoutToCenterInput = {
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateWithoutToCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutToCenterInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type TicketCreateManyCreatedByUserInput = {
@@ -50460,6 +55235,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
   }
 
   export type TicketCreateManyUpdatedByUserInput = {
@@ -50494,6 +55272,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
   }
 
   export type MessageCreateManySenderInput = {
@@ -50546,13 +55327,46 @@ export namespace Prisma {
 
   export type ProductTransactionCreateManyCreatedByUserInput = {
     id?: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
     ticketId?: number | null
-    notes?: string | null
+    remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    productId?: number | null
+  }
+
+  export type ProductTransactionCreateManyApproverUserInput = {
+    id?: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    ticketId?: number | null
+    remarks?: string | null
+    createdBy: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    productId?: number | null
   }
 
   export type TicketMilestoneCreateManyChangerInput = {
@@ -50619,6 +55433,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
@@ -50664,6 +55481,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -50704,6 +55524,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type TicketUpdateWithoutUpdatedByUserInput = {
@@ -50732,6 +55555,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
     state?: StateUpdateOneWithoutTicketsNestedInput
@@ -50777,6 +55603,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -50817,6 +55646,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type MessageUpdateWithoutSenderInput = {
@@ -50970,35 +55802,137 @@ export namespace Prisma {
   }
 
   export type ProductTransactionUpdateWithoutCreatedByUserInput = {
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneRequiredWithoutTransactionsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
     ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateWithoutCreatedByUserInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateManyWithoutCreatedByUserInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type ProductTransactionUpdateWithoutApproverUserInput = {
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
+    ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
+    createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateWithoutApproverUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
+  }
+
+  export type ProductTransactionUncheckedUpdateManyWithoutApproverUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ticketId?: NullableIntFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdBy?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type TicketMilestoneUpdateWithoutChangerInput = {
@@ -51162,13 +56096,24 @@ export namespace Prisma {
 
   export type ProductTransactionCreateManyTicketInput = {
     id?: number
-    productId: number
-    type: $Enums.TransactionType
-    quantity: number
-    notes?: string | null
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
+    remarks?: string | null
     createdBy: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    productId?: number | null
   }
 
   export type AttachmentsCreateManyTicketInput = {
@@ -51265,35 +56210,70 @@ export namespace Prisma {
   }
 
   export type ProductTransactionUpdateWithoutTicketInput = {
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    product?: ProductUpdateOneRequiredWithoutTransactionsNestedInput
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
     createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
+    Product?: ProductUpdateOneWithoutTransactionsNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateWithoutTicketInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateManyWithoutTicketInput = {
     id?: IntFieldUpdateOperationsInput | number
-    productId?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type AttachmentsUpdateWithoutTicketInput = {
@@ -51481,12 +56461,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type InventoryCreateManyProductInput = {
+    id?: number
+    centerCode: string
+    goodQty?: number
+    repairableQty?: number
+    damagedQty?: number
+    scrapQty?: number
+    minStock?: number
+    maxStock?: number | null
+    location?: string | null
+    updatedAt?: Date | string
+  }
+
   export type ProductTransactionCreateManyProductInput = {
     id?: number
-    type: $Enums.TransactionType
-    quantity: number
+    transactionType: $Enums.TransactionType
+    status?: $Enums.TransactionStatus
+    centerCode: string
+    fromCenterCode?: string | null
+    toCenterCode?: string | null
+    approvedBy?: number | null
+    approvedAt?: Date | string | null
+    rejectionReason?: string | null
+    invoiceNo?: string | null
+    billNo?: string | null
+    receiptDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedAt?: Date | string | null
     ticketId?: number | null
-    notes?: string | null
+    remarks?: string | null
     createdBy: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -51501,33 +56505,114 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ProductTransactionItemCreateManyProductInput = {
+    id?: number
+    transactionId: number
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+  }
+
+  export type InventoryUpdateWithoutProductInput = {
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
+    minStock?: IntFieldUpdateOperationsInput | number
+    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutInventoriesNestedInput
+  }
+
+  export type InventoryUncheckedUpdateWithoutProductInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    centerCode?: StringFieldUpdateOperationsInput | string
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
+    minStock?: IntFieldUpdateOperationsInput | number
+    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InventoryUncheckedUpdateManyWithoutProductInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    centerCode?: StringFieldUpdateOperationsInput | string
+    goodQty?: IntFieldUpdateOperationsInput | number
+    repairableQty?: IntFieldUpdateOperationsInput | number
+    damagedQty?: IntFieldUpdateOperationsInput | number
+    scrapQty?: IntFieldUpdateOperationsInput | number
+    minStock?: IntFieldUpdateOperationsInput | number
+    maxStock?: NullableIntFieldUpdateOperationsInput | number | null
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ProductTransactionUpdateWithoutProductInput = {
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    serviceCenter?: ServiceCenterUpdateOneRequiredWithoutTransactionsNestedInput
+    fromCenter?: ServiceCenterUpdateOneWithoutTransfersFromNestedInput
+    toCenter?: ServiceCenterUpdateOneWithoutTransfersToNestedInput
     ticket?: TicketUpdateOneWithoutProductTransactionsNestedInput
+    items?: ProductTransactionItemUpdateManyWithoutTransactionNestedInput
     createdByUser?: UserUpdateOneRequiredWithoutProductTransactionsNestedInput
+    approverUser?: UserUpdateOneWithoutApprovedTransactionsNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateWithoutProductInput = {
     id?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: ProductTransactionItemUncheckedUpdateManyWithoutTransactionNestedInput
   }
 
   export type ProductTransactionUncheckedUpdateManyWithoutProductInput = {
     id?: IntFieldUpdateOperationsInput | number
-    type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
-    quantity?: IntFieldUpdateOperationsInput | number
+    transactionType?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+    status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
+    centerCode?: StringFieldUpdateOperationsInput | string
+    fromCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    toCenterCode?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedBy?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    invoiceNo?: NullableStringFieldUpdateOperationsInput | string | null
+    billNo?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ticketId?: NullableIntFieldUpdateOperationsInput | number | null
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdBy?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -51557,6 +56642,60 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProductTransactionItemUpdateWithoutProductInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+    transaction?: ProductTransactionUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type ProductTransactionItemUncheckedUpdateWithoutProductInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionId?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ProductTransactionItemUncheckedUpdateManyWithoutProductInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    transactionId?: IntFieldUpdateOperationsInput | number
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ProductTransactionItemCreateManyTransactionInput = {
+    id?: number
+    productId?: number | null
+    productName?: string | null
+    condition: $Enums.InventoryCondition
+    quantity: number
+  }
+
+  export type ProductTransactionItemUpdateWithoutTransactionInput = {
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+    product?: ProductUpdateOneWithoutProductTransactionItemNestedInput
+  }
+
+  export type ProductTransactionItemUncheckedUpdateWithoutTransactionInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type ProductTransactionItemUncheckedUpdateManyWithoutTransactionInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    productId?: NullableIntFieldUpdateOperationsInput | number | null
+    productName?: NullableStringFieldUpdateOperationsInput | string | null
+    condition?: EnumInventoryConditionFieldUpdateOperationsInput | $Enums.InventoryCondition
+    quantity?: IntFieldUpdateOperationsInput | number
   }
 
   export type NotificationCreateManyMessageInput = {
@@ -51752,6 +56891,9 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
+    backupjson?: string | null
+    backupcreatedAt?: Date | string | null
+    backupurl?: string | null
   }
 
   export type TicketUpdateWithoutMotorhpInput = {
@@ -51780,6 +56922,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     createdByUser?: UserUpdateOneRequiredWithoutCreatedTicketsNestedInput
     updatedByUser?: UserUpdateOneWithoutUpdatedTicketsNestedInput
     serviceCenter?: ServiceCenterUpdateOneWithoutAssignedTicketsNestedInput
@@ -51825,6 +56970,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
     messages?: MessageUncheckedUpdateManyWithoutTicketNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutTicketNestedInput
     productTransactions?: ProductTransactionUncheckedUpdateManyWithoutTicketNestedInput
@@ -51865,6 +57013,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupjson?: NullableStringFieldUpdateOperationsInput | string | null
+    backupcreatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    backupurl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

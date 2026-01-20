@@ -11,6 +11,10 @@ const {
 router.get("/check-controller/:controllerNo", authenticate, tickets.checkActiveTicketForController);
 router.get("/search/controller/:controllerNo", authenticate, tickets.searchByControllerNumber);
 router.get("/search", authenticate, tickets.searchTickets);
+router.get("/archive/candidates", authenticate, tickets.getArchivalCandidates);
+router.post("/archive/trigger", authenticate, tickets.triggerArchivalJob);
+router.get("/:id/archive", authenticate, tickets.getArchivedData);
+router.post("/:id/archive", authenticate, tickets.archiveTicketManually);
 router.get("/", authenticate, tickets.getTickets);
 router.get("/:id", authenticate, tickets.getTicketById);
 router.post("/", authenticate, handleTicketFileUpload, tickets.createTicket);
