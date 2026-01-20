@@ -1,15 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import uiSlice from "../features/uiSlice";
 import authSlice from "../features/authSlice";
-import userSlice from "../features/users"
-/* 
-import devicesSlice from "../features/devices";
-import manufacturersSlice from "../features/manufacturers";
-import commandSlice from "../features/commands";
-import templatesSlice from "../features/template";
-import dashboardSlice from "../features/dashboard";
-import mappingsSlice from "../features/mappings";
-import userSlice from "../features/users"; */
+import userSlice from "../features/users" ;
+import templaSlice from "../features/template";
 import notificationSlice from "../features/notifications";
 import ticketSlice from "../features/tickets";
 import organisationSlice from "../features/organisations";
@@ -28,6 +21,7 @@ export const store = configureStore({
     servicecenter: serviceCenterSlice,
     project: projectsSlice,
     product: productSlice,
+    template: templaSlice,
   },/* 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

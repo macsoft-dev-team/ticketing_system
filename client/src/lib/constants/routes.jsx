@@ -42,6 +42,8 @@ import SettingsPage from '../../pages/settings';
 import Projects from '../../pages/projects/projects';
 import DeliveryPage from '../../pages/delivery/DeliveryPage';
 import NotificationsPage from '../../pages/notifications';
+import ModbusTemplates from '../../pages/modbustemplates/ModbusTemplates';
+
 
 const BASE_ITEMS = {
   // -------------------------
@@ -182,6 +184,13 @@ const BASE_ITEMS = {
     category: 'management',
     element: <SpareRequestApproval />,
   },
+  template:{
+    path: '/configuration-templates',
+    icon: Network,
+    label: 'Configuration Templates',
+    category: 'management',
+    element: <ModbusTemplates />,
+  },
 
   settings: {
     path: '/settings',
@@ -223,6 +232,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.spareRequestApproval,
 
     BASE_ITEMS.motorhp,
+    BASE_ITEMS.template,
     BASE_ITEMS.settings,
     BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
@@ -247,6 +257,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.project,
 
     BASE_ITEMS.motorhp,
+    BASE_ITEMS.template,
     BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
@@ -263,6 +274,7 @@ const ROLE_ITEMS = {
     BASE_ITEMS.serviceCenter,
 
     BASE_ITEMS.products,
+    BASE_ITEMS.template,
     BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],

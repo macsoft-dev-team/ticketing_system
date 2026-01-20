@@ -172,3 +172,18 @@ export const productsState = {
   loading: false,
   error: null,
 };
+
+export const templatesState = {
+  templates: [],
+  template: null,
+  filter: {
+    search: "",
+    customerId: "",
+    status: "",
+  },
+  mode: {} ,
+  totalPages: 0,
+  currentPage: 0,
+  loading: false,
+  error: null,
+};
