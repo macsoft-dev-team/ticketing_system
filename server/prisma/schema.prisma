@@ -130,6 +130,7 @@ model Organisation {
   project        Project[]
   users          User[]
   serviceCenters ServiceCenter[]
+  templates      template[]
 }
 
 model Project {
@@ -259,6 +260,7 @@ model Ticket {
   backupjson          String?              @db.LongText
   backupcreatedAt     DateTime?
   backupurl           String?
+  isArchived          Boolean              @default(false)
 }
 
 model TicketMilestone {
@@ -622,4 +624,16 @@ model BuzzerAlertConfig {
   description String?  @default("Time window for buzzer alerts when customer messages are pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model template {
+  id         String        @id @default(cuid())
+  name       String
+  driveCode  String?
+  orgCode    String?
+  parameters String?       @db.LongText
+  users      String?       @db.LongText
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime?     @updatedAt
+  customer   Organisation? @relation(fields: [orgCode], references: [orgCode])
 }
