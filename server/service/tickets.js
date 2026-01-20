@@ -14,9 +14,25 @@ const fs = require("fs");
 const path = require("path");
 
 /**
+ * Utility function to read backup JSON from file path
+ */
+const readBackupFromFile = async (backupUrl) => {
+  try {
+    if (!backupUrl || !fs.existsSync(backupUrl)) {
+      return null;
+    }
+    const jsonData = fs.readFileSync(backupUrl, "utf8");
+    return JSON.parse(jsonData);
+  } catch (error) {
+    console.error("Error reading backup JSON from file:", error);
+    return null;
+  }
+};
+
+/**
  * Archive ticket data to JSON when ticket is closed
  * Fetches all related data (messages, MessageSeen, notifications, NotificationRecipient)
- * and stores it as JSON in the ticket's backupjson field
+ * and stores it as JSON file, with the file path saved in backupurl field
  */
 const archiveTicketData = async (ticketId) => {
   try {
@@ -162,11 +178,10 @@ const archiveTicketData = async (ticketId) => {
     const backupFilePath = path.join(ticketDir, `archive_${Date.now()}.json`);
     fs.writeFileSync(backupFilePath, backupJson, "utf8");
 
-    // Update ticket with backup JSON and metadata
+    // Update ticket with backup file path and metadata
     await prisma.ticket.update({
       where: { id: ticketId },
       data: {
-        backupjson: backupJson,
         backupcreatedAt: new Date(),
         backupurl: backupFilePath,
       },
@@ -613,7 +628,6 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
       select: {
         id: true,
         status: true,
-        backupjson: true,
         backupcreatedAt: true,
         backupurl: true,
       },
@@ -624,9 +638,12 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
     }
 
     // If ticket is CLOSED and has archived data, return the archived data
-    if (ticketStatus.status === "CLOSED" && ticketStatus.backupjson) {
+    if (ticketStatus.status === "CLOSED" && ticketStatus.backupurl) {
       try {
-        const archivedData = JSON.parse(ticketStatus.backupjson);
+        const archivedData = await readBackupFromFile(ticketStatus.backupurl);
+        if (!archivedData) {
+          throw new Error("Failed to read backup data from file");
+        }
         
         // Fetch basic ticket info and merge with archived data
         const basicTicket = await prisma.ticket.findFirst({

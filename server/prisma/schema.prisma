@@ -257,7 +257,6 @@ model Ticket {
   attachments         Attachments[]
   ticketMilestones    TicketMilestone[]
   batchItems          batchItem[]
-  backupjson          String?              @db.LongText
   backupcreatedAt     DateTime?
   backupurl           String?
   isArchived          Boolean              @default(false)

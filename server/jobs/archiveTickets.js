@@ -108,7 +108,7 @@ const archiveTicketById = async (ticketId) => {
         id: true,
         ticketCode: true,
         status: true,
-        backupjson: true,
+        backupurl: true,
       },
     });
 
@@ -126,7 +126,7 @@ const archiveTicketById = async (ticketId) => {
     return {
       success: true,
       ticketCode: ticket.ticketCode,
-      message: ticket.backupjson 
+      message: ticket.backupurl 
         ? "Ticket re-archived successfully" 
         : "Ticket archived successfully",
     };
@@ -149,7 +149,7 @@ const archiveTicketsOlderThan = async (daysOld = 30) => {
     const ticketsToArchive = await prisma.ticket.findMany({
       where: {
         status: "CLOSED",
-        backupjson: null,
+        backupurl: null,
         updatedAt: {
           lt: cutoffDate,
         },

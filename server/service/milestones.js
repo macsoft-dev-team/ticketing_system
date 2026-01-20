@@ -11,6 +11,23 @@ const {
   saveAndBroadcastNotification,
   createMilestoneNotification,
 } = require("../lib/notificationUtils");
+const fs = require("fs");
+
+/**
+ * Utility function to read backup JSON from file path
+ */
+const readBackupFromFile = async (backupUrl) => {
+  try {
+    if (!backupUrl || !fs.existsSync(backupUrl)) {
+      return null;
+    }
+    const jsonData = fs.readFileSync(backupUrl, "utf8");
+    return JSON.parse(jsonData);
+  } catch (error) {
+    console.error("Error reading backup JSON from file:", error);
+    return null;
+  }
+};
 
 // RBAC Socket emission helper for milestone events
 const emitMilestoneEventWithRBAC = (io, eventName, ticketData, eventData) => {
@@ -116,14 +133,17 @@ const getTicketMilestones = async (ticketId) => {
       where: { id: ticketId },
       select: {
         status: true,
-        backupjson: true,
+        backupurl: true,
       },
     });
 
     // If ticket is CLOSED and has archived data, return archived milestones
-    if (ticket && ticket.status === "CLOSED" && ticket.backupjson) {
+    if (ticket && ticket.status === "CLOSED" && ticket.backupurl) {
       try {
-        const archivedData = JSON.parse(ticket.backupjson);
+        const archivedData = await readBackupFromFile(ticket.backupurl);
+        if (!archivedData) {
+          throw new Error("Failed to read backup data from file");
+        }
         const archivedMilestones = archivedData.milestones || [];
 
         // Enhance archived milestones with configuration data
