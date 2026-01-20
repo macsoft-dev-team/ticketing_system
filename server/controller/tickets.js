@@ -4,6 +4,23 @@ const {
   archiveTicketById,
   getCandidateTicketsForArchival 
 } = require("../jobs/archiveTickets");
+const fs = require("fs");
+
+/**
+ * Utility function to read backup JSON from file path
+ */
+const readBackupFromFile = async (backupUrl) => {
+  try {
+    if (!backupUrl || !fs.existsSync(backupUrl)) {
+      return null;
+    }
+    const jsonData = fs.readFileSync(backupUrl, "utf8");
+    return JSON.parse(jsonData);
+  } catch (error) {
+    console.error("Error reading backup JSON from file:", error);
+    return null;
+  }
+};
 
 const getTickets = async (req, res) => {
   try {
@@ -284,7 +301,6 @@ const getArchivedData = async (req, res) => {
         id: true,
         ticketCode: true,
         status: true,
-        backupjson: true,
         backupcreatedAt: true,
         backupurl: true,
       },
@@ -294,7 +310,7 @@ const getArchivedData = async (req, res) => {
       return res.status(404).json({ message: "Ticket not found" });
     }
 
-    if (!ticket.backupjson) {
+    if (!ticket.backupurl) {
       return res.status(404).json({ 
         message: "No archived data found for this ticket",
         ticketCode: ticket.ticketCode,
@@ -302,7 +318,15 @@ const getArchivedData = async (req, res) => {
       });
     }
 
-    const archivedData = JSON.parse(ticket.backupjson);
+    const archivedData = await readBackupFromFile(ticket.backupurl);
+    
+    if (!archivedData) {
+      return res.status(404).json({ 
+        message: "Failed to read archived data for this ticket",
+        ticketCode: ticket.ticketCode,
+        status: ticket.status
+      });
+    }
 
     res.status(200).json({
       ticketId: ticket.id,
