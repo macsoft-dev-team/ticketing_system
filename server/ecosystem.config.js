@@ -6,7 +6,7 @@ module.exports = {
       env: {
         NODE_ENV: "development",
         JWT_SECRET: "whatasecretforyou",
-        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketingsystem",
+        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketingsystem?connection_limit=25&pool_timeout=30&sslaccept=strict",
         PORT: 4055,
         FILE_UPLOAD_PATH: "/var/www/ticketsystem2/uploads",
         UPLOAD_DIR: "/var/www/ticketsystem2/uploads",
@@ -24,7 +24,7 @@ module.exports = {
       env_production: {
         NODE_ENV: "production",
         JWT_SECRET: "nevergonnagiveyouup",
-        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketingsystem",
+        DATABASE_URL: "mysql://root:Welcome123!@localhost:3306/ticketingsystem?connection_limit=25&pool_timeout=30&sslaccept=strict",
         PORT: 4055,
         FILE_UPLOAD_PATH: "/var/www/ticketsystem2/uploads",
         PASSWORD_RESET_URL:
