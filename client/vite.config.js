@@ -16,8 +16,8 @@ export default defineConfig({
       ],    
       workbox: {
         globPatterns: ["**/*.{js,css,html}"],
-        // Further reduce the maximum file size limit to 1MB for minimal cache
-        maximumFileSizeToCacheInBytes: 1 * 1024 * 1024, // 1MB
+        // Increase the maximum file size limit to accommodate current bundle size
+        maximumFileSizeToCacheInBytes: 2 * 1024 * 1024, // 2MB
         // Skip caching large files and media
         globIgnores: [
           '**/node_modules/**/*',
