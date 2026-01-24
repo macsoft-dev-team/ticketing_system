@@ -835,8 +835,7 @@ const checkActiveTicketForController = async (controllerNo) => {
       if (ticket.status === "CLOSED") {
         // If ticket has backup URL, it's been archived and should be considered inactive
         if (
-          ticket &&
-          ticket.isArchived &&
+          ticket && 
           ticket.backupurl &&
           ticket.backupcreatedAt
         ) {
