@@ -102,7 +102,7 @@ const archiveTicketData = async (ticketId) => {
             attachments: true,
           },
           orderBy: {
-            order: 'asc',
+            order: "asc",
           },
         },
       },
@@ -245,7 +245,9 @@ const archiveTicketData = async (ticketId) => {
       });
     }
 
-    console.log(`Successfully archived and cleaned ticket ${ticketData.ticketCode}`);
+    console.log(
+      `Successfully archived and cleaned ticket ${ticketData.ticketCode}`,
+    );
     return {
       success: true,
       backupFilePath,
@@ -258,30 +260,38 @@ const archiveTicketData = async (ticketId) => {
 };
 
 // RBAC Socket emission helper
-const emitTicketEventWithRBAC = (io, eventName, ticketData, eventData = null) => {
+const emitTicketEventWithRBAC = (
+  io,
+  eventName,
+  ticketData,
+  eventData = null,
+) => {
   if (!io || !ticketData) return;
-  
+
   const dataToEmit = eventData || ticketData;
-  
+
   // Always emit to MACSOFT roles (global access)
-  io.to('role-MACSOFT_ADMIN').emit(eventName, dataToEmit);
-  io.to('role-MACSOFT_HEAD').emit(eventName, dataToEmit);
-  io.to('role-MACSOFT_SUPPORT').emit(eventName, dataToEmit);
-  
+  io.to("role-MACSOFT_ADMIN").emit(eventName, dataToEmit);
+  io.to("role-MACSOFT_HEAD").emit(eventName, dataToEmit);
+  io.to("role-MACSOFT_SUPPORT").emit(eventName, dataToEmit);
+
   // Emit to ticket creator (if they are a field engineer)
   if (ticketData.createdBy) {
     io.to(`notifications-${ticketData.createdBy}`).emit(eventName, dataToEmit);
   }
-  
+
   // Emit to assigned service center
   if (ticketData.assignedServiceCenter) {
-    io.to(`center-${ticketData.assignedServiceCenter}`).emit(eventName, dataToEmit);
+    io.to(`center-${ticketData.assignedServiceCenter}`).emit(
+      eventName,
+      dataToEmit,
+    );
   }
-  
+
   // Emit to Customer Service Heads based on ticket's state/location
   // Note: This could be enhanced with state-based targeting
-  io.to('role-CUSTOMER_SERVICE_HEAD').emit(eventName, dataToEmit);
- };
+  io.to("role-CUSTOMER_SERVICE_HEAD").emit(eventName, dataToEmit);
+};
 
 const getTickets = async (skip, take, filter, userId, role) => {
   try {
@@ -329,11 +339,11 @@ const getTickets = async (skip, take, filter, userId, role) => {
           },
           orderBy: { order: "asc" },
         },
-         state: true,
+        state: true,
       },
       orderBy: [
-        { isBuzzerOn: "desc" }, // Buzzer alert tickets first 
-        { createdAt: "desc" }    // Then by creation date
+        { isBuzzerOn: "desc" }, // Buzzer alert tickets first
+        { createdAt: "desc" }, // Then by creation date
       ],
     };
 
@@ -354,17 +364,17 @@ const getTickets = async (skip, take, filter, userId, role) => {
     if (filter && filter.search) {
       const s = String(filter.search).trim();
       if (s.length > 0) {
-        const searchType = filter.searchType || 'controller'; // default to controller
-        
-        if (searchType === 'ticket') {
+        const searchType = filter.searchType || "controller"; // default to controller
+
+        if (searchType === "ticket") {
           // Search only in ticket code
           where.ticketCode = { contains: s };
-        } else if (searchType === 'controller') {
+        } else if (searchType === "controller") {
           // Search only in controller number
           where.controllerNo = { contains: s };
-        } else if (searchType === 'imeinumber') {
+        } else if (searchType === "imeinumber") {
           // Search only in IMEI number
-          where.imei = { contains: s };          
+          where.imei = { contains: s };
         } else {
           // Fallback to search all fields if searchType is not recognized
           where.OR = [
@@ -397,8 +407,8 @@ const getTickets = async (skip, take, filter, userId, role) => {
       where.ticketMilestones = {
         some: {
           stage: stageToFilter,
-          status: 'IN_PROGRESS' // Filter by milestones that are currently in progress
-        }
+          status: "IN_PROGRESS", // Filter by milestones that are currently in progress
+        },
       };
     }
 
@@ -557,8 +567,19 @@ const getTickets = async (skip, take, filter, userId, role) => {
     _transformedStatusCount.RECEIVED_AT_SERVICE_CENTER =
       _transformedMilestoneCount.RECEIVED_AT_SERVICE_CENTER || 0;
 
+    const sortedTickets = tickets.slice().sort((a, b) => {
+      const aMsg =
+        a.messages && a.messages.length > 0
+          ? a.messages[a.messages.length - 1].createdAt
+          : a.createdAt;
+      const bMsg =
+        b.messages && b.messages.length > 0
+          ? b.messages[b.messages.length - 1].createdAt
+          : b.createdAt;
+      return new Date(bMsg) - new Date(aMsg);
+    });
     return {
-      tickets,
+      tickets: sortedTickets,
       count: totalFilteredCount,
       statusCount: _transformedStatusCount,
     };
@@ -644,7 +665,7 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
         if (!archivedData) {
           throw new Error("Failed to read backup data from file");
         }
-        
+
         // Fetch basic ticket info and merge with archived data
         const basicTicket = await prisma.ticket.findFirst({
           where,
@@ -713,11 +734,11 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
           include: {
             sender: true,
             attachments: true,
-            seenBy: { 
+            seenBy: {
               include: {
                 user: {
-                  select: { id: true, name: true, role: true }
-                }
+                  select: { id: true, name: true, role: true },
+                },
               },
             },
           },
@@ -769,7 +790,7 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
  * A ticket is considered active if:
  * 1. Status is not CLOSED
  * 2. OR no final milestone is completed (DONE status for REQUEST_CLEARED_AT_FIELD, DELIVERED_TO_FIELD, FIELD_CLEARANCE_APPROVED, TICKET_CLOSED)
- * 
+ *
  * New tickets are permitted when:
  * - No existing tickets for the controller, OR
  * - All existing tickets have TICKET_CLOSED milestone in DONE status
@@ -780,23 +801,28 @@ const checkActiveTicketForController = async (controllerNo) => {
     const existingTickets = await prisma.ticket.findMany({
       where: {
         controllerNo: controllerNo,
-        deletedAt: null // Only check non-deleted tickets
+        deletedAt: null, // Only check non-deleted tickets
       },
       include: {
         ticketMilestones: {
           where: {
             stage: {
-              in: ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED']
-            }
+              in: [
+                "REQUEST_CLEARED_AT_FIELD",
+                "DELIVERED_TO_FIELD",
+                "FIELD_CLEARANCE_APPROVED",
+                "TICKET_CLOSED",
+              ],
+            },
           },
           orderBy: {
-            createdAt: 'desc'
-          }
-        }
+            createdAt: "desc",
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     if (existingTickets.length === 0) {
@@ -804,17 +830,33 @@ const checkActiveTicketForController = async (controllerNo) => {
     }
 
     // Check each ticket to see if it's active
-    const activeTickets = existingTickets.filter(ticket => {
-      // If ticket status is CLOSED, check if it has completed final milestones (including TICKET_CLOSED)
-      if (ticket.status === 'CLOSED') {
-        // Check if any final milestone is completed
-        const hasFinalMilestone = ticket.ticketMilestones.some(milestone => 
-          milestone.status === 'DONE' && 
-          ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED'].includes(milestone.stage)
+    const activeTickets = existingTickets.filter((ticket) => {
+      // If ticket status is CLOSED, check if it's archived or has completed final milestones
+      if (ticket.status === "CLOSED") {
+        // If ticket has backup URL, it's been archived and should be considered inactive
+        if (
+          ticket &&
+          ticket.isArchived &&
+          ticket.backupurl &&
+          ticket.backupcreatedAt
+        ) {
+          return false; // Archived tickets are inactive
+        }
+
+        // For non-archived CLOSED tickets, check if any final milestone is completed
+        const hasFinalMilestone = ticket.ticketMilestones.some(
+          (milestone) =>
+            milestone.status === "DONE" &&
+            [
+              "REQUEST_CLEARED_AT_FIELD",
+              "DELIVERED_TO_FIELD",
+              "FIELD_CLEARANCE_APPROVED",
+              "TICKET_CLOSED",
+            ].includes(milestone.stage),
         );
         return !hasFinalMilestone; // If no final milestone is done, ticket is still active
       }
-      
+
       // If status is not CLOSED (OPEN, IN_PROGRESS, RESOLVED), it's active
       return true;
     });
@@ -827,26 +869,26 @@ const checkActiveTicketForController = async (controllerNo) => {
           ticketCode: activeTicket.ticketCode,
           status: activeTicket.status,
           createdAt: activeTicket.createdAt,
-          id: activeTicket.id
-        }
+          id: activeTicket.id,
+        },
       };
     }
 
     return { hasActiveTicket: false };
   } catch (error) {
-    console.error('Error checking active ticket for controller:', error);
-    throw new Error('Failed to check for existing tickets');
+    console.error("Error checking active ticket for controller:", error);
+    throw new Error("Failed to check for existing tickets");
   }
 };
 
 /**
  * Create a new ticket with role-based workflow
- * 
+ *
  * For SERVICE_CENTER_TECHNICIAN:
  * - Auto-assigns their service center to the ticket
- * - Auto-progresses through milestones up to DIAGNOSIS_IN_PROGRESS 
+ * - Auto-progresses through milestones up to DIAGNOSIS_IN_PROGRESS
  * - Creates notification for repair/replacement decision
- * 
+ *
  * For other roles:
  * - Standard ticket creation workflow
  */
@@ -873,7 +915,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     cableLength,
     pumpPlacementDepth,
     // Optional custom suffix
-  } = ticket;  
+  } = ticket;
   try {
     // Fetch user information to determine role-based logic
     const user = await prisma.user.findUnique({
@@ -886,24 +928,25 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
           select: {
             id: true,
             centerCode: true,
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
 
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Validate controller number - check for active tickets
     if (controllerNo) {
-      const controllerCheck = await checkActiveTicketForController(controllerNo);
+      const controllerCheck =
+        await checkActiveTicketForController(controllerNo);
       if (controllerCheck.hasActiveTicket) {
         throw new Error(
           `Active ticket already exists for controller ${controllerNo}. ` +
-          `Please close ticket ${controllerCheck.activeTicket.ticketCode} (Status: ${controllerCheck.activeTicket.status}) ` +
-          `before creating a new one. Created on ${new Date(controllerCheck.activeTicket.createdAt).toLocaleDateString()}.`
+            `Please close ticket ${controllerCheck.activeTicket.ticketCode} (Status: ${controllerCheck.activeTicket.status}) ` +
+            `before creating a new one. Created on ${new Date(controllerCheck.activeTicket.createdAt).toLocaleDateString()}.`,
         );
       }
     }
@@ -911,14 +954,14 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     // Generate unique ticket code
     const ticketCode = await generateTicketCode(
       ticketCodePrefix,
-      ticketCodeSuffix
+      ticketCodeSuffix,
     );
 
     // For SERVICE_CENTER_TECHNICIAN, auto-assign their service center
     let assignedServiceCenter = null;
-    if (user.role === 'SERVICE_CENTER_TECHNICIAN' && user.centerCode) {
+    if (user.role === "SERVICE_CENTER_TECHNICIAN" && user.centerCode) {
       assignedServiceCenter = user.centerCode;
-    } 
+    }
     // Process attachments - move from temp folder to ticket folder
     let processedAttachments = [];
     if (attachments && attachments.length > 0) {
@@ -950,7 +993,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         }
       });
     }
-    
+
     const newTicket = await prisma.ticket.create({
       data: {
         ticketCode: ticketCode,
@@ -995,9 +1038,8 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
       },
     });
 
-
     // Create initial milestones for the ticket
-    if (user.role === 'SERVICE_CENTER_TECHNICIAN') {
+    if (user.role === "SERVICE_CENTER_TECHNICIAN") {
       // For SERVICE_CENTER_TECHNICIAN, create milestones up to RECEIVED_AT_SERVICE_CENTER
       const milestoneStages = [
         {
@@ -1019,13 +1061,14 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         {
           stage: "RECEIVED_AT_SERVICE_CENTER",
           order: 5,
-          notes: "Controller received at service center by technician. Please upload 4 required photos: Controller Front, Controller Bottom, Full View Open, MCB Close Up.",
+          notes:
+            "Controller received at service center by technician. Please upload 4 required photos: Controller Front, Controller Bottom, Full View Open, MCB Close Up.",
           status: "IN_PROGRESS",
           startedAt: new Date(),
           eta: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days ETA
           slaDueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days SLA
           photoRequired: true,
-        }
+        },
       ];
 
       // Create all milestones in sequence
@@ -1051,7 +1094,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         ticketId: newTicket.id,
         changedBy: userId,
       };
-      
+
       await createMilestone(milestonesData);
     }
 
@@ -1124,7 +1167,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     let notificationData;
     let targetUserIds = [];
 
-    if (user.role === 'SERVICE_CENTER_TECHNICIAN') {
+    if (user.role === "SERVICE_CENTER_TECHNICIAN") {
       // For SERVICE_CENTER_TECHNICIAN, create notification about diagnosis ready
       notificationData = createTicketNotification(
         "diagnosis_ready",
@@ -1136,7 +1179,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
           customerName: completeTicket.customerName,
           description: completeTicket.description,
           serviceCenter: user.serviceCenter?.name || user.centerCode,
-        }
+        },
       );
 
       // Target other technicians in the same service center and management roles
@@ -1154,10 +1197,17 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
                 {
                   AND: [
                     { centerCode: user.centerCode },
-                    { role: { in: ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"] } }
-                  ]
-                }
-              ]
+                    {
+                      role: {
+                        in: [
+                          "SERVICE_CENTER_TECHNICIAN",
+                          "CUSTOMER_SERVICE_HEAD",
+                        ],
+                      },
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
@@ -1176,7 +1226,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
           priority: completeTicket.priority,
           customerName: completeTicket.customerName,
           description: completeTicket.description,
-        }
+        },
       );
 
       // Get target users (ADMIN, HEAD, and SUPPORT roles)
@@ -1196,28 +1246,33 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
 
       targetUserIds = targetUsers.map((u) => u.id);
     }
- 
+
     // Save and broadcast notification
     await saveAndBroadcastNotification(
       prisma,
       io,
       notificationData,
-      targetUserIds
+      targetUserIds,
     );
 
     if (io) {
       // Use RBAC-aware emission
       emitTicketEventWithRBAC(io, "ticket", completeTicket);
       emitTicketEventWithRBAC(io, "conversation", completeTicket, conversation);
-      
+
       // Emit new ticket creation for real-time updates in ticket lists
       const newTicketData = {
         ...completeTicket,
         isNewTicket: true,
-        createdAt: completeTicket.createdAt
+        createdAt: completeTicket.createdAt,
       };
-      emitTicketEventWithRBAC(io, "ticket-created", completeTicket, newTicketData);
-     }
+      emitTicketEventWithRBAC(
+        io,
+        "ticket-created",
+        completeTicket,
+        newTicketData,
+      );
+    }
     return completeTicket;
   } catch (error) {
     throw error;
@@ -1229,7 +1284,7 @@ const updateTicket = async (
   ticketData,
   userId,
   io,
-  userRole = null
+  userRole = null,
 ) => {
   try {
     // First, verify the user has access to this ticket
@@ -1251,7 +1306,7 @@ const updateTicket = async (
       // Field engineers can only update their own tickets
       if (existingTicket.createdBy !== userId) {
         throw new Error(
-          "Access denied: You can only update tickets you created"
+          "Access denied: You can only update tickets you created",
         );
       }
     } else if (
@@ -1266,13 +1321,13 @@ const updateTicket = async (
 
       if (!user?.centerCode) {
         throw new Error(
-          "Access denied: No service center assigned to your account"
+          "Access denied: No service center assigned to your account",
         );
       }
 
       if (existingTicket.assignedServiceCenter !== user.centerCode) {
         throw new Error(
-          "Access denied: This ticket is not assigned to your service center"
+          "Access denied: This ticket is not assigned to your service center",
         );
       }
     }
@@ -1320,7 +1375,7 @@ const updateTicket = async (
         updatedBy: userId,
       },
     });
-    
+
     // Archive ticket data if closing
     if (status === "CLOSED") {
       try {
@@ -1331,7 +1386,7 @@ const updateTicket = async (
         // Continue with the flow even if archiving fails
       }
     }
-    
+
     // Create update conversation message
     const conversation = await prisma.message.create({
       data: {
@@ -1348,7 +1403,7 @@ const updateTicket = async (
       userId,
       {
         messageId: conversation.id,
-      }
+      },
     );
 
     // Get target users (ADMIN and HEAD roles)
@@ -1378,13 +1433,13 @@ const updateTicket = async (
       prisma,
       io,
       notificationData,
-      targetUserIds
+      targetUserIds,
     );
 
     if (io) {
       // Use RBAC-aware emission
       emitTicketEventWithRBAC(io, "ticket", updatedTicket);
-      emitTicketEventWithRBAC(io, "conversation", updatedTicket, conversation); 
+      emitTicketEventWithRBAC(io, "conversation", updatedTicket, conversation);
     }
     return updatedTicket;
   } catch (error) {
@@ -1414,7 +1469,7 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
       // Field engineers can only update their own tickets
       if (existingTicket.createdBy !== userId) {
         throw new Error(
-          "Access denied: You can only update tickets you created"
+          "Access denied: You can only update tickets you created",
         );
       }
     } else if (
@@ -1429,13 +1484,13 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
 
       if (!user?.centerCode) {
         throw new Error(
-          "Access denied: No service center assigned to your account"
+          "Access denied: No service center assigned to your account",
         );
       }
 
       if (existingTicket.assignedServiceCenter !== user.centerCode) {
         throw new Error(
-          "Access denied: This ticket is not assigned to your service center"
+          "Access denied: This ticket is not assigned to your service center",
         );
       }
     }
@@ -1445,7 +1500,7 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
       where: { id: ticketId },
       data: { status: status },
     });
-    
+
     // Archive ticket data if closing
     if (status === "CLOSED") {
       try {
@@ -1456,7 +1511,7 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
         // Continue with the flow even if archiving fails
       }
     }
-    
+
     // Determine action based on status change
     let action = "updated";
     if (status === "CLOSED") {
@@ -1473,7 +1528,7 @@ const updateStatus = async (ticketId, status, userId, io, userRole = null) => {
       {
         oldStatus: updatedTicket.status,
         newStatus: status,
-      }
+      },
     );
 
     // Save and broadcast notification to all users
@@ -1512,7 +1567,7 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
       // Field engineers can only delete their own tickets
       if (ticketToDelete.createdBy !== userId) {
         throw new Error(
-          "Access denied: You can only delete tickets you created"
+          "Access denied: You can only delete tickets you created",
         );
       }
     } else if (
@@ -1527,13 +1582,13 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
 
       if (!user?.centerCode) {
         throw new Error(
-          "Access denied: No service center assigned to your account"
+          "Access denied: No service center assigned to your account",
         );
       }
 
       if (ticketToDelete.assignedServiceCenter !== user.centerCode) {
         throw new Error(
-          "Access denied: This ticket is not assigned to your service center"
+          "Access denied: This ticket is not assigned to your service center",
         );
       }
     }
@@ -1561,7 +1616,7 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
     const notificationData = createTicketNotification(
       "deleted",
       ticketToDelete,
-      userId
+      userId,
     );
 
     // Save and broadcast notification to all users
@@ -1573,7 +1628,12 @@ const deleteTicket = async (ticketId, userId, io, userRole = null) => {
         ticketId: ticketId,
         ticketCode: ticketToDelete.ticketCode,
       };
-      emitTicketEventWithRBAC(io, "ticketDeleted", ticketToDelete, deleteEventData);
+      emitTicketEventWithRBAC(
+        io,
+        "ticketDeleted",
+        ticketToDelete,
+        deleteEventData,
+      );
     }
 
     return deletedTicket;
@@ -1727,7 +1787,7 @@ const searchTickets = async (keyword, userId, userRole) => {
         { stateCode: { contains: keyword } },
         { district: { contains: keyword } },
         { village: { contains: keyword } },
-        { block: { contains: keyword } }
+        { block: { contains: keyword } },
       ],
       // For receive controller, we want tickets that are ready to be received
       ticketMilestones: {
@@ -1801,7 +1861,7 @@ const searchTickets = async (keyword, userId, userRole) => {
         attachments: true,
       },
       orderBy: { createdAt: "desc" },
-      take: 50 // Limit results for performance
+      take: 50, // Limit results for performance
     });
 
     return tickets;
