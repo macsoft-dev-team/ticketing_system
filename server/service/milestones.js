@@ -476,7 +476,7 @@ const transitionMilestone = async (
     } else if (createdMilestone.order > 1) {
       await prisma.ticket.update({
         where: { id: ticketId },
-        data: { status: "IN_PROGRESS" },
+        data: { status: "IN_PROGRESS", isBuzzerOn: false },
       });
     }
 
