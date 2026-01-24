@@ -1305,56 +1305,56 @@ export default function TicketDashboard() {
             <StatusBadge status={ticketData.status} />
             
             {/* Archive Button for closed tickets (Admin only) */}
-            {ticketData.status === 'closed' && 
-             (user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={async () => {
-                  try {
-                    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
-                    const response = await fetch(`${baseUrl}/tickets/${ticketId}/archive`, {
-                      method: 'POST',
-                      headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                      },
-                    });
-                    
-                    if (!response.ok) {
-                      const error = await response.json();
-                      throw new Error(error.message || 'Failed to archive ticket');
+            {ticketData.status === 'closed' && ticketData.isArchived === false &&
+              (user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={async () => {
+                    try {
+                      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3057/api';
+                      const response = await fetch(`${baseUrl}/tickets/${ticketId}/archive`, {
+                        method: 'POST',
+                        headers: {
+                          'Authorization': `Bearer ${token}`,
+                          'Content-Type': 'application/json'
+                        },
+                      });
+
+                      if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.message || 'Failed to archive ticket');
+                      }
+
+                      const result = await response.json();
+
+                      addToast({
+                        title: 'Ticket Archived',
+                        description: 'Ticket data has been archived successfully. Page will refresh.',
+                        variant: 'success'
+                      });
+
+                      // Refresh ticket data to show archived state
+                      setTimeout(() => {
+                        fetchTicketById(ticketId);
+                      }, 1500);
+                    } catch (error) {
+                      addToast({
+                        title: 'Archive Failed',
+                        description: error.message || 'Failed to archive ticket data',
+                        variant: 'error'
+                      });
                     }
-                    
-                    const result = await response.json();
-                    
-                    addToast({
-                      title: 'Ticket Archived',
-                      description: 'Ticket data has been archived successfully. Page will refresh.',
-                      variant: 'success'
-                    });
-                    
-                    // Refresh ticket data to show archived state
-                    setTimeout(() => {
-                      fetchTicketById(ticketId);
-                    }, 1500);
-                  } catch (error) {
-                    addToast({
-                      title: 'Archive Failed',
-                      description: error.message || 'Failed to archive ticket data',
-                      variant: 'error'
-                    });
-                  }
-                }}
-                className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg text-sm font-medium transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
-                {ticketData.isArchived ? 'Re-archive' : 'Archive Now'}
-              </motion.button>
-            )}
-            
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  Archive Now
+                </motion.button>
+              )}
+              
             {/* Service Center Assignment Button for MACSOFT_SUPPORT, MACSOFT_HEAD, and MACSOFT_ADMIN */}
             {/* Hide button after ticket has been submitted to service center or closed */}
             {(user?.role === 'MACSOFT_SUPPORT' || user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') &&
