@@ -475,6 +475,7 @@ export default function Products() {
                 >
                   <option value="">Select Category</option>
                   <option value="MCB">MCB</option>
+                  <option value="PCB">PCB</option>
                   <option value="VFD">VFD</option>
                   <option value="CONNECTOR">CONNECTOR</option>
                   <option value="ENCLOSURE_AND_ACCESSORIES">

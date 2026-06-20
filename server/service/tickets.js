@@ -184,6 +184,7 @@ const archiveTicketData = async (ticketId) => {
       data: {
         backupcreatedAt: new Date(),
         backupurl: backupFilePath,
+          isArchived: true, 
       },
     });
 
@@ -417,6 +418,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
       where: { id: userId },
       select: {
         centerCode: true,
+        orgCode: true,
         State: { select: { id: true, name: true, stateCode: true } }, // primary state
         states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
       },
@@ -453,9 +455,13 @@ const getTickets = async (skip, take, filter, userId, role) => {
       // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
       // is in the CSH's allowed state IDs (primary + assigned states).
       if (allowedStateIdsArr.length) {
-        where.AND = [
+        const andConditions = [
           { createdByUser: { stateId: { in: allowedStateIdsArr } } },
         ];
+        if (user?.orgCode) {
+          andConditions.push({ createdByUser: { orgCode: user.orgCode } });
+        }
+        where.AND = andConditions;
         // NOTE:
         // - If you also want to restrict by the ticket.state string (the ticket's own state name),
         //   add `{ state: { in: allowedStateNamesArr } }` into the AND array.
@@ -502,14 +508,18 @@ const getTickets = async (skip, take, filter, userId, role) => {
       if (allowedStateIdsArr.length) {
         // Mirror logic used for fetching tickets: only counts for tickets
         // where createdByUser.stateId is in allowedStateIdsArr.
-        statusCountWhere = {
-          AND: [{ createdByUser: { stateId: { in: allowedStateIdsArr } } }],
-        };
+        const cshAndConditions = [
+          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
+        ];
+        if (user?.orgCode) {
+          cshAndConditions.push({ createdByUser: { orgCode: user.orgCode } });
+        }
+        statusCountWhere = { AND: cshAndConditions };
 
         // Also apply same AND within milestone ticket filter (plus stage + not closed)
         milestoneCountWhere.ticket = {
           ...milestoneCountWhere.ticket,
-          AND: [{ createdByUser: { stateId: { in: allowedStateIdsArr } } }],
+          AND: cshAndConditions,
         };
       } else {
         statusCountWhere = { id: -1 };
@@ -596,6 +606,7 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
       where: { id: userId },
       select: {
         centerCode: true,
+        orgCode: true,
         State: { select: { id: true, name: true, stateCode: true } }, // primary state
         states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
       },
@@ -633,9 +644,13 @@ const getTicketById = async (ticketId, userId, userRole = null) => {
       // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
       // is in the CSH's allowed state IDs (primary + assigned states).
       if (allowedStateIdsArr.length) {
-        where.AND = [
+        const andConditions = [
           { createdByUser: { stateId: { in: allowedStateIdsArr } } },
         ];
+        if (user?.orgCode) {
+          andConditions.push({ createdByUser: { orgCode: user.orgCode } });
+        }
+        where.AND = andConditions;
       } else {
         // head has no allowed states => no access
         where.id = -1;
@@ -1648,6 +1663,7 @@ const searchByControllerNumber = async (controllerNo, userId, userRole) => {
       where: { id: userId },
       select: {
         centerCode: true,
+        orgCode: true,
         State: { select: { id: true, name: true, stateCode: true } }, // primary state
         states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
       },
@@ -1700,9 +1716,13 @@ const searchByControllerNumber = async (controllerNo, userId, userRole) => {
       // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
       // is in the CSH's allowed state IDs (primary + assigned states).
       if (allowedStateIdsArr.length) {
-        where.AND = [
+        const andConditions = [
           { createdByUser: { stateId: { in: allowedStateIdsArr } } },
         ];
+        if (user?.orgCode) {
+          andConditions.push({ createdByUser: { orgCode: user.orgCode } });
+        }
+        where.AND = andConditions;
       } else {
         // head has no allowed states => no tickets
         where.id = -1;
@@ -1755,6 +1775,7 @@ const searchTickets = async (keyword, userId, userRole) => {
       where: { id: userId },
       select: {
         centerCode: true,
+        orgCode: true,
         State: { select: { id: true, name: true, stateCode: true } }, // primary state
         states: { select: { id: true, name: true, stateCode: true } }, // assigned states (array)
       },
@@ -1817,9 +1838,13 @@ const searchTickets = async (keyword, userId, userRole) => {
       // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
       // is in the CSH's allowed state IDs (primary + assigned states).
       if (allowedStateIdsArr.length) {
-        where.AND = [
+        const andConditions = [
           { createdByUser: { stateId: { in: allowedStateIdsArr } } },
         ];
+        if (user?.orgCode) {
+          andConditions.push({ createdByUser: { orgCode: user.orgCode } });
+        }
+        where.AND = andConditions;
       } else {
         // head has no allowed states => no tickets
         where.id = -1;

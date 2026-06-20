@@ -11,7 +11,7 @@ const MACSOFT_ROLES = [
  * Excludes weekends, office holidays, and break times from database
  * Converts UTC to IST timezone
  */
-const isWithinWorkingHours = async (retryCount = 0) => {
+const isWithinWorkingHours = async () => {
   try {
     // Get current time in IST timezone (UTC + 5:30)
     const nowUTC = new Date();
@@ -76,14 +76,6 @@ const isWithinWorkingHours = async (retryCount = 0) => {
     
   } catch (error) {
     console.error('Error checking working hours:', error);
-    
-    // Retry logic for connection pool timeout
-    if (error.code === 'P2024' && retryCount < 3) {
-      console.log(`Retrying working hours check (attempt ${retryCount + 1}/3)...`);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-      return isWithinWorkingHours(retryCount + 1);
-    }
-    
     // Fallback to basic check if database fails (using IST)
     const nowUTC = new Date();
     const nowIST = new Date(nowUTC.getTime() + (5.5 * 60 * 60 * 1000));
@@ -115,11 +107,12 @@ const CUSTOMER_ROLES = [
 /**
  * Find tickets where customers messaged last but no Macsoft response within configured time window
  */
-const checkPendingCustomerMessages = async (io = null, retryCount = 0) => {
+const checkPendingCustomerMessages = async (io = null) => {
   try {
      
     // Check if we're within working hours
-    const withinWorkingHours = await isWithinWorkingHours();
+    // TEMPORARILY DISABLED FOR TESTING - REMOVE COMMENTS IN PRODUCTION
+     const withinWorkingHours = await isWithinWorkingHours();
     if (!withinWorkingHours) {
       // Always force buzzer off if not within working hours (including break times)
       await prisma.ticket.updateMany({
@@ -133,6 +126,7 @@ const checkPendingCustomerMessages = async (io = null, retryCount = 0) => {
         skippedReason: 'Outside working hours or holiday/break time'
       };
     }
+    
     
     // Fetch buzzer alert configuration from database
     let buzzerConfig = await prisma.buzzerAlertConfig.findFirst({
@@ -329,14 +323,6 @@ const checkPendingCustomerMessages = async (io = null, retryCount = 0) => {
     
   } catch (error) {
     console.error('Error checking pending customer messages:', error);
-    
-    // Retry logic for connection pool timeout
-    if (error.code === 'P2024' && retryCount < 3) {
-      console.log(`Retrying pending customer messages check (attempt ${retryCount + 1}/3)...`);
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
-      return checkPendingCustomerMessages(io, retryCount + 1);
-    }
-    
     throw error;
   }
 };

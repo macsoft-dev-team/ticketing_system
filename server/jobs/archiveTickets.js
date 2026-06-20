@@ -13,13 +13,15 @@ const archiveClosedTickets = async () => {
     const ticketsToArchive = await prisma.ticket.findMany({
       where: {
         status: "CLOSED", 
+        backupurl: null,  
+        isArchived: false,
       },
       select: {
         id: true,
         ticketCode: true,
         updatedAt: true,
       },
-      take: 50, // Process in batches of 50 to avoid overwhelming the system
+      take: 250, // Process in batches of 250 to avoid overwhelming the system
     });
 
     if (ticketsToArchive.length === 0) {

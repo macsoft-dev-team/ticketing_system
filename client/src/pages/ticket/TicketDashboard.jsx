@@ -1421,7 +1421,7 @@ export default function TicketDashboard() {
               </h2>
               
               {/* Archived Data Alert */}
-              {ticketData.isArchived && (
+              {ticketData.isArchived && (user?.role === 'ACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' || user?.role === 'MACSOFT_SUPPORT') && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}

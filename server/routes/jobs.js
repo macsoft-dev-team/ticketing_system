@@ -107,6 +107,27 @@ router.post('/run-buzzer-alerts', async (req, res) => {
 });
 
 /**
+ * Run archive tickets job manually
+ */
+router.post('/run-archive', async (req, res) => {
+  try {
+    const result = await jobScheduler.runArchiveTicketsNow();
+    res.json({
+      success: true,
+      message: 'Archive job completed successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Error running archive job:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to run archive job',
+      error: error.message
+    });
+  }
+});
+
+/**
  * Get tickets that are candidates for auto-closure
  */
 router.get('/candidates', async (req, res) => {

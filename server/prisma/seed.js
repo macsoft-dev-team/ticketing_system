@@ -41,9 +41,9 @@ async function main() {
     "serviceCenter",
     "user",
     "product",
-    "state", */
-    "motorhp",
     "district",
+    "motorhp",
+    "state", */
   ];
 
   for (const file of files) {

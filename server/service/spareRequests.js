@@ -31,6 +31,8 @@ async function createSpareRequest(data) {
       include: {
         ticketMilestones: true,
       },
+      // stateCode needed for customer service head notification lookup
+      // (included automatically via include + schema defaults)
     });
 
     if (!ticket) {
@@ -167,6 +169,65 @@ async function createSpareRequest(data) {
       );
       // Re-throw the error since milestone transition is critical for workflow
       throw milestoneError;
+    }
+
+    // Notify all MACSOFT roles, the field engineer who created the ticket, and the respective customer service head
+    try {
+      const macsoftUsers = await prisma.user.findMany({
+        where: {
+          role: { in: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'] },
+          id: { not: createdBy },
+        },
+        select: { id: true },
+      });
+
+      // Build unique recipient set: MACSOFT users + ticket creator (field engineer), excluding requester
+      const recipientIds = new Set(macsoftUsers.map(u => u.id));
+      if (ticket.createdBy && ticket.createdBy !== createdBy) {
+        recipientIds.add(ticket.createdBy);
+      }
+
+      // Include customer service head(s) assigned to the ticket's state
+      if (ticket.stateCode) {
+        const stateInfo = await prisma.state.findUnique({
+          where: { stateCode: ticket.stateCode },
+          select: { id: true },
+        });
+        if (stateInfo) {
+          const cshUsers = await prisma.user.findMany({
+            where: {
+              role: 'CUSTOMER_SERVICE_HEAD',
+              states: { some: { id: stateInfo.id } },
+              id: { not: createdBy },
+            },
+            select: { id: true },
+          });
+          cshUsers.forEach(u => recipientIds.add(u.id));
+        }
+      }
+
+      if (recipientIds.size > 0) {
+        const notification = await prisma.notification.create({
+          data: {
+            title: 'New Spare Request Submitted',
+            description: `Spare request submitted for ticket ${ticketCode} with ${spareItems.length} item(s) requiring approval.`,
+            type: 'SPARE_REQUEST_CREATED',
+            createdById: createdBy,
+            recipients: {
+              create: [...recipientIds].map(userId => ({ userId, seen: false })),
+            },
+          },
+        });
+
+        if (io) {
+          for (const userId of recipientIds) {
+            io.to(`notifications-${userId}`).emit('notification', notification);
+          }
+        }
+      }
+    } catch (notificationError) {
+      console.error('❌ Error sending spare request created notifications:', notificationError);
+      // Non-critical — don't throw
     }
 
     return spareRequest;

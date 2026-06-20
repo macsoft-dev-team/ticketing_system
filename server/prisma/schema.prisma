@@ -63,6 +63,7 @@ enum Category {
   RMS
   SPD
   WIRE
+  PCB
   CONNECTOR
   ENCLOSURE_AND_ACCESSORIES
 }

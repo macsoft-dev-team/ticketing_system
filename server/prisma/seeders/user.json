@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Venkat Kumar",
+    "name": "Venkat",
     "phone": "9876543210",
     "password": "$2b$10$DCo5HFnEsWJt2UUpyGINWOHwZLtARmeUKWp6c/tPTOKFe5pCgOLR6",
     "role": "MACSOFT_ADMIN"
