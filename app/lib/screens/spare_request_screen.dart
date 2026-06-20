@@ -54,7 +54,12 @@ class _SpareRequestScreenState extends State<SpareRequestScreen> {
   }
 
   Future<void> _capturePhoto() async {
-    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? photo = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 70,
+      maxWidth: 1200,
+      maxHeight: 1200,
+    );
     if (photo != null) {
       setState(() {
         _photos.add(File(photo.path));

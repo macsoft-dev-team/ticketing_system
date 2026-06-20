@@ -213,7 +213,12 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> with SingleTi
   }
 
   Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera); // Pick an image from the camera
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 70,
+      maxWidth: 1200,
+      maxHeight: 1200,
+    ); // Pick and compress image from the camera
     if (image != null) {
       setState(() {
         _messages.add({

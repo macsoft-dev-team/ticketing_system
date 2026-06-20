@@ -29,6 +29,8 @@ import useTickets from '../../lib/hooks/useTickets';
 import useBatch from '../../lib/hooks/useBatch';
 import { useDebounce } from '../../lib/hooks/ticketHooks';
 import axios from 'axios';
+import { compressImage } from '../../lib/utils/imageCompressor';
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -356,29 +358,32 @@ const ReceiveController = () => {
     // Functions exist later in the component
 
     // Handle photo upload
-    const handlePhotoSelect = (e) => {
+    const handlePhotoSelect = async (e) => {
         const files = Array.from(e.target.files || []);
-        const newPhotos = files.map((file, index) => {
-            const photoId = Date.now() + Math.random() + index;
-            const originalName = file.name;
-            let fileName = originalName;
-            
-            // If ticket is selected, use proper naming format
-            if (searchedTicket && originalName.includes('.')) {
-                const extension = originalName.split('.').pop();
-                fileName = `photo_${searchedTicket.ticketCode}_${photoId}.${extension}`;
-            }
-            
-            const renamedFile = new File([file], fileName, { type: file.type });
-            
-            return {
-                id: photoId,
-                file: renamedFile,
-                label: '',
-                preview: URL.createObjectURL(file)
-            };
-        });
-        setPhotos(prev => [...prev, ...newPhotos]);
+        const compressedNewPhotos = await Promise.all(
+            files.map(async (file, index) => {
+                const compressedFile = await compressImage(file, { quality: 0.7, maxWidth: 1200, maxHeight: 1200 });
+                const photoId = Date.now() + Math.random() + index;
+                const originalName = file.name;
+                let fileName = originalName;
+                
+                // If ticket is selected, use proper naming format
+                if (searchedTicket && originalName.includes('.')) {
+                    const extension = originalName.split('.').pop();
+                    fileName = `photo_${searchedTicket.ticketCode}_${photoId}.${extension}`;
+                }
+                
+                const renamedFile = new File([compressedFile], fileName, { type: compressedFile.type });
+                
+                return {
+                    id: photoId,
+                    file: renamedFile,
+                    label: '',
+                    preview: URL.createObjectURL(compressedFile)
+                };
+            })
+        );
+        setPhotos(prev => [...prev, ...compressedNewPhotos]);
     };
 
     // NEW: Open camera to capture photos one by one
@@ -421,12 +426,29 @@ const ReceiveController = () => {
         if (!cameraVideoRef.current || !cameraStream || !searchedTicket) return;
 
         const video = cameraVideoRef.current;
+        let width = video.videoWidth;
+        let height = video.videoHeight;
+        const maxWidth = 1200;
+        const maxHeight = 1200;
+
+        if (width > height) {
+            if (width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
+            }
+        } else {
+            if (height > maxHeight) {
+                width = Math.round((width * maxHeight) / height);
+                height = maxHeight;
+            }
+        }
+
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        canvas.width = width;
+        canvas.height = height;
 
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0);
+        ctx.drawImage(video, 0, 0, width, height);
 
         canvas.toBlob((blob) => {
             const label = requiredPhotos[currentPhotoIndex];
@@ -461,7 +483,7 @@ const ReceiveController = () => {
                     variant: 'success'
                 });
             }
-        }, 'image/jpeg', 0.95);
+        }, 'image/jpeg', 0.7);
     };
 
     // NEW: Close camera capture

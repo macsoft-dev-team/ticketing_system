@@ -29,6 +29,7 @@ import { useToast } from '../../../components/ui/toast';
 import useTickets from '../../../lib/hooks/useTickets';
 import MotorHPSelect from '../../../components/ui/MotorHPSelect';
 import { useAuth } from '../../../lib/hooks/useAuth';
+import { compressImage } from '../../../lib/utils/imageCompressor';
 export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const { user } = useAuth();
     const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -392,18 +393,26 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     };
 
     // File handling functions
-    const handleFileUpload = useCallback((files) => {
-        const newFiles = Array.from(files).map(file => ({
-            file,
-            id: Math.random().toString(36).substr(2, 9),
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
-        }));
+    const handleFileUpload = useCallback(async (files) => {
+        const processedFiles = await Promise.all(
+            Array.from(files).map(async (file) => {
+                const compressedFile = await compressImage(file, { quality: 0.7, maxWidth: 1200, maxHeight: 1200 });
+                return {
+                    file: compressedFile,
+                    id: Math.random().toString(36).substr(2, 9),
+                    name: compressedFile.name,
+                    size: compressedFile.size,
+                    type: compressedFile.type,
+                    preview: compressedFile.type.startsWith('image/') ? URL.createObjectURL(compressedFile) : null
+                };
+            })
+        );
 
-        setUploadedFiles(prev => [...prev, ...newFiles]);
-        setValue('attachments', [...uploadedFiles, ...newFiles].map(f => f.file));
+        setUploadedFiles(prev => {
+            const updated = [...prev, ...processedFiles];
+            setValue('attachments', updated.map(f => f.file));
+            return updated;
+        });
         clearErrors('attachments');
     }, [uploadedFiles, setValue, clearErrors]);
 

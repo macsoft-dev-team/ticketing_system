@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Camera, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { compressImage } from '../lib/utils/imageCompressor';
+
 
 /**
  * Photo Upload Modal for Milestone Photos
@@ -78,13 +80,24 @@ const PhotoUploadModal = ({
       }
     }
 
+    // Compress all files before upload
+    let compressedFiles = [];
+    try {
+      compressedFiles = await Promise.all(
+        selectedFiles.map(file => compressImage(file, { quality: 0.7, maxWidth: 1200, maxHeight: 1200 }))
+      );
+    } catch (e) {
+      console.error("Image compression failed, using original files", e);
+      compressedFiles = selectedFiles;
+    }
+
     // Create files with labels if required
     const filesWithLabels = requireLabels 
-      ? selectedFiles.map((file, index) => ({
+      ? compressedFiles.map((file, index) => ({
           file,
           label: photoLabels[index] || ''
         }))
-      : selectedFiles;
+      : compressedFiles;
 
     if (!filesWithLabels.length) {
       setErrorMsg('No photos provided. Please select photos to upload.');

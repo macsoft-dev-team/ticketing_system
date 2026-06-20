@@ -25,6 +25,8 @@ import MilestoneActionButton from './MilestoneActionButton';
 import { SpareRequestForm } from './ui/spareRequestForm';
 import { API_URL } from '../lib/constants/api';
 import PhotoUploadModal from './PhotoUploadModal';
+import { compressImage } from '../lib/utils/imageCompressor';
+
 
 // Role-based permissions - matches backend milestoneConfig.js
 const STAGE_ROLE_PERMISSIONS = {
@@ -518,9 +520,12 @@ const MilestoneCard = ({
     };
     const isBlocked = milestone.status === MilestoneStatus.BLOCKED;
 
-    const handlePhotoUpload = (e) => {
+    const handlePhotoUpload = async (e) => {
         const files = Array.from(e.target.files);
-        setPhotos(files);
+        const compressed = await Promise.all(
+            files.map(file => compressImage(file, { quality: 0.7, maxWidth: 1200, maxHeight: 1200 }))
+        );
+        setPhotos(compressed);
     };
 
     const handleTransition = async () => {
@@ -1514,10 +1519,13 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
             fileInput.type = 'file';
             fileInput.multiple = true;
             fileInput.accept = 'image/*';
-            fileInput.onchange = (e) => {
+            fileInput.onchange = async (e) => {
                 const files = Array.from(e.target.files);
                 if (files.length > 0) {
-                    handleAddPhotos(files);
+                    const compressed = await Promise.all(
+                        files.map(file => compressImage(file, { quality: 0.7, maxWidth: 1200, maxHeight: 1200 }))
+                    );
+                    handleAddPhotos(compressed);
                 }
             };
             fileInput.click();
