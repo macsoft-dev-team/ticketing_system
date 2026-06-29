@@ -126,68 +126,125 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
     });
 
 
-    // Create SERVICE_CENTER_ASSIGNED milestone
+    // Create milestones
     try {
-      const stageConfig = getStageConfig('SERVICE_CENTER_ASSIGNED');
-            
-      if (!stageConfig) {
-        console.warn(`⚠️ No stage config found for SERVICE_CENTER_ASSIGNED, skipping milestone creation`);
-      } else {
-        // Check if milestone already exists for this stage
-        const existingMilestone = await prisma.ticketMilestone.findFirst({
+      const isTechCreated = updatedTicket.createdByUser?.role === 'SERVICE_CENTER_TECHNICIAN';
+      
+      if (isTechCreated) {
+        // For SERVICE_CENTER_TECHNICIAN, auto-progress milestones up to RECEIVED_AT_SERVICE_CENTER (since they already have the controller)
+        // 1. Mark TICKET_RAISED as DONE
+        const ticketRaisedMilestone = await prisma.ticketMilestone.findFirst({
           where: {
             ticketId: ticketId,
-            stage: 'SERVICE_CENTER_ASSIGNED'
+            stage: 'TICKET_RAISED'
           }
         });
-        
-        if (existingMilestone) {          
-          const updatedMilestone = await prisma.ticketMilestone.update({
-            where: { id: existingMilestone.id },
+        if (ticketRaisedMilestone) {
+          await prisma.ticketMilestone.update({
+            where: { id: ticketRaisedMilestone.id },
             data: {
+              status: 'DONE',
+              completedAt: new Date(),
+              changedBy: assignedByUserId,
+              notes: 'Ticket raised by technician - approved by Macsoft.'
+            }
+          });
+        }
+
+        // 2. Create SERVICE_CENTER_ASSIGNED as DONE
+        const scAssignedConfig = getStageConfig('SERVICE_CENTER_ASSIGNED');
+        await createMilestone({
+          ticketId: ticketId,
+          stage: 'SERVICE_CENTER_ASSIGNED',
+          order: scAssignedConfig?.order || 1,
+          status: 'DONE',
+          startedAt: new Date(),
+          completedAt: new Date(),
+          changedBy: assignedByUserId,
+          notes: `Approved and assigned to service center: ${serviceCenter.name} (${centerCode})`
+        });
+
+        // 3. Create RECEIVED_AT_SERVICE_CENTER as IN_PROGRESS
+        const receivedConfig = getStageConfig('RECEIVED_AT_SERVICE_CENTER');
+        await createMilestone({
+          ticketId: ticketId,
+          stage: 'RECEIVED_AT_SERVICE_CENTER',
+          order: receivedConfig?.order || 5,
+          status: 'IN_PROGRESS',
+          startedAt: new Date(),
+          eta: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days ETA
+          slaDueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days SLA
+          photoRequired: true,
+          changedBy: assignedByUserId,
+          notes: "Controller received at service center by technician. Please upload 4 required photos: Controller Front, Controller Bottom, Full View Open, MCB Close Up."
+        });
+
+        // Update ticket status to IN_PROGRESS
+        await prisma.ticket.update({
+          where: { id: ticketId },
+          data: { status: 'IN_PROGRESS' }
+        });
+
+      } else {
+        // Standard flow for non-technician tickets
+        const stageConfig = getStageConfig('SERVICE_CENTER_ASSIGNED');
+              
+        if (!stageConfig) {
+          console.warn(`⚠️ No stage config found for SERVICE_CENTER_ASSIGNED, skipping milestone creation`);
+        } else {
+          // Check if milestone already exists for this stage
+          const existingMilestone = await prisma.ticketMilestone.findFirst({
+            where: {
+              ticketId: ticketId,
+              stage: 'SERVICE_CENTER_ASSIGNED'
+            }
+          });
+          
+          if (existingMilestone) {          
+            await prisma.ticketMilestone.update({
+              where: { id: existingMilestone.id },
+              data: {
+                changedBy: assignedByUserId,
+                notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
+                status: 'IN_PROGRESS'
+              }
+            });
+          } else {
+            await createMilestone({
+              ticketId: ticketId,
+              stage: 'SERVICE_CENTER_ASSIGNED',
+              order: stageConfig.order,
               changedBy: assignedByUserId,
               notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
               status: 'IN_PROGRESS'
-            }
-          });
-        } else {
+            });
+          }
           
-          const milestone = await createMilestone({
-            ticketId: ticketId,
-            stage: 'SERVICE_CENTER_ASSIGNED',
-            order: stageConfig.order,
-            changedBy: assignedByUserId,
-            notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
-            status: 'IN_PROGRESS'
-          });
-                  }
-        
-        // Also mark TICKET_RAISED milestone as DONE if it exists and is still IN_PROGRESS
-        try {
-          const ticketRaisedMilestone = await prisma.ticketMilestone.findFirst({
-            where: {
-              ticketId: ticketId,
-              stage: 'TICKET_RAISED',
-              status: 'IN_PROGRESS'
-            }
-          });
-          
-          if (ticketRaisedMilestone) {
-            await prisma.ticketMilestone.update({
-              where: { id: ticketRaisedMilestone.id },
-              data: {
-                status: 'DONE',
-                completedAt: new Date(),
-                changedBy: assignedByUserId,
-                notes: ticketRaisedMilestone.notes || 'Ticket raised - service center assigned'
+          // Also mark TICKET_RAISED milestone as DONE if it exists and is still IN_PROGRESS
+          try {
+            const ticketRaisedMilestone = await prisma.ticketMilestone.findFirst({
+              where: {
+                ticketId: ticketId,
+                stage: 'TICKET_RAISED',
+                status: 'IN_PROGRESS'
               }
             });
             
+            if (ticketRaisedMilestone) {
+              await prisma.ticketMilestone.update({
+                where: { id: ticketRaisedMilestone.id },
+                data: {
+                  status: 'DONE',
+                  completedAt: new Date(),
+                  changedBy: assignedByUserId,
+                  notes: ticketRaisedMilestone.notes || 'Ticket raised - service center assigned'
+                }
+              });
+            }
+          } catch (ticketRaisedError) {
+            // Ignore
           }
-        } catch (ticketRaisedError) {
-
         }
-        
       }
     } catch (milestoneError) {
       console.error(`❌ Error creating milestone (but continuing):`, milestoneError);

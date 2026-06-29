@@ -18,10 +18,10 @@ import {
 const STAGE_ROLE_PERMISSIONS = {
   // ticket creation / field actions
   TICKET_RAISED: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN'],
-  REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+  REQUEST_CLEARED_AT_FIELD: ['CUSTOMER_FIELD_ENGINEER', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'SERVICE_CENTER_TECHNICIAN'],
 
   // assigning / submitting to service centre (image shows Macsoft roles + support/head)
-  SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD'],
+  SERVICE_CENTER_ASSIGNED: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'SERVICE_CENTER_TECHNICIAN'],
   SENT_TO_SERVICE_CENTER: ['MACSOFT_SUPPORT', 'MACSOFT_ADMIN', 'MACSOFT_HEAD', 'CUSTOMER_SERVICE_HEAD'],
   SUBMITTED_TO_SERVICE_CENTER: ['CUSTOMER_FIELD_ENGINEER', 'CUSTOMER_SERVICE_HEAD', 'MACSOFT_ADMIN'],
 
@@ -42,6 +42,7 @@ const STAGE_ROLE_PERMISSIONS = {
   READY_FOR_DISPATCH: ['MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'MACSOFT_ADMIN'],
   DELIVERED_TO_FIELD: ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT','SERVICE_CENTER_TECHNICIAN', ],
   FIELD_CLEARANCE_APPROVED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN'],
+  CLOSE_REQUESTED: ['SERVICE_CENTER_TECHNICIAN', 'MACSOFT_HEAD', 'MACSOFT_ADMIN'],
   TICKET_CLOSED: ['MACSOFT_HEAD', 'MACSOFT_ADMIN']
 };
 
@@ -91,6 +92,12 @@ const MilestoneActionButton = ({
       milestone => milestone.stage === 'SERVICE_CENTER_ASSIGNED' || milestone.stage === 'SENT_TO_SERVICE_CENTER'
     );
 
+    const isTechCreated = ticketCreatedBy && (
+      typeof ticketCreatedBy === 'object' 
+        ? ticketCreatedBy.role === 'SERVICE_CENTER_TECHNICIAN' 
+        : false
+    );
+
     // Stages that require photos
     const photoRequiredStages = [
       'REQUEST_CLEARED_AT_FIELD',
@@ -112,7 +119,7 @@ const MilestoneActionButton = ({
     // Configuration for each stage - now returns array of possible actions
     const configs = {
       TICKET_RAISED: [
-        {
+        ...(userRole !== 'SERVICE_CENTER_TECHNICIAN' || isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId) ? [{
           title: 'Issue Solved',
           shortTitle: 'Field Clear',
           icon: CheckCircle,
@@ -120,14 +127,31 @@ const MilestoneActionButton = ({
           action: 'transition',
           targetStage: 'REQUEST_CLEARED_AT_FIELD',
           requiresPhotos: true,
-        },
-        // Only show "Assign SC" if service center is not already assigned
+        }] : []),
+        // Show "Assign Service Center" if not assigned, OR "Approve Assignment" if already assigned (to allow Macsoft users to approve technician-created tickets)
         ...(!isServiceCenterAssigned ? [{
           title: 'Assign Service Center',
           shortTitle: 'Assign SC',
           icon: Settings,
           color: 'purple',
           action: 'service_center_assignment',
+          targetStage: 'SERVICE_CENTER_ASSIGNED',
+          requiresPhotos: false,
+        }] : (userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' || userRole === 'MACSOFT_SUPPORT' ? [{
+          title: 'Approve Assignment',
+          shortTitle: 'Approve SC',
+          icon: CheckCircle,
+          color: 'purple',
+          action: 'service_center_assignment',
+          targetStage: 'SERVICE_CENTER_ASSIGNED',
+          requiresPhotos: false,
+        }] : [])),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId) ? [{
+          title: 'Assign this to me',
+          shortTitle: 'Assign Me',
+          icon: ArrowRight,
+          color: 'blue',
+          action: 'transition',
           targetStage: 'SERVICE_CENTER_ASSIGNED',
           requiresPhotos: false,
         }] : [])
@@ -143,24 +167,45 @@ const MilestoneActionButton = ({
         }
       ] : [],
       SERVICE_CENTER_ASSIGNED: [
-        {
-          title: 'Issue Solved',
-          shortTitle: 'Field Clear',
-          icon: CheckCircle,
-          color: 'green',
-          action: 'transition',
-          targetStage: 'REQUEST_CLEARED_AT_FIELD',
-          requiresPhotos: true,
-        },
-        {
-          title: 'Submit to service center',
-          shortTitle: 'Submit to SC',
-          icon: Send,
-          color: 'blue',
-          action: 'transition',
-          targetStage: 'SENT_TO_SERVICE_CENTER',
-          requiresPhotos: false,
-        }
+        // If technician-created, Macsoft approves it to progress to RECEIVED_AT_SERVICE_CENTER
+        ...(isTechCreated ? (
+          userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' || userRole === 'MACSOFT_SUPPORT' ? [{
+            title: 'Approve Repair/Replace',
+            shortTitle: 'Approve Repair',
+            icon: CheckCircle,
+            color: 'green',
+            action: 'transition',
+            targetStage: 'RECEIVED_AT_SERVICE_CENTER',
+            requiresPhotos: false,
+          }] : [{
+            title: 'Awaiting Repair/Replace Approval',
+            shortTitle: 'Awaiting Approval',
+            icon: Clock,
+            color: 'gray',
+            action: 'awaiting_approval',
+            disabled: true,
+          }]
+        ) : [
+          // Standard non-technician flow: Field Clear or Submit to SC
+          {
+            title: 'Issue Solved',
+            shortTitle: 'Field Clear',
+            icon: CheckCircle,
+            color: 'green',
+            action: 'transition',
+            targetStage: 'REQUEST_CLEARED_AT_FIELD',
+            requiresPhotos: true,
+          },
+          {
+            title: 'Submit to service center',
+            shortTitle: 'Submit to SC',
+            icon: Send,
+            color: 'blue',
+            action: 'transition',
+            targetStage: 'SENT_TO_SERVICE_CENTER',
+            requiresPhotos: false,
+          }
+        ])
       ],
       SENT_TO_SERVICE_CENTER: [
         // For Customer Field Engineers - acknowledge submission
@@ -196,33 +241,50 @@ const MilestoneActionButton = ({
           requiresPhotos: true,
         }] : [])
       ],
-      RECEIVED_AT_SERVICE_CENTER: needsPhotos ? [
-        {
+      RECEIVED_AT_SERVICE_CENTER: [
+        ...(needsPhotos ? [{
           title: 'Add Receipt Photos',
           shortTitle: 'Add Photos',
           icon: Camera,
           color: 'orange',
           action: 'upload_photos',
           requiresPhotos: true,
-        }
-      ] : [
-        {
-          title: 'Start Diagnosis',
-          shortTitle: 'Diagnose',
-          icon: Settings,
-          color: 'blue',
-          action: 'transition',
-          targetStage: 'DIAGNOSIS_IN_PROGRESS',
-          requiresPhotos: false,
-        },
-        // Close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
-        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+        }] : [
+          {
+            title: 'Start Diagnosis',
+            shortTitle: 'Diagnose',
+            icon: Settings,
+            color: 'blue',
+            action: 'transition',
+            targetStage: 'DIAGNOSIS_IN_PROGRESS',
+            requiresPhotos: false,
+          }
+        ]),
+        ...(userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' ? [{
           title: 'Close Ticket',
           shortTitle: 'Close',
           icon: X,
           color: 'red',
           action: 'close_ticket',
           targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' ? [{
+          title: 'Request Ticket Close',
+          shortTitle: 'Req Close',
+          icon: X,
+          color: 'orange',
+          action: 'transition',
+          targetStage: 'CLOSE_REQUESTED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId) ? [{
+          title: 'Issue Solved',
+          shortTitle: 'Field Clear',
+          icon: CheckCircle,
+          color: 'green',
+          action: 'transition',
+          targetStage: 'REQUEST_CLEARED_AT_FIELD',
           requiresPhotos: false,
         }] : [])
       ],
@@ -245,14 +307,31 @@ const MilestoneActionButton = ({
           targetStage: 'REPLACEMENT_IN_PROGRESS',
           requiresPhotos: false,
         },
-        // Close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
-        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+        ...(userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' ? [{
           title: 'Close Ticket',
           shortTitle: 'Close',
           icon: X,
           color: 'red',
           action: 'close_ticket',
           targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' ? [{
+          title: 'Request Ticket Close',
+          shortTitle: 'Req Close',
+          icon: X,
+          color: 'orange',
+          action: 'transition',
+          targetStage: 'CLOSE_REQUESTED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId) ? [{
+          title: 'Issue Solved',
+          shortTitle: 'Field Clear',
+          icon: CheckCircle,
+          color: 'green',
+          action: 'transition',
+          targetStage: 'REQUEST_CLEARED_AT_FIELD',
           requiresPhotos: false,
         }] : [])
       ],
@@ -290,7 +369,7 @@ const MilestoneActionButton = ({
         }
 
         // Add close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
-        if (userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId))) {
+        if (userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD') {
           baseActions.push({
             title: 'Close Ticket',
             shortTitle: 'Close',
@@ -300,6 +379,28 @@ const MilestoneActionButton = ({
             targetStage: 'TICKET_CLOSED',
             requiresPhotos: false,
           });
+        }
+        if (userRole === 'SERVICE_CENTER_TECHNICIAN') {
+          baseActions.push({
+            title: 'Request Ticket Close',
+            shortTitle: 'Req Close',
+            icon: X,
+            color: 'orange',
+            action: 'transition',
+            targetStage: 'CLOSE_REQUESTED',
+            requiresPhotos: false,
+          });
+          if (isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) {
+            baseActions.push({
+              title: 'Issue Solved',
+              shortTitle: 'Field Clear',
+              icon: CheckCircle,
+              color: 'green',
+              action: 'transition',
+              targetStage: 'REQUEST_CLEARED_AT_FIELD',
+              requiresPhotos: false,
+            });
+          }
         }
 
         return baseActions;
@@ -314,14 +415,23 @@ const MilestoneActionButton = ({
           action: 'upload_photos',
           requiresPhotos: true,
         }] : []),
-        // Cancel spare request and close ticket for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
-        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+        // Cancel spare request and close ticket
+        ...(userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' ? [{
           title: 'Cancel Spare & Close Ticket',
           shortTitle: 'Cancel & Close',
           icon: X,
           color: 'red',
           action: 'cancel_spare_and_close',
           targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' ? [{
+          title: 'Cancel Spare & Request Close',
+          shortTitle: 'Cancel & Req Close',
+          icon: X,
+          color: 'orange',
+          action: 'cancel_spare_and_close',
+          targetStage: 'CLOSE_REQUESTED',
           requiresPhotos: false,
         }] : [])
       ],
@@ -335,14 +445,23 @@ const MilestoneActionButton = ({
           targetStage: 'READY_FOR_DISPATCH',
           requiresPhotos: true,
         },
-        // Cancel spare request and close ticket for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
-        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+        // Cancel spare request and close ticket
+        ...(userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' ? [{
           title: 'Cancel Spare & Close Ticket',
           shortTitle: 'Cancel & Close',
           icon: X,
           color: 'red',
           action: 'cancel_spare_and_close',
           targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' ? [{
+          title: 'Cancel Spare & Request Close',
+          shortTitle: 'Cancel & Req Close',
+          icon: X,
+          color: 'orange',
+          action: 'cancel_spare_and_close',
+          targetStage: 'CLOSE_REQUESTED',
           requiresPhotos: false,
         }] : [])
       ],
@@ -356,14 +475,31 @@ const MilestoneActionButton = ({
           targetStage: 'REPAIRED',
           requiresPhotos: false,
         },
-        // Close ticket button for SERVICE_CENTER_TECHNICIAN who created ticket or MACSOFT_ADMIN (unrestricted)
-        ...(userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId)) ? [{
+        ...(userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' ? [{
           title: 'Close Ticket',
           shortTitle: 'Close',
           icon: X,
           color: 'red',
           action: 'close_ticket',
           targetStage: 'TICKET_CLOSED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' ? [{
+          title: 'Request Ticket Close',
+          shortTitle: 'Req Close',
+          icon: X,
+          color: 'orange',
+          action: 'transition',
+          targetStage: 'CLOSE_REQUESTED',
+          requiresPhotos: false,
+        }] : []),
+        ...(userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId) ? [{
+          title: 'Issue Solved',
+          shortTitle: 'Field Clear',
+          icon: CheckCircle,
+          color: 'green',
+          action: 'transition',
+          targetStage: 'REQUEST_CLEARED_AT_FIELD',
           requiresPhotos: false,
         }] : [])
       ],
@@ -409,6 +545,37 @@ const MilestoneActionButton = ({
           requiresPhotos: false,
         }
       ],
+      CLOSE_REQUESTED: [
+        ...(userRole === 'MACSOFT_ADMIN' || userRole === 'MACSOFT_HEAD' ? [
+          {
+            title: 'Approve Close Request',
+            shortTitle: 'Approve Close',
+            icon: CheckCircle,
+            color: 'green',
+            action: 'transition',
+            targetStage: 'TICKET_CLOSED',
+            requiresPhotos: false,
+          },
+          ...(availableTransitions.filter(t => t.stage !== 'TICKET_CLOSED').map(prevStageConfig => ({
+            title: `Reject Close (Return to ${prevStageConfig.label})`,
+            shortTitle: 'Reject Close',
+            icon: RotateCcw,
+            color: 'red',
+            action: 'transition',
+            targetStage: prevStageConfig.stage,
+            requiresPhotos: false,
+          })))
+        ] : [
+          {
+            title: 'Awaiting Close Approval',
+            shortTitle: 'Awaiting Approval',
+            icon: Clock,
+            color: 'gray',
+            action: 'awaiting_approval',
+            disabled: true,
+          }
+        ])
+      ],
       FIELD_CLEARANCE_APPROVED: [
         {
           title: 'Close Ticket',
@@ -446,9 +613,9 @@ const MilestoneActionButton = ({
         return canUserTransitionToStage(userRole, config.targetStage);
       }
 
-      // For close_ticket and cancel_spare_and_close actions - MACSOFT_ADMIN has unrestricted access
+      // For close_ticket and cancel_spare_and_close actions
       if (config.action === 'close_ticket' || config.action === 'cancel_spare_and_close') {
-        return userRole === 'MACSOFT_ADMIN' || (userRole === 'SERVICE_CENTER_TECHNICIAN' && isTicketCreatedByCurrentUser(ticketCreatedBy, currentUserId));
+        return ['MACSOFT_ADMIN', 'MACSOFT_HEAD'].includes(userRole) || userRole === 'SERVICE_CENTER_TECHNICIAN';
       }
 
       // For upload_photos and other non-transition actions, allow if user can access current stage

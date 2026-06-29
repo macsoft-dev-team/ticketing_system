@@ -971,7 +971,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
       ticketCodeSuffix,
     );
 
-    // For SERVICE_CENTER_TECHNICIAN, auto-assign their service center
+    // For SERVICE_CENTER_TECHNICIAN, auto-assign their service center but keep the approval gate
     let assignedServiceCenter = null;
     if (user.role === "SERVICE_CENTER_TECHNICIAN" && user.centerCode) {
       assignedServiceCenter = user.centerCode;
@@ -1053,64 +1053,25 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     });
 
     // Create initial milestones for the ticket
-    if (user.role === "SERVICE_CENTER_TECHNICIAN") {
-      // For SERVICE_CENTER_TECHNICIAN, create milestones up to RECEIVED_AT_SERVICE_CENTER
-      const milestoneStages = [
-        {
-          stage: "TICKET_RAISED",
-          order: 0,
-          notes: "Ticket raised by service center technician.",
-          status: "DONE",
-          startedAt: new Date(),
-          completedAt: new Date(),
-        },
-        {
-          stage: "SERVICE_CENTER_ASSIGNED",
-          order: 1,
-          notes: `Auto-assigned to service center: ${user.serviceCenter?.name || user.centerCode}`,
-          status: "DONE",
-          startedAt: new Date(),
-          completedAt: new Date(),
-        },
-        {
-          stage: "RECEIVED_AT_SERVICE_CENTER",
-          order: 5,
-          notes:
-            "Controller received at service center by technician. Please upload 4 required photos: Controller Front, Controller Bottom, Full View Open, MCB Close Up.",
-          status: "IN_PROGRESS",
-          startedAt: new Date(),
-          eta: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days ETA
-          slaDueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days SLA
-          photoRequired: true,
-        },
-      ];
+    // Both technician and standard roles now start with a standard TICKET_RAISED milestone awaiting assignment/approval
+    const notesText = user.role === "SERVICE_CENTER_TECHNICIAN"
+      ? "Ticket raised by service center technician. Awaiting Macsoft review/approval."
+      : "Ticket has been raised and awaiting service center assignment.";
 
-      // Create all milestones in sequence
-      for (const milestoneData of milestoneStages) {
-        await createMilestone({
-          ...milestoneData,
-          ticketId: newTicket.id,
-          changedBy: userId,
-          photoRequired: milestoneData.photoRequired || false,
-        });
-      }
-    } else {
-      // Standard milestone creation for other roles
-      const milestonesData = {
-        stage: "TICKET_RAISED",
-        order: 0,
-        notes: "Ticket has been raised and awaiting service center assignment.",
-        status: "IN_PROGRESS",
-        startedAt: new Date(),
-        eta: null,
-        slaDueAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-        photoRequired: false,
-        ticketId: newTicket.id,
-        changedBy: userId,
-      };
+    const milestonesData = {
+      stage: "TICKET_RAISED",
+      order: 0,
+      notes: notesText,
+      status: "IN_PROGRESS",
+      startedAt: new Date(),
+      eta: null,
+      slaDueAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      photoRequired: false,
+      ticketId: newTicket.id,
+      changedBy: userId,
+    };
 
-      await createMilestone(milestonesData);
-    }
+    await createMilestone(milestonesData);
 
     // Create initial message with ticket description
     const conversation = await prisma.message.create({
@@ -1181,85 +1142,35 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     let notificationData;
     let targetUserIds = [];
 
-    if (user.role === "SERVICE_CENTER_TECHNICIAN") {
-      // For SERVICE_CENTER_TECHNICIAN, create notification about diagnosis ready
-      notificationData = createTicketNotification(
-        "diagnosis_ready",
-        completeTicket,
-        userId,
-        {
-          messageId: conversation.id,
-          priority: completeTicket.priority,
-          customerName: completeTicket.customerName,
-          description: completeTicket.description,
-          serviceCenter: user.serviceCenter?.name || user.centerCode,
-        },
-      );
+    // Standard notification for ticket creation
+    notificationData = createTicketNotification(
+      "created",
+      completeTicket,
+      userId,
+      {
+        messageId: conversation.id,
+        priority: completeTicket.priority,
+        customerName: completeTicket.customerName,
+        description: completeTicket.description,
+      },
+    );
 
-      // Target other technicians in the same service center and management roles
-      const targetUsers = await prisma.user.findMany({
-        where: {
-          AND: [
-            { id: { not: userId } },
-            {
-              OR: [
-                {
-                  role: {
-                    in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
-                  },
-                },
-                {
-                  AND: [
-                    { centerCode: user.centerCode },
-                    {
-                      role: {
-                        in: [
-                          "SERVICE_CENTER_TECHNICIAN",
-                          "CUSTOMER_SERVICE_HEAD",
-                        ],
-                      },
-                    },
-                  ],
-                },
-              ],
+    // Get target users (ADMIN, HEAD, and SUPPORT roles)
+    const targetUsers = await prisma.user.findMany({
+      where: {
+        AND: [
+          { id: { not: userId } },
+          {
+            role: {
+              in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
             },
-          ],
-        },
-        select: { id: true, name: true, role: true },
-      });
+          },
+        ],
+      },
+      select: { id: true, name: true, role: true },
+    });
 
-      targetUserIds = targetUsers.map((u) => u.id);
-    } else {
-      // Standard notification for other roles
-      notificationData = createTicketNotification(
-        "created",
-        completeTicket,
-        userId,
-        {
-          messageId: conversation.id,
-          priority: completeTicket.priority,
-          customerName: completeTicket.customerName,
-          description: completeTicket.description,
-        },
-      );
-
-      // Get target users (ADMIN, HEAD, and SUPPORT roles)
-      const targetUsers = await prisma.user.findMany({
-        where: {
-          AND: [
-            { id: { not: userId } },
-            {
-              role: {
-                in: ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
-              },
-            },
-          ],
-        },
-        select: { id: true, name: true, role: true },
-      });
-
-      targetUserIds = targetUsers.map((u) => u.id);
-    }
+    targetUserIds = targetUsers.map((u) => u.id);
 
     // Save and broadcast notification
     await saveAndBroadcastNotification(

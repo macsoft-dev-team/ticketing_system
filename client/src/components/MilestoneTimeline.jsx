@@ -673,6 +673,7 @@ const MilestoneCard = ({
                                         allMilestones={allMilestones}
                                         ticketCreatedBy={ticketCreatedBy}
                                         currentUserId={user?.id}
+                                        availableTransitions={availableTransitions}
                                     />
                                 )}
                             </div>
@@ -1088,6 +1089,11 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         const targetConfig = MILESTONE_CONFIG[selectedTargetStage];
         let photoRequired = targetConfig?.photoRequired;
         let minPhotos = targetConfig?.minPhotos || 1;
+        
+        // Bypass photo requirement if the user has a Macsoft role and the target stage is RECEIVED_AT_SERVICE_CENTER
+        if (selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role)) {
+            photoRequired = false;
+        }
         
         // Handle dynamic photo requirements for REQUEST_CLEARED_AT_FIELD
         if (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && targetConfig?.getPhotoRequirements) {
@@ -1637,191 +1643,196 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
 
             {/* Transition Modal */}
             <AnimatePresence>
-                {showTransitionModal && selectedTargetStage && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/25 z-50 flex items-center justify-center p-4"
-                        onClick={() => setShowTransitionModal(false)}
-                    >
+                {showTransitionModal && selectedTargetStage && (() => {
+                    const targetConfig = MILESTONE_CONFIG[selectedTargetStage];
+                    const isMacsoftApprovalOfReceipt = selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' && 
+                        ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
+                    
+                    let isPhotoRequired = targetConfig?.photoRequired && !isMacsoftApprovalOfReceipt;
+                    
+                    if (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && targetConfig?.getPhotoRequirements) {
+                        isPhotoRequired = targetConfig.getPhotoRequirements(user?.role)?.photoRequired;
+                    }
+
+                    return (
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/25 z-50 flex items-center justify-center p-4"
+                            onClick={() => setShowTransitionModal(false)}
                         >
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                    {selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.label || 'Advance Milestone'}
-                                </h3>
-                                <button
-                                    onClick={() => setShowTransitionModal(false)}
-                                    className="text-gray-400 hover:text-gray-600"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                {selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage] && (
-                                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                        <p className="text-sm text-blue-700">
-                                            <strong>Action:</strong> {MILESTONE_CONFIG[selectedTargetStage].description}
-                                        </p>
-                                        {(MILESTONE_CONFIG[selectedTargetStage].photoRequired || 
-                                         (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements?.(user?.role)?.photoRequired)) && (
-                                            <p className="text-xs text-blue-600 mt-1">
-                                                📷 {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && user?.role === 'CUSTOMER_FIELD_ENGINEER' 
-                                                    ? 'Photos are required for field engineers to document the resolution'
-                                                    : 'This milestone will require photo documentation'
-                                                }
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* Photo Upload Section */}
-                                {selectedTargetStage && (MILESTONE_CONFIG[selectedTargetStage]?.photoRequired || 
-                                 (selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements?.(user?.role)?.photoRequired)) && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements
-                                                ? `Photos ${MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.photoRequired ? 'Required' : 'Optional'} (Min: ${MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.minPhotos || 0})`
-                                                : `Photos Required (Min: ${MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1})`
-                                            }
-                                        </label>
-
-                                        {/* Photo Requirements Info */}
-                                        {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
-                                            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border mb-3">
-                                                <strong>4 specific photos required:</strong>
-                                                <div className="mt-1 grid grid-cols-2 gap-1 text-xs">
-                                                    {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.map((photoType, index) => (
-                                                        <div key={index} className="flex items-center gap-1">
-                                                            <span className={`w-4 h-4 rounded text-white text-xs flex items-center justify-center ${transitionPhotos.length > index ? 'bg-green-500' : 'bg-gray-400'
-                                                                }`}>
-                                                                {index + 1}
-                                                            </span>
-                                                            <span className={transitionPhotos.length > index ? 'text-green-600 font-medium' : 'text-gray-600'}>
-                                                                {photoType}
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Upload Button */}
-                                        <button
-                                            onClick={() => setShowPhotoModal(true)}
-                                            className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:border-blue-500 hover:bg-blue-50 transition-colors"
-                                        >
-                                            <Camera className="w-5 h-5" />
-                                            <span className="font-medium">
-                                                {transitionPhotos.length > 0 
-                                                    ? `${transitionPhotos.length} photo(s) selected - Click to change`
-                                                    : 'Upload Photos'
-                                                }
-                                            </span>
-                                        </button>
-
-                                        {/* Photo Count Status */}
-                                        {transitionPhotos.length > 0 && (
-                                            <div className="mt-2 text-xs text-center">
-                                                {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos === 4 ? (
-                                                    <span className={`font-medium ${transitionPhotos.length >= 4 ? 'text-green-600' : 'text-orange-600'}`}>
-                                                        {transitionPhotos.length >= 4 
-                                                            ? '✓ All required photos uploaded!' 
-                                                            : `${transitionPhotos.length} of 4 photos - ${4 - transitionPhotos.length} more needed`
-                                                        }
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-green-600 font-medium">
-                                                        ✓ {transitionPhotos.length} photo(s) ready to upload
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* Required Photos Info for other stages */}
-                                        {selectedTargetStage !== 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
-                                            <div className="mt-2 text-xs text-gray-600">
-                                                <span className="font-medium">Required Photos: </span>
-                                                {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* Notes Section - always show for REQUEST_CLEARED_AT_FIELD, optionally for others */}
-                                {(selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' || transitionNotes) && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' 
-                                                ? 'Resolution Notes (Required)' 
-                                                : 'Notes (Optional)'
-                                            }
-                                        </label>
-                                        <textarea
-                                            value={transitionNotes}
-                                            onChange={(e) => setTransitionNotes(e.target.value)}
-                                            placeholder={selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' 
-                                                ? 'Describe how the issue was resolved at field, actions taken, parts replaced, etc.'
-                                                : 'Add any additional notes for this milestone...'
-                                            }
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                            rows={4}
-                                        />
-                                        {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && (
-                                            <p className="text-xs text-blue-600 mt-1">
-                                                ℹ️ Notes are required to document the field resolution
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* Add Notes button for other stages */}
-                                {selectedTargetStage !== 'REQUEST_CLEARED_AT_FIELD' && !transitionNotes && (
-                                    <button
-                                        onClick={() => setTransitionNotes(' ')} // Set a space to trigger the textarea display
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-                                    >
-                                        <FileText className="w-4 h-4" />
-                                        Add Notes (Optional)
-                                    </button>
-                                )}
-
-                                <div className="flex items-center justify-end gap-2">
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+                            >
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-gray-900">
+                                        {selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.label || 'Advance Milestone'}
+                                    </h3>
                                     <button
                                         onClick={() => setShowTransitionModal(false)}
-                                        className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                        className="text-gray-400 hover:text-gray-600"
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleTransition}
-                                        disabled={
-                                            (selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') &&
-                                            MILESTONE_CONFIG[selectedTargetStage]?.photoRequired &&
-                                            transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
-                                        }
-                                        className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') &&
-                                            MILESTONE_CONFIG[selectedTargetStage]?.photoRequired &&
-                                            transitionPhotos.length < (MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1)
-                                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                                            }`}
-                                    >
-                                        <ArrowRight className="w-4 h-4" />
-                                        Advance
+                                        <X className="w-5 h-5" />
                                     </button>
                                 </div>
-                            </div>
+
+                                <div className="space-y-4">
+                                    {selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage] && (
+                                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                            <p className="text-sm text-blue-700">
+                                                <strong>Action:</strong> {MILESTONE_CONFIG[selectedTargetStage].description}
+                                            </p>
+                                            {isPhotoRequired && (
+                                                <p className="text-xs text-blue-600 mt-1">
+                                                    📷 {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && user?.role === 'CUSTOMER_FIELD_ENGINEER' 
+                                                        ? 'Photos are required for field engineers to document the resolution'
+                                                        : 'This milestone will require photo documentation'
+                                                    }
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Photo Upload Section */}
+                                    {isPhotoRequired && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements
+                                                    ? `Photos ${MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.photoRequired ? 'Required' : 'Optional'} (Min: ${MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.minPhotos || 0})`
+                                                    : `Photos Required (Min: ${MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1})`
+                                                }
+                                            </label>
+
+                                            {/* Photo Requirements Info */}
+                                            {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
+                                                <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border mb-3">
+                                                    <strong>4 specific photos required:</strong>
+                                                    <div className="mt-1 grid grid-cols-2 gap-1 text-xs">
+                                                        {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.map((photoType, index) => (
+                                                            <div key={index} className="flex items-center gap-1">
+                                                                <span className={`w-4 h-4 rounded text-white text-xs flex items-center justify-center ${transitionPhotos.length > index ? 'bg-green-500' : 'bg-gray-400'
+                                                                    }`}>
+                                                                    {index + 1}
+                                                                </span>
+                                                                <span className={transitionPhotos.length > index ? 'text-green-600 font-medium' : 'text-gray-600'}>
+                                                                    {photoType}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Upload Button */}
+                                            <button
+                                                onClick={() => setShowPhotoModal(true)}
+                                                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                                            >
+                                                <Camera className="w-5 h-5" />
+                                                <span className="font-medium">
+                                                    {transitionPhotos.length > 0 
+                                                        ? `${transitionPhotos.length} photo(s) selected - Click to change`
+                                                        : 'Upload Photos'
+                                                    }
+                                                </span>
+                                            </button>
+
+                                            {/* Photo Count Status */}
+                                            {transitionPhotos.length > 0 && (
+                                                <div className="mt-2 text-xs text-center">
+                                                    {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.minPhotos === 4 ? (
+                                                        <span className={`font-medium ${transitionPhotos.length >= 4 ? 'text-green-600' : 'text-orange-600'}`}>
+                                                            {transitionPhotos.length >= 4 
+                                                                ? '✓ All required photos uploaded!' 
+                                                                : `${transitionPhotos.length} of 4 photos - ${4 - transitionPhotos.length} more needed`
+                                                            }
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-green-600 font-medium">
+                                                            ✓ {transitionPhotos.length} photo(s) ready to upload
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Required Photos Info for other stages */}
+                                            {selectedTargetStage !== 'RECEIVED_AT_SERVICE_CENTER' && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
+                                                <div className="mt-2 text-xs text-gray-600">
+                                                    Required photos: {MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Notes Input Section */}
+                                    {selectedTargetStage && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Notes {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' ? <span className="text-red-500">*</span> : '(Optional)'}
+                                            </label>
+                                            <textarea
+                                                value={transitionNotes}
+                                                onChange={(e) => setTransitionNotes(e.target.value)}
+                                                placeholder={selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' 
+                                                    ? 'Describe how the issue was resolved at field, actions taken, parts replaced, etc.'
+                                                    : 'Add any additional notes for this milestone...'
+                                                }
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                rows={4}
+                                            />
+                                            {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && (
+                                                <p className="text-xs text-blue-600 mt-1">
+                                                    ℹ️ Notes are required to document the field resolution
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Add Notes button for other stages */}
+                                    {selectedTargetStage !== 'REQUEST_CLEARED_AT_FIELD' && !transitionNotes && (
+                                        <button
+                                            onClick={() => setTransitionNotes(' ')} // Set a space to trigger the textarea display
+                                            className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+                                        >
+                                            <FileText className="w-4 h-4" />
+                                            Add Notes (Optional)
+                                        </button>
+                                    )}
+
+                                    <div className="flex items-center justify-end gap-2">
+                                        <button
+                                            onClick={() => setShowTransitionModal(false)}
+                                            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={handleTransition}
+                                            disabled={
+                                                isPhotoRequired &&
+                                                transitionPhotos.length < (targetConfig?.minPhotos || 1)
+                                            }
+                                            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                                                isPhotoRequired &&
+                                                transitionPhotos.length < (targetConfig?.minPhotos || 1)
+                                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                            }`}
+                                        >
+                                            <ArrowRight className="w-4 h-4" />
+                                            Advance
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
+                    );
+                })()}
             </AnimatePresence>
 
             {/* Spare Request Modal */}

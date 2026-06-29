@@ -230,6 +230,11 @@ const transitionMilestone = async (
   io = null
 ) => {
   try {
+    // Redirect direct closure attempts by technicians to CLOSE_REQUESTED
+    if (targetStage === "TICKET_CLOSED" && userRole === "SERVICE_CENTER_TECHNICIAN") {
+      targetStage = "CLOSE_REQUESTED";
+    }
+
     // Check if ticket is archived/closed and get ticket info
     const ticket = await prisma.ticket.findUnique({
       where: { id: ticketId },
@@ -241,6 +246,9 @@ const transitionMilestone = async (
         stateCode: true,
         customerName: true,
         priority: true,
+        createdByUser: {
+          select: { role: true }
+        }
       },
     });
 
@@ -272,16 +280,91 @@ const transitionMilestone = async (
       throw new Error(validation.error);
     }
 
+    // Special handling for rejecting a close request (transitioning from CLOSE_REQUESTED back to a previous stage)
+    if (currentMilestone && currentMilestone.stage === "CLOSE_REQUESTED" && targetStage !== "TICKET_CLOSED") {
+      // Find the previous milestone record
+      const previousMilestone = await prisma.ticketMilestone.findFirst({
+        where: {
+          ticketId,
+          stage: targetStage
+        }
+      });
+
+      if (!previousMilestone) {
+        throw new Error(`Cannot return to stage ${targetStage} - milestone not found`);
+      }
+
+      // Delete the CLOSE_REQUESTED milestone to clear the unique constraint and history
+      await prisma.ticketMilestone.delete({
+        where: { id: currentMilestone.id }
+      });
+
+      // Update the previous milestone to put it back IN_PROGRESS
+      const updatedMilestone = await prisma.ticketMilestone.update({
+        where: { id: previousMilestone.id },
+        data: {
+          status: 'IN_PROGRESS',
+          completedAt: null,
+          changedBy: userId,
+          notes: (previousMilestone.notes || "") + `\n\n[Rejection] Close request rejected by Macsoft: ${data.notes || 'No reason specified'}`
+        },
+        include: {
+          changer: {
+            select: { id: true, name: true, role: true }
+          },
+          attachments: true
+        }
+      });
+
+      const config = getStageConfig(targetStage);
+      const result = {
+        ...updatedMilestone,
+        config
+      };
+
+      // Broadcast real-time update
+      if (io) {
+        const updateData = {
+          ticketId,
+          milestone: result,
+          previousStage: "CLOSE_REQUESTED",
+          newStage: targetStage,
+          isTicketClosed: false,
+          ticketStatus: "IN_PROGRESS",
+          closeRequestRejected: true,
+          rejectionNotes: data.notes || 'No reason specified'
+        };
+        emitMilestoneEventWithRBAC(io, "milestone-updated", ticket, updateData);
+      }
+
+      return result;
+    }
+
     // Additional validation for RECEIVED_AT_SERVICE_CENTER
     if (targetStage === "RECEIVED_AT_SERVICE_CENTER") {
-      // Check if current milestone is SUBMITTED_TO_SERVICE_CENTER (which is the required prerequisite)
-      if (
-        !currentMilestone ||
-        currentMilestone.stage !== "SUBMITTED_TO_SERVICE_CENTER"
-      ) {
-        throw new Error(
-          "Controller must be submitted to service center by field engineer before it can be received"
-        );
+      const isTechCreated = ticket.createdByUser?.role === "SERVICE_CENTER_TECHNICIAN";
+      
+      // If technician-created, allow transition from SERVICE_CENTER_ASSIGNED.
+      // Otherwise, require transition from SUBMITTED_TO_SERVICE_CENTER.
+      if (isTechCreated) {
+        if (
+          !currentMilestone ||
+          (currentMilestone.stage !== "SUBMITTED_TO_SERVICE_CENTER" &&
+           currentMilestone.stage !== "SERVICE_CENTER_ASSIGNED")
+        ) {
+          throw new Error(
+            "Controller must be assigned or submitted to service center before it can be received"
+          );
+        }
+      } else {
+        if (
+          !currentMilestone ||
+          currentMilestone.stage !== "SUBMITTED_TO_SERVICE_CENTER"
+        ) {
+          throw new Error(
+            "Controller must be submitted to service center by field engineer before it can be received"
+          );
+        }
       }
     }
 
@@ -290,23 +373,26 @@ const transitionMilestone = async (
       data.action === "close_ticket" ||
       data.action === "cancel_spare_and_close"
     ) {
-      // Allow MACSOFT_ADMIN unrestricted access, SERVICE_CENTER_TECHNICIAN only if they created the ticket
+      // Allow MACSOFT_ADMIN and MACSOFT_HEAD unrestricted access, SERVICE_CENTER_TECHNICIAN can request close
       if (
         userRole !== "SERVICE_CENTER_TECHNICIAN" &&
-        userRole !== "MACSOFT_ADMIN"
+        userRole !== "MACSOFT_ADMIN" &&
+        userRole !== "MACSOFT_HEAD"
       ) {
         throw new Error(
-          "Only service center technicians or MACSOFT admins can perform this action"
+          "Only service center technicians or MACSOFT admins/heads can perform this action"
         );
       }
 
-      // MACSOFT_ADMIN can close any ticket, SERVICE_CENTER_TECHNICIAN can only close tickets they created
-      if (
-        userRole === "SERVICE_CENTER_TECHNICIAN" &&
-        ticket.createdBy !== userId
-      ) {
+      // MACSOFT_ADMIN and MACSOFT_HEAD can close any ticket.
+      // SERVICE_CENTER_TECHNICIAN closing is routed to CLOSE_REQUESTED, so they are allowed to initiate it.
+    }
+
+    // Special validation for technician field clearance (only allowed for tickets they created)
+    if (targetStage === "REQUEST_CLEARED_AT_FIELD" && userRole === "SERVICE_CENTER_TECHNICIAN") {
+      if (ticket.createdBy !== userId) {
         throw new Error(
-          "Service center technicians can only close tickets they created"
+          "Service center technicians can only perform field clearance on tickets they created"
         );
       }
     }
@@ -335,12 +421,20 @@ const transitionMilestone = async (
 
     // Mark current milestone as done if exists
     if (currentMilestone) {
+      const milestoneUpdateData = {
+        status: "DONE",
+        completedAt: new Date(),
+      };
+
+      // If we are transitioning to CLOSE_REQUESTED or TICKET_CLOSED, update notes to show it was bypassed/closed
+      if (targetStage === "CLOSE_REQUESTED" || targetStage === "TICKET_CLOSED") {
+        milestoneUpdateData.notes = (currentMilestone.notes || "") + 
+          `\n\n[Bypassed/Closed] Milestone ended due to ticket closure request. Reason: ${data.notes || 'No problem found.'}`;
+      }
+
       await prisma.ticketMilestone.update({
         where: { id: currentMilestone.id },
-        data: {
-          status: "DONE",
-          completedAt: new Date(),
-        },
+        data: milestoneUpdateData,
       });
     }
 
@@ -405,7 +499,8 @@ const transitionMilestone = async (
 
     if (
       targetStage === "DELIVERED_TO_FIELD" ||
-      targetStage === "FIELD_CLEARANCE_APPROVED"
+      targetStage === "FIELD_CLEARANCE_APPROVED" ||
+      (targetStage === "REQUEST_CLEARED_AT_FIELD" && userRole === "SERVICE_CENTER_TECHNICIAN")
     ) {
       shouldCreateTicketClosed = true;
 
@@ -724,6 +819,25 @@ const getAvailableTransitions = async (ticketId, userRole) => {
       currentMilestone.stage,
       userRole
     );
+
+    // If current stage is CLOSE_REQUESTED, fetch the previous milestone and add it to available return transitions for Macsoft roles
+    if (currentMilestone.stage === "CLOSE_REQUESTED" && ["MACSOFT_ADMIN", "MACSOFT_HEAD"].includes(userRole)) {
+      const previousMilestone = await prisma.ticketMilestone.findFirst({
+        where: {
+          ticketId,
+          stage: { not: "CLOSE_REQUESTED" }
+        },
+        orderBy: { createdAt: "desc" }
+      });
+      if (previousMilestone) {
+        const previousConfig = getStageConfig(previousMilestone.stage);
+        if (previousConfig) {
+          // Add it to the front of availableTransitions
+          availableStages.unshift(previousConfig);
+        }
+      }
+    }
+
     return availableStages;
   } catch (error) {
     throw error;
