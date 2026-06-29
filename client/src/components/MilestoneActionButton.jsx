@@ -635,37 +635,7 @@ const MilestoneActionButton = ({
     return null;
   }
 
-  // Enforce mutual exclusivity between REPAIR_IN_PROGRESS and REPLACEMENT_IN_PROGRESS
-  // If both actions are present, prefer the one that appears first in availableTransitions (server-provided)
-  let filteredConfigs = actionConfigs.slice();
-  try {
-    const hasReplace = filteredConfigs.some(c => c.targetStage === 'REPLACEMENT_IN_PROGRESS');
-    const hasRepair = filteredConfigs.some(c => c.targetStage === 'REPAIR_IN_PROGRESS');
-
-    if (hasReplace && hasRepair && Array.isArray(availableTransitions) && availableTransitions.length > 0) {
-      // Build a lookup of available transition stages for ordering
-      const availOrder = availableTransitions.reduce((acc, t, idx) => {
-        acc[t.stage] = idx;
-        return acc;
-      }, {});
-
-      const replaceOrder = typeof availOrder['REPLACEMENT_IN_PROGRESS'] === 'number' ? availOrder['REPLACEMENT_IN_PROGRESS'] : Infinity;
-      const repairOrder = typeof availOrder['REPAIR_IN_PROGRESS'] === 'number' ? availOrder['REPAIR_IN_PROGRESS'] : Infinity;
-
-      if (replaceOrder < repairOrder) {
-        filteredConfigs = filteredConfigs.filter(c => c.targetStage !== 'REPAIR_IN_PROGRESS');
-      } else if (repairOrder < replaceOrder) {
-        filteredConfigs = filteredConfigs.filter(c => c.targetStage !== 'REPLACEMENT_IN_PROGRESS');
-      } else {
-        // If both have equal priority (or neither present in availableTransitions), pick one based on default preference
-        // Default preference: REPAIR_IN_PROGRESS over REPLACEMENT_IN_PROGRESS
-        filteredConfigs = filteredConfigs.filter(c => c.targetStage !== 'REPLACEMENT_IN_PROGRESS');
-      }
-    }
-  } catch (err) {
-    // Fallback: don't crash - keep original configs
-    filteredConfigs = actionConfigs.slice();
-  }
+  const filteredConfigs = actionConfigs;
 
   // Get color classes
   const colorClasses = {
