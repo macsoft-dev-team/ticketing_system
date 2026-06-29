@@ -496,7 +496,8 @@ const MilestoneCard = ({
     user,
     allMilestones,
     ticketStatus,
-    ticketCreatedBy
+    ticketCreatedBy,
+    availableTransitions = []
 }) => {
     const [showDetails, setShowDetails] = useState(isActive);
     const [showTransitionForm, setShowTransitionForm] = useState(false);
@@ -1636,6 +1637,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                             allMilestones={milestones}
                             ticketStatus={ticketStatus}
                             ticketCreatedBy={ticketCreatedBy}
+                            availableTransitions={availableTransitions}
                         />
                     );
                 })}
