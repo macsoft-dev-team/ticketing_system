@@ -38,6 +38,7 @@ enum ServiceStage {
   READY_FOR_DISPATCH // Controller ready for dispatch (photo required)
   DELIVERED_TO_FIELD // Controller delivered/dispatched back to field
   FIELD_CLEARANCE_APPROVED // Field clearance approved by Head
+  CLOSE_REQUESTED // Close request raised by technician
   TICKET_CLOSED // Ticket formally closed
 }
 
@@ -277,7 +278,7 @@ model TicketMilestone {
   slaDueAt      DateTime?
   photoRequired Boolean         @default(false)
   changedBy     Int?
-  notes         String?
+  notes         String?         @db.Text
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 

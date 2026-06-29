@@ -20,6 +20,7 @@ const ServiceStages = {
   READY_FOR_DISPATCH: "READY_FOR_DISPATCH",
   DELIVERED_TO_FIELD: "DELIVERED_TO_FIELD",
   FIELD_CLEARANCE_APPROVED: "FIELD_CLEARANCE_APPROVED",
+  CLOSE_REQUESTED: "CLOSE_REQUESTED",
   TICKET_CLOSED: "TICKET_CLOSED",
 };
 
@@ -51,7 +52,7 @@ const milestoneStageConfig = [
     label: "Service Center Assigned",
     description:
       "Service center assigned - field engineer can issue solved or submit to service center",
-    allowedRoles: ["MACSOFT_SUPPORT", "MACSOFT_ADMIN", "MACSOFT_HEAD"],
+    allowedRoles: ["MACSOFT_SUPPORT", "MACSOFT_ADMIN", "MACSOFT_HEAD", "SERVICE_CENTER_TECHNICIAN"],
     photoRequired: false,
     notes:
       "Service center has been assigned - choose to issue solved or submit to service center",
@@ -60,8 +61,8 @@ const milestoneStageConfig = [
     stage: ServiceStages.REQUEST_CLEARED_AT_FIELD,
     order: 2,
     label: "Request Cleared at Field",
-    description: "Fault cleared on-site by field engineer",
-    allowedRoles: ["CUSTOMER_FIELD_ENGINEER", "MACSOFT_ADMIN", "MACSOFT_HEAD"],
+    description: "Fault cleared on-site by field engineer or service center technician",
+    allowedRoles: ["CUSTOMER_FIELD_ENGINEER", "MACSOFT_ADMIN", "MACSOFT_HEAD", "SERVICE_CENTER_TECHNICIAN"],
     photoRequired: true,
     minPhotos: 1,
     isFinal: true,
@@ -265,6 +266,15 @@ const milestoneStageConfig = [
     notes: "Final approval for field clearance",
   },
   {
+    stage: ServiceStages.CLOSE_REQUESTED,
+    order: 14.5,
+    label: "Close Requested",
+    description: "Close request submitted by service center technician, awaiting Macsoft team approval",
+    allowedRoles: ["SERVICE_CENTER_TECHNICIAN", "MACSOFT_ADMIN", "MACSOFT_HEAD"],
+    photoRequired: false,
+    notes: "Awaiting Macsoft admin/head approval to close the ticket",
+  },
+  {
     stage: ServiceStages.TICKET_CLOSED,
     order: 15,
     label: "Ticket Closed",
@@ -298,23 +308,27 @@ function getNextAvailableStages(currentStage, userRole) {
     SERVICE_CENTER_ASSIGNED: [
       "REQUEST_CLEARED_AT_FIELD",
       "SENT_TO_SERVICE_CENTER",
+      "RECEIVED_AT_SERVICE_CENTER",
+      "CLOSE_REQUESTED"
     ],
     SENT_TO_SERVICE_CENTER: ["SUBMITTED_TO_SERVICE_CENTER"],
     SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
-    RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS"],
-    DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS"],
-    SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED"],
-    SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD"], // Direct completion options after spare approval
-    SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD"], // Can close or try field clearance after rejection
-    REPAIR_IN_PROGRESS: ["REPAIRED"], // Repair goes directly to repaired
+    RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS", "CLOSE_REQUESTED", "REQUEST_CLEARED_AT_FIELD"],
+    DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS", "CLOSE_REQUESTED", "REQUEST_CLEARED_AT_FIELD"],
+    SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED", "CLOSE_REQUESTED"],
+    SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD", "CLOSE_REQUESTED"], // Direct completion options after spare approval
+    SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD", "CLOSE_REQUESTED"], // Can close or try field clearance after rejection
+    REPAIR_IN_PROGRESS: ["REPAIRED", "CLOSE_REQUESTED", "REQUEST_CLEARED_AT_FIELD"], // Repair goes directly to repaired
     REPLACEMENT_IN_PROGRESS: [
       "SPARE_REQUESTED",
       "REQUEST_CLEARED_AT_FIELD",
       "REPAIRED",
+      "CLOSE_REQUESTED",
     ],
-    REPAIRED: ["READY_FOR_DISPATCH"],
-    READY_FOR_DISPATCH: ["DELIVERED_TO_FIELD"],
+    REPAIRED: ["READY_FOR_DISPATCH", "CLOSE_REQUESTED"],
+    READY_FOR_DISPATCH: ["DELIVERED_TO_FIELD", "CLOSE_REQUESTED"],
     DELIVERED_TO_FIELD: ["TICKET_CLOSED"], // Can close after delivery
+    CLOSE_REQUESTED: ["TICKET_CLOSED"], // Can transition to closed if approved
     FIELD_CLEARANCE_APPROVED: ["TICKET_CLOSED"], // Can close after field clearance approval
     TICKET_CLOSED: [], // Final stage
   };
@@ -361,7 +375,7 @@ function validateMilestoneTransition(
   }
 
   // Photo gate: Check if CURRENT milestone requires photos before leaving
-  if (currentMilestone) {
+  if (currentMilestone && targetStage !== 'TICKET_CLOSED' && targetStage !== 'CLOSE_REQUESTED' && targetStage !== 'REQUEST_CLEARED_AT_FIELD') {
     const currentConfig = getStageConfig(currentMilestone.stage);
     if (currentConfig && currentConfig.photoRequired) {
       // Check if current milestone has attachments
@@ -396,23 +410,39 @@ function validateMilestoneTransition(
       SERVICE_CENTER_ASSIGNED: [
         "REQUEST_CLEARED_AT_FIELD",
         "SENT_TO_SERVICE_CENTER",
+        "RECEIVED_AT_SERVICE_CENTER",
+        "TICKET_CLOSED",
+        "CLOSE_REQUESTED"
       ],
       SENT_TO_SERVICE_CENTER: ["SUBMITTED_TO_SERVICE_CENTER"],
       SUBMITTED_TO_SERVICE_CENTER: ["RECEIVED_AT_SERVICE_CENTER"],
-      RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS", "TICKET_CLOSED"], // Allow technicians to close ticket
-      DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS", "TICKET_CLOSED"], // Allow technicians to close ticket
-      SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED", "TICKET_CLOSED"], // Allow technicians to cancel spare and close ticket
-      SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD", "TICKET_CLOSED"], // Allow technicians to cancel spare and close ticket
-      SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD"], // Can close or try field clearance after rejection
-      REPAIR_IN_PROGRESS: ["REPAIRED", "TICKET_CLOSED"], // Allow technicians to close ticket
+      RECEIVED_AT_SERVICE_CENTER: ["DIAGNOSIS_IN_PROGRESS", "TICKET_CLOSED", "CLOSE_REQUESTED", "REQUEST_CLEARED_AT_FIELD"],
+      DIAGNOSIS_IN_PROGRESS: ["REPAIR_IN_PROGRESS", "REPLACEMENT_IN_PROGRESS", "TICKET_CLOSED", "CLOSE_REQUESTED", "REQUEST_CLEARED_AT_FIELD"],
+      SPARE_REQUESTED: ["SPARE_APPROVED", "SPARE_REJECTED", "TICKET_CLOSED", "CLOSE_REQUESTED"],
+      SPARE_APPROVED: ["READY_FOR_DISPATCH", "REQUEST_CLEARED_AT_FIELD", "TICKET_CLOSED", "CLOSE_REQUESTED"],
+      SPARE_REJECTED: ["TICKET_CLOSED", "REQUEST_CLEARED_AT_FIELD", "CLOSE_REQUESTED"],
+      REPAIR_IN_PROGRESS: ["REPAIRED", "TICKET_CLOSED", "CLOSE_REQUESTED", "REQUEST_CLEARED_AT_FIELD"],
       REPLACEMENT_IN_PROGRESS: [
         "SPARE_REQUESTED",
         "REQUEST_CLEARED_AT_FIELD",
         "REPAIRED",
+        "CLOSE_REQUESTED",
       ],
-      REPAIRED: ["READY_FOR_DISPATCH"],
-      READY_FOR_DISPATCH: ["DELIVERED_TO_FIELD"],
+      REPAIRED: ["READY_FOR_DISPATCH", "CLOSE_REQUESTED"],
+      READY_FOR_DISPATCH: ["DELIVERED_TO_FIELD", "CLOSE_REQUESTED"],
       DELIVERED_TO_FIELD: ["TICKET_CLOSED"], // Can close after delivery
+      CLOSE_REQUESTED: [
+        "TICKET_CLOSED",
+        "RECEIVED_AT_SERVICE_CENTER",
+        "DIAGNOSIS_IN_PROGRESS",
+        "REPAIR_IN_PROGRESS",
+        "REPLACEMENT_IN_PROGRESS",
+        "SPARE_REQUESTED",
+        "SPARE_APPROVED",
+        "SPARE_REJECTED",
+        "REPAIRED",
+        "READY_FOR_DISPATCH"
+      ], // Can close or return to any service center stage if rejected
       FIELD_CLEARANCE_APPROVED: ["TICKET_CLOSED"], // Can close after field clearance approval
       TICKET_CLOSED: [], // Final stage
     };
