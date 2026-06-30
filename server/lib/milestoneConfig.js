@@ -91,6 +91,8 @@ const milestoneStageConfig = [
       "CUSTOMER_FIELD_ENGINEER",
       "CUSTOMER_SERVICE_HEAD",
       "MACSOFT_ADMIN",
+      "MACSOFT_HEAD",
+      "SERVICE_CENTER_TECHNICIAN",
     ],
     photoRequired: true,
     minPhotos: 4,
