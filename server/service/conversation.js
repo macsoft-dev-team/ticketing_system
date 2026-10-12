@@ -847,6 +847,184 @@ const getTicketsNotRepliedByMacsoft = async (userId, userRole) => {
   }
 };
 
+const editMessage = async (messageId, userId, userRole, newContent, io) => {
+  try {
+    const existingMessage = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        ticket: {
+          select: {
+            id: true,
+            ticketCode: true,
+            createdBy: true,
+            assignedServiceCenter: true,
+          },
+        },
+      },
+    });
+
+    if (!existingMessage) {
+      const error = new Error("Message not found");
+      error.status = 404;
+      throw error;
+    }
+
+    // Role check: Only Macsoft roles and Head roles can use this feature
+    const isAllowedRole =
+      userRole &&
+      (userRole.startsWith("MACSOFT_") || userRole.endsWith("_HEAD"));
+    if (!isAllowedRole) {
+      const error = new Error("This feature is only available for Macsoft and Head roles");
+      error.status = 403;
+      throw error;
+    }
+
+    if (existingMessage.content === "🚫 This message was deleted") {
+      const error = new Error("Cannot edit a deleted message");
+      error.status = 400;
+      throw error;
+    }
+
+    // Permission check: only original sender can edit (or MACSOFT_ADMIN)
+    if (existingMessage.senderId !== userId && !["MACSOFT_ADMIN"].includes(userRole)) {
+      const error = new Error("You can only edit your own messages");
+      error.status = 403;
+      throw error;
+    }
+
+    const trimmed = (newContent || "").trim();
+    if (!trimmed) {
+      const error = new Error("Message content cannot be empty");
+      error.status = 400;
+      throw error;
+    }
+
+    if (trimmed.length > 191) {
+      const error = new Error("Message cannot exceed 191 characters");
+      error.status = 400;
+      throw error;
+    }
+
+    const updated = await prisma.message.update({
+      where: { id: messageId },
+      data: { content: trimmed },
+      include: {
+        sender: {
+          select: { id: true, name: true, phone: true, role: true },
+        },
+        attachments: true,
+        seenBy: true,
+      },
+    });
+
+    // Real-time broadcast
+    if (io && existingMessage.ticket) {
+      emitConversationEventWithRBAC(
+        io,
+        "conversation-updated",
+        existingMessage.ticket,
+        {
+          id: updated.id,
+          ticketId: existingMessage.ticketId,
+          content: updated.content,
+          isEdited: true,
+        }
+      );
+    }
+
+    return updated;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const deleteMessageForEveryone = async (messageId, userId, userRole, io) => {
+  try {
+    const existingMessage = await prisma.message.findUnique({
+      where: { id: messageId },
+      include: {
+        ticket: {
+          select: {
+            id: true,
+            ticketCode: true,
+            createdBy: true,
+            assignedServiceCenter: true,
+          },
+        },
+        attachments: true,
+      },
+    });
+
+    if (!existingMessage) {
+      const error = new Error("Message not found");
+      error.status = 404;
+      throw error;
+    }
+
+    // Role check: Only Macsoft roles and Head roles can use this feature
+    const isAllowedRole =
+      userRole &&
+      (userRole.startsWith("MACSOFT_") || userRole.endsWith("_HEAD"));
+    if (!isAllowedRole) {
+      const error = new Error("This feature is only available for Macsoft and Head roles");
+      error.status = 403;
+      throw error;
+    }
+
+    if (existingMessage.content === "🚫 This message was deleted") {
+      return existingMessage;
+    }
+
+    // Permission check: sender or MACSOFT_ADMIN or MACSOFT_HEAD
+    const isSender = existingMessage.senderId === userId;
+    const isAdmin = ["MACSOFT_ADMIN", "MACSOFT_HEAD"].includes(userRole);
+    if (!isSender && !isAdmin) {
+      const error = new Error("You do not have permission to delete this message for everyone");
+      error.status = 403;
+      throw error;
+    }
+
+    // Remove attachment records if any to prevent downloading files of deleted messages
+    if (existingMessage.attachments && existingMessage.attachments.length > 0) {
+      await prisma.attachments.deleteMany({
+        where: { messageId: messageId },
+      });
+    }
+
+    const tombstoneText = "🚫 This message was deleted";
+    const updated = await prisma.message.update({
+      where: { id: messageId },
+      data: { content: tombstoneText },
+      include: {
+        sender: {
+          select: { id: true, name: true, phone: true, role: true },
+        },
+        attachments: true,
+        seenBy: true,
+      },
+    });
+
+    // Real-time broadcast
+    if (io && existingMessage.ticket) {
+      emitConversationEventWithRBAC(
+        io,
+        "conversation-deleted",
+        existingMessage.ticket,
+        {
+          id: updated.id,
+          ticketId: existingMessage.ticketId,
+          content: tombstoneText,
+          isDeleted: true,
+        }
+      );
+    }
+
+    return updated;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   getConversations,
   createConversation,
@@ -855,5 +1033,8 @@ module.exports = {
   markMessagesAsSeen,
   getUnreadMessageCount,
   getUnrepliedTickets: getTicketsNotRepliedByMacsoft,
-  getUnrepliedMessagesForUser, // New function for flexible unreplied messages
+  getUnrepliedMessagesForUser,
+  editMessage,
+  deleteMessageForEveryone,
 };
+

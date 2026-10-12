@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic } from 'lucide-react';
+import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic, MoreVertical, Pencil, Trash2, Check, AlertTriangle } from 'lucide-react';
 import DocumentModal from './DocumentModal';
 import MediaCapture from './MediaCapture';
 import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
@@ -171,7 +171,143 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   );
 };
 
-export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, name, attachments = [], onPreviewAttachment, date }) => {
+export const ChatMessage = ({
+  id,
+  message,
+  isOwnMessage = false,
+  timestamp,
+  avatar,
+  name,
+  attachments = [],
+  onPreviewAttachment,
+  date,
+  isDeleted = false,
+  isEdited = false,
+  currentUserRole = null,
+  onEditMessage = null,
+  onDeleteForEveryone = null,
+  onDeleteForMe = null,
+  disabled = false,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(message || '');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editError, setEditError] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    setEditText(message || '');
+  }, [message]);
+
+  // Click outside to close dropdown menu
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [showMenu]);
+
+  const isEligibleRole =
+    currentUserRole &&
+    (currentUserRole.startsWith('MACSOFT_') || currentUserRole.endsWith('_HEAD'));
+
+  const isMacsoftAdmin =
+    currentUserRole === 'MACSOFT_ADMIN' || currentUserRole === 'MACSOFT_HEAD';
+
+  const canEdit =
+    isEligibleRole &&
+    !isDeleted &&
+    isOwnMessage &&
+    !disabled &&
+    Boolean(onEditMessage);
+
+  const canDeleteForEveryone =
+    isEligibleRole &&
+    !isDeleted &&
+    (isOwnMessage || isMacsoftAdmin) &&
+    !disabled &&
+    Boolean(onDeleteForEveryone);
+
+  const canDeleteForMe = isEligibleRole && Boolean(onDeleteForMe);
+
+  const hasActions = isEligibleRole && (canEdit || canDeleteForEveryone || canDeleteForMe);
+
+  const handleStartEdit = () => {
+    setEditText(message || '');
+    setEditError(null);
+    setIsEditing(true);
+    setShowMenu(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditText(message || '');
+    setEditError(null);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editText.trim()) {
+      setEditError('Message cannot be empty');
+      return;
+    }
+    if (editText.trim().length > 191) {
+      setEditError('Message cannot exceed 191 characters');
+      return;
+    }
+    if (editText.trim() === message) {
+      setIsEditing(false);
+      return;
+    }
+
+    setIsSavingEdit(true);
+    setEditError(null);
+    try {
+      await onEditMessage(id, editText.trim());
+      setIsEditing(false);
+    } catch (err) {
+      setEditError(err.message || 'Failed to update message');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleKeyDownEdit = (e) => {
+    if (e.key === 'Escape') {
+      handleCancelEdit();
+    } else if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveEdit();
+    }
+  };
+
+  const handleDeleteForEveryone = async () => {
+    setIsDeleting(true);
+    try {
+      await onDeleteForEveryone(id);
+      setShowDeleteModal(false);
+    } catch (err) {
+      alert(err.message || 'Failed to delete message');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteForMe = () => {
+    onDeleteForMe(id);
+    setShowDeleteModal(false);
+  };
+
   const formatDateTime = (timestamp, date) => {
     if (!timestamp) return '';
     
@@ -201,34 +337,217 @@ export const ChatMessage = ({ message, isOwnMessage = false, timestamp, avatar, 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`flex gap-2 sm:gap-3 mb-3 sm:mb-4 ${isOwnMessage ? 'flex-row-reverse' : ''}`}
+      className={`group relative flex gap-2 sm:gap-3 mb-3 sm:mb-4 ${isOwnMessage ? 'flex-row-reverse' : ''}`}
     >
       <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs sm:text-sm font-medium flex-shrink-0">
         {avatar || name?.charAt(0) || 'A'}
       </div>
-      <div className={`flex flex-col max-w-[75%] sm:max-w-[70%] ${isOwnMessage ? 'items-end' : ''}`}>
-        <div className={`px-3 sm:px-4 py-2 rounded-2xl ${isOwnMessage
-          ? 'bg-blue-500 text-white rounded-br-md'
-          : 'bg-gray-100 text-gray-900 rounded-bl-md'
-          }`}>
-          {message && <p className="text-xs sm:text-sm">{message}</p>}
-          {attachments && attachments.length > 0 && (
-            <div className={`${message ? 'mt-2' : ''} space-y-1`}>
-              {attachments.map((attachment, index) => (
-                <MessageAttachment
-                  key={attachment.id || index}
-                  attachment={attachment}
-                  isOwnMessage={isOwnMessage}
-                  onPreview={onPreviewAttachment}
-                />
-              ))}
+      <div className={`flex flex-col max-w-[85%] sm:max-w-[75%] ${isOwnMessage ? 'items-end' : ''}`}>
+        <div className={`relative flex items-center gap-1.5 ${isOwnMessage ? 'flex-row-reverse' : ''}`}>
+          {/* Message bubble or Inline Edit */}
+          {isEditing ? (
+            <div className="bg-white border-2 border-blue-400 shadow-md rounded-2xl p-2.5 min-w-[260px] sm:min-w-[320px]">
+              <div className="text-[11px] font-semibold text-blue-600 mb-1 flex items-center justify-between">
+                <span>Editing Message</span>
+                <span className={editText.length > 180 ? 'text-amber-600 font-bold' : 'text-gray-400'}>
+                  {editText.length}/191
+                </span>
+              </div>
+              <textarea
+                value={editText}
+                onChange={(e) => {
+                  setEditText(e.target.value.slice(0, 191));
+                  setEditError(null);
+                }}
+                onKeyDown={handleKeyDownEdit}
+                rows={2}
+                autoFocus
+                className="w-full text-xs sm:text-sm p-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none resize-none text-gray-900"
+                placeholder="Edit message..."
+              />
+              {editError && (
+                <p className="text-[11px] text-red-600 mt-1 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" />
+                  {editError}
+                </p>
+              )}
+              <div className="flex items-center justify-end gap-1.5 mt-2">
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  disabled={isSavingEdit}
+                  className="px-2.5 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveEdit}
+                  disabled={isSavingEdit || !editText.trim()}
+                  className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {isSavingEdit ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              className={`px-3 sm:px-4 py-2 rounded-2xl transition-all ${
+                isDeleted
+                  ? 'bg-gray-100 text-gray-500 border border-gray-200/80 rounded-bl-md italic'
+                  : isOwnMessage
+                  ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
+                  : 'bg-gray-100 text-gray-900 rounded-bl-md'
+              }`}
+            >
+              {isDeleted ? (
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-500 italic select-none py-0.5">
+                  <span className="text-gray-400">🚫</span>
+                  <span>This message was deleted</span>
+                </div>
+              ) : (
+                <>
+                  {message && <p className="text-xs sm:text-sm whitespace-pre-wrap break-words">{message}</p>}
+                  {attachments && attachments.length > 0 && (
+                    <div className={`${message ? 'mt-2' : ''} space-y-1`}>
+                      {attachments.map((attachment, index) => (
+                        <MessageAttachment
+                          key={attachment.id || index}
+                          attachment={attachment}
+                          isOwnMessage={isOwnMessage}
+                          onPreview={onPreviewAttachment}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Action button (3-dots) for non-editing messages */}
+          {!isEditing && hasActions && (
+            <div className="relative" ref={menuRef}>
+              <button
+                type="button"
+                onClick={() => setShowMenu((prev) => !prev)}
+                className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-all cursor-pointer"
+                title="Message actions"
+              >
+                <MoreVertical className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showMenu && (
+                <div
+                  className={`absolute z-30 top-full mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs ${
+                    isOwnMessage ? 'right-0' : 'left-0'
+                  }`}
+                >
+                  {canEdit && (
+                    <button
+                      type="button"
+                      onClick={handleStartEdit}
+                      className="w-full text-left px-3 py-1.5 hover:bg-gray-100 flex items-center gap-2 text-gray-700 font-medium transition-colors"
+                    >
+                      <Pencil className="w-3 h-3 text-blue-500" />
+                      <span>Edit</span>
+                    </button>
+                  )}
+                  {hasActions && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowDeleteModal(true);
+                      }}
+                      className="w-full text-left px-3 py-1.5 hover:bg-red-50 flex items-center gap-2 text-red-600 font-medium transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3 text-red-500" />
+                      <span>Delete...</span>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
-        <span className="text-[10px] sm:text-xs text-gray-500 mt-1 px-2">
-          {formatDateTime(timestamp, date)} {name ? `• ${name}` : ''}
+
+        {/* Message timestamp, sender name, edited tag */}
+        <span className="text-[10px] sm:text-xs text-gray-500 mt-1 px-2 flex items-center gap-1">
+          <span>{formatDateTime(timestamp, date)}</span>
+          {name && <span>• {name}</span>}
+          {isEdited && !isDeleted && (
+            <span className="text-gray-400 italic font-normal ml-0.5">(edited)</span>
+          )}
         </span>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-xl shadow-xl max-w-sm w-full p-5 border border-gray-100 text-left"
+            >
+              <div className="flex items-center gap-2 text-red-600 font-semibold text-base mb-2">
+                <Trash2 className="w-5 h-5 text-red-500" />
+                <span>Delete Message?</span>
+              </div>
+              <p className="text-xs text-gray-600 mb-4">
+                Choose how you would like to delete this message.
+              </p>
+
+              <div className="space-y-2 mb-4">
+                {canDeleteForEveryone && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteForEveryone}
+                    disabled={isDeleting}
+                    className="w-full p-2.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-medium text-left transition-colors flex flex-col gap-0.5"
+                  >
+                    <span className="font-semibold flex items-center justify-between">
+                      Delete for everyone
+                      {isDeleting && <span className="text-[10px]">Deleting...</span>}
+                    </span>
+                    <span className="text-[11px] text-red-500 font-normal">
+                      Removes message content & attachments for all users on this ticket.
+                    </span>
+                  </button>
+                )}
+
+                {canDeleteForMe && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteForMe}
+                    disabled={isDeleting}
+                    className="w-full p-2.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium text-left transition-colors flex flex-col gap-0.5"
+                  >
+                    <span className="font-semibold">Delete for me</span>
+                    <span className="text-[11px] text-gray-500 font-normal">
+                      Removes this message from your view only on this device.
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                  className="px-3.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
@@ -475,6 +794,10 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 export const ChatWindow = ({
   messages = [],
   onSendMessage,
+  onEditMessage = null,
+  onDeleteForEveryone = null,
+  onDeleteForMe = null,
+  currentUserRole = null,
   isTyping = false,
   autoCloseTimer = null,
   disabled = false,
@@ -648,14 +971,22 @@ export const ChatWindow = ({
           messages.map((msg, index) => (
             <ChatMessage
               key={msg.id || index}
+              id={msg.id}
               message={msg.message}
               isOwnMessage={msg.isOwnMessage}
-              timestamp={msg.createdAt}
+              timestamp={msg.timestamp || msg.createdAt}
               date={msg.createdAt}
               avatar={msg.avatar}
               name={msg.senderName}
               attachments={msg.attachments}
+              isDeleted={msg.isDeleted}
+              isEdited={msg.isEdited}
+              currentUserRole={currentUserRole}
               onPreviewAttachment={handlePreviewAttachment}
+              onEditMessage={onEditMessage}
+              onDeleteForEveryone={onDeleteForEveryone}
+              onDeleteForMe={onDeleteForMe}
+              disabled={disabled || ticketStatus === 'closed' || isArchived}
             />
           ))
         )}

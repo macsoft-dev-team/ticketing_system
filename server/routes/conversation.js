@@ -123,4 +123,9 @@ router.post("/:ticketId/mark-seen", conversationController.markMessagesAsSeen);
 router.post("/message/:messageId/seen", conversationController.markMessageAsSeen);
 router.get("/:ticketId/unread-count", conversationController.getUnreadCount);
 
+// Message edit and delete routes
+router.put("/message/:messageId", conversationController.editMessage);
+router.delete("/message/:messageId", conversationController.deleteMessageForEveryone);
+
 module.exports = router;
+

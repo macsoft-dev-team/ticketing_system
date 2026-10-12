@@ -332,6 +332,9 @@ export default function TicketDashboard() {
     error: messagesError,
     isConnected: socketConnected,
     sendMessage: sendConversationMessage,
+    editMessage,
+    deleteForEveryone,
+    deleteForMe,
     refreshMessages,
     // MessageSeen functions
     markMessagesAsSeen: originalMarkMessagesAsSeen,
@@ -2161,6 +2164,10 @@ export default function TicketDashboard() {
           <ChatWindow
             messages={messages}
             onSendMessage={handleSendMessage}
+            onEditMessage={editMessage}
+            onDeleteForEveryone={deleteForEveryone}
+            onDeleteForMe={deleteForMe}
+            currentUserRole={user?.role}
             isTyping={isTyping}
             autoCloseTimer={autoCloseTimer}
             loading={messagesLoading}

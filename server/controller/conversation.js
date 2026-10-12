@@ -141,6 +141,62 @@ const getUnrepliedTickets = async (req, res) => {
   }
 };
 
+const editMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { message } = req.body;
+  const userId = req.user.id;
+  const userRole = req.user.role;
+  const io = req.io;
+
+  try {
+    const updated = await conversationService.editMessage(
+      parseInt(messageId),
+      userId,
+      userRole,
+      message,
+      io
+    );
+    res.status(200).json({
+      success: true,
+      data: updated,
+      message: "Message updated successfully",
+    });
+  } catch (error) {
+    console.error("Error editing message:", error);
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
+const deleteMessageForEveryone = async (req, res) => {
+  const { messageId } = req.params;
+  const userId = req.user.id;
+  const userRole = req.user.role;
+  const io = req.io;
+
+  try {
+    const deleted = await conversationService.deleteMessageForEveryone(
+      parseInt(messageId),
+      userId,
+      userRole,
+      io
+    );
+    res.status(200).json({
+      success: true,
+      data: deleted,
+      message: "Message deleted for everyone",
+    });
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    res.status(error.status || 500).json({
+      success: false,
+      message: error.message || "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   getConversations,
   createConversation,
@@ -149,4 +205,7 @@ module.exports = {
   markMessagesAsSeen,
   getUnreadCount,
   getUnrepliedTickets,
+  editMessage,
+  deleteMessageForEveryone,
 };
+
