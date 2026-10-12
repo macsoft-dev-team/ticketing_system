@@ -2,11 +2,81 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Build version from environment or generated timestamp
+const appVersion = process.env.VITE_APP_VERSION || String(Date.now());
+
+function versionPlugin() {
+  return {
+    name: "vite-plugin-version-generator",
+    buildStart() {
+      try {
+        const publicDir = path.resolve(__dirname, "public");
+        if (!fs.existsSync(publicDir)) {
+          fs.mkdirSync(publicDir, { recursive: true });
+        }
+        const versionData = {
+          version: appVersion,
+          buildTime: new Date().toISOString(),
+        };
+        fs.writeFileSync(
+          path.resolve(publicDir, "version.json"),
+          JSON.stringify(versionData, null, 2)
+        );
+      } catch (err) {
+        console.warn("Could not write public/version.json:", err);
+      }
+    },
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const cleanUrl = req.url?.split("?")[0];
+        if (cleanUrl === "/version.json") {
+          res.setHeader("Content-Type", "application/json");
+          res.setHeader(
+            "Cache-Control",
+            "no-store, no-cache, must-revalidate, proxy-revalidate"
+          );
+          res.setHeader("Pragma", "no-cache");
+          res.setHeader("Expires", "0");
+          res.end(
+            JSON.stringify({
+              version: appVersion,
+              buildTime: new Date().toISOString(),
+            })
+          );
+          return;
+        }
+        next();
+      });
+    },
+    generateBundle() {
+      this.emitFile({
+        type: "asset",
+        fileName: "version.json",
+        source: JSON.stringify(
+          {
+            version: appVersion,
+            buildTime: new Date().toISOString(),
+          },
+          null,
+          2
+        ),
+      });
+    },
+  };
+}
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    versionPlugin(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: [
@@ -20,6 +90,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024, // 2MB
         // Skip caching large files and media
         globIgnores: [
+          '**/version.json', // Must not be precached by service worker
           '**/node_modules/**/*',
           '**/sounds/**/*',
           '**/images/**/*',
@@ -72,6 +143,7 @@ export default defineConfig({
     }),
   ],
   define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(appVersion),
     "import.meta.env.MODE": JSON.stringify(
       process.env.NODE_ENV || "development"
     ),

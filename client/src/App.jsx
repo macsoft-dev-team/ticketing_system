@@ -7,10 +7,14 @@ import { ToastProvider } from './components/ui/toast';
 import { SocketProvider } from './lib/contexts/SocketContext';
 import { BuzzerAlertsProvider } from './lib/contexts/BuzzerAlertsContext';
 import useAuth from './lib/hooks/useAuth';
+import useAppUpdate from './lib/hooks/useAppUpdate';
 import { SessionManager } from './lib/utils/sessionManager';
 import { SoundProvider } from './lib/hooks/SoundManager';
 
 function App() {
+  // Automatic UI version update detection (checks every 60s)
+  useAppUpdate();
+
   const [router, setRouter] = React.useState(null);
   const [initializing, setInitializing] = React.useState(true);
   const { user, loading, token, setUser, setToken, isAuthenticated, checkAuth } = useAuth();
