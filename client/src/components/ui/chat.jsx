@@ -6,6 +6,7 @@ import MediaCapture from './MediaCapture';
 import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
 import { useToast } from '../../lib/hooks/use-toast';
 import { useSoundManager } from '../../lib/hooks/SoundManager';
+import { useAuth } from '../../lib/hooks/useAuth';
 import moment from 'moment';
 
 const TicketClosedView = ({ onViewChat }) => {
@@ -552,7 +553,10 @@ export const ChatMessage = ({
   );
 };
 
-export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticketStatus = null }) => {
+export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticketStatus = null, currentUserRole = null }) => {
+  const { user } = useAuth();
+  const effectiveRole = currentUserRole || user?.role;
+  const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(effectiveRole);
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [showMediaCapture, setShowMediaCapture] = useState(false);
@@ -561,8 +565,19 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   const [maxVideoDuration, setMaxVideoDuration] = useState(120);
   const [maxAudioDuration, setMaxAudioDuration] = useState(300);
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
   const { toast } = useToast();
   const { play, muted } = useSoundManager();
+
+  const handleCameraCapture = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setAttachments(prev => [...prev, ...files]);
+    }
+    if (e.target) {
+      e.target.value = '';
+    }
+  };
 
   // Load media upload configuration on component mount
   /*   useEffect(() => {
@@ -722,53 +737,68 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">
+          {/* File Upload (Paperclip): Only for Admin and Macsoft roles */}
+          {!isRestrictedRole && (
+            <>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                multiple
+                className="hidden"
+                accept={mediaUploadEnabled
+                  ? "image/*,.pdf,.doc,.docx,.txt,.mp4,.mov,.avi,.webm,.mp3,.wav,.ogg,.m4a"
+                  : "image/*,.pdf,.doc,.docx,.txt"
+                }
+              />
+
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={disabled}
+                className="p-2 sm:p-3 text-gray-500 hover:text-blue-500 transition-colors disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer"
+                title={mediaUploadEnabled ? "Attach files" : "Attach files (media upload disabled)"}
+              >
+                <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
+              </motion.button>
+            </>
+          )}
+
+          {/* Device Camera Capture: Mandatory for Field Engineers and Technicians; available for all */}
           <input
             type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            multiple
+            ref={cameraInputRef}
+            onChange={handleCameraCapture}
+            accept="image/*"
+            capture="environment"
             className="hidden"
-            accept={mediaUploadEnabled
-              ? "image/*,.pdf,.doc,.docx,.txt,.mp4,.mov,.avi,.webm,.mp3,.wav,.ogg,.m4a"
-              : "image/*,.pdf,.doc,.docx,.txt"
-            }
           />
 
           <motion.button
+            type="button"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => cameraInputRef.current?.click()}
             disabled={disabled}
-            className="p-2 sm:p-3 text-gray-500 hover:text-blue-500 transition-colors disabled:text-gray-300 disabled:cursor-not-allowed"
-            title={mediaUploadEnabled ? "Attach files" : "Attach files (media upload disabled)"}
+            className={`p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed ${
+              isRestrictedRole
+                ? 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100'
+                : 'text-gray-500 hover:text-blue-500'
+            }`}
+            title="Take photo with device camera"
           >
-            <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
 
-          {/* Media Capture Button - Show on mobile or small screens
-          {isMobileView && (
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleMediaCaptureAttempt}
-              disabled={disabled}
-              className={`p-2 sm:p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg ${
-                mediaUploadEnabled
-                  ? 'text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
-                  : 'text-gray-400 bg-gray-200 hover:bg-gray-300 cursor-pointer'
-              }`}
-              title={mediaUploadEnabled ? "Capture photo/video/audio" : "Media upload disabled - Contact admin"}
-            >
-              <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.button>
-          )}
- */}
           <motion.button
+            type="button"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleSend}
             disabled={disabled || (!message.trim() && attachments.length === 0)}
-            className="p-2 sm:p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="p-2 sm:p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
           >
             <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
@@ -1028,6 +1058,7 @@ export const ChatWindow = ({
         <ChatInput
           ticketStatus={ticketStatus}
           onSendMessage={onSendMessage}
+          currentUserRole={currentUserRole}
           disabled={disabled || !isConnected || ticketStatus === 'closed'}
         />
       )}

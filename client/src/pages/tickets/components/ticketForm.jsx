@@ -15,7 +15,9 @@ import {
     User,
     Settings,
     FileWarning,
-    Loader2
+    Loader2,
+    Camera,
+    RefreshCw
 } from 'lucide-react';
 import {
     ticketFormSchema,
@@ -32,6 +34,14 @@ import { useAuth } from '../../../lib/hooks/useAuth';
 import { compressImage } from '../../../lib/utils/imageCompressor';
 export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const { user } = useAuth();
+    const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role);
+    const cameraInputRef = useRef(null);
+    const videoRef = useRef(null);
+    const [isLiveCameraOpen, setIsLiveCameraOpen] = useState(false);
+    const [cameraStream, setCameraStream] = useState(null);
+    const [cameraLoading, setCameraLoading] = useState(false);
+    const [cameraFacingMode, setCameraFacingMode] = useState('environment');
+    const [cameraError, setCameraError] = useState('');
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isDragActive, setIsDragActive] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +56,82 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const { addToast } = useToast();
     const { createTicket, loading: ticketLoading, error: ticketError } = useTickets();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isLiveCameraOpen && cameraStream && videoRef.current) {
+            videoRef.current.srcObject = cameraStream;
+            videoRef.current.play().catch(console.error);
+        }
+    }, [isLiveCameraOpen, cameraStream]);
+
+    useEffect(() => {
+        return () => {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+            }
+        };
+    }, [cameraStream]);
+
+    const startLiveCamera = async (facing = cameraFacingMode) => {
+        setCameraError('');
+        setCameraLoading(true);
+        try {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+            }
+            if (!navigator.mediaDevices?.getUserMedia) {
+                throw new Error('Camera API is not supported in this browser.');
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                audio: false
+            });
+            setCameraStream(stream);
+            setIsLiveCameraOpen(true);
+            setCameraFacingMode(facing);
+        } catch (err) {
+            console.warn('Live camera error:', err);
+            setCameraError(err.message || 'Could not access device camera.');
+            cameraInputRef.current?.click();
+        } finally {
+            setCameraLoading(false);
+        }
+    };
+
+    const stopLiveCamera = () => {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(t => t.stop());
+            setCameraStream(null);
+        }
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+        }
+        setIsLiveCameraOpen(false);
+        setCameraLoading(false);
+    };
+
+    const toggleCameraFacing = async () => {
+        const nextMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
+        await startLiveCamera(nextMode);
+    };
+
+    const capturePhotoFromLiveStream = () => {
+        if (!videoRef.current || !cameraStream) return;
+        const video = videoRef.current;
+        const width = video.videoWidth || 1280;
+        const height = video.videoHeight || 720;
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+            if (!blob) return;
+            const file = new File([blob], `Device_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            handleFileUpload([file]);
+            stopLiveCamera();
+        }, 'image/jpeg', 0.85);
+    };
 
     const {
         register,
@@ -446,11 +532,20 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         e.stopPropagation();
         setIsDragActive(false);
 
+        if (isRestrictedRole) {
+            addToast({
+                title: "Upload Not Allowed",
+                description: "Field Engineers and Technicians must capture photos using their device camera. File upload is disabled.",
+                variant: "warning"
+            });
+            return;
+        }
+
         const files = e.dataTransfer.files;
         if (files && files.length > 0) {
             handleFileUpload(files);
         }
-    }, [handleFileUpload]);
+    }, [handleFileUpload, isRestrictedRole, addToast]);
 
     // Form submission
     const handleFormSubmit = async (data) => {
@@ -1263,44 +1358,103 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                         </div>
                     </motion.div>
 
-                    {/* File Upload Section */}
+                    {/* File Upload / Camera Section */}
                     <motion.div
                         variants={itemVariants}
                         className="lg:col-span-1 bg-white rounded-lg sm:rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
                     >
                         <h3 className="text-sm xs:text-base sm:text-lg lg:text-xl font-semibold tracking-wide p-2 xs:p-3 sm:p-4 lg:p-6 flex items-center gap-1.5 xs:gap-2 border-b border-gray-200 bg-gray-50">
-                            <Upload className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-                            <span className="truncate">Attachments (Optional)</span>
+                            {isRestrictedRole ? (
+                                <>
+                                    <Camera className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-blue-600" />
+                                    <span className="truncate">Capture Photos (Device Camera)</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
+                                    <span className="truncate">Attachments (Optional)</span>
+                                </>
+                            )}
                         </h3>
 
                         <div className="p-2 xs:p-3 sm:p-4 lg:p-6">
-                            {/* Drop Zone */}
-                            <motion.div
-                                onDragEnter={onDragEnter}
-                                onDragLeave={onDragLeave}
-                                onDragOver={onDragOver}
-                                onDrop={onDrop}
-                                whileHover={{ scale: 1.01 }}
-                                className={`relative border-2 border-dashed rounded-xl p-4 sm:p-6 lg:p-8 text-center transition-all duration-300 ${isDragActive
-                                    ? 'border-blue-400 bg-blue-50'
-                                    : 'border-gray-300 hover:border-gray-400'
-                                    }`}
-                            >
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*,.pdf,.doc,.docx,.txt"
-                                    onChange={(e) => handleFileUpload(e.target.files)}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                />
-                                <Upload className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-gray-400 mx-auto mb-2 sm:mb-3 lg:mb-4" />
-                                <p className="text-xs sm:text-sm lg:text-base font-medium text-gray-900 mb-1 sm:mb-2">
-                                    {isDragActive ? 'Drop files here' : 'Drop files here or click to browse'}
-                                </p>
-                                <p className="text-xs sm:text-sm text-gray-500 px-1 sm:px-2">
-                                    Support for images, PDF, DOC, DOCX, TXT files. Max 5MB per file, 5 files maximum.
-                                </p>
-                            </motion.div>
+                            {isRestrictedRole ? (
+                                /* Device Camera only for Field Engineers and Technicians */
+                                <div className="space-y-4">
+                                    <div className="border-2 border-dashed border-blue-300 rounded-xl p-5 sm:p-8 text-center bg-blue-50/40">
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mx-auto mb-3">
+                                            <Camera className="w-6 h-6 sm:w-7 sm:h-7" />
+                                        </div>
+                                        <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-1">
+                                            Take Photo with Device Camera
+                                        </h4>
+                                        <p className="text-xs text-gray-500 max-w-md mx-auto mb-4">
+                                            Field Engineers and Service Center Technicians must capture photos directly using their device camera. Uploading files or gallery photos is not permitted.
+                                        </p>
+                                        <div className="flex flex-wrap items-center justify-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => cameraInputRef.current?.click()}
+                                                className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium shadow-sm cursor-pointer"
+                                            >
+                                                <Camera className="w-4 h-4" />
+                                                <span>Open Device Camera</span>
+                                            </button>
+                                            {navigator.mediaDevices?.getUserMedia && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => startLiveCamera('environment')}
+                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium shadow-sm cursor-pointer"
+                                                >
+                                                    <span>Live Viewfinder</span>
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <input
+                                        ref={cameraInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        capture="environment"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            if (e.target.files && e.target.files.length > 0) {
+                                                handleFileUpload(e.target.files);
+                                                e.target.value = '';
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                /* Standard File Upload for Macsoft and Admin roles */
+                                <motion.div
+                                    onDragEnter={onDragEnter}
+                                    onDragLeave={onDragLeave}
+                                    onDragOver={onDragOver}
+                                    onDrop={onDrop}
+                                    whileHover={{ scale: 1.01 }}
+                                    className={`relative border-2 border-dashed rounded-xl p-4 sm:p-6 lg:p-8 text-center transition-all duration-300 ${isDragActive
+                                        ? 'border-blue-400 bg-blue-50'
+                                        : 'border-gray-300 hover:border-gray-400'
+                                        }`}
+                                >
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*,.pdf,.doc,.docx,.txt"
+                                        onChange={(e) => handleFileUpload(e.target.files)}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <Upload className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-gray-400 mx-auto mb-2 sm:mb-3 lg:mb-4" />
+                                    <p className="text-xs sm:text-sm lg:text-base font-medium text-gray-900 mb-1 sm:mb-2">
+                                        {isDragActive ? 'Drop files here' : 'Drop files here or click to browse'}
+                                    </p>
+                                    <p className="text-xs sm:text-sm text-gray-500 px-1 sm:px-2">
+                                        Support for images, PDF, DOC, DOCX, TXT files. Max 5MB per file, 5 files maximum.
+                                    </p>
+                                </motion.div>
+                            )}
 
                             {/* Uploaded Files */}
                             <AnimatePresence>
@@ -1438,6 +1592,84 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                     </motion.button>
                 </motion.div>
             </form>
+
+            {/* Live Camera Viewfinder Modal for Device Photo Capture */}
+            <AnimatePresence>
+                {isLiveCameraOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-gray-900 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col"
+                        >
+                            <div className="p-3 sm:p-4 bg-gray-800 flex items-center justify-between text-white">
+                                <div className="flex items-center gap-2">
+                                    <Camera className="w-5 h-5 text-blue-400" />
+                                    <h4 className="text-sm sm:text-base font-semibold">Device Camera Viewfinder</h4>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={stopLiveCamera}
+                                    className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="relative aspect-video sm:aspect-4/3 bg-black flex items-center justify-center overflow-hidden">
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                    className="w-full h-full object-cover"
+                                />
+                                {cameraLoading && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-white">
+                                        <Loader2 className="w-8 h-8 animate-spin" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {cameraError && (
+                                <div className="p-3 bg-red-900/60 text-red-200 text-xs text-center">
+                                    {cameraError}
+                                </div>
+                            )}
+
+                            <div className="p-4 bg-gray-800 flex items-center justify-between gap-3">
+                                <button
+                                    type="button"
+                                    onClick={toggleCameraFacing}
+                                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                                >
+                                    <RefreshCw className="w-3.5 h-3.5" />
+                                    <span>Flip</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={capturePhotoFromLiveStream}
+                                    disabled={cameraLoading}
+                                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                                >
+                                    <Camera className="w-4 h-4" />
+                                    <span>Capture Photo</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={stopLiveCamera}
+                                    className="px-3 py-2 text-gray-400 hover:text-white text-xs transition-colors cursor-pointer"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </motion.section>
     );
 }
