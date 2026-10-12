@@ -703,20 +703,22 @@ const MilestoneCard = ({
                                                     Upload Photos (Required - Min: {config.minPhotos || 1})
                                                 </label>
                                                 <div className="flex gap-2 mb-2">
-                                                    <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer text-sm">
-                                                        <ImageIcon className="w-4 h-4" />
-                                                        Gallery
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
-                                                            onChange={handlePhotoUpload}
-                                                            className="hidden"
-                                                        />
-                                                    </label>
+                                                    {(!['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role) || milestone.stage !== 'SUBMITTED_TO_SERVICE_CENTER') && (
+                                                        <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer text-sm">
+                                                            <ImageIcon className="w-4 h-4" />
+                                                            Gallery
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                multiple
+                                                                onChange={handlePhotoUpload}
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    )}
                                                     <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:text-orange-700 transition-colors cursor-pointer text-sm">
                                                         <Camera className="w-4 h-4" />
-                                                        Camera
+                                                        Take Photo (Camera)
                                                         <input
                                                             type="file"
                                                             accept="image/*"
@@ -858,6 +860,14 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     const currentMilestone = useMemo(() => {
         return milestones.find(m => m.status === 'IN_PROGRESS') || null;
     }, [milestones]);
+
+    // Check if device camera is strictly required for the user and milestone
+    const isCameraOnlyForSubmission = useMemo(() => {
+        const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role);
+        const isTargetSubmittedToSC = selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER';
+        const isCurrentSubmittedToSC = currentMilestone?.stage === 'SUBMITTED_TO_SERVICE_CENTER';
+        return isRestrictedRole && (isTargetSubmittedToSC || isCurrentSubmittedToSC);
+    }, [user?.role, selectedTargetStage, currentMilestone?.stage]);
 
     // Check if current milestone requires photos and has them
     const currentMilestoneNeedsPhotos = useMemo(() => {
@@ -1521,6 +1531,13 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         setConfirmationNotes(''); // Reset notes
 
         if (isPhotoUpload) {
+            // For restricted roles on Submitted to Service Center, open PhotoUploadModal in camera-only mode
+            if ((targetStage === 'SUBMITTED_TO_SERVICE_CENTER' || confirmDialogData.currentStage === 'SUBMITTED_TO_SERVICE_CENTER') &&
+                ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role)) {
+                setSelectedTargetStage(targetStage || confirmDialogData.currentStage);
+                setShowPhotoModal(true);
+                return;
+            }
             // Handle photo upload action - create a file input dynamically
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
@@ -1691,9 +1708,11 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                             </p>
                                             {isPhotoRequired && (
                                                 <p className="text-xs text-blue-600 mt-1">
-                                                    📷 {selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && user?.role === 'CUSTOMER_FIELD_ENGINEER' 
-                                                        ? 'Photos are required for field engineers to document the resolution'
-                                                        : 'This milestone will require photo documentation'
+                                                    📷 {isCameraOnlyForSubmission
+                                                        ? 'Device camera photo required. Photos must be taken live with your device camera.'
+                                                        : selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && user?.role === 'CUSTOMER_FIELD_ENGINEER' 
+                                                            ? 'Photos are required for field engineers to document the resolution'
+                                                            : 'This milestone will require photo documentation'
                                                     }
                                                 </p>
                                             )}
@@ -1709,6 +1728,16 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                                     : `Photos Required (Min: ${MILESTONE_CONFIG[selectedTargetStage]?.minPhotos || 1})`
                                                 }
                                             </label>
+
+                                            {/* Camera Only Notice for Restricted Roles */}
+                                            {isCameraOnlyForSubmission && (
+                                                <div className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200 mb-3 flex items-start gap-2">
+                                                    <Camera className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                                                    <span>
+                                                        <strong>Device Camera Required:</strong> As a {user?.role === 'CUSTOMER_FIELD_ENGINEER' ? 'Field Engineer' : 'Service Center Technician'}, you must take photos using your device camera. Uploading from gallery is disabled.
+                                                    </span>
+                                                </div>
+                                            )}
 
                                             {/* Photo Requirements Info */}
                                             {(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos && (
@@ -1730,16 +1759,20 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                                                 </div>
                                             )}
 
-                                            {/* Upload Button */}
+                                            {/* Upload / Camera Button */}
                                             <button
                                                 onClick={() => setShowPhotoModal(true)}
-                                                className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                                                className={`w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg transition-colors ${
+                                                    isCameraOnlyForSubmission
+                                                        ? 'border-orange-300 text-orange-600 hover:border-orange-500 hover:bg-orange-50'
+                                                        : 'border-blue-300 text-blue-600 hover:border-blue-500 hover:bg-blue-50'
+                                                }`}
                                             >
                                                 <Camera className="w-5 h-5" />
                                                 <span className="font-medium">
                                                     {transitionPhotos.length > 0 
                                                         ? `${transitionPhotos.length} photo(s) selected - Click to change`
-                                                        : 'Upload Photos'
+                                                        : (isCameraOnlyForSubmission ? 'Take Photos with Device Camera' : 'Upload Photos')
                                                     }
                                                 </span>
                                             </button>
@@ -2003,11 +2036,13 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                     setShowPhotoModal(false);
                 }}
                 title={selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage] 
-                    ? `Upload Photos - ${MILESTONE_CONFIG[selectedTargetStage].label}`
+                    ? (isCameraOnlyForSubmission ? `Take Photos with Device - ${MILESTONE_CONFIG[selectedTargetStage].label}` : `Upload Photos - ${MILESTONE_CONFIG[selectedTargetStage].label}`)
                     : 'Upload Photos'
                 }
                 description={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
-                    ? `Please upload 4 specific photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
+                    ? (isCameraOnlyForSubmission
+                        ? `Please take 4 specific photos using your device camera: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
+                        : `Please upload 4 specific photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`)
                     : selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
                         ? `Required photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
                         : 'Select photos to upload for this milestone'
@@ -2019,6 +2054,8 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 uploading={uploadingPhotos}
                 requireLabels={selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER'}
                 requiredLabels={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') ? MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos : undefined}
+                userRole={user?.role}
+                stage={selectedTargetStage || currentMilestone?.stage}
             />
         </div>
     );

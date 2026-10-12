@@ -222,8 +222,12 @@ const MilestoneActionButton = ({
       ],
       SUBMITTED_TO_SERVICE_CENTER: needsPhotos ? [
         {
-          title: 'Add Submission Photos',
-          shortTitle: 'Add Photos',
+          title: ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(userRole)
+            ? 'Take Submission Photos'
+            : 'Add Submission Photos',
+          shortTitle: ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(userRole)
+            ? 'Take Photos'
+            : 'Add Photos',
           icon: Camera,
           color: 'orange',
           action: 'upload_photos',

@@ -1174,9 +1174,12 @@ export default function TicketDashboard() {
         minPhotos: 0
       };
     } else if (currentMilestone.stage === 'SUBMITTED_TO_SERVICE_CENTER') {
+      const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role);
       info = {
-        title: 'Upload Submission Photos',
-        description: 'Add 4 specific photos confirming controller submission: Controller Front, Controller Bottom, Full View Open, MCB Close Up',
+        title: isRestrictedRole ? 'Take Submission Photos with Device' : 'Upload Submission Photos',
+        description: isRestrictedRole
+          ? 'Take 4 specific photos using your device camera: Controller Front, Controller Bottom, Full View Open, MCB Close Up. Uploading from gallery is disabled for your role.'
+          : 'Add 4 specific photos confirming controller submission: Controller Front, Controller Bottom, Full View Open, MCB Close Up',
         minPhotos: 4,
         requiredPhotos: ['Controller Front', 'Controller Bottom', 'Full View Open', 'MCB Close Up']
       };
@@ -2210,6 +2213,8 @@ export default function TicketDashboard() {
         uploading={uploadingPhotos}
         requireLabels={!!photoModalInfo.requiredPhotos}
         requiredLabels={photoModalInfo.requiredPhotos || []}
+        userRole={user?.role}
+        stage={currentMilestone?.stage}
       />
 
       {/* Service Center Assignment Modal */}
