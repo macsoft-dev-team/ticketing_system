@@ -116,17 +116,24 @@ export default function Tickets() {
     useEffect(() => {
         const handleTicketMessageUpdate = (event) => {
             const messageData = event.detail;
-             // Update the ticket's last message and ticket data in Redux store
+            // Update the ticket's last message and ticket data in Redux store
             if (messageData.ticketId) {
+                const isTicketOnCurrentView = tickets.some(t => Number(t.id) === Number(messageData.ticketId));
+
                 // Use server-provided ticket updates if available, or generate client-side
                 const ticketUpdates = messageData.ticketUpdates || {
                     lastActivity: messageData.createdAt,
-                    messageCount: (tickets.find(t => t.id === messageData.ticketId)?.messages?.length || 0) + 1,
+                    messageCount: (tickets.find(t => Number(t.id) === Number(messageData.ticketId))?.messages?.length || 0) + 1,
                     hasNewActivity: true,
                     updatedAt: messageData.createdAt
                 };
                 
                 updateTicketWithMessage(messageData.ticketId, messageData, ticketUpdates);
+
+                // If ticket was not already on the current view, re-fetch so it immediately appears at the top
+                if (!isTicketOnCurrentView && (currentPage === 1 || currentPage === 0)) {
+                    fetchTickets({ skip: currentPage, take: 8, filter: filters });
+                }
             }
         };
 

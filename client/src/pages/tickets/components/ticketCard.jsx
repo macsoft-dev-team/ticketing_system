@@ -98,7 +98,7 @@ export default function TicketCard({
             const messageData = event.detail;
 
             // Only update if this message is for the current ticket
-            if (messageData.ticketId === localTicket.id) {
+            if (Number(messageData.ticketId) === Number(localTicket.id)) {
 
                 // Update local ticket with new message
                 setLocalTicket(prev => {

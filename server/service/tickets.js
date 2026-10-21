@@ -345,8 +345,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
       },
       orderBy: [
         { isBuzzerOn: "desc" }, // Buzzer alert tickets first
-        { status: "asc" }, // Active tickets (OPEN, IN_PROGRESS) before completed (RESOLVED, CLOSED)
-        { updatedAt: "desc" }, // Then recently replied / updated tickets
+        { updatedAt: "desc" }, // Then recently replied / updated tickets (both OPEN and IN_PROGRESS)
         { createdAt: "desc" }, // Fallback to creation date
       ],
     };

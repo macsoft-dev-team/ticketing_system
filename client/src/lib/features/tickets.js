@@ -392,7 +392,7 @@ const ticketSlice = createSlice({
     },
     updateTicketLastMessage: (state, action) => {
       const { ticketId, messageData, ticketUpdates = {} } = action.payload;
-      const ticketIndex = state.tickets.findIndex((ticket) => ticket.id === ticketId);
+      const ticketIndex = state.tickets.findIndex((ticket) => Number(ticket.id) === Number(ticketId));
       if (ticketIndex !== -1) {
         // Initialize messages array if it doesn't exist
         if (!state.tickets[ticketIndex].messages) {
@@ -501,7 +501,7 @@ const ticketSlice = createSlice({
     markTicketWithBuzzerAlert: (state, action) => {
        const { ticketId, alertData } = action.payload;
        
-      const ticketIndex = state.tickets.findIndex((ticket) => ticket.id === ticketId);
+      const ticketIndex = state.tickets.findIndex((ticket) => Number(ticket.id) === Number(ticketId));
        
       if (ticketIndex !== -1) {
         // Mark ticket with buzzer alert
@@ -521,7 +521,7 @@ const ticketSlice = createSlice({
     },
     clearTicketBuzzerAlert: (state, action) => {
       const ticketId = action.payload;
-      const ticketIndex = state.tickets.findIndex((ticket) => ticket.id === ticketId);
+      const ticketIndex = state.tickets.findIndex((ticket) => Number(ticket.id) === Number(ticketId));
       
       if (ticketIndex !== -1) {
         state.tickets[ticketIndex].hasBuzzerAlert = false;
