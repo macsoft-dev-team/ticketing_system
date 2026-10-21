@@ -310,6 +310,7 @@ const getTickets = async (skip, take, filter, userId, role) => {
           },
         },
         messages: {
+          orderBy: { createdAt: "asc" },
           include: {
             sender: true,
             attachments: true,
@@ -344,7 +345,9 @@ const getTickets = async (skip, take, filter, userId, role) => {
       },
       orderBy: [
         { isBuzzerOn: "desc" }, // Buzzer alert tickets first
-        { createdAt: "desc" }, // Then by creation date
+        { status: "asc" }, // Active tickets (OPEN, IN_PROGRESS) before completed (RESOLVED, CLOSED)
+        { updatedAt: "desc" }, // Then recently replied / updated tickets
+        { createdAt: "desc" }, // Fallback to creation date
       ],
     };
 
@@ -578,15 +581,32 @@ const getTickets = async (skip, take, filter, userId, role) => {
       _transformedMilestoneCount.RECEIVED_AT_SERVICE_CENTER || 0;
 
     const sortedTickets = tickets.slice().sort((a, b) => {
-      const aMsg =
+      // 1. Buzzer alert tickets always first
+      const aBuzzer = Boolean(a.isBuzzerOn);
+      const bBuzzer = Boolean(b.isBuzzerOn);
+      if (bBuzzer !== aBuzzer) {
+        return (bBuzzer ? 1 : 0) - (aBuzzer ? 1 : 0);
+      }
+
+      // 2. Active tickets (OPEN, IN_PROGRESS) prioritized over closed (CLOSED, RESOLVED)
+      const isAClosed = a.status === "CLOSED" || a.status === "RESOLVED";
+      const isBClosed = b.status === "CLOSED" || b.status === "RESOLVED";
+      if (isAClosed !== isBClosed) {
+        return isAClosed ? 1 : -1;
+      }
+
+      // 3. Latest reply (message) or ticket activity (updatedAt / createdAt)
+      const aLatestMsg =
         a.messages && a.messages.length > 0
-          ? a.messages[a.messages.length - 1].createdAt
-          : a.createdAt;
-      const bMsg =
+          ? Math.max(...a.messages.map((m) => new Date(m.createdAt).getTime()))
+          : new Date(a.updatedAt || a.createdAt).getTime();
+
+      const bLatestMsg =
         b.messages && b.messages.length > 0
-          ? b.messages[b.messages.length - 1].createdAt
-          : b.createdAt;
-      return new Date(bMsg) - new Date(aMsg);
+          ? Math.max(...b.messages.map((m) => new Date(m.createdAt).getTime()))
+          : new Date(b.updatedAt || b.createdAt).getTime();
+
+      return bLatestMsg - aLatestMsg;
     });
     return {
       tickets: sortedTickets,

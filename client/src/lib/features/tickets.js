@@ -423,11 +423,36 @@ const ticketSlice = createSlice({
         // Apply any additional ticket updates
         Object.assign(state.tickets[ticketIndex], ticketUpdates);
         
-        // Move ticket to top of list if it's not already (for better UX)
+        // Move ticket in list for better UX:
+        // 1. Buzzer alerts at the top
+        // 2. Active tickets (OPEN / IN_PROGRESS) prioritized next
+        // 3. Closed / Resolved tickets remain behind active tickets
         if (ticketIndex > 0) {
           const updatedTicket = state.tickets[ticketIndex];
           state.tickets.splice(ticketIndex, 1);
-          state.tickets.unshift(updatedTicket);
+          
+          const isClosed = updatedTicket.status === 'CLOSED' || updatedTicket.status === 'RESOLVED';
+          if (isClosed) {
+            const firstClosedIndex = state.tickets.findIndex(
+              (t) => t.status === 'CLOSED' || t.status === 'RESOLVED'
+            );
+            if (firstClosedIndex !== -1) {
+              state.tickets.splice(firstClosedIndex, 0, updatedTicket);
+            } else {
+              state.tickets.push(updatedTicket);
+            }
+          } else if (updatedTicket.hasBuzzerAlert || updatedTicket.isBuzzerOn) {
+            state.tickets.unshift(updatedTicket);
+          } else {
+            const firstNonBuzzerIndex = state.tickets.findIndex(
+              (t) => !t.hasBuzzerAlert && !t.isBuzzerOn
+            );
+            if (firstNonBuzzerIndex !== -1) {
+              state.tickets.splice(firstNonBuzzerIndex, 0, updatedTicket);
+            } else {
+              state.tickets.unshift(updatedTicket);
+            }
+          }
         }
       }
     },

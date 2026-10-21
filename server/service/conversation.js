@@ -244,19 +244,28 @@ const createConversation = async (conversation, userId, io, files = []) => {
       targetUserIds
     );
 
-    // If sender is a MACSOFT user, turn off buzzer alert for this ticket
+    // Always update ticket's updatedAt timestamp on every reply so it moves to top in ticket lists
     const senderUser = await prisma.user.findUnique({
       where: { id: userId },
       select: { role: true },
     });
 
     const MACSOFT_ROLES = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"];
-    if (senderUser && MACSOFT_ROLES.includes(senderUser.role)) {
-      await prisma.ticket.update({
-        where: { id: ticketId },
-        data: { isBuzzerOn: false },
-      });
+    const isMacsoftUser = senderUser && MACSOFT_ROLES.includes(senderUser.role);
 
+    const ticketUpdateData = {
+      updatedAt: new Date(),
+    };
+    if (isMacsoftUser) {
+      ticketUpdateData.isBuzzerOn = false;
+    }
+
+    await prisma.ticket.update({
+      where: { id: ticketId },
+      data: ticketUpdateData,
+    });
+
+    if (isMacsoftUser) {
       // Emit socket event to clear buzzer alert
       if (io) {
         io.to("role-MACSOFT_HEAD").emit("buzzer_alert_cleared", {

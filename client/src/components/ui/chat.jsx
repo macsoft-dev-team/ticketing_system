@@ -766,7 +766,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             </>
           )}
 
-          {/* Device Camera Capture: Mandatory for Field Engineers and Technicians; available for all */}
+          {/* Device Camera Capture: Mandatory for Field Engineers and Technicians on mobile/tablets; hidden on large screens for restricted roles; available for all other roles */}
           <input
             type="file"
             ref={cameraInputRef}
@@ -784,7 +784,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             disabled={disabled}
             className={`p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed ${
               isRestrictedRole
-                ? 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100'
+                ? 'lg:hidden text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100'
                 : 'text-gray-500 hover:text-blue-500'
             }`}
             title="Take photo with device camera"

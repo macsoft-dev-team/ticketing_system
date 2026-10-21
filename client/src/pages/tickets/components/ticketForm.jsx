@@ -1391,7 +1391,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         <p className="text-xs text-gray-500 max-w-md mx-auto mb-4">
                                             Field Engineers and Service Center Technicians must capture photos directly using their device camera. Uploading files or gallery photos is not permitted.
                                         </p>
-                                        <div className="flex flex-wrap items-center justify-center gap-2">
+                                        <div className="flex flex-wrap items-center justify-center gap-2 lg:hidden">
                                             <button
                                                 type="button"
                                                 onClick={() => cameraInputRef.current?.click()}
@@ -1410,6 +1410,9 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                                 </button>
                                             )}
                                         </div>
+                                        <p className="hidden lg:block text-xs text-amber-700 bg-amber-50 py-2 px-3 rounded-lg border border-amber-200 max-w-sm mx-auto font-medium">
+                                            Device camera capture is only available on mobile / tablet devices.
+                                        </p>
                                     </div>
 
                                     <input
