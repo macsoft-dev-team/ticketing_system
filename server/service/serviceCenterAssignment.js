@@ -200,14 +200,25 @@ const assignServiceCenterToTicket = async (ticketId, centerCode, assignedByUserI
             }
           });
           
-          if (existingMilestone) {          
+          if (existingMilestone) {
+            // Check if ticket has already advanced past SERVICE_CENTER_ASSIGNED
+            const hasLaterMilestone = await prisma.ticketMilestone.findFirst({
+              where: {
+                ticketId: ticketId,
+                order: { gt: stageConfig.order },
+              },
+            });
+
+            const shouldStayDone =
+              existingMilestone.status === 'DONE' || Boolean(hasLaterMilestone);
+
             await prisma.ticketMilestone.update({
               where: { id: existingMilestone.id },
               data: {
                 changedBy: assignedByUserId,
                 notes: `Service center ${serviceCenter.name} (${centerCode}) has been assigned to this ticket - choose to issue solved or send to service center`,
-                status: 'IN_PROGRESS'
-              }
+                status: shouldStayDone ? 'DONE' : 'IN_PROGRESS',
+              },
             });
           } else {
             await createMilestone({

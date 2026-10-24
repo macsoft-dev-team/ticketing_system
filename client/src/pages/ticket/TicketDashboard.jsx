@@ -1090,10 +1090,11 @@ export default function TicketDashboard() {
     { id: 'chat', label: 'Chat', icon: MessageSquare }
   ], []);
 
-  // Get current milestone from ticket
+  // Get current milestone from ticket (highest order IN_PROGRESS milestone)
   const currentMilestone = useMemo(() => {
-    if (!ticket?.ticketMilestones) return null;
-    return ticket.ticketMilestones.find(m => m.status === 'IN_PROGRESS') || null;
+    if (!ticket?.ticketMilestones || ticket.ticketMilestones.length === 0) return null;
+    const inProgress = ticket.ticketMilestones.filter(m => m.status === 'IN_PROGRESS');
+    return inProgress.length > 0 ? inProgress[inProgress.length - 1] : null;
   }, [ticket?.ticketMilestones]);
 
   // Check if all spare requests are resolved (approved or rejected)

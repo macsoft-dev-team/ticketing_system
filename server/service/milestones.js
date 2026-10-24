@@ -176,6 +176,32 @@ const getTicketMilestones = async (ticketId) => {
       orderBy: { order: "asc" },
     });
 
+    // Auto-heal data inconsistency: if multiple milestones are IN_PROGRESS or BLOCKED,
+    // only the highest order milestone should remain active; mark earlier ones as DONE.
+    const inProgressList = milestones.filter(
+      (m) => m.status === "IN_PROGRESS" || m.status === "BLOCKED"
+    );
+    if (inProgressList.length > 1) {
+      const maxOrder = Math.max(...inProgressList.map((m) => m.order));
+      const obsoleteMilestones = inProgressList.filter((m) => m.order < maxOrder);
+
+      if (obsoleteMilestones.length > 0) {
+        const obsoleteIds = obsoleteMilestones.map((m) => m.id);
+        await prisma.ticketMilestone.updateMany({
+          where: { id: { in: obsoleteIds } },
+          data: {
+            status: "DONE",
+            completedAt: new Date(),
+          },
+        });
+
+        obsoleteMilestones.forEach((m) => {
+          m.status = "DONE";
+          if (!m.completedAt) m.completedAt = new Date();
+        });
+      }
+    }
+
     // Enhance with configuration data
     return milestones.map((milestone) => {
       const config = getStageConfig(milestone.stage);
@@ -210,6 +236,19 @@ const getCurrentMilestone = async (ticketId) => {
     });
 
     if (!milestone) return null;
+
+    // Clean up any earlier milestones that were left IN_PROGRESS
+    await prisma.ticketMilestone.updateMany({
+      where: {
+        ticketId,
+        order: { lt: milestone.order },
+        status: "IN_PROGRESS",
+      },
+      data: {
+        status: "DONE",
+        completedAt: new Date(),
+      },
+    });
 
     const config = getStageConfig(milestone.stage);
     return {
@@ -437,6 +476,21 @@ const transitionMilestone = async (
         data: milestoneUpdateData,
       });
     }
+
+    // Ensure all previous milestones with order <= targetConfig.order (and stage !== targetStage)
+    // are marked as DONE so none are left in IN_PROGRESS or PENDING
+    await prisma.ticketMilestone.updateMany({
+      where: {
+        ticketId,
+        order: { lte: targetConfig.order },
+        stage: { not: targetStage },
+        status: { in: ["IN_PROGRESS", "PENDING"] },
+      },
+      data: {
+        status: "DONE",
+        completedAt: new Date(),
+      },
+    });
 
     // Handle special case for SPARE_APPROVED - update all pending spare request items
     let spareApprovalResult = null;

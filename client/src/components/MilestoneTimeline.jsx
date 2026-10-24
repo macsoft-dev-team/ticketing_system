@@ -856,9 +856,18 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         }
     }, [propMilestones]);
 
-    // Get current milestone
+    // Get current milestone (highest order IN_PROGRESS milestone)
     const currentMilestone = useMemo(() => {
-        return milestones.find(m => m.status === 'IN_PROGRESS') || null;
+        if (!milestones || milestones.length === 0) return null;
+        const inProgress = milestones.filter(m => m.status === 'IN_PROGRESS');
+        return inProgress.length > 0 ? inProgress[inProgress.length - 1] : null;
+    }, [milestones]);
+
+    // Active milestone - MOVED BEFORE EARLY RETURNS (highest order IN_PROGRESS or BLOCKED milestone)
+    const activeMilestone = useMemo(() => {
+        if (!milestones || milestones.length === 0) return null;
+        const active = milestones.filter(m => m.status === 'IN_PROGRESS' || m.status === 'BLOCKED');
+        return active.length > 0 ? active[active.length - 1] : null;
     }, [milestones]);
 
     // Check if device camera is strictly required for the user and milestone
@@ -893,23 +902,28 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     const displayMilestones = useMemo(() => {
         if (!milestones || milestones.length === 0) return [];
 
+        // Normalize milestones: If a later milestone is active (IN_PROGRESS or BLOCKED),
+        // any earlier milestone with order < activeMilestone.order should display as DONE.
+        const activeOrder = activeMilestone ? (activeMilestone.order ?? -1) : -1;
+        const normalized = milestones.map(m => {
+            if (activeOrder > -1 && m.order < activeOrder && m.status !== MilestoneStatus.DONE) {
+                return { ...m, status: MilestoneStatus.DONE };
+            }
+            return m;
+        });
+
         // Check if ticket is closed and has field clearance as the final milestone
         const isClosedByClearance = ticketStatus === 'closed' &&
-            milestones.some(m => (m.stage === 'REQUEST_CLEARED_AT_FIELD' || m.stage === 'FIELD_CLEARANCE_APPROVED') && m.status === MilestoneStatus.DONE);
+            normalized.some(m => (m.stage === 'REQUEST_CLEARED_AT_FIELD' || m.stage === 'FIELD_CLEARANCE_APPROVED') && m.status === MilestoneStatus.DONE);
 
         if (isClosedByClearance) {
             // Show only accomplished milestones (DONE status)
-            return milestones.filter(m => m.status === MilestoneStatus.DONE);
+            return normalized.filter(m => m.status === MilestoneStatus.DONE);
         }
 
         // For open tickets or closed by other means, show all milestones
-        return milestones;
-    }, [milestones, ticketStatus]);
-
-    // Active milestone - MOVED BEFORE EARLY RETURNS
-    const activeMilestone = useMemo(() => {
-        return milestones.find(m => m.status === 'IN_PROGRESS' || m.status === 'BLOCKED') || null;
-    }, [milestones]);
+        return normalized;
+    }, [milestones, ticketStatus, activeMilestone]);
 
     // Check if user has any permissions for current milestone or transitions
     const userHasPermissions = useMemo(() => {
