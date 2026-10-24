@@ -35,7 +35,8 @@ import { compressImage } from '../../lib/utils/imageCompressor';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ReceiveController = () => {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
+    const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
     const { fetchTickets, tickets, searching, searchResults, updateMilestone } = useTickets();
     const { 
         currentBatch, 
@@ -1780,7 +1781,7 @@ const ReceiveController = () => {
                                     className="hidden"
                                 />
 
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className={isMacsoftRole ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2"}>
                                     <Button
                                         onClick={openCameraForCapture}
                                         variant="default"
@@ -1789,14 +1790,16 @@ const ReceiveController = () => {
                                         <Camera className="w-4 h-4" />
                                         Capture Photos
                                     </Button>
-                                    <Button
-                                        onClick={() => photoInputRef.current?.click()}
-                                        variant="outline"
-                                        className="w-full gap-2"
-                                    >
-                                        <ImageIcon className="w-4 h-4" />
-                                        Upload Photos
-                                    </Button>
+                                    {isMacsoftRole && (
+                                        <Button
+                                            onClick={() => photoInputRef.current?.click()}
+                                            variant="outline"
+                                            className="w-full gap-2"
+                                        >
+                                            <ImageIcon className="w-4 h-4" />
+                                            Upload Photos
+                                        </Button>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2">

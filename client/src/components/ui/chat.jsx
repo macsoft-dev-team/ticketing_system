@@ -556,7 +556,8 @@ export const ChatMessage = ({
 export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticketStatus = null, currentUserRole = null }) => {
   const { user } = useAuth();
   const effectiveRole = currentUserRole || user?.role;
-  const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(effectiveRole);
+  const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(effectiveRole);
+  const isRestrictedRole = !isMacsoftRole;
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [showMediaCapture, setShowMediaCapture] = useState(false);
@@ -784,7 +785,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             disabled={disabled}
             className={`p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed ${
               isRestrictedRole
-                ? 'lg:hidden text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100'
+                ? 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100'
                 : 'text-gray-500 hover:text-blue-500'
             }`}
             title="Take photo with device camera"

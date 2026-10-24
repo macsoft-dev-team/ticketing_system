@@ -35,10 +35,10 @@ const PhotoUploadModal = ({
   const videoRef = useRef(null);
   const cameraInputRef = useRef(null);
 
-  // Role and Milestone camera restriction
-  const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(userRole);
-  const isSubmittedToServiceCenter = stage === 'SUBMITTED_TO_SERVICE_CENTER';
-  const isCameraOnly = (isSubmittedToServiceCenter && isRestrictedRole) || allowGallery === false;
+  // Role camera restriction: Only Macsoft roles can upload from gallery/device storage; all other roles are strictly camera-only across all milestones
+  const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole);
+  const isCameraOnly = !isMacsoftRole || allowGallery === false;
+  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   // Cleanup camera stream on close / unmount
   const stopLiveCamera = () => {
@@ -60,6 +60,20 @@ const PhotoUploadModal = ({
       }
     };
   }, [cameraStream]);
+
+  // Auto-open live camera stream when modal opens in camera-only mode
+  useEffect(() => {
+    if (isOpen && isCameraOnly && !cameraStream) {
+      startLiveCamera('environment');
+    }
+    if (!isOpen) {
+      stopLiveCamera();
+      setSelectedFiles([]);
+      setPreviewUrls([]);
+      setPhotoLabels([]);
+      setErrorMsg('');
+    }
+  }, [isOpen, isCameraOnly]);
 
   // Connect stream to video element when available
   useEffect(() => {
@@ -332,7 +346,7 @@ const PhotoUploadModal = ({
                   <span className="font-semibold block text-amber-900 text-xs sm:text-sm mb-0.5">
                     Live Device Camera Photo Required
                   </span>
-                  For <strong>Submitted to Service Center</strong>, photos must be captured directly using your device camera. Uploading existing photos from gallery or local storage is disabled for Field Engineers and Technicians.
+                  Photos must be captured directly using your device camera. Uploading existing photos from gallery or local storage is restricted to Macsoft team roles.
                 </div>
               </div>
             )}
@@ -404,14 +418,14 @@ const PhotoUploadModal = ({
             {/* Photo Capture / Input Controls */}
             <div className="mb-5 space-y-3">
               {isCameraOnly ? (
-                /* CAMERA ONLY: For Field Engineers & Technicians on Submitted to Service Center */
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Option 1: Live In-Browser Camera */}
+                /* CAMERA ONLY: For non-Macsoft roles across all milestones - strictly in-browser camera feed, zero file inputs */
+                <div className="flex flex-col items-center justify-center">
+                  {/* Live In-Browser Camera Viewfinder Toggle */}
                   <button
                     type="button"
                     onClick={() => (isLiveCameraOpen ? stopLiveCamera() : startLiveCamera('environment'))}
                     disabled={uploading || cameraLoading}
-                    className="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-600 rounded-xl p-4 sm:p-5 text-center transition-all flex flex-col items-center justify-center group"
+                    className="w-full border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-600 rounded-xl p-4 sm:p-5 text-center transition-all flex flex-col items-center justify-center group"
                   >
                     <div className="w-11 h-11 rounded-full bg-blue-100 group-hover:bg-blue-200 text-blue-600 flex items-center justify-center mb-2 transition-colors">
                       <Camera className="w-6 h-6" />
@@ -420,32 +434,9 @@ const PhotoUploadModal = ({
                       {isLiveCameraOpen ? 'Close Live Camera' : 'Open Live Camera'}
                     </p>
                     <p className="text-xs text-blue-700">
-                      Snap photo directly in browser
+                      Take photo directly using device camera
                     </p>
                   </button>
-
-                  {/* Option 2: Native Device Camera App */}
-                  <label className="border-2 border-dashed border-orange-400 bg-orange-50/50 hover:bg-orange-50 hover:border-orange-600 rounded-xl p-4 sm:p-5 text-center transition-all flex flex-col items-center justify-center cursor-pointer group">
-                    <input
-                      ref={cameraInputRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      capture="environment"
-                      onChange={handleFileSelect}
-                      disabled={uploading}
-                      className="hidden"
-                    />
-                    <div className="w-11 h-11 rounded-full bg-orange-100 group-hover:bg-orange-200 text-orange-600 flex items-center justify-center mb-2 transition-colors">
-                      <Camera className="w-6 h-6" />
-                    </div>
-                    <p className="text-sm font-semibold text-orange-900 mb-0.5">
-                      Use Device Camera App
-                    </p>
-                    <p className="text-xs text-orange-700">
-                      Open mobile / tablet camera
-                    </p>
-                  </label>
                 </div>
               ) : (
                 /* ALLOW BOTH GALLERY & CAMERA: For Admin and Macsoft roles */

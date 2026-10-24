@@ -34,7 +34,9 @@ import { useAuth } from '../../../lib/hooks/useAuth';
 import { compressImage } from '../../../lib/utils/imageCompressor';
 export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const { user } = useAuth();
-    const isRestrictedRole = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role);
+    const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
+    const isRestrictedRole = !isMacsoftRole;
+    const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const cameraInputRef = useRef(null);
     const videoRef = useRef(null);
     const [isLiveCameraOpen, setIsLiveCameraOpen] = useState(false);
@@ -1389,30 +1391,18 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                             Take Photo with Device Camera
                                         </h4>
                                         <p className="text-xs text-gray-500 max-w-md mx-auto mb-4">
-                                            Field Engineers and Service Center Technicians must capture photos directly using their device camera. Uploading files or gallery photos is not permitted.
+                                            Photos must be captured directly using your device camera. Uploading files or gallery photos is not permitted.
                                         </p>
-                                        <div className="flex flex-wrap items-center justify-center gap-2 lg:hidden">
+                                        <div className="flex flex-wrap items-center justify-center gap-2">
                                             <button
                                                 type="button"
-                                                onClick={() => cameraInputRef.current?.click()}
+                                                onClick={() => startLiveCamera('environment')}
                                                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium shadow-sm cursor-pointer"
                                             >
                                                 <Camera className="w-4 h-4" />
-                                                <span>Open Device Camera</span>
+                                                <span>Open Live Camera</span>
                                             </button>
-                                            {navigator.mediaDevices?.getUserMedia && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => startLiveCamera('environment')}
-                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm font-medium shadow-sm cursor-pointer"
-                                                >
-                                                    <span>Live Viewfinder</span>
-                                                </button>
-                                            )}
                                         </div>
-                                        <p className="hidden lg:block text-xs text-amber-700 bg-amber-50 py-2 px-3 rounded-lg border border-amber-200 max-w-sm mx-auto font-medium">
-                                            Device camera capture is only available on mobile / tablet devices.
-                                        </p>
                                     </div>
 
                                     <input

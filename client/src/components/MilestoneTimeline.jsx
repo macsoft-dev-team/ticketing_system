@@ -519,6 +519,9 @@ const MilestoneCard = ({
         photoRequired: false,
         order: 0,
     };
+    // Role check: only Macsoft roles are permitted to upload from gallery/device
+    const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
+    const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     const isBlocked = milestone.status === MilestoneStatus.BLOCKED;
 
     const handlePhotoUpload = async (e) => {
@@ -703,7 +706,7 @@ const MilestoneCard = ({
                                                     Upload Photos (Required - Min: {config.minPhotos || 1})
                                                 </label>
                                                 <div className="flex gap-2 mb-2">
-                                                    {(!['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role) || milestone.stage !== 'SUBMITTED_TO_SERVICE_CENTER') && (
+                                                    {isMacsoftRole && (
                                                         <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors cursor-pointer text-sm">
                                                             <ImageIcon className="w-4 h-4" />
                                                             Gallery
@@ -716,18 +719,29 @@ const MilestoneCard = ({
                                                             />
                                                         </label>
                                                     )}
-                                                    <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:text-orange-700 transition-colors cursor-pointer text-sm">
-                                                        <Camera className="w-4 h-4" />
-                                                        Take Photo (Camera)
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
-                                                            capture="environment"
-                                                            onChange={handlePhotoUpload}
-                                                            className="hidden"
-                                                        />
-                                                    </label>
+                                                    {!isMacsoftRole ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleMilestoneAction({ action: 'upload_photos', targetStage: milestone.stage })}
+                                                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:text-orange-700 transition-colors cursor-pointer text-sm"
+                                                        >
+                                                            <Camera className="w-4 h-4" />
+                                                            Take Photo (Live Camera)
+                                                        </button>
+                                                    ) : (
+                                                        <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed border-orange-300 rounded-lg text-orange-600 hover:border-orange-400 hover:text-orange-700 transition-colors cursor-pointer text-sm">
+                                                            <Camera className="w-4 h-4" />
+                                                            Take Photo (Camera)
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                multiple
+                                                                capture="environment"
+                                                                onChange={handlePhotoUpload}
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    )}
                                                 </div>
                                                 {photos.length > 0 && (
                                                     <p className="text-xs text-green-600 mt-1">
@@ -849,6 +863,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
     const [showPhotoModal, setShowPhotoModal] = useState(false);
     const { token, user } = useAuth();
     const { addToast } = useToast();
+    const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
     // Update milestones when prop changes
     useEffect(() => {
         if (propMilestones && propMilestones.length > 0) {
@@ -1545,14 +1560,13 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
         setConfirmationNotes(''); // Reset notes
 
         if (isPhotoUpload) {
-            // For restricted roles on Submitted to Service Center, open PhotoUploadModal in camera-only mode
-            if ((targetStage === 'SUBMITTED_TO_SERVICE_CENTER' || confirmDialogData.currentStage === 'SUBMITTED_TO_SERVICE_CENTER') &&
-                ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(user?.role)) {
+            if (!isMacsoftRole) {
+                // Non-Macsoft roles must strictly use PhotoUploadModal in camera-only mode across all milestones
                 setSelectedTargetStage(targetStage || confirmDialogData.currentStage);
                 setShowPhotoModal(true);
                 return;
             }
-            // Handle photo upload action - create a file input dynamically
+            // For Macsoft roles, allow selecting files from device
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
             fileInput.multiple = true;
@@ -2050,16 +2064,16 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                     setShowPhotoModal(false);
                 }}
                 title={selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage] 
-                    ? (isCameraOnlyForSubmission ? `Take Photos with Device - ${MILESTONE_CONFIG[selectedTargetStage].label}` : `Upload Photos - ${MILESTONE_CONFIG[selectedTargetStage].label}`)
-                    : 'Upload Photos'
+                    ? (!isMacsoftRole ? `Take Photos with Device - ${MILESTONE_CONFIG[selectedTargetStage].label}` : `Upload Photos - ${MILESTONE_CONFIG[selectedTargetStage].label}`)
+                    : (!isMacsoftRole ? 'Take Photos with Device' : 'Upload Photos')
                 }
                 description={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
-                    ? (isCameraOnlyForSubmission
+                    ? (!isMacsoftRole
                         ? `Please take 4 specific photos using your device camera: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
                         : `Please upload 4 specific photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`)
                     : selectedTargetStage && MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos
                         ? `Required photos: ${MILESTONE_CONFIG[selectedTargetStage].requiredPhotos.join(', ')}`
-                        : 'Select photos to upload for this milestone'
+                        : (!isMacsoftRole ? 'Take photos using device camera' : 'Select photos to upload for this milestone')
                 }
                 minPhotos={selectedTargetStage === 'REQUEST_CLEARED_AT_FIELD' && MILESTONE_CONFIG[selectedTargetStage]?.getPhotoRequirements
                     ? MILESTONE_CONFIG[selectedTargetStage].getPhotoRequirements(user?.role)?.minPhotos || 0
@@ -2070,6 +2084,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                 requiredLabels={(selectedTargetStage === 'RECEIVED_AT_SERVICE_CENTER' || selectedTargetStage === 'SUBMITTED_TO_SERVICE_CENTER') ? MILESTONE_CONFIG[selectedTargetStage]?.requiredPhotos : undefined}
                 userRole={user?.role}
                 stage={selectedTargetStage || currentMilestone?.stage}
+                allowGallery={isMacsoftRole}
             />
         </div>
     );

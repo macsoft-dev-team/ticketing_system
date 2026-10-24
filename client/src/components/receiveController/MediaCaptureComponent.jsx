@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import { useAuth } from '../../lib/hooks/useAuth';
 
 const MediaCaptureComponent = ({
     photos,
@@ -45,6 +46,9 @@ const MediaCaptureComponent = ({
     removeAudio,
     handleDeviceChange
 }) => {
+    const { user } = useAuth();
+    const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role);
+
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -58,15 +62,17 @@ const MediaCaptureComponent = ({
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium text-gray-900">Required Photos ({photos.length}/4)</h3>
                     <div className="flex gap-2">
-                        <Button
-                            onClick={() => photoInputRef.current?.click()}
-                            variant="outline"
-                            size="small"
-                            className="gap-2"
-                        >
-                            <Upload className="w-4 h-4" />
-                            Upload
-                        </Button>
+                        {isMacsoftRole && (
+                            <Button
+                                onClick={() => photoInputRef.current?.click()}
+                                variant="outline"
+                                size="small"
+                                className="gap-2"
+                            >
+                                <Upload className="w-4 h-4" />
+                                Upload
+                            </Button>
+                        )}
                         <Button
                             onClick={openCameraForCapture}
                             variant="outline"
@@ -131,15 +137,17 @@ const MediaCaptureComponent = ({
                 <div className="flex items-center justify-between">
                     <h3 className="font-medium text-gray-900">Videos ({videos.length})</h3>
                     <div className="flex gap-2">
-                        <Button
-                            onClick={() => videoInputRef.current?.click()}
-                            variant="outline"
-                            size="small"
-                            className="gap-2"
-                        >
-                            <Upload className="w-4 h-4" />
-                            Upload
-                        </Button>
+                        {isMacsoftRole && (
+                            <Button
+                                onClick={() => videoInputRef.current?.click()}
+                                variant="outline"
+                                size="small"
+                                className="gap-2"
+                            >
+                                <Upload className="w-4 h-4" />
+                                Upload
+                            </Button>
+                        )}
                         <Button
                             onClick={isVideoRecording ? stopVideoRecording : startVideoRecording}
                             variant={isVideoRecording ? "destructive" : "outline"}
