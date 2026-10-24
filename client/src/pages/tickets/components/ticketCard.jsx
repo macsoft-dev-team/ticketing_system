@@ -265,17 +265,24 @@ export default function TicketCard({
 
     // Helper function to get closure information
     const getClosureInfo = () => {
-        if (localTicket.status !== TICKET_STATUS.CLOSED && localTicket.status !== TICKET_STATUS.RESOLVED) {
+        const statusUpper = localTicket.status ? String(localTicket.status).toUpperCase() : '';
+        const isClosed = statusUpper === 'CLOSED' || 
+                         statusUpper === 'RESOLVED' || 
+                         localTicket.status === TICKET_STATUS.CLOSED || 
+                         localTicket.status === TICKET_STATUS.RESOLVED || 
+                         localTicket.isArchived;
+
+        if (!isClosed) {
             return null;
         }
 
-        if (!localTicket.ticketMilestones || localTicket.ticketMilestones.length === 0) {
-            return null;
-        }
+        const milestones = (localTicket.ticketMilestones && localTicket.ticketMilestones.length > 0)
+            ? localTicket.ticketMilestones
+            : (ticket.ticketMilestones || []);
 
         // Check for field clearance scenarios first (higher priority)
-        const fieldClearedMilestone = localTicket.ticketMilestones.find(m =>
-            m.stage === 'REQUEST_CLEARED_AT_FIELD' && m.status === 'DONE'
+        const fieldClearedMilestone = milestones.find(m =>
+            m.stage === 'REQUEST_CLEARED_AT_FIELD' && (m.status === 'DONE' || m.status === 'COMPLETED')
         );
         if (fieldClearedMilestone) {
             return {
@@ -287,15 +294,15 @@ export default function TicketCard({
                 textColor: 'text-emerald-800',
                 borderColor: 'border-emerald-100',
                 iconColor: 'text-emerald-600',
-                closedBy: fieldClearedMilestone.changer?.name,
-                closedAt: fieldClearedMilestone.completedAt,
+                closedBy: fieldClearedMilestone.changer?.name || localTicket.updatedByUser?.name,
+                closedAt: fieldClearedMilestone.completedAt || fieldClearedMilestone.updatedAt || localTicket.updatedAt,
                 notes: fieldClearedMilestone.notes
             };
         }
 
         // Check for field clearance approval
-        const fieldClearanceApprovedMilestone = ticket.ticketMilestones.find(m =>
-            m.stage === 'FIELD_CLEARANCE_APPROVED' && m.status === 'DONE'
+        const fieldClearanceApprovedMilestone = milestones.find(m =>
+            m.stage === 'FIELD_CLEARANCE_APPROVED' && (m.status === 'DONE' || m.status === 'COMPLETED')
         );
         if (fieldClearanceApprovedMilestone) {
             return {
@@ -307,15 +314,15 @@ export default function TicketCard({
                 textColor: 'text-green-800',
                 borderColor: 'border-green-100',
                 iconColor: 'text-green-600',
-                closedBy: fieldClearanceApprovedMilestone.changer?.name,
-                closedAt: fieldClearanceApprovedMilestone.completedAt,
+                closedBy: fieldClearanceApprovedMilestone.changer?.name || localTicket.updatedByUser?.name,
+                closedAt: fieldClearanceApprovedMilestone.completedAt || fieldClearanceApprovedMilestone.updatedAt || localTicket.updatedAt,
                 notes: fieldClearanceApprovedMilestone.notes
             };
         }
 
         // Check for delivery completion
-        const deliveredMilestone = ticket.ticketMilestones.find(m =>
-            m.stage === 'DELIVERED_TO_FIELD' && m.status === 'DONE'
+        const deliveredMilestone = milestones.find(m =>
+            m.stage === 'DELIVERED_TO_FIELD' && (m.status === 'DONE' || m.status === 'COMPLETED')
         );
         if (deliveredMilestone) {
             return {
@@ -327,25 +334,28 @@ export default function TicketCard({
                 textColor: 'text-blue-800',
                 borderColor: 'border-blue-100',
                 iconColor: 'text-blue-600',
-                closedBy: deliveredMilestone.changer?.name,
-                closedAt: deliveredMilestone.completedAt,
+                closedBy: deliveredMilestone.changer?.name || localTicket.updatedByUser?.name,
+                closedAt: deliveredMilestone.completedAt || deliveredMilestone.updatedAt || localTicket.updatedAt,
                 notes: deliveredMilestone.notes
             };
         }
 
         // Check for general ticket closure (including auto-closure)
-        const ticketClosedMilestone = ticket.ticketMilestones.find(m =>
-            m.stage === 'TICKET_CLOSED' && m.status === 'DONE'
-        );
+        const ticketClosedMilestone = milestones.find(m =>
+            (m.stage === 'TICKET_CLOSED' || m.stage === 'CLOSED') && (m.status === 'DONE' || m.status === 'COMPLETED')
+        ) || milestones.find(m => m.stage === 'TICKET_CLOSED' || m.stage === 'CLOSED');
+
         if (ticketClosedMilestone) {
             // Check if it's an auto-closure based on description or notes
             const isAutoClosed = ticketClosedMilestone.description?.toLowerCase().includes('automatically') ||
-                ticketClosedMilestone.notes?.toLowerCase().includes('automatically');
+                ticketClosedMilestone.notes?.toLowerCase().includes('automatically') ||
+                localTicket.closureReason?.toLowerCase().includes('automatically');
 
             const isNoResponse = ticketClosedMilestone.description?.toLowerCase().includes('no customer response') ||
-                ticketClosedMilestone.notes?.toLowerCase().includes('no customer response');
+                ticketClosedMilestone.notes?.toLowerCase().includes('no customer response') ||
+                localTicket.closureReason?.toLowerCase().includes('no customer response');
 
-            let label = 'Ticket Closed';
+            let label = localTicket.isArchived ? 'Ticket Archived' : 'Ticket Closed';
             let icon = '🔒';
             let bgColor = 'bg-gray-50';
             let textColor = 'text-gray-800';
@@ -374,20 +384,44 @@ export default function TicketCard({
                 type: isAutoClosed ? 'auto-closed' : 'closed',
                 label,
                 icon,
-                description: ticketClosedMilestone.description || 'Ticket permanently closed',
+                description: ticketClosedMilestone.description || localTicket.closureReason || 'Ticket permanently closed',
                 bgColor,
                 textColor,
                 borderColor,
                 iconColor,
-                closedBy: ticketClosedMilestone.changer?.name,
-                closedAt: ticketClosedMilestone.completedAt,
-                notes: ticketClosedMilestone.notes,
+                closedBy: ticketClosedMilestone.changer?.name || localTicket.updatedByUser?.name || localTicket.assignedToUser?.name,
+                closedAt: ticketClosedMilestone.completedAt || ticketClosedMilestone.updatedAt || localTicket.closedAt || localTicket.updatedAt,
+                notes: ticketClosedMilestone.notes || localTicket.closureReason || localTicket.resolutionNotes,
                 isAutoClosed,
                 isNoResponse
             };
         }
 
-        return null;
+        // Fallback for archived/closed tickets without milestone records
+        const fallbackClosedBy = localTicket.updatedByUser?.name || 
+                                 localTicket.changer?.name || 
+                                 localTicket.assignedToUser?.name || 
+                                 localTicket.closedBy || 
+                                 (typeof localTicket.updatedBy === 'string' ? localTicket.updatedBy : null);
+        
+        const fallbackClosedAt = localTicket.closedAt || localTicket.archivedAt || localTicket.updatedAt;
+        const fallbackNotes = localTicket.closureReason || localTicket.resolutionNotes || localTicket.notes;
+
+        return {
+            type: 'closed',
+            label: localTicket.isArchived ? 'Ticket Archived' : 'Ticket Closed',
+            icon: '🔒',
+            description: localTicket.closureReason || (localTicket.isArchived ? 'Ticket archived and stored' : 'Ticket permanently closed'),
+            bgColor: 'bg-gray-50',
+            textColor: 'text-gray-800',
+            borderColor: 'border-gray-200',
+            iconColor: 'text-gray-600',
+            closedBy: fallbackClosedBy,
+            closedAt: fallbackClosedAt,
+            notes: fallbackNotes,
+            isAutoClosed: false,
+            isNoResponse: false
+        };
     };
 
     const closureInfo = getClosureInfo();
@@ -781,14 +815,16 @@ export default function TicketCard({
 
                 {/* Title and Description */}
                 <div className="flex-1 flex flex-col justify-start mb-4">
-                    <motion.h4
-                        className="text-base font-semibold mb-2 line-clamp-2 leading-snug"
-                        style={{ color: "#1e293b" }}
-                        whileHover={{ color: "#3b82f6" }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        {localTicket.title}
-                    </motion.h4>
+                    {localTicket.title && (
+                        <motion.h4
+                            className="text-base font-semibold mb-2 line-clamp-2 leading-snug"
+                            style={{ color: "#1e293b" }}
+                            whileHover={{ color: "#3b82f6" }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {localTicket.title}
+                        </motion.h4>
+                    )}
                     <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed min-h-10">
                         {localTicket.description}
                     </p>
@@ -837,10 +873,10 @@ export default function TicketCard({
                             <p className={`text-xs ${closureInfo.textColor} opacity-80 mb-1`}>
                                 {closureInfo.description}
                             </p>
-                            {closureInfo.closedBy && (
+                            {(closureInfo.closedBy || closureInfo.closedAt) && (
                                 <div className={`text-xs ${closureInfo.textColor} opacity-70 flex items-center gap-1`}>
                                     <User className="w-3 h-3" />
-                                    <span>Closed by {closureInfo.closedBy}</span>
+                                    <span>{closureInfo.closedBy ? `Closed by ${closureInfo.closedBy}` : 'Closed'}</span>
                                     {closureInfo.closedAt && (
                                         <span className="ml-1">• {moment(closureInfo.closedAt).format('MMM DD, YYYY')}</span>
                                     )}
