@@ -367,25 +367,47 @@ const getTickets = async (skip, take, filter, userId, role) => {
     if (filter && filter.search) {
       const s = String(filter.search).trim();
       if (s.length > 0) {
-        const searchType = filter.searchType || "controller"; // default to controller
+        const searchType = filter.searchType || "all";
+        const cleanS = s.replace(/^[#\s]+/, "");
+        const num = parseInt(cleanS, 10);
+        const isNumeric = !isNaN(num) && /^\d+$/.test(cleanS);
+
+        // Build robust ticket code / sequence matching conditions
+        const ticketConditions = [
+          { ticketCode: { contains: s } },
+          { ticketCode: { contains: cleanS } },
+        ];
+        if (isNumeric) {
+          ticketConditions.push({ id: num });
+          const pad3 = String(num).padStart(3, "0");
+          const pad4 = String(num).padStart(4, "0");
+          ticketConditions.push({ ticketCode: { contains: `-${pad3}` } });
+          ticketConditions.push({ ticketCode: { contains: `-${pad4}` } });
+          ticketConditions.push({ ticketCode: { endsWith: String(num) } });
+        }
 
         if (searchType === "ticket") {
-          // Search only in ticket code
-          where.ticketCode = { contains: s };
+          where.OR = ticketConditions;
         } else if (searchType === "controller") {
-          // Search only in controller number
-          where.controllerNo = { contains: s };
+          // If user selected controller but entered pure numbers that could match a ticket number, search both
+          if (isNumeric) {
+            where.OR = [
+              { controllerNo: { contains: s } },
+              ...ticketConditions,
+            ];
+          } else {
+            where.controllerNo = { contains: s };
+          }
         } else if (searchType === "imeinumber") {
-          // Search only in IMEI number
           where.imei = { contains: s };
         } else {
-          // Fallback to search all fields if searchType is not recognized
+          // Default / "all": search across ticketCode (including ID and sequence padding), controllerNo, imei, customerName, etc.
           where.OR = [
-            { ticketCode: { contains: s } },
-            { description: { contains: s } },
-            { customerName: { contains: s } },
+            ...ticketConditions,
             { controllerNo: { contains: s } },
             { imei: { contains: s } },
+            { customerName: { contains: s } },
+            { description: { contains: s } },
             { hp: { contains: s } },
             { motorType: { contains: s } },
             { stateCode: { contains: s } },
@@ -400,8 +422,13 @@ const getTickets = async (skip, take, filter, userId, role) => {
     }
 
     // status filter
+    // If the user is specifically searching by ticket code / numeric ID, do not restrict by status
+    // so that tickets in other states (e.g. IN_PROGRESS, RESOLVED, CLOSED) are found!
     if (filter && filter.status) {
-      where.status = filter.status;
+      const isTicketSpecificSearch = filter.search && (filter.searchType === "ticket" || /^\d+$/.test(String(filter.search).trim()));
+      if (!isTicketSpecificSearch) {
+        where.status = filter.status;
+      }
     }
 
     // stage filter - filter tickets by their current milestone stage

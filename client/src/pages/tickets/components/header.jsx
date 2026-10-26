@@ -11,7 +11,7 @@ export default function Header() {
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
     const [activeStageFilter, setActiveStageFilter] = useState(filters?.stage || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
-    const [searchType, setSearchType] = useState(filters?.searchType || 'controller');
+    const [searchType, setSearchType] = useState(filters?.searchType || 'all');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isStageDropdownOpen, setIsStageDropdownOpen] = useState(false);
@@ -107,6 +107,9 @@ export default function Header() {
         const currentSearch = debouncedSearchTerm || '';
         if (setFilters && (filters?.status !== activeFilter || filters?.stage !== activeStageFilter || filters?.search !== currentSearch || filters?.searchType !== searchType)) {
             setFilters({ status: activeFilter, stage: activeStageFilter, search: currentSearch, searchType });
+            if (setCurrentPage) {
+                setCurrentPage(0);
+            }
             
             // Update URL params for search
             const newParams = new URLSearchParams(searchParams);
@@ -120,7 +123,7 @@ export default function Header() {
             }
             setSearchParams(newParams);
         }
-    }, [debouncedSearchTerm, activeFilter, activeStageFilter, searchType, filters?.status, filters?.stage, filters?.search, filters?.searchType, setFilters, searchParams, setSearchParams]);
+    }, [debouncedSearchTerm, activeFilter, activeStageFilter, searchType, filters?.status, filters?.stage, filters?.search, filters?.searchType, setFilters, setCurrentPage, searchParams, setSearchParams]);
 
     // Close stage dropdown when clicking outside
     useEffect(() => {
@@ -298,8 +301,9 @@ export default function Header() {
                         onChange={(e) => setSearchType(e.target.value)}
                         className="hidden md:block px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     >
+                        <option value="all">All Fields</option>
+                        <option value="ticket">Ticket Code / No</option>
                         <option value="controller">Controller Number</option>
-                        <option value="ticket">Ticket Code</option>
                         <option value="imeinumber">IMEI Number</option>
                     </motion.select>
 
@@ -380,8 +384,10 @@ export default function Header() {
                                 onChange={(e) => setSearchType(e.target.value)}
                                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
+                                <option value="all">All Fields</option>
+                                <option value="ticket">Ticket No / Code</option>
                                 <option value="controller">Controller No</option>
-                                <option value="ticket">Ticket No</option>
+                                <option value="imeinumber">IMEI No</option>
                             </select>
                             
                             {/* Search Input - Mobile */}
