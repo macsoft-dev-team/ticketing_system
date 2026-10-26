@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Download, FileText, Image, File as FileIcon, Video, Volume2 } from 'lucide-react';
+import { X, Download, FileText, Image, File as FileIcon, Video, Volume2, FileX, AlertCircle, ImageOff } from 'lucide-react';
 
 const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isUnavailable, setIsUnavailable] = useState(false);
 
   if (!isOpen || !fileDocument) return null;
 
@@ -130,7 +131,8 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
       console.error('Download failed:', error);
       console.error('Document data:', fileDocument);
       console.error('Download URL attempted:', downloadUrl);
-      setError(`Failed to download file: ${error.message}`)
+      setIsUnavailable(true);
+      setError('File is no longer available on the server.');
     } finally {
       setLoading(false);
     }
@@ -146,10 +148,10 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             src={fileUrl}
             alt={fileDocument.name}
             className="sm:max-w-1/2 object-contain"
-           // onLoad={() => console.log('Image loaded successfully:', fileUrl)}
             onError={(e) => {
-              console.error('Image failed to load:', fileUrl, e);
-              setError(`Failed to load image: ${fileUrl}`);
+              console.warn('Image unavailable on server:', fileUrl);
+              setIsUnavailable(true);
+              setError('Photo unavailable');
             }}
           />
         </div>
@@ -163,7 +165,10 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             src={fileUrl}
             title={fileDocument.name}
             className="w-full h-full sm:min-h-[85vh] sm:max-h-[85vh] border-0"
-            onError={() => setError('Failed to load PDF')}
+            onError={() => {
+              setIsUnavailable(true);
+              setError('PDF unavailable');
+            }}
           />
         </div>
       );
@@ -176,7 +181,10 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             src={fileUrl}
             title={fileDocument.name}
             className="w-full h-full border-0 bg-white"
-            onError={() => setError('Failed to load text file')}
+            onError={() => {
+              setIsUnavailable(true);
+              setError('Text file unavailable');
+            }}
           />
         </div>
       );
@@ -282,11 +290,18 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
                 <FileIcon className="w-5 h-5 text-gray-500" />
               )}
               <div>
-                <h2 className="text-sm font-semibold text-gray-900 truncate">
-                  {fileDocument.name}
-                </h2>
-                <p className="text-sm text-gray-500">
-                  {fileDocument.size} • {fileDocument.mimetype}
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-semibold text-gray-900 truncate max-w-xs sm:max-w-md">
+                    {fileDocument.name}
+                  </h2>
+                  {isUnavailable && (
+                    <span className="px-2 py-0.5 text-[10px] font-semibold bg-amber-100 text-amber-800 rounded-full">
+                      Unavailable
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">
+                  {fileDocument.size ? `${fileDocument.size} • ` : ''}{fileDocument.mimetype || 'Attachment'}
                 </p>
               </div>
             </div>
@@ -294,15 +309,15 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleDownload}
-                disabled={loading}
-                className="p-2 border cursor-pointer rounded-lg text-green-500 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-400"
-                title="Download"
+                disabled={loading || isUnavailable}
+                className="p-2 border cursor-pointer rounded-lg text-green-500 hover:bg-green-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-400"
+                title={isUnavailable ? "File unavailable on server" : "Download"}
               >
                 <Download className="w-5 h-5" />
               </button>
               <button
                 onClick={onClose}
-                className="p-2 border cursor-pointer rounded-lg text-red-500 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-400"
+                className="p-2 border cursor-pointer rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-400"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -312,19 +327,41 @@ const DocumentModal = ({ isOpen, onClose, document: fileDocument }) => {
 
           {/* Content */}
           <div className="flex-1 overflow-hidden">
-            {error ? (
-              <div className="flex items-center justify-center h-full min-h-[400px]">
-                <div className="text-center">
-                  <FileIcon className="w-16 h-16 text-red-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading File</h3>
-                  <p className="text-sm text-red-600 mb-4">{error}</p>
-                  <button
-                    onClick={handleDownload}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Try Download
-                  </button>
+            {isUnavailable || error ? (
+              <div className="flex items-center justify-center h-full min-h-[380px] p-6 bg-slate-50/50">
+                <div className="text-center max-w-sm mx-auto">
+                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200/80 flex items-center justify-center mx-auto mb-4 text-amber-600 shadow-xs">
+                    {isImage ? (
+                      <ImageOff className="w-8 h-8" />
+                    ) : (
+                      <FileX className="w-8 h-8" />
+                    )}
+                  </div>
+                  <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 mb-2">
+                    Unavailable on Server
+                  </span>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5">
+                    {isImage ? 'Photo Unavailable' : 'File Unavailable'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-5 leading-relaxed">
+                    This file is no longer available on the server or may have been archived during storage maintenance.
+                  </p>
+                  <div className="p-3 bg-white rounded-lg border border-gray-200 text-xs text-gray-600 text-left mb-5 shadow-xs">
+                    <p className="font-semibold text-gray-700 mb-1">File Info:</p>
+                    <p className="truncate text-gray-500 font-mono text-[11px]">{fileDocument.name}</p>
+                    {fileDocument.size && (
+                      <p className="text-gray-500 text-[11px] mt-0.5">Recorded Size: {fileDocument.size}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm cursor-pointer"
+                    >
+                      Close Preview
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (

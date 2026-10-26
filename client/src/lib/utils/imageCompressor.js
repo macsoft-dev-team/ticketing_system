@@ -14,11 +14,19 @@
  * @returns {Promise<File|Blob>} The compressed file, or the original if compression fails or results in a larger size.
  */
 export const compressImage = (file, options = {}) => {
-  const { quality = 0.7, maxWidth = 1200, maxHeight = 1200 } = options;
+  const { quality = 0.7, maxWidth = 1280, maxHeight = 1280 } = options;
 
   return new Promise((resolve) => {
-    // Only compress image files
-    if (file && file.type && !file.type.startsWith('image/')) {
+    if (!file) {
+      resolve(file);
+      return;
+    }
+
+    // Check if file is an image by MIME type or extension
+    const hasImageMime = file.type && file.type.startsWith('image/');
+    const hasImageExt = /\.(jpe?g|png|webp|bmp|gif|heic|heif)$/i.test(file.name || '');
+    
+    if (!hasImageMime && !hasImageExt) {
       resolve(file);
       return;
     }
@@ -66,15 +74,19 @@ export const compressImage = (file, options = {}) => {
               return;
             }
 
+            // Ensure proper .jpg extension
+            const rawName = file.name || `photo_${Date.now()}.jpg`;
+            const cleanName = rawName.replace(/\.[^/.]+$/, "") + ".jpg";
+
             // Create a new File from the blob if the original was a File
             const resultFile = file instanceof File 
-              ? new File([blob], file.name, {
+              ? new File([blob], cleanName, {
                   type: 'image/jpeg',
                   lastModified: Date.now(),
                 })
               : blob;
 
-            // If compressed file is actually larger (can happen with tiny pngs), keep original
+            // If compressed file is smaller or significantly converted, use compressed
             resolve(resultFile.size < file.size ? resultFile : file);
           },
           'image/jpeg',

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic, MoreVertical, Pencil, Trash2, Check, AlertTriangle } from 'lucide-react';
+import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic, MoreVertical, Pencil, Trash2, Check, AlertTriangle, ImageOff } from 'lucide-react';
 import DocumentModal from './DocumentModal';
 import MediaCapture from './MediaCapture';
 import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
@@ -44,6 +44,7 @@ const TicketClosedView = ({ onViewChat }) => {
 
 const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const getIcon = (attachment) => {
     const mimeType = attachment.fileType || attachment.type || '';
@@ -134,6 +135,31 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
     };
 
     if (isImage && attachment.url) {
+      if (imageError) {
+        return (
+          <div className="mb-2 max-w-xs">
+            <div 
+              onClick={handlePreview}
+              className={`flex items-center gap-3 p-3 rounded-lg border border-dashed cursor-pointer transition-colors ${
+                isOwnMessage 
+                  ? 'border-blue-300 bg-blue-500/20 text-white' 
+                  : 'border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <div className="p-2 rounded-md bg-black/10">
+                <ImageOff className="w-5 h-5 text-gray-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">{attachment.name || 'Photo'}</p>
+                <p className={`text-[10px] ${isOwnMessage ? 'text-blue-100' : 'text-gray-500'}`}>
+                  Photo Unavailable
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       const imgUrl = getImageUrl();
       return (
         <div className="mb-2 max-w-xs">
@@ -146,6 +172,7 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
               alt={attachment.name || 'Chat photo'}
               className="w-full max-h-56 object-cover hover:scale-105 transition-transform duration-200"
               loading="lazy"
+              onError={() => setImageError(true)}
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
               <span className="p-1.5 bg-black/60 text-white rounded-full">
@@ -653,7 +680,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     }
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     if (isFieldOrTechnician) {
       toast({
         title: "Upload Not Allowed",
@@ -664,6 +691,8 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     }
 
     const files = Array.from(e.target.files);
+
+    let allowedFiles = files;
 
     // Check if any files are media files when media upload is disabled
     if (!mediaUploadEnabled) {
@@ -681,18 +710,30 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         });
 
         // Filter out media files
-        const allowedFiles = files.filter(file => {
+        allowedFiles = files.filter(file => {
           const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|avi|webm)$/i.test(file.name);
           const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/i.test(file.name);
           return !isVideo && !isAudio;
         });
-
-        setAttachments(prev => [...prev, ...allowedFiles]);
-        return;
       }
     }
 
-    setAttachments(prev => [...prev, ...files]);
+    // Compress image files before adding to attachments
+    const processedFiles = await Promise.all(
+      allowedFiles.map(async (file) => {
+        if (file.type?.startsWith('image/') || /\.(jpe?g|png|webp|bmp)$/i.test(file.name)) {
+          try {
+            return await compressImage(file, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
+          } catch (err) {
+            console.warn('Image compression fallback on select:', err);
+            return file;
+          }
+        }
+        return file;
+      })
+    );
+
+    setAttachments(prev => [...prev, ...processedFiles]);
   };
 
   const handlePaste = (e) => {
@@ -722,7 +763,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleMediaCapture = async (file, mediaType) => {
+  const handleMediaCapture = async (file, mediaType, sendDirectly = false) => {
     try {
       const fileName = file.name || `Live_Photo_${Date.now()}.jpg`;
       const fileType = file.type || 'image/jpeg';
@@ -731,19 +772,38 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         safeFile = new File([file], fileName, { type: fileType });
       }
 
-      // Compress image before adding to attachments to ensure fast delivery
-      const compressed = await compressImage(safeFile, { quality: 0.8, maxWidth: 1600, maxHeight: 1600 });
+      // Aggressively compress image before adding to attachments to ensure fast delivery & small size (< 250 KB)
+      const compressed = await compressImage(safeFile, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
       const finalFile = (compressed instanceof File && compressed.name)
         ? compressed
         : new File([compressed], safeFile.name, { type: 'image/jpeg' });
 
-      setAttachments(prev => [...prev, finalFile]);
+      if (sendDirectly) {
+        if (!muted) {
+          play('outbound_chime');
+        }
+        await onSendMessage(message.trim(), [...attachments, finalFile]);
+        setMessage('');
+        setAttachments([]);
+      } else {
+        setAttachments(prev => [...prev, finalFile]);
+      }
     } catch (err) {
       console.warn('Image compression fallback:', err);
       const fallbackFile = (file instanceof File && file.name)
         ? file
         : new File([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
-      setAttachments(prev => [...prev, fallbackFile]);
+
+      if (sendDirectly) {
+        if (!muted) {
+          play('outbound_chime');
+        }
+        await onSendMessage(message.trim(), [...attachments, fallbackFile]);
+        setMessage('');
+        setAttachments([]);
+      } else {
+        setAttachments(prev => [...prev, fallbackFile]);
+      }
     }
     setShowMediaCapture(false);
   };

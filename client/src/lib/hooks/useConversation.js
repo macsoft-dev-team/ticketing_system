@@ -3,6 +3,7 @@ import { useAuth } from "./useAuth";
 import { useSocket } from "../contexts/SocketContext";
 import { useSoundManager } from "./SoundManager";
 import moment from "moment";
+import { compressImage } from "../utils/imageCompressor";
 
 export const useConversation = (ticketId) => {
   const { user, token } = useAuth();
@@ -160,11 +161,12 @@ export const useConversation = (ticketId) => {
 
   // Send message
   const sendMessage = useCallback(
-    async (messageContent, attachments = []) => {
+    async (messageContent = "", attachments = []) => {
+      const safeText = typeof messageContent === "string" ? messageContent.trim() : "";
       if (
         !ticketId ||
         !token ||
-        (!messageContent.trim() && attachments.length === 0)
+        (!safeText && (!attachments || attachments.length === 0))
       ) { 
         setError("Cannot send message: Missing required data");
         return;
@@ -173,13 +175,23 @@ export const useConversation = (ticketId) => {
 
       try {
         const formData = new FormData();
-        formData.append("message", messageContent);
+        formData.append("message", safeText);
 
-        // Append files if any
+        // Append files if any (ensure images are compressed before uploading)
         if (attachments && attachments.length > 0) {
-          attachments.forEach((file) => {
-            formData.append("attachments", file);
-          });
+          for (const file of attachments) {
+            let fileToSend = file;
+            // Only recompress if file is larger than 1MB
+            if (file && file.size > 1024 * 1024 && (file.type?.startsWith("image/") || /\.(jpe?g|png|webp|bmp)$/i.test(file.name || ""))) {
+              try {
+                fileToSend = await compressImage(file, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
+              } catch (compressErr) {
+                console.warn("Pre-send compression failed for file:", file.name, compressErr);
+              }
+            }
+            const safeName = fileToSend.name || (fileToSend.type === 'image/jpeg' ? `photo_${Date.now()}.jpg` : `file_${Date.now()}`);
+            formData.append("attachments", fileToSend, safeName);
+          }
         }
 
         const baseUrl =

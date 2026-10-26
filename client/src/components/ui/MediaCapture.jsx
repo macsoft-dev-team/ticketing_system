@@ -16,8 +16,11 @@ import {
   Trash2,
   Upload,
   Eye,
-  EyeOff
+  EyeOff,
+  Send,
+  Paperclip
 } from 'lucide-react';
+import { compressImage } from '../../lib/utils/imageCompressor';
 
 const MediaCapture = ({ 
   onCapture, 
@@ -214,7 +217,7 @@ const MediaCapture = ({
   };
 
   // Fallback to native device camera app (works on all mobile devices even if WebRTC fails)
-  const handleDeviceCameraCapture = (e) => {
+  const handleDeviceCameraCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -223,7 +226,14 @@ const MediaCapture = ({
       streamRef.current = null;
     }
 
-    onCapture(file, 'photo');
+    try {
+      // Compress the native device photo to prevent huge files (e.g. 5-10MB) from mobile cameras
+      const compressed = await compressImage(file, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
+      onCapture(compressed, 'photo', true);
+    } catch (err) {
+      console.warn('Compression error on device capture:', err);
+      onCapture(file, 'photo', true);
+    }
     onClose();
   };
 
@@ -238,9 +248,9 @@ const MediaCapture = ({
     let width = video.videoWidth || 1280;
     let height = video.videoHeight || 720;
 
-    // Scale down if extremely large to prevent mobile memory crashes
-    const maxWidth = 1920;
-    const maxHeight = 1920;
+    // Scale to standard mobile size (max 1280) to ensure lightweight transfer and low memory use
+    const maxWidth = 1280;
+    const maxHeight = 1280;
     if (width > height) {
       if (width > maxWidth) {
         height = Math.round((height * maxWidth) / width);
@@ -272,7 +282,7 @@ const MediaCapture = ({
       setRecordedBlob(blob);
       setMediaState('recorded');
       setIsPreviewMode(true);
-    }, 'image/jpeg', 0.88);
+    }, 'image/jpeg', 0.72);
   }, [facingMode]);
 
   // Start recording (video or audio)
@@ -427,7 +437,7 @@ const MediaCapture = ({
   }, [currentMode, resetCapture]);
 
   // Handle capture submission
-  const handleCapture = useCallback(() => {
+  const handleCapture = useCallback((sendDirectly = true) => {
     if (!recordedBlob) return;
 
     const file = new File(
@@ -443,7 +453,7 @@ const MediaCapture = ({
       stream.getTracks().forEach(track => track.stop());
     }
 
-    onCapture(file, currentMode);
+    onCapture(file, currentMode, sendDirectly);
     onClose();
   }, [recordedBlob, currentMode, onCapture, onClose, stream]);
 
@@ -711,11 +721,11 @@ const MediaCapture = ({
                 <Square className="w-8 h-8 text-white fill-current" />
               </button>
             ) : mediaState === 'recorded' ? (
-              <div className="flex items-center gap-4 sm:gap-6">
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
                 <button
                   type="button"
                   onClick={resetCapture}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-xs sm:text-sm font-medium transition-colors shadow-lg border border-gray-700 cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-xs sm:text-sm font-medium transition-colors shadow-lg border border-gray-700 cursor-pointer"
                   title="Retake photo"
                 >
                   <Trash2 className="w-4 h-4 text-red-400" />
@@ -726,20 +736,30 @@ const MediaCapture = ({
                   <button
                     type="button"
                     onClick={playRecording}
-                    className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
+                    className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
                   >
-                    <Play className="w-6 h-6 text-white fill-current" />
+                    <Play className="w-5 h-5 text-white fill-current" />
                   </button>
                 )}
                 
                 <button
                   type="button"
-                  onClick={handleCapture}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
-                  title="Attach live photo to message"
+                  onClick={() => handleCapture(false)}
+                  className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-700 hover:bg-gray-600 active:scale-95 text-white text-xs sm:text-sm font-medium transition-all shadow-md cursor-pointer border border-gray-600"
+                  title="Attach to message input"
                 >
-                  <Check className="w-4 h-4" />
-                  <span>Use Photo</span>
+                  <Paperclip className="w-4 h-4 text-gray-300" />
+                  <span>Attach</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleCapture(true)}
+                  className="flex items-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
+                  title="Send photo directly to chat"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Send Photo</span>
                 </button>
               </div>
             ) : mediaState === 'playing' ? (

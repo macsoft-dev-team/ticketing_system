@@ -66,22 +66,28 @@ const createConversationUpload = (ticketCode) => {
         'audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/m4a', 'audio/aac'
       ];
       
-      const isImageMime = file.mimetype && file.mimetype.startsWith('image/');
-      const baseMimetypeAllowed = baseMimeTypes.includes(file.mimetype) || isImageMime;
-      const mediaMimetypeAllowed = mediaMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('audio/') || file.mimetype.startsWith('video/');
-      
-      // Allow base files always (images always allowed even if filename is blob/canvas), media files only if enabled
-      const isAllowedFileType = (baseMimetypeAllowed && (baseExtname || isImageMime)) || 
-                                (isMediaUploadEnabled && mediaMimetypeAllowed && mediaExtname);
-      
-      if (isAllowedFileType) {
+      const isImage = (file.mimetype && file.mimetype.startsWith('image/')) || 
+                      /\.(jpe?g|png|gif|webp|bmp)$/i.test(file.originalname);
+
+      // Images are always allowed
+      if (isImage) {
         return cb(null, true);
-      } else {
-        const errorMsg = isMediaUploadEnabled 
-          ? 'Invalid file type. Only images, documents, videos, and audio files are allowed!'
-          : 'Invalid file type. Only images and documents are allowed! Video/audio upload is disabled.';
-        cb(new Error(errorMsg));
       }
+
+      const isBaseDoc = baseMimeTypes.includes(file.mimetype) || baseExtname;
+      if (isBaseDoc) {
+        return cb(null, true);
+      }
+
+      const mediaMimetypeAllowed = mediaMimeTypes.includes(file.mimetype) || file.mimetype?.startsWith('audio/') || file.mimetype?.startsWith('video/');
+      if (isMediaUploadEnabled && (mediaMimetypeAllowed || mediaExtname)) {
+        return cb(null, true);
+      }
+
+      const errorMsg = isMediaUploadEnabled 
+        ? 'Invalid file type. Only images, documents, videos, and audio files are allowed!'
+        : 'Invalid file type. Only images and documents are allowed!';
+      cb(new Error(errorMsg));
     }
   });
 };
@@ -103,8 +109,15 @@ const handleConversationFileUpload = async (req, res, next) => {
     
     // Create dynamic upload middleware for this ticket's conversations
     const upload = createConversationUpload(ticket.ticketCode);
-    upload.array('attachments', 5)(req, res, next);
+    upload.array('attachments', 5)(req, res, (err) => {
+      if (err) {
+        console.error("Multer upload error in conversations:", err);
+        return res.status(400).json({ message: err.message || "File upload error" });
+      }
+      next();
+    });
   } catch (error) {
+     console.error("handleConversationFileUpload exception:", error);
      res.status(500).json({ message: "Internal server error" });
   }
 };
