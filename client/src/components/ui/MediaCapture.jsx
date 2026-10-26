@@ -17,7 +17,8 @@ import {
   Upload,
   Eye,
   EyeOff,
-  Send
+  Send,
+  Loader2
 } from 'lucide-react';
 import { compressImage } from '../../lib/utils/imageCompressor';
 
@@ -49,6 +50,7 @@ const MediaCapture = ({
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [cameraPermission, setCameraPermission] = useState('prompt');
   const [microphonePermission, setMicrophonePermission] = useState('prompt');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -228,10 +230,10 @@ const MediaCapture = ({
     try {
       // Compress the native device photo to prevent huge files (e.g. 5-10MB) from mobile cameras
       const compressed = await compressImage(file, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
-      onCapture(compressed, 'photo', true);
+      await onCapture(compressed, 'photo', false);
     } catch (err) {
       console.warn('Compression error on device capture:', err);
-      onCapture(file, 'photo', true);
+      await onCapture(file, 'photo', false);
     }
     onClose();
   };
@@ -436,25 +438,32 @@ const MediaCapture = ({
   }, [currentMode, resetCapture]);
 
   // Handle capture submission
-  const handleCapture = useCallback((sendDirectly = true) => {
-    if (!recordedBlob) return;
+  const handleCapture = useCallback(async (sendDirectly = true) => {
+    if (!recordedBlob || isSubmitting) return;
 
-    const file = new File(
-      [recordedBlob], 
-      `Live_Photo_${Date.now()}.${currentMode === 'photo' ? 'jpg' : currentMode === 'video' ? 'mp4' : 'webm'}`,
-      { 
-        type: recordedBlob.type || 'image/jpeg',
-        lastModified: Date.now()
+    setIsSubmitting(true);
+    try {
+      const file = new File(
+        [recordedBlob], 
+        `Live_Photo_${Date.now()}.${currentMode === 'photo' ? 'jpg' : currentMode === 'video' ? 'mp4' : 'webm'}`,
+        { 
+          type: recordedBlob.type || 'image/jpeg',
+          lastModified: Date.now()
+        }
+      );
+
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
       }
-    );
 
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+      await onCapture(file, currentMode, sendDirectly);
+      onClose();
+    } catch (err) {
+      console.error('Capture submission error:', err);
+      setError('Failed to process media: ' + (err.message || 'Unknown error'));
+      setIsSubmitting(false);
     }
-
-    onCapture(file, currentMode, sendDirectly);
-    onClose();
-  }, [recordedBlob, currentMode, onCapture, onClose, stream]);
+  }, [recordedBlob, currentMode, onCapture, onClose, stream, isSubmitting]);
 
   const handleClose = useCallback(() => {
     if (stream) {
@@ -720,11 +729,12 @@ const MediaCapture = ({
                 <Square className="w-8 h-8 text-white fill-current" />
               </button>
             ) : mediaState === 'recorded' ? (
-              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4">
                 <button
                   type="button"
                   onClick={resetCapture}
-                  className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-xs sm:text-sm font-medium transition-colors shadow-lg border border-gray-700 cursor-pointer"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-1.5 px-3.5 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-white text-xs sm:text-sm font-medium transition-colors shadow-lg border border-gray-700 cursor-pointer"
                   title="Retake photo"
                 >
                   <Trash2 className="w-4 h-4 text-red-400" />
@@ -735,7 +745,8 @@ const MediaCapture = ({
                   <button
                     type="button"
                     onClick={playRecording}
-                    className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
+                    disabled={isSubmitting}
+                    className="w-11 h-11 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
                   >
                     <Play className="w-5 h-5 text-white fill-current" />
                   </button>
@@ -743,12 +754,33 @@ const MediaCapture = ({
                 
                 <button
                   type="button"
+                  onClick={() => handleCapture(false)}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-1.5 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
+                  title="Attach photo to chat input (like ticket creation)"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Attach Photo</span>
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => handleCapture(true)}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
                   title="Send photo directly to chat"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>Send Photo</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Send Photo</span>
+                    </>
+                  )}
                 </button>
               </div>
             ) : mediaState === 'playing' ? (

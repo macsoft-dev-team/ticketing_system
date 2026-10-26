@@ -763,7 +763,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleMediaCapture = async (file, mediaType, sendDirectly = true) => {
+  const handleMediaCapture = async (file, mediaType, sendDirectly = false) => {
     try {
       const fileName = file.name || `Live_Photo_${Date.now()}.jpg`;
       const fileType = file.type || 'image/jpeg';
@@ -778,10 +778,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         ? compressed
         : new File([compressed], safeFile.name, { type: 'image/jpeg' });
 
-      // Service Center Technicians and Field Engineers have file attachments disabled; photos are sent directly!
-      const shouldSendDirectly = sendDirectly || isFieldOrTechnician;
-
-      if (shouldSendDirectly) {
+      if (sendDirectly) {
         if (!muted) {
           play('outbound_chime');
         }
@@ -789,6 +786,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         setMessage('');
         setAttachments([]);
       } else {
+        // Attach directly to chat input, EXACTLY like ticket creation!
         setAttachments(prev => [...prev, finalFile]);
       }
     } catch (err) {
@@ -797,14 +795,21 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         ? file
         : new File([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
 
-      const shouldSendDirectly = sendDirectly || isFieldOrTechnician;
-      if (shouldSendDirectly) {
-        if (!muted) {
-          play('outbound_chime');
+      if (sendDirectly) {
+        try {
+          if (!muted) {
+            play('outbound_chime');
+          }
+          await onSendMessage(message.trim(), [fallbackFile]);
+          setMessage('');
+          setAttachments([]);
+        } catch (sendErr) {
+          toast({
+            title: "Failed to send photo",
+            description: sendErr.message || "Please check connection and retry",
+            variant: "destructive"
+          });
         }
-        await onSendMessage(message.trim(), [fallbackFile]);
-        setMessage('');
-        setAttachments([]);
       } else {
         setAttachments(prev => [...prev, fallbackFile]);
       }

@@ -426,9 +426,9 @@ export default function TicketDashboard() {
 
       await sendConversationMessage(message, attachments);
       setAutoCloseTimer(null);
-      // Immediately refresh ticket data so any uploaded photos appear in the Ticket Attachments list
+      // Refresh ticket data in background so any uploaded photos appear in the Ticket Attachments list
       if (attachments && attachments.length > 0) {
-        await fetchTicketById(ticketId);
+        fetchTicketById(ticketId);
       }
     } catch (error) {
       addToast({
@@ -1234,8 +1234,8 @@ export default function TicketDashboard() {
     }
   }, [ticket?.id, ticket?.updatedAt]); // Only re-run when ticket ID or update time changes
 
-  // Loading state
-  if (loading) {
+  // Loading state (only show full screen loader during initial ticket fetch)
+  if (loading && !ticketData?.id) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
