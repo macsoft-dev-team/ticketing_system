@@ -20,7 +20,15 @@ const createConversationStorage = (ticketCode) => multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
+    let ext = path.extname(file.originalname);
+    if (!ext && file.mimetype) {
+      if (file.mimetype === 'image/jpeg') ext = '.jpg';
+      else if (file.mimetype === 'image/png') ext = '.png';
+      else if (file.mimetype === 'image/webp') ext = '.webp';
+      else ext = '.jpg';
+    }
+    const cleanName = path.basename(file.originalname, ext) || 'photo';
+    cb(null, file.fieldname + '-' + uniqueSuffix + '-' + cleanName + ext);
   }
 });
 
@@ -45,7 +53,7 @@ const createConversationUpload = (ticketCode) => {
       // Check mimetype for broader support
       const baseMimeTypes = [
         // Images
-        'image/jpeg', 'image/jpg', 'image/png', 'image/gif',
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
         // Documents
         'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'text/plain', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -58,11 +66,12 @@ const createConversationUpload = (ticketCode) => {
         'audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm', 'audio/m4a', 'audio/aac'
       ];
       
-      const baseMimetypeAllowed = baseMimeTypes.includes(file.mimetype);
+      const isImageMime = file.mimetype && file.mimetype.startsWith('image/');
+      const baseMimetypeAllowed = baseMimeTypes.includes(file.mimetype) || isImageMime;
       const mediaMimetypeAllowed = mediaMimeTypes.includes(file.mimetype) || file.mimetype.startsWith('audio/') || file.mimetype.startsWith('video/');
       
-      // Allow base files always, media files only if enabled
-      const isAllowedFileType = (baseMimetypeAllowed && baseExtname) || 
+      // Allow base files always (images always allowed even if filename is blob/canvas), media files only if enabled
+      const isAllowedFileType = (baseMimetypeAllowed && (baseExtname || isImageMime)) || 
                                 (isMediaUploadEnabled && mediaMimetypeAllowed && mediaExtname);
       
       if (isAllowedFileType) {

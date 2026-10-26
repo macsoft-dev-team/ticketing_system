@@ -119,59 +119,117 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
     }
   };
 
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      className={`flex items-center gap-2 p-2 rounded-lg transition-colors mb-1 ${isOwnMessage
-        ? 'bg-blue-400'
-        : 'bg-gray-200'
-        }`}
-    >
-      <span className="text-sm">{getIcon(attachment)}</span>
-      <div className="flex-1 min-w-0">
-        <p className={`text-xs font-medium truncate max-w-40 ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
-          {attachment.name}
-        </p>
-        <p className={`text-[10px] ${isOwnMessage ? 'text-blue-100' : 'text-gray-600'}`}>
-          {attachment.size}
-        </p>
-      </div>
-      <div className="flex items-center gap-1">
-        <button
-          onClick={handlePreview}
-          className={`p-1 rounded transition-colors ${isOwnMessage
-            ? 'text-white hover:text-blue-100'
-            : 'text-gray-600 hover:text-gray-800 cursor-pointer '
-            }`}
-          title="Preview"
-        >
-          <Eye className="w-3 h-3" />
-        </button>
-        <button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className={`p-1 rounded transition-colors ${isDownloading
-            ? 'opacity-50 cursor-not-allowed'
-            : isOwnMessage
+    const baseApiUrl = import.meta.env.VITE_API_URL;
+    const baseUrl = baseApiUrl?.replace('/api', '') || '';
+    const isImage = (attachment.type === 'image') || 
+      (attachment.mimetype && attachment.mimetype.startsWith('image/')) || 
+      (attachment.fileType && attachment.fileType.startsWith('image/')) || 
+      /\.(jpg|jpeg|png|webp|gif)$/i.test(attachment.name || attachment.fileName || '');
+
+    const getImageUrl = () => {
+      if (!attachment.url) return '';
+      if (attachment.url.startsWith('http')) return attachment.url;
+      const path = attachment.url.startsWith('/') ? attachment.url : `/${attachment.url}`;
+      return `${baseUrl}${path}`;
+    };
+
+    if (isImage && attachment.url) {
+      const imgUrl = getImageUrl();
+      return (
+        <div className="mb-2 max-w-xs">
+          <div 
+            onClick={handlePreview}
+            className="relative overflow-hidden rounded-lg border border-black/10 bg-black/5 cursor-pointer group shadow-xs"
+          >
+            <img
+              src={imgUrl}
+              alt={attachment.name || 'Chat photo'}
+              className="w-full max-h-56 object-cover hover:scale-105 transition-transform duration-200"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <span className="p-1.5 bg-black/60 text-white rounded-full">
+                <Eye className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+          <div className={`flex items-center justify-between text-[11px] mt-1 px-1 ${isOwnMessage ? 'text-blue-100' : 'text-gray-600'}`}>
+            <span className="truncate max-w-40 font-medium">{attachment.name || 'Photo'}</span>
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className={`p-1 rounded hover:bg-black/10 transition-colors cursor-pointer ${isOwnMessage ? 'text-white' : 'text-gray-700'}`}
+              title="Download photo"
+            >
+              {isDownloading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-3 h-3 border border-current border-t-transparent rounded-full"
+                />
+              ) : (
+                <Download className="w-3 h-3" />
+              )}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        className={`flex items-center gap-2 p-2 rounded-lg transition-colors mb-1 ${isOwnMessage
+          ? 'bg-blue-400'
+          : 'bg-gray-200'
+          }`}
+      >
+        <span className="text-sm">{getIcon(attachment)}</span>
+        <div className="flex-1 min-w-0">
+          <p className={`text-xs font-medium truncate max-w-40 ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
+            {attachment.name}
+          </p>
+          <p className={`text-[10px] ${isOwnMessage ? 'text-blue-100' : 'text-gray-600'}`}>
+            {attachment.size}
+          </p>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={handlePreview}
+            className={`p-1 rounded transition-colors ${isOwnMessage
               ? 'text-white hover:text-blue-100'
               : 'text-gray-600 hover:text-gray-800 cursor-pointer '
-            }`}
-          title={isDownloading ? 'Downloading...' : 'Download'}
-        >
-          {isDownloading ? (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="w-3 h-3 border border-current border-t-transparent rounded-full"
-            />
-          ) : (
-            <Download className="w-3 h-3" />
-          )}
-        </button>
-      </div>
-    </motion.div>
-  );
-};
+              }`}
+            title="Preview"
+          >
+            <Eye className="w-3 h-3" />
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className={`p-1 rounded transition-colors ${isDownloading
+              ? 'opacity-50 cursor-not-allowed'
+              : isOwnMessage
+                ? 'text-white hover:text-blue-100'
+                : 'text-gray-600 hover:text-gray-800 cursor-pointer '
+              }`}
+            title={isDownloading ? 'Downloading...' : 'Download'}
+          >
+            {isDownloading ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-3 h-3 border border-current border-t-transparent rounded-full"
+              />
+            ) : (
+              <Download className="w-3 h-3" />
+            )}
+          </button>
+        </div>
+      </motion.div>
+    );
+  };
 
 export const ChatMessage = ({
   id,
@@ -666,12 +724,26 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
   const handleMediaCapture = async (file, mediaType) => {
     try {
+      const fileName = file.name || `Live_Photo_${Date.now()}.jpg`;
+      const fileType = file.type || 'image/jpeg';
+      let safeFile = file;
+      if (!(file instanceof File)) {
+        safeFile = new File([file], fileName, { type: fileType });
+      }
+
       // Compress image before adding to attachments to ensure fast delivery
-      const compressed = await compressImage(file, { quality: 0.8, maxWidth: 1600, maxHeight: 1600 });
-      setAttachments(prev => [...prev, compressed]);
+      const compressed = await compressImage(safeFile, { quality: 0.8, maxWidth: 1600, maxHeight: 1600 });
+      const finalFile = (compressed instanceof File && compressed.name)
+        ? compressed
+        : new File([compressed], safeFile.name, { type: 'image/jpeg' });
+
+      setAttachments(prev => [...prev, finalFile]);
     } catch (err) {
       console.warn('Image compression fallback:', err);
-      setAttachments(prev => [...prev, file]);
+      const fallbackFile = (file instanceof File && file.name)
+        ? file
+        : new File([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+      setAttachments(prev => [...prev, fallbackFile]);
     }
     setShowMediaCapture(false);
   };
@@ -895,6 +967,8 @@ export const ChatWindow = ({
     scrollToBottom();
   }, [messages]);
 
+  const markingIdsRef = useRef(new Set());
+
   // Auto-mark messages as seen when they become visible (skip for archived/closed tickets)
   useEffect(() => {
     // Skip marking messages for archived or closed tickets
@@ -903,6 +977,7 @@ export const ChatWindow = ({
 
     const unreadMessages = messages.filter(message =>
       message.senderId !== currentUserId && // Don't mark own messages
+      !markingIdsRef.current.has(message.id) &&
       !message.seenBy?.some(seen => seen.userId === currentUserId) // Not already seen
     );
 
@@ -910,8 +985,12 @@ export const ChatWindow = ({
       // Mark all unread messages as seen after a short delay to ensure they're visible
       const timeoutId = setTimeout(() => {
         const messageIds = unreadMessages.map(msg => msg.id);
-        onMarkMessagesAsSeen(messageIds).catch(console.error);
-      }, 1000); // 1 second delay
+        messageIds.forEach(id => markingIdsRef.current.add(id));
+        onMarkMessagesAsSeen(messageIds).catch(err => {
+          console.warn("Failed to mark messages as seen:", err);
+          messageIds.forEach(id => markingIdsRef.current.delete(id));
+        });
+      }, 1000);
 
       return () => clearTimeout(timeoutId);
     }

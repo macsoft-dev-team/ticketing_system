@@ -114,11 +114,12 @@ const getConversations = async (ticketId) => {
 
 const createConversation = async (conversation, userId, io, files = []) => {
   const { ticketId, message } = conversation;
+  const safeMessage = typeof message === 'string' ? message : '';
   try {
     const newMessage = await prisma.message.create({
       data: {
         ticketId: ticketId,
-        content: message,
+        content: safeMessage,
         senderId: userId,
       },
       include: {
@@ -181,12 +182,16 @@ const createConversation = async (conversation, userId, io, files = []) => {
       Object.assign(newMessage, messageWithAttachments);
     }
     // Create notification using the standardized utility
+    const notifSnippet = safeMessage
+      ? (safeMessage.length > 100 ? `${safeMessage.substring(0, 100)}...` : safeMessage)
+      : (files.length > 0 ? `${files.length} photo(s) attached` : 'New message');
+
     const notificationData = createNotification(
       NOTIFICATION_TYPES.MESSAGE_RECEIVED,
       `New message in ticket #${newMessage.ticket?.ticketCode}`,
       `New message from ${newMessage.sender?.name} in ticket #${
         newMessage.ticket?.ticketCode
-      }: "${message.substring(0, 100)}${message.length > 100 ? "..." : ""}"`,
+      }: "${notifSnippet}"`,
       {
         ticketId: ticketId,
         messageId: newMessage.id,
@@ -447,12 +452,29 @@ const markMessagesAsSeen = async (
       totalMessages: messages.length,
     };
   } catch (error) {
-    // Handle write conflict/deadlock errors (P2034) with retry logic
-    if (error.code === "P2034" && retryCount < MAX_RETRIES) {
+    const isLockTimeoutOrConflict =
+      error.code === "P2034" ||
+      error.message?.includes("1205") ||
+      error.message?.includes("Lock wait timeout") ||
+      error.message?.includes("1213") ||
+      error.message?.includes("Deadlock");
+
+    // Handle write conflict/deadlock/lock timeout errors with retry logic
+    if (isLockTimeoutOrConflict && retryCount < MAX_RETRIES) {
       // Exponential backoff: wait longer with each retry
-      const delay = RETRY_DELAY_MS * Math.pow(2, retryCount);
+      const delay = RETRY_DELAY_MS * Math.pow(2, retryCount) + Math.floor(Math.random() * 50);
       await new Promise((resolve) => setTimeout(resolve, delay));
       return markMessagesAsSeen(ticketId, userId, messageIds, retryCount + 1);
+    }
+
+    // If lock timeout persists after retries, return gracefully without crashing client or throwing 500
+    if (isLockTimeoutOrConflict) {
+      console.warn("markMessagesAsSeen lock conflict resolved by skipping:", error.message);
+      return {
+        success: true,
+        markedCount: 0,
+        skipped: true,
+      };
     }
 
     throw error;

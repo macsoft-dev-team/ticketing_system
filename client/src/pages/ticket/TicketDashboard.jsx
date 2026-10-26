@@ -342,12 +342,11 @@ export default function TicketDashboard() {
     getUnreadCount,
   } = useConversation(ticketId);
 
-  // Wrapper function to mark messages as seen and refresh ticket data
+  // Wrapper function to mark messages as seen
   const markMessagesAsSeen = useCallback(async (messageIds) => {
     try {
       // Skip if ticket is closed or archived
       if (ticketData?.status === 'closed' || ticketData?.isArchived) {
-        console.log('Skipping mark as seen for closed/archived ticket');
         return;
       }
 
@@ -356,17 +355,12 @@ export default function TicketDashboard() {
         return;
       }
 
-      // Mark messages as seen
-      const result = await originalMarkMessagesAsSeen(messageIds);
-
-      // Only refresh ticket data if messages were actually marked as seen
-      if (result && result.markedCount > 0) {
-        await fetchTicketById(ticketId);
-      }
+      // Mark messages as seen (no need to refetch full ticket details)
+      await originalMarkMessagesAsSeen(messageIds);
     } catch (error) {
-      console.error('Error marking messages as seen:', error);
+      console.warn('Error marking messages as seen:', error);
     }
-  }, [originalMarkMessagesAsSeen, fetchTicketById, ticketId, ticketData?.status, ticketData?.isArchived]);
+  }, [originalMarkMessagesAsSeen, ticketData?.status, ticketData?.isArchived]);
 
   // Set current ticket ID for socket context (prevents sounds/toasts when user is in this ticket)
   useEffect(() => {
@@ -432,6 +426,10 @@ export default function TicketDashboard() {
 
       await sendConversationMessage(message, attachments);
       setAutoCloseTimer(null);
+      // Immediately refresh ticket data so any uploaded photos appear in the Ticket Attachments list
+      if (attachments && attachments.length > 0) {
+        await fetchTicketById(ticketId);
+      }
     } catch (error) {
       addToast({
         title: 'Failed to send message',
@@ -441,7 +439,7 @@ export default function TicketDashboard() {
         duration: 7000
       });
     }
-  }, [sendConversationMessage, addToast, ticketId, user, token, ticketData?.status, ticketData?.isArchived]);
+  }, [sendConversationMessage, addToast, ticketId, fetchTicketById, user, token, ticketData?.status, ticketData?.isArchived]);
 
   const handleSpareRequestSubmit = useCallback(async (formData) => {
     try {

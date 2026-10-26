@@ -55,6 +55,8 @@ const MediaCapture = ({
   const analyserRef = useRef(null);
   const recordingTimerRef = useRef(null);
   const audioPreviewRef = useRef(null);
+  const streamRef = useRef(null);
+  const deviceCameraInputRef = useRef(null);
 
   // Manage object URL for preview cleanly
   useEffect(() => {
@@ -68,6 +70,11 @@ const MediaCapture = ({
       setPreviewUrl(null);
     }
   }, [recordedBlob]);
+
+  // Keep streamRef updated
+  useEffect(() => {
+    streamRef.current = stream;
+  }, [stream]);
 
   // Get supported media types based on current browser
   const getSupportedMimeType = useCallback((mediaType) => {
@@ -105,24 +112,26 @@ const MediaCapture = ({
     }
   }, [currentMode]);
 
-  // Initialize media stream
+  // Initialize media stream with mobile-safe constraints
   const initializeStream = useCallback(async () => {
     try {
       setError(null);
       
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
       }
 
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Camera is not supported on this device or requires a secure connection (HTTPS).');
       }
 
+      // Safe constraints for both mobile and desktop (avoids restrictive max width/height that fails on mobile portrait)
       const constraints = {
         video: currentMode === 'audio' ? false : {
-          facingMode: facingMode,
-          width: { ideal: 1280, max: 1920 },
-          height: { ideal: 720, max: 1080 }
+          facingMode: { ideal: facingMode },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
         },
         audio: currentMode !== 'photo'
       };
@@ -131,22 +140,27 @@ const MediaCapture = ({
       try {
         newStream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (constraintErr) {
+        console.warn('Initial camera constraints failed, attempting fallback:', constraintErr);
         // Fallback for devices without back camera or strict constraint support
         if (currentMode !== 'audio') {
-          newStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: currentMode !== 'photo'
-          });
+          try {
+            newStream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: facingMode },
+              audio: currentMode !== 'photo'
+            });
+          } catch (err2) {
+            newStream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: currentMode !== 'photo'
+            });
+          }
         } else {
           throw constraintErr;
         }
       }
 
+      streamRef.current = newStream;
       setStream(newStream);
-
-      if (videoRef.current && newStream.getVideoTracks().length > 0) {
-        videoRef.current.srcObject = newStream;
-      }
 
       // Set up audio level monitoring for audio/video modes
       if (currentMode !== 'photo' && newStream.getAudioTracks().length > 0) {
@@ -159,44 +173,61 @@ const MediaCapture = ({
         
         audioContextRef.current = audioContext;
         analyserRef.current = analyser;
-        
-        // Monitor audio levels
-        const monitorAudio = () => {
-          if (analyserRef.current && mediaState === 'recording') {
-            const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-            analyserRef.current.getByteFrequencyData(dataArray);
-            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-            setAudioLevel(average / 255);
-            requestAnimationFrame(monitorAudio);
-          }
-        };
-        
-        if (mediaState === 'recording') {
-          monitorAudio();
-        }
       }
       
     } catch (error) {
       console.error('Error accessing media devices:', error);
       setError(getErrorMessage(error));
     }
-  }, [currentMode, facingMode, stream, mediaState]);
+  }, [currentMode, facingMode]);
+
+  // Connect stream to video element and ensure autoplay on mobile
+  useEffect(() => {
+    if (videoRef.current && stream && currentMode !== 'audio' && !isPreviewMode) {
+      const video = videoRef.current;
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.warn('Video auto-play prevented or stream ended:', err);
+        });
+      }
+    }
+  }, [stream, currentMode, isPreviewMode]);
 
   // Get user-friendly error message
   const getErrorMessage = (error) => {
     if (error.name === 'NotAllowedError') {
-      return 'Camera/microphone access denied. Please enable permissions and try again.';
+      return 'Camera access was denied. Please enable camera permission in your browser settings, or tap below to open the device camera app.';
     } else if (error.name === 'NotFoundError') {
-      return 'Camera or microphone not found.';
+      return 'No camera or microphone found on this device.';
     } else if (error.name === 'NotReadableError') {
-      return 'Camera or microphone is being used by another application.';
+      return 'Camera is being used by another application or blocked by system.';
     } else if (error.name === 'OverconstrainedError') {
-      return 'Camera configuration not supported.';
+      return 'Camera configuration not supported by this device.';
     }
-    return `Media error: ${error.message}`;
+    return `Camera error: ${error.message || 'Unable to open camera.'}`;
   };
 
-  // Capture photo
+  // Fallback to native device camera app (works on all mobile devices even if WebRTC fails)
+  const handleDeviceCameraCapture = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+
+    onCapture(file, 'photo');
+    onClose();
+  };
+
+  // Capture photo frame from stream
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -204,8 +235,24 @@ const MediaCapture = ({
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
-    const width = video.videoWidth || 1280;
-    const height = video.videoHeight || 720;
+    let width = video.videoWidth || 1280;
+    let height = video.videoHeight || 720;
+
+    // Scale down if extremely large to prevent mobile memory crashes
+    const maxWidth = 1920;
+    const maxHeight = 1920;
+    if (width > height) {
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+    } else {
+      if (height > maxHeight) {
+        width = Math.round((width * maxHeight) / height);
+        height = maxHeight;
+      }
+    }
+
     canvas.width = width;
     canvas.height = height;
     
@@ -218,7 +265,10 @@ const MediaCapture = ({
     context.drawImage(video, 0, 0, width, height);
     
     canvas.toBlob((blob) => {
-      if (!blob) return;
+      if (!blob) {
+        setError('Failed to capture photo frame. Please try again or use the device camera.');
+        return;
+      }
       setRecordedBlob(blob);
       setMediaState('recorded');
       setIsPreviewMode(true);
@@ -485,16 +535,26 @@ const MediaCapture = ({
               </div>
               <h4 className="text-white font-semibold mb-1">Camera Access Issue</h4>
               <p className="text-gray-300 text-xs sm:text-sm mb-5 leading-relaxed">{error}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setError(null);
-                  initializeStream();
-                }}
-                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors shadow-md cursor-pointer"
-              >
-                Try Again
-              </button>
+              <div className="flex flex-col gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError(null);
+                    initializeStream();
+                  }}
+                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors shadow-md cursor-pointer"
+                >
+                  Try Live Camera Again
+                </button>
+                <button
+                  type="button"
+                  onClick={() => deviceCameraInputRef.current?.click()}
+                  className="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium border border-gray-600 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Camera className="w-4 h-4 text-blue-400" />
+                  <span>Open Device Camera App</span>
+                </button>
+              </div>
             </div>
           ) : currentMode === 'audio' ? (
             <div className="text-center p-8">
@@ -533,7 +593,13 @@ const MediaCapture = ({
                 ref={videoRef}
                 autoPlay
                 playsInline
-                muted={mediaState !== 'playing'}
+                muted
+                onLoadedMetadata={() => {
+                  if (videoRef.current) {
+                    videoRef.current.muted = true;
+                    videoRef.current.play().catch(() => {});
+                  }
+                }}
                 className="w-full h-full object-cover"
                 style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
               />
@@ -578,6 +644,16 @@ const MediaCapture = ({
           
           {/* Hidden canvas for photo capture */}
           <canvas ref={canvasRef} className="hidden" />
+
+          {/* Hidden native device camera input for fallback */}
+          <input
+            ref={deviceCameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={handleDeviceCameraCapture}
+          />
         </div>
 
         {/* Bottom Controls */}

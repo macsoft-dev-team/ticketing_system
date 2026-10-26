@@ -125,6 +125,39 @@ export const useConversation = (ticketId) => {
     }
   }, [ticketId, token, formatMessage, getDeletedForMeIds]);
 
+  // Handle incoming real-time messages
+  const handleNewMessage = useCallback(
+    (newMessage) => {
+      try {
+        const deletedIds = getDeletedForMeIds();
+        if (deletedIds.includes(newMessage.id)) {
+          return;
+        }
+
+        const formattedMessage = formatMessage(newMessage);
+
+        setMessages((prevMessages) => {
+          // Check if message already exists (avoid duplicates)
+          const exists = prevMessages.some(
+            (msg) => msg.id === formattedMessage.id
+          );
+          if (exists) {
+            return prevMessages;
+          }
+
+          // Add new message and sort by timestamp
+          const updatedMessages = [...prevMessages, formattedMessage];
+          return updatedMessages.sort(
+            (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+          );
+        });
+      } catch (error) {
+        console.error("Error handling new message:", error);
+      }
+    },
+    [formatMessage, getDeletedForMeIds]
+  );
+
   // Send message
   const sendMessage = useCallback(
     async (messageContent, attachments = []) => {
@@ -178,13 +211,17 @@ export const useConversation = (ticketId) => {
           throw new Error(errorMessage);
         }
 
-        await response.json();
+        const savedMessage = await response.json();
+        if (savedMessage && savedMessage.id) {
+          handleNewMessage(savedMessage);
+        }
+        return savedMessage;
       } catch (err) {
         setError(err.message);
         throw err;
       }
     },
-    [ticketId, token]
+    [ticketId, token, handleNewMessage]
   );
 
   // Edit message
@@ -288,38 +325,7 @@ export const useConversation = (ticketId) => {
     [user?.id, getDeletedForMeIds]
   );
 
-  // Handle incoming real-time messages
-  const handleNewMessage = useCallback(
-    (newMessage) => {
-      try {
-        const deletedIds = getDeletedForMeIds();
-        if (deletedIds.includes(newMessage.id)) {
-          return;
-        }
 
-        const formattedMessage = formatMessage(newMessage);
-
-        setMessages((prevMessages) => {
-          // Check if message already exists (avoid duplicates)
-          const exists = prevMessages.some(
-            (msg) => msg.id === formattedMessage.id
-          );
-          if (exists) {
-            return prevMessages;
-          }
-
-          // Add new message and sort by timestamp
-          const updatedMessages = [...prevMessages, formattedMessage];
-          return updatedMessages.sort(
-            (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
-          );
-        });
-      } catch (error) {
-        console.error("Error handling new message:", error);
-      }
-    },
-    [formatMessage, getDeletedForMeIds]
-  );
 
   // Set up conversation listeners using SocketContext
   useEffect(() => {
