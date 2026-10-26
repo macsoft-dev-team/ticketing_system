@@ -49,6 +49,7 @@ const autoCloseTickets = async () => {
       },
       include: {
         messages: {
+          take: 1, // Only fetch the single latest message
           include: {
             sender: {
               select: {
@@ -71,11 +72,10 @@ const autoCloseTickets = async () => {
       }
     });
 
-     
     let closedCount = 0;
     
     for (const ticket of candidateTickets) {
-      if (ticket.messages.length === 0) continue;
+      if (!ticket.messages || ticket.messages.length === 0) continue;
       
       // Get the last message
       const lastMessage = ticket.messages[0];
@@ -95,15 +95,6 @@ const autoCloseTickets = async () => {
       // For logging, show ticket creation time and last message time in IST
       const ticketCreatedIST = new Date(ticket.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
       const messageTimeIST = new Date(lastMessage.createdAt.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
-      
-       
-      // Check if there are any customer messages after the last Macsoft message
-      const hasCustomerResponseAfterMacsoft = ticket.messages.some(message => {
-        return CUSTOMER_ROLES.includes(message.sender.role) && 
-               message.createdAt > lastMessage.createdAt;
-      });
-      
-      if (hasCustomerResponseAfterMacsoft) continue;
       
       // Check if there are any pending spare requests for this ticket
       const pendingSpareRequests = await prisma.spareRequest.findMany({

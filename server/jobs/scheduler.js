@@ -46,9 +46,9 @@ class JobScheduler {
     this.jobs.set("autoCloseTickets", autoCloseJob);
     autoCloseJob.start();
 
-    // Schedule buzzer alerts job to run every 30 seconds
+    // Schedule buzzer alerts job to run every 1 minute (sufficient for alerts measuring hours/minutes of waiting)
     const buzzerAlertsJob = cron.schedule(
-      "*/30 * * * * *",
+      "0 */1 * * * *",
       async () => {
          try {
           await checkPendingCustomerMessages(io);

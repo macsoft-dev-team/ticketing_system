@@ -3,6 +3,8 @@ module.exports = {
     {
       name: "TICKETING SYSTEM API",
       script: "bin/www",
+      max_memory_restart: "380M",
+      node_args: "--max-old-space-size=350",
       env: {
         NODE_ENV: "development",
         JWT_SECRET: "whatasecretforyou",

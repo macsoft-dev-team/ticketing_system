@@ -180,6 +180,7 @@ const checkPendingCustomerMessages = async (io = null) => {
       },
       include: {
         messages: {
+          take: 1, // Only fetch the single latest message instead of all messages
           include: {
             sender: {
               select: {
@@ -215,11 +216,10 @@ const checkPendingCustomerMessages = async (io = null) => {
       },
     });
 
-     
     const pendingTickets = [];
     
     for (const ticket of candidateTickets) {
-      if (ticket.messages.length === 0) continue;
+      if (!ticket.messages || ticket.messages.length === 0) continue;
       
       // Exclude tickets with CLOSED or RESOLVED status (safety check)
       if (ticket.status === 'CLOSED' || ticket.status === 'RESOLVED') continue;
@@ -244,19 +244,8 @@ const checkPendingCustomerMessages = async (io = null) => {
       const isWithinTimeWindow = lastMessage.createdAt < minTimeAgo && lastMessage.createdAt >= maxTimeAgo;
       
       if (!isWithinTimeWindow) {
-        if (lastMessage.createdAt >= minTimeAgo) {
-         } else if (lastMessage.createdAt < maxTimeAgo) {
-         }
         continue;
       }
-      
-      // Check if there are any Macsoft messages after the last customer message
-      const hasMacsoftResponseAfterCustomer = ticket.messages.some(message => {
-        return MACSOFT_ROLES.includes(message.sender.role) && 
-               message.createdAt > lastMessage.createdAt;
-      });
-      
-      if (hasMacsoftResponseAfterCustomer) continue;
       
       // This ticket qualifies for buzzer alert
       const secondsSince = Math.round((now - lastMessage.createdAt) / 1000);
@@ -268,27 +257,31 @@ const checkPendingCustomerMessages = async (io = null) => {
         secondsSinceLastMessage: secondsSince,
         hoursSinceLastMessage: hoursSince
       });
-      
-     }
+    }
     
-     
-    // Clear isBuzzerOn for all OPEN/IN_PROGRESS tickets first
+    // Efficient delta update: only update tickets whose buzzer state actually changed
+    const pendingTicketIds = pendingTickets.map(pt => pt.ticket.id);
+
+    // Turn off buzzer only for tickets that currently have it on and are no longer pending
     await prisma.ticket.updateMany({
       where: { 
         status: { in: ['OPEN', 'IN_PROGRESS'] },
-        isBuzzerOn: true
+        isBuzzerOn: true,
+        ...(pendingTicketIds.length > 0 ? { id: { notIn: pendingTicketIds } } : {})
       },
       data: { isBuzzerOn: false }
     });
     
-    // Mark tickets with isBuzzerOn = true (only those currently in time window)
-    if (pendingTickets.length > 0) {
-      const ticketIds = pendingTickets.map(pt => pt.ticket.id);
+    // Turn on buzzer only for pending tickets that do not have it on yet
+    if (pendingTicketIds.length > 0) {
       await prisma.ticket.updateMany({
-        where: { id: { in: ticketIds } },
+        where: { 
+          id: { in: pendingTicketIds },
+          isBuzzerOn: false
+        },
         data: { isBuzzerOn: true }
       });
-     }
+    }
     
     // Trigger buzzer alerts if we have pending tickets and io is available
     if (pendingTickets.length > 0 && io) {
