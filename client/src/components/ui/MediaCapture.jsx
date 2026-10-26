@@ -23,6 +23,8 @@ const MediaCapture = ({
   onCapture, 
   onClose, 
   disabled = false,
+  allowedModes = ['photo', 'video', 'audio'],
+  initialMode = 'photo',
   maxVideoDuration = 120, // 2 minutes in seconds
   maxAudioDuration = 300, // 5 minutes in seconds
   supportedFormats = {
@@ -31,10 +33,13 @@ const MediaCapture = ({
     audio: ['audio/mp3', 'audio/wav', 'audio/ogg', 'audio/webm']
   }
 }) => {
-  const [currentMode, setCurrentMode] = useState('photo'); // 'photo', 'video', 'audio'
+  const [currentMode, setCurrentMode] = useState(
+    allowedModes.includes(initialMode) ? initialMode : (allowedModes[0] || 'photo')
+  );
   const [mediaState, setMediaState] = useState('idle'); // 'idle', 'recording', 'recorded', 'playing'
   const [stream, setStream] = useState(null);
   const [recordedBlob, setRecordedBlob] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [audioLevel, setAudioLevel] = useState(0);
   const [facingMode, setFacingMode] = useState('environment'); // 'user' or 'environment'
@@ -50,6 +55,19 @@ const MediaCapture = ({
   const analyserRef = useRef(null);
   const recordingTimerRef = useRef(null);
   const audioPreviewRef = useRef(null);
+
+  // Manage object URL for preview cleanly
+  useEffect(() => {
+    if (recordedBlob) {
+      const url = URL.createObjectURL(recordedBlob);
+      setPreviewUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [recordedBlob]);
 
   // Get supported media types based on current browser
   const getSupportedMimeType = useCallback((mediaType) => {
@@ -68,22 +86,24 @@ const MediaCapture = ({
     return types[0];
   }, [supportedFormats]);
 
-  // Check permissions
+  // Check permissions (only request microphone if in video or audio mode)
   const checkPermissions = useCallback(async () => {
     try {
-      const cameraResult = await navigator.permissions.query({ name: 'camera' });
-      const microphoneResult = await navigator.permissions.query({ name: 'microphone' });
-      
-      setCameraPermission(cameraResult.state);
-      setMicrophonePermission(microphoneResult.state);
+      if (navigator.permissions?.query) {
+        const cameraResult = await navigator.permissions.query({ name: 'camera' });
+        setCameraPermission(cameraResult.state);
+        cameraResult.onchange = () => setCameraPermission(cameraResult.state);
 
-      // Listen for permission changes
-      cameraResult.onchange = () => setCameraPermission(cameraResult.state);
-      microphoneResult.onchange = () => setMicrophonePermission(microphoneResult.state);
+        if (currentMode !== 'photo') {
+          const microphoneResult = await navigator.permissions.query({ name: 'microphone' });
+          setMicrophonePermission(microphoneResult.state);
+          microphoneResult.onchange = () => setMicrophonePermission(microphoneResult.state);
+        }
+      }
     } catch (error) {
       console.warn('Permission API not supported:', error);
     }
-  }, []);
+  }, [currentMode]);
 
   // Initialize media stream
   const initializeStream = useCallback(async () => {
@@ -92,6 +112,10 @@ const MediaCapture = ({
       
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera is not supported on this device or requires a secure connection (HTTPS).');
       }
 
       const constraints = {
@@ -103,7 +127,21 @@ const MediaCapture = ({
         audio: currentMode !== 'photo'
       };
 
-      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+      let newStream;
+      try {
+        newStream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (constraintErr) {
+        // Fallback for devices without back camera or strict constraint support
+        if (currentMode !== 'audio') {
+          newStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: currentMode !== 'photo'
+          });
+        } else {
+          throw constraintErr;
+        }
+      }
+
       setStream(newStream);
 
       if (videoRef.current && newStream.getVideoTracks().length > 0) {
@@ -166,17 +204,26 @@ const MediaCapture = ({
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+    canvas.width = width;
+    canvas.height = height;
     
-    context.drawImage(video, 0, 0);
+    // When front camera (user facing) is active, flip horizontally to match video viewfinder
+    if (facingMode === 'user') {
+      context.translate(width, 0);
+      context.scale(-1, 1);
+    }
+
+    context.drawImage(video, 0, 0, width, height);
     
     canvas.toBlob((blob) => {
+      if (!blob) return;
       setRecordedBlob(blob);
       setMediaState('recorded');
       setIsPreviewMode(true);
-    }, 'image/jpeg', 0.9);
-  }, []);
+    }, 'image/jpeg', 0.88);
+  }, [facingMode]);
 
   // Start recording (video or audio)
   const startRecording = useCallback(async () => {
@@ -335,16 +382,27 @@ const MediaCapture = ({
 
     const file = new File(
       [recordedBlob], 
-      `${currentMode}-${Date.now()}.${currentMode === 'photo' ? 'jpg' : currentMode === 'video' ? 'mp4' : 'webm'}`,
+      `Live_Photo_${Date.now()}.${currentMode === 'photo' ? 'jpg' : currentMode === 'video' ? 'mp4' : 'webm'}`,
       { 
-        type: recordedBlob.type,
+        type: recordedBlob.type || 'image/jpeg',
         lastModified: Date.now()
       }
     );
 
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+
     onCapture(file, currentMode);
     onClose();
-  }, [recordedBlob, currentMode, onCapture, onClose]);
+  }, [recordedBlob, currentMode, onCapture, onClose, stream]);
+
+  const handleClose = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    onClose();
+  }, [stream, onClose]);
 
   // Cleanup on unmount or mode change
   useEffect(() => {
@@ -358,11 +416,8 @@ const MediaCapture = ({
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
-      if (recordedBlob) {
-        URL.revokeObjectURL(recordedBlob);
-      }
     };
-  }, [stream, recordedBlob]);
+  }, [stream]);
 
   // Initialize when component mounts or mode changes
   useEffect(() => {
@@ -374,19 +429,29 @@ const MediaCapture = ({
   const isSmallScreen = window.innerWidth < 768;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black">
+    <div className="fixed inset-0 z-50 bg-black flex flex-col">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4">
-        <div className="flex items-center justify-between text-white">
+      <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent p-3 sm:p-4">
+        <div className="flex items-center justify-between text-white max-w-4xl mx-auto">
           <button
-            onClick={onClose}
-            className="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-colors"
+            type="button"
+            onClick={handleClose}
+            className="p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-colors cursor-pointer"
+            title="Close camera"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium capitalize">{currentMode} Mode</span>
+            <span className="text-sm sm:text-base font-semibold tracking-wide">
+              {allowedModes.length === 1 && allowedModes[0] === 'photo'
+                ? 'Live Camera'
+                : `${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)} Mode`}
+            </span>
+            <span className="px-2 py-0.5 text-[10px] sm:text-xs bg-emerald-500 text-white rounded-full font-medium flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              Live
+            </span>
             {recordingDuration > 0 && (
               <span className="text-red-400 font-mono text-sm">
                 {formatDuration(recordingDuration)}
@@ -394,13 +459,17 @@ const MediaCapture = ({
             )}
           </div>
 
-          {currentMode !== 'audio' && (
+          {currentMode !== 'audio' ? (
             <button
+              type="button"
               onClick={flipCamera}
-              className="p-2 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-colors"
+              className="p-2 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 transition-colors cursor-pointer"
+              title="Flip camera (front / back)"
             >
-              <RotateCcw className="w-6 h-6" />
+              <RotateCcw className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
+          ) : (
+            <div className="w-9" />
           )}
         </div>
       </div>
@@ -408,17 +477,21 @@ const MediaCapture = ({
       {/* Main Content */}
       <div className="flex flex-col h-full">
         {/* Media Display Area */}
-        <div className="flex-1 relative bg-black flex items-center justify-center">
+        <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden">
           {error ? (
-            <div className="text-center p-4">
-              <div className="text-red-400 text-lg mb-2">⚠️</div>
-              <p className="text-white text-sm max-w-xs">{error}</p>
+            <div className="text-center p-6 z-10 max-w-sm">
+              <div className="w-14 h-14 rounded-full bg-red-500/20 text-red-400 mx-auto flex items-center justify-center text-2xl mb-3">
+                ⚠️
+              </div>
+              <h4 className="text-white font-semibold mb-1">Camera Access Issue</h4>
+              <p className="text-gray-300 text-xs sm:text-sm mb-5 leading-relaxed">{error}</p>
               <button
+                type="button"
                 onClick={() => {
                   setError(null);
                   initializeStream();
                 }}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors"
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors shadow-md cursor-pointer"
               >
                 Try Again
               </button>
@@ -455,7 +528,7 @@ const MediaCapture = ({
               <audio ref={audioPreviewRef} className="hidden" controls={false} />
             </div>
           ) : (
-            <div className="relative w-full h-full">
+            <div className="relative w-full h-full flex items-center justify-center">
               <video
                 ref={videoRef}
                 autoPlay
@@ -465,22 +538,39 @@ const MediaCapture = ({
                 style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
               />
               
+              {/* Viewfinder framing guide for photo mode */}
+              {currentMode === 'photo' && !isPreviewMode && !error && (
+                <div className="absolute inset-8 sm:inset-16 pointer-events-none rounded-2xl border border-white/20">
+                  <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-white rounded-tl" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-white rounded-tr" />
+                  <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-white rounded-bl" />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-white rounded-br" />
+                  <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-white/90 text-[11px] font-medium flex items-center gap-1.5">
+                    <Camera className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Point device at subject and tap shutter</span>
+                  </div>
+                </div>
+              )}
+
               {/* Recording indicator */}
               {mediaState === 'recording' && (
-                <div className="absolute top-4 right-4 bg-red-500 rounded-full p-2 animate-pulse">
+                <div className="absolute top-16 right-4 bg-red-500 rounded-full p-2 animate-pulse">
                   <div className="w-3 h-3 bg-white rounded-full" />
                 </div>
               )}
               
-              {/* Preview overlay for photos */}
-              {currentMode === 'photo' && isPreviewMode && recordedBlob && (
-                <div className="absolute inset-0 bg-black flex items-center justify-center">
+              {/* Preview overlay for captured photos */}
+              {currentMode === 'photo' && isPreviewMode && previewUrl && (
+                <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
                   <img
-                    src={URL.createObjectURL(recordedBlob)}
-                    alt="Captured"
+                    src={previewUrl}
+                    alt="Captured Live Photo"
                     className="max-w-full max-h-full object-contain"
-                    style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
                   />
+                  <div className="absolute top-16 left-4 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs font-medium flex items-center gap-1.5 border border-white/20 shadow-md">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Photo captured live - Review & confirm</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -490,39 +580,46 @@ const MediaCapture = ({
           <canvas ref={canvasRef} className="hidden" />
         </div>
 
-        {/* Controls */}
-        <div className="bg-black/90 backdrop-blur-sm p-4 space-y-4">
-          {/* Mode Selection */}
-          <div className="flex justify-center gap-2 mb-4">
-            {['photo', 'video', 'audio'].map((mode) => (
-              <button
-                key={mode}
-                onClick={() => changeMode(mode)}
-                disabled={mediaState === 'recording'}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  currentMode === mode
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-white/20 text-white hover:bg-white/30'
-                } disabled:opacity-50`}
-              >
-                {mode === 'photo' && <Camera className="w-4 h-4 mr-2 inline" />}
-                {mode === 'video' && <Video className="w-4 h-4 mr-2 inline" />}
-                {mode === 'audio' && <Mic className="w-4 h-4 mr-2 inline" />}
-                {mode.charAt(0).toUpperCase() + mode.slice(1)}
-              </button>
-            ))}
-          </div>
+        {/* Bottom Controls */}
+        <div className="bg-black/95 backdrop-blur-md p-4 sm:p-5 space-y-3 z-20">
+          {/* Mode Selection - only shown when more than 1 mode is permitted */}
+          {allowedModes.length > 1 && (
+            <div className="flex justify-center gap-2 mb-2">
+              {allowedModes.map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => changeMode(mode)}
+                  disabled={mediaState === 'recording'}
+                  className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
+                    currentMode === mode
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white/15 text-white/80 hover:bg-white/25'
+                  } disabled:opacity-50`}
+                >
+                  {mode === 'photo' && <Camera className="w-3.5 h-3.5 mr-1.5 inline" />}
+                  {mode === 'video' && <Video className="w-3.5 h-3.5 mr-1.5 inline" />}
+                  {mode === 'audio' && <Mic className="w-3.5 h-3.5 mr-1.5 inline" />}
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex items-center justify-center gap-6">
             {mediaState === 'idle' ? (
               <button
+                type="button"
                 onClick={currentMode === 'photo' ? capturePhoto : startRecording}
                 disabled={disabled || !!error}
-                className="w-20 h-20 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-white flex items-center justify-center hover:bg-gray-100 active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ring-4 ring-white/30"
+                title="Capture live photo"
               >
                 {currentMode === 'photo' ? (
-                  <Camera className="w-8 h-8 text-gray-800" />
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-gray-900 flex items-center justify-center">
+                    <Camera className="w-7 h-7 sm:w-8 sm:h-8 text-gray-900" />
+                  </div>
                 ) : currentMode === 'video' ? (
                   <Video className="w-8 h-8 text-red-500" />
                 ) : (
@@ -531,42 +628,51 @@ const MediaCapture = ({
               </button>
             ) : mediaState === 'recording' ? (
               <button
+                type="button"
                 onClick={stopRecording}
-                className="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center hover:bg-red-600 transition-colors"
+                className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-red-500 flex items-center justify-center hover:bg-red-600 transition-colors shadow-xl ring-4 ring-red-400/30 cursor-pointer"
               >
                 <Square className="w-8 h-8 text-white fill-current" />
               </button>
             ) : mediaState === 'recorded' ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 sm:gap-6">
                 <button
+                  type="button"
                   onClick={resetCapture}
-                  className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center hover:bg-gray-700 transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-800 hover:bg-gray-700 text-white text-xs sm:text-sm font-medium transition-colors shadow-lg border border-gray-700 cursor-pointer"
+                  title="Retake photo"
                 >
-                  <Trash2 className="w-6 h-6 text-white" />
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                  <span>Retake</span>
                 </button>
                 
                 {currentMode !== 'photo' && (
                   <button
+                    type="button"
                     onClick={playRecording}
-                    className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                    className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg cursor-pointer"
                   >
-                    <Play className="w-8 h-8 text-white fill-current" />
+                    <Play className="w-6 h-6 text-white fill-current" />
                   </button>
                 )}
                 
                 <button
+                  type="button"
                   onClick={handleCapture}
-                  className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center hover:bg-green-600 transition-colors"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
+                  title="Attach live photo to message"
                 >
-                  <Check className="w-6 h-6 text-white" />
+                  <Check className="w-4 h-4" />
+                  <span>Use Photo</span>
                 </button>
               </div>
             ) : mediaState === 'playing' ? (
               <button
+                type="button"
                 onClick={pausePlayback}
-                className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors shadow-xl cursor-pointer"
               >
-                <Pause className="w-8 h-8 text-white fill-current" />
+                <Pause className="w-7 h-7 text-white fill-current" />
               </button>
             ) : null}
           </div>
@@ -574,9 +680,9 @@ const MediaCapture = ({
           {/* Additional Info */}
           {mediaState === 'idle' && (
             <div className="text-center">
-              <p className="text-white/70 text-sm">
+              <p className="text-white/70 text-xs sm:text-sm">
                 {currentMode === 'photo' 
-                  ? 'Tap to capture photo'
+                  ? 'Tap button to capture live photo'
                   : currentMode === 'video'
                   ? `Tap to start recording (max ${Math.floor(maxVideoDuration / 60)}min)`
                   : `Tap to start recording (max ${Math.floor(maxAudioDuration / 60)}min)`

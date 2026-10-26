@@ -8,6 +8,7 @@ import { useToast } from '../../lib/hooks/use-toast';
 import { useSoundManager } from '../../lib/hooks/SoundManager';
 import { useAuth } from '../../lib/hooks/useAuth';
 import moment from 'moment';
+import { compressImage } from '../../lib/utils/imageCompressor';
 
 const TicketClosedView = ({ onViewChat }) => {
   return (
@@ -556,8 +557,15 @@ export const ChatMessage = ({
 export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticketStatus = null, currentUserRole = null }) => {
   const { user } = useAuth();
   const effectiveRole = currentUserRole || user?.role;
-  const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(effectiveRole);
-  const isRestrictedRole = !isMacsoftRole;
+  const normalizedRole = (effectiveRole || '').toUpperCase();
+  const isMacsoftRole = ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(normalizedRole);
+  const isFieldOrTechnician = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(normalizedRole);
+
+  // File upload is restricted to Macsoft / Admin roles only.
+  // Field Engineers and Service Technicians must capture live photos (file upload disabled).
+  const canUploadFiles = isMacsoftRole;
+  const canCaptureLivePhoto = isFieldOrTechnician || isMacsoftRole;
+
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [showMediaCapture, setShowMediaCapture] = useState(false);
@@ -566,40 +574,8 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   const [maxVideoDuration, setMaxVideoDuration] = useState(120);
   const [maxAudioDuration, setMaxAudioDuration] = useState(300);
   const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
   const { toast } = useToast();
   const { play, muted } = useSoundManager();
-
-  const handleCameraCapture = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setAttachments(prev => [...prev, ...files]);
-    }
-    if (e.target) {
-      e.target.value = '';
-    }
-  };
-
-  // Load media upload configuration on component mount
-  /*   useEffect(() => {
-      const loadMediaConfig = async () => {
-        try {
-          const enabled = await isMediaUploadEnabled();
-          const videoDuration = await getMaxVideoDuration();
-          const audioDuration = await getMaxAudioDuration();
-          
-          setMediaUploadEnabled(enabled);
-          setMaxVideoDuration(videoDuration);
-          setMaxAudioDuration(audioDuration);
-        } catch (error) {
-          console.warn('Failed to load media config:', error);
-          // Fallback to environment variables
-          setMediaUploadEnabled(import.meta.env.VITE_ENABLE_MEDIA_UPLOAD === 'true');
-        }
-      };
-      
-      loadMediaConfig();
-    }, []); */
 
   const handleSend = () => {
     if (message.trim() || attachments.length > 0) {
@@ -620,6 +596,15 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   };
 
   const handleFileSelect = (e) => {
+    if (isFieldOrTechnician) {
+      toast({
+        title: "Upload Not Allowed",
+        description: "Field Engineers and Service Technicians must capture live photos using the device camera. File upload is disabled.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const files = Array.from(e.target.files);
 
     // Check if any files are media files when media upload is disabled
@@ -652,30 +637,47 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     setAttachments(prev => [...prev, ...files]);
   };
 
+  const handlePaste = (e) => {
+    if (isFieldOrTechnician && e.clipboardData?.files?.length > 0) {
+      e.preventDefault();
+      toast({
+        title: "Upload Not Allowed",
+        description: "Field Engineers and Service Technicians must capture live photos using the device camera. File upload and pasting files is disabled.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDrop = (e) => {
+    if (isFieldOrTechnician && e.dataTransfer?.files?.length > 0) {
+      e.preventDefault();
+      e.stopPropagation();
+      toast({
+        title: "Upload Not Allowed",
+        description: "Field Engineers and Service Technicians must capture live photos using the device camera. File upload is disabled.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const removeAttachment = (index) => {
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleMediaCapture = (file, mediaType) => {
-    // Add the captured media file to attachments
-    setAttachments(prev => [...prev, file]);
+  const handleMediaCapture = async (file, mediaType) => {
+    try {
+      // Compress image before adding to attachments to ensure fast delivery
+      const compressed = await compressImage(file, { quality: 0.8, maxWidth: 1600, maxHeight: 1600 });
+      setAttachments(prev => [...prev, compressed]);
+    } catch (err) {
+      console.warn('Image compression fallback:', err);
+      setAttachments(prev => [...prev, file]);
+    }
     setShowMediaCapture(false);
   };
 
   const handleMediaCaptureClose = () => {
     setShowMediaCapture(false);
-  };
-
-  const handleMediaCaptureAttempt = () => {
-    if (!mediaUploadEnabled) {
-      toast({
-        title: "Video/Voice Upload Not Enabled",
-        description: "Video and audio upload features are currently disabled. Please contact your administrator to enable this feature.",
-        variant: "destructive"
-      });
-      return;
-    }
-    setShowMediaCapture(true);
   };
 
   // Update mobile view on resize
@@ -689,7 +691,11 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   }, []);
 
   return (
-    <div className={`border-t py-5 pb-0 border-gray-200 p-2 sm:p-4  ${disabled ? 'bg-gray-200' : 'bg-white '}`}>
+    <div 
+      onDragOver={(e) => { if (isFieldOrTechnician) e.preventDefault(); }}
+      onDrop={handleDrop}
+      className={`border-t py-5 pb-0 border-gray-200 p-2 sm:p-4 ${disabled ? 'bg-gray-200' : 'bg-white'}`}
+    >
       {/* Attachments Preview */}
       <AnimatePresence>
         {attachments.length > 0 && (
@@ -700,23 +706,37 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             className="mb-2 sm:mb-3"
           >
             <div className="flex flex-wrap gap-2">
-              {attachments.map((file, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-2 bg-gray-100 cursor-pointer rounded-lg px-2 sm:px-3 py-1 sm:py-2 text-xs sm:text-sm"
-                >
-                  <File className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-gray-500" />
-                  <span className="truncate max-w-24 sm:max-w-32">{file.name}</span>
-                  <button
-                    onClick={() => removeAttachment(index)}
-                    className="text-red-500 hover:text-red-700 transition-colors"
+              {attachments.map((file, index) => {
+                const isImage = file.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(file.name);
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-2 bg-blue-50/70 border border-blue-200 text-blue-900 rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm shadow-xs"
                   >
-                    <X className="w-3 h-3 sm:w-[14px] sm:h-[14px]" />
-                  </button>
-                </motion.div>
-              ))}
+                    {isImage ? (
+                      <Camera className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-blue-600 flex-shrink-0" />
+                    ) : (
+                      <File className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+                    )}
+                    <span className="truncate max-w-28 sm:max-w-40 font-medium">{file.name}</span>
+                    {isImage && (
+                      <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-semibold uppercase">
+                        Live Photo
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeAttachment(index)}
+                      className="text-red-500 hover:text-red-700 transition-colors p-0.5 rounded hover:bg-red-50 ml-1 cursor-pointer"
+                      title="Remove photo"
+                    >
+                      <X className="w-3 h-3 sm:w-[14px] sm:h-[14px]" />
+                    </button>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -729,7 +749,12 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Type your message..."
+            onPaste={handlePaste}
+            placeholder={
+              isFieldOrTechnician
+                ? "Type a message or tap camera to capture live photo..."
+                : "Type your message..."
+            }
             disabled={disabled}
             className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base"
             rows={2}
@@ -738,8 +763,8 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          {/* File Upload (Paperclip): Only for Admin and Macsoft roles */}
-          {!isRestrictedRole && (
+          {/* File Upload (Paperclip): Only for Macsoft roles */}
+          {canUploadFiles && (
             <>
               <input
                 type="file"
@@ -764,37 +789,37 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
               >
                 <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
               </motion.button>
-
-              <input
-                type="file"
-                ref={cameraInputRef}
-                onChange={handleCameraCapture}
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-              />
-
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => cameraInputRef.current?.click()}
-                disabled={disabled}
-                className="p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed text-gray-500 hover:text-blue-500"
-                title="Take photo with device camera"
-              >
-                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
-              </motion.button>
             </>
           )}
 
+          {/* Live Photo Capture (Camera): For Service Technicians, Field Engineers, and Macsoft roles */}
+          {canCaptureLivePhoto && (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowMediaCapture(true)}
+              disabled={disabled}
+              className={`p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed ${
+                isFieldOrTechnician
+                  ? 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 shadow-xs'
+                  : 'text-gray-500 hover:text-blue-500'
+              }`}
+              title={isFieldOrTechnician ? "Capture live photo with device camera (Upload disabled)" : "Take live photo with camera"}
+            >
+              <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+            </motion.button>
+          )}
+
+          {/* Send Message Button */}
           <motion.button
             type="button"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={handleSend}
             disabled={disabled || (!message.trim() && attachments.length === 0)}
-            className="p-2 sm:p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
+            className="p-2 sm:p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer shadow-xs"
+            title="Send message"
           >
             <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
@@ -803,11 +828,13 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
       {/* Media Capture Modal */}
       <AnimatePresence>
-        {showMediaCapture && mediaUploadEnabled && (
+        {showMediaCapture && (
           <MediaCapture
             onCapture={handleMediaCapture}
             onClose={handleMediaCaptureClose}
             disabled={disabled}
+            allowedModes={isFieldOrTechnician ? ['photo'] : (mediaUploadEnabled ? ['photo', 'video', 'audio'] : ['photo'])}
+            initialMode="photo"
             maxVideoDuration={maxVideoDuration}
             maxAudioDuration={maxAudioDuration}
           />
