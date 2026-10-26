@@ -168,32 +168,19 @@ const checkPendingCustomerMessages = async (io = null) => {
     };
     
      
-    // Find open/in-progress tickets that have messages (exclude RESOLVED and CLOSED)
+    // Find open/in-progress tickets (exclude RESOLVED and CLOSED)
     const candidateTickets = await prisma.ticket.findMany({
       where: {
         status: {
           in: ["OPEN", "IN_PROGRESS"]
-        },
-        messages: {
-          some: {} // Has at least one message
         }
       },
-      include: {
-        messages: {
-          take: 1, // Only fetch the single latest message instead of all messages
-          include: {
-            sender: {
-              select: {
-                id: true,
-                role: true,
-                name: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
+      select: {
+        id: true,
+        ticketCode: true,
+        customerName: true,
+        status: true,
+        isBuzzerOn: true,
         createdByUser: {
           select: {
             id: true,
@@ -211,29 +198,68 @@ const checkPendingCustomerMessages = async (io = null) => {
             stage: {
               in: ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED']
             }
+          },
+          select: {
+            stage: true,
+            status: true
           }
         }
       },
     });
 
+    if (candidateTickets.length === 0) {
+      return { success: true, pendingCount: 0, tickets: [] };
+    }
+
+    const candidateTicketIds = candidateTickets.map(t => t.id);
+
+    // Fetch only messages created within or near the time window (using indexed query without disk temp table)
+    const recentMessages = await prisma.message.findMany({
+      where: {
+        ticketId: { in: candidateTicketIds },
+        createdAt: { gte: maxTimeAgo }
+      },
+      select: {
+        id: true,
+        ticketId: true,
+        createdAt: true,
+        sender: {
+          select: {
+            id: true,
+            role: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    // Map latest message per ticket in memory (O(1) lookup, zero temp disk files)
+    const latestMessageByTicket = new Map();
+    for (const msg of recentMessages) {
+      if (!latestMessageByTicket.has(msg.ticketId)) {
+        latestMessageByTicket.set(msg.ticketId, msg);
+      }
+    }
+
     const pendingTickets = [];
     
     for (const ticket of candidateTickets) {
-      if (!ticket.messages || ticket.messages.length === 0) continue;
+      const lastMessage = latestMessageByTicket.get(ticket.id);
+      if (!lastMessage) continue;
       
       // Exclude tickets with CLOSED or RESOLVED status (safety check)
       if (ticket.status === 'CLOSED' || ticket.status === 'RESOLVED') continue;
       
       // Exclude tickets that have completed any final milestone stages
       const hasFinalMilestone = ticket.ticketMilestones.some(milestone => 
-        milestone.stage === 'DONE' && 
+        milestone.status === 'DONE' && 
         ['REQUEST_CLEARED_AT_FIELD', 'DELIVERED_TO_FIELD', 'FIELD_CLEARANCE_APPROVED', 'TICKET_CLOSED'].includes(milestone.stage)
       );
       
       if (hasFinalMilestone) continue;
-      
-      // Get the last message
-      const lastMessage = ticket.messages[0];
       
       // Check if last message was from a customer user
       const isLastMessageFromCustomer = CUSTOMER_ROLES.includes(lastMessage.sender.role);
