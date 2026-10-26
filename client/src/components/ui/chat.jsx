@@ -763,7 +763,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleMediaCapture = async (file, mediaType, sendDirectly = false) => {
+  const handleMediaCapture = async (file, mediaType, sendDirectly = true) => {
     try {
       const fileName = file.name || `Live_Photo_${Date.now()}.jpg`;
       const fileType = file.type || 'image/jpeg';
@@ -772,17 +772,20 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         safeFile = new File([file], fileName, { type: fileType });
       }
 
-      // Aggressively compress image before adding to attachments to ensure fast delivery & small size (< 250 KB)
+      // Aggressively compress image before sending to ensure fast delivery & small size (< 250 KB)
       const compressed = await compressImage(safeFile, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
       const finalFile = (compressed instanceof File && compressed.name)
         ? compressed
         : new File([compressed], safeFile.name, { type: 'image/jpeg' });
 
-      if (sendDirectly) {
+      // Service Center Technicians and Field Engineers have file attachments disabled; photos are sent directly!
+      const shouldSendDirectly = sendDirectly || isFieldOrTechnician;
+
+      if (shouldSendDirectly) {
         if (!muted) {
           play('outbound_chime');
         }
-        await onSendMessage(message.trim(), [...attachments, finalFile]);
+        await onSendMessage(message.trim(), [finalFile]);
         setMessage('');
         setAttachments([]);
       } else {
@@ -794,11 +797,12 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         ? file
         : new File([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
 
-      if (sendDirectly) {
+      const shouldSendDirectly = sendDirectly || isFieldOrTechnician;
+      if (shouldSendDirectly) {
         if (!muted) {
           play('outbound_chime');
         }
-        await onSendMessage(message.trim(), [...attachments, fallbackFile]);
+        await onSendMessage(message.trim(), [fallbackFile]);
         setMessage('');
         setAttachments([]);
       } else {

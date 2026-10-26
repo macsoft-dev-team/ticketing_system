@@ -17,8 +17,7 @@ import {
   Upload,
   Eye,
   EyeOff,
-  Send,
-  Paperclip
+  Send
 } from 'lucide-react';
 import { compressImage } from '../../lib/utils/imageCompressor';
 
@@ -744,18 +743,8 @@ const MediaCapture = ({
                 
                 <button
                   type="button"
-                  onClick={() => handleCapture(false)}
-                  className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gray-700 hover:bg-gray-600 active:scale-95 text-white text-xs sm:text-sm font-medium transition-all shadow-md cursor-pointer border border-gray-600"
-                  title="Attach to message input"
-                >
-                  <Paperclip className="w-4 h-4 text-gray-300" />
-                  <span>Attach</span>
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => handleCapture(true)}
-                  className="flex items-center gap-2 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-lg cursor-pointer"
                   title="Send photo directly to chat"
                 >
                   <Send className="w-4 h-4" />
