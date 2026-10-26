@@ -79,8 +79,9 @@ export const compressImage = (file, options = {}) => {
             const cleanName = rawName.replace(/\.[^/.]+$/, "") + ".jpg";
 
             // Create a new File from the blob if the original was a File
-            const resultFile = file instanceof File 
-              ? new File([blob], cleanName, {
+            const isFile = typeof window !== 'undefined' && typeof window.File === 'function' && file instanceof window.File;
+            const resultFile = isFile 
+              ? new window.File([blob], cleanName, {
                   type: 'image/jpeg',
                   lastModified: Date.now(),
                 })

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Paperclip, X, File, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic, MoreVertical, Pencil, Trash2, Check, AlertTriangle, ImageOff } from 'lucide-react';
+import { Send, Paperclip, X, File as FileIcon, RefreshCw, Eye, CheckCircle, MessageCircle, Download, Camera, Video, Mic, MoreVertical, Pencil, Trash2, Check, AlertTriangle, ImageOff } from 'lucide-react';
 import DocumentModal from './DocumentModal';
 import MediaCapture from './MediaCapture';
 import { isMediaUploadEnabled, getMaxVideoDuration, getMaxAudioDuration } from '../../lib/mediaConfig';
@@ -765,18 +765,21 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
   const handleMediaCapture = async (file, mediaType, sendDirectly = false) => {
     try {
-      const fileName = file.name || `Live_Photo_${Date.now()}.jpg`;
-      const fileType = file.type || 'image/jpeg';
+      const fileName = file?.name || `Live_Photo_${Date.now()}.jpg`;
+      const fileType = file?.type || 'image/jpeg';
+      const FileConstructor = typeof window !== 'undefined' ? window.File : null;
       let safeFile = file;
-      if (!(file instanceof File)) {
-        safeFile = new File([file], fileName, { type: fileType });
+      if (typeof FileConstructor === 'function' && !(file instanceof FileConstructor)) {
+        safeFile = new FileConstructor([file], fileName, { type: fileType });
       }
 
       // Aggressively compress image before sending to ensure fast delivery & small size (< 250 KB)
       const compressed = await compressImage(safeFile, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
-      const finalFile = (compressed instanceof File && compressed.name)
+      const finalFile = (typeof FileConstructor === 'function' && compressed instanceof FileConstructor && compressed.name)
         ? compressed
-        : new File([compressed], safeFile.name, { type: 'image/jpeg' });
+        : (typeof FileConstructor === 'function'
+            ? new FileConstructor([compressed], safeFile?.name || fileName, { type: 'image/jpeg' })
+            : compressed);
 
       if (sendDirectly) {
         if (!muted) {
@@ -791,9 +794,12 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
       }
     } catch (err) {
       console.warn('Image compression fallback:', err);
-      const fallbackFile = (file instanceof File && file.name)
+      const FileConstructor = typeof window !== 'undefined' ? window.File : null;
+      const fallbackFile = (typeof FileConstructor === 'function' && file instanceof FileConstructor && file.name)
         ? file
-        : new File([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+        : (typeof FileConstructor === 'function'
+            ? new FileConstructor([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' })
+            : file);
 
       if (sendDirectly) {
         try {
@@ -859,7 +865,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
                     {isImage ? (
                       <Camera className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-blue-600 flex-shrink-0" />
                     ) : (
-                      <File className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
+                      <FileIcon className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
                     )}
                     <span className="truncate max-w-28 sm:max-w-40 font-medium">{file.name}</span>
                     {isImage && (
