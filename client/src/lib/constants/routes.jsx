@@ -233,7 +233,6 @@ const ROLE_ITEMS = {
 
     BASE_ITEMS.motorhp,
     BASE_ITEMS.template,
-    BASE_ITEMS.settings,
     BASE_ITEMS.notifications,
     BASE_ITEMS.profile,
   ],
