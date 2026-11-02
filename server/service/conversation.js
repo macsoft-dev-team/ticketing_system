@@ -1,4 +1,5 @@
 const { prisma } = require("../lib/clients");
+const { sendBuzzOff } = require("../lib/mqttClient");
 const { generateTicketFileUrl } = require("../lib/ticket_file_handler");
 const {
   createNotification,
@@ -270,7 +271,9 @@ const createConversation = async (conversation, userId, io, files = []) => {
       data: ticketUpdateData,
     });
 
-    if (isMacsoftUser) {
+    const hadBuzzerOn = Boolean(newMessage.ticket?.isBuzzerOn);
+
+    if (isMacsoftUser && hadBuzzerOn) {
       // Emit socket event to clear buzzer alert
       if (io) {
         io.to("role-MACSOFT_HEAD").emit("buzzer_alert_cleared", {
@@ -281,6 +284,18 @@ const createConversation = async (conversation, userId, io, files = []) => {
           ticketId,
           ticketCode: newMessage.ticket?.ticketCode,
         });
+      }
+
+      // If no other tickets are waiting with an active non-reply buzzer, publish BSTS: 0
+      const remainingBuzzerCount = await prisma.ticket.count({
+        where: {
+          isBuzzerOn: true,
+          status: { in: ["OPEN", "IN_PROGRESS"] },
+          id: { not: ticketId },
+        },
+      });
+      if (remainingBuzzerCount === 0) {
+        sendBuzzOff().catch((e) => console.error("Error sending MQTT buzz off:", e));
       }
     }
 

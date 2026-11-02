@@ -1,4 +1,5 @@
 const { prisma } = require("../lib/clients");
+const { sendBuzzOn, sendBuzzOff } = require("../lib/mqttClient");
 
 // Define Macsoft roles who should receive buzzer alerts
 const MACSOFT_ROLES = [
@@ -119,6 +120,7 @@ const checkPendingCustomerMessages = async (io = null) => {
         where: { status: { in: ['OPEN', 'IN_PROGRESS'] }, isBuzzerOn: true },
         data: { isBuzzerOn: false }
       });
+      await sendBuzzOff();
       return {
         success: true,
         pendingCount: 0,
@@ -208,6 +210,7 @@ const checkPendingCustomerMessages = async (io = null) => {
     });
 
     if (candidateTickets.length === 0) {
+      await sendBuzzOff();
       return { success: true, pendingCount: 0, tickets: [] };
     }
 
@@ -315,6 +318,13 @@ const checkPendingCustomerMessages = async (io = null) => {
     } else if (pendingTickets.length > 0 && !io) {
      } else {
      }
+
+    // Publish MQTT buzzer status: {"BSTS": 1} if pending alerts exist, {"BSTS": 0} if none
+    if (pendingTickets.length > 0) {
+      await sendBuzzOn();
+    } else {
+      await sendBuzzOff();
+    }
     
     return {
       success: true,
@@ -391,12 +401,12 @@ const triggerBuzzerAlerts = async (pendingTickets, io, buzzerConfig) => {
       tickets: pendingTickets.map(p => ({
         ticketCode: p.ticket.ticketCode,
         customerName: p.ticket.customerName,
-        description: p.ticket.description.substring(0, 100) + '...',
-        lastMessageFrom: p.lastMessage.sender.name,
-        lastMessageRole: p.lastMessage.sender.role,
+        description: (p.ticket.description || '').substring(0, 100) + '...',
+        lastMessageFrom: p.lastMessage?.sender?.name || 'Customer',
+        lastMessageRole: p.lastMessage?.sender?.role || '',
         secondsSinceLastMessage: p.secondsSinceLastMessage,
         hoursSinceLastMessage: p.hoursSinceLastMessage,
-        lastMessagePreview: p.lastMessage.content.substring(0, 150) + '...',
+        lastMessagePreview: (p.lastMessage?.content || '').substring(0, 150) + '...',
         serviceCenter: p.ticket.serviceCenter?.name || 'Unassigned',
         priority: p.ticket.priority || 'Normal'
       })),
