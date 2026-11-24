@@ -95,7 +95,7 @@ async function closeInactiveTickets() {
 
     // 2. Fetch candidate tickets (all non-closed tickets)
     const ticketWhere = {
-      status: { notIn: ['CLOSED', 'closed'] }
+      status: { not: 'CLOSED' }
     };
 
     if (options.ticket) {
