@@ -324,6 +324,10 @@ export default function TicketDashboard() {
   const [inventoryDetails, setInventoryDetails] = useState(null);
   const [transactionHistory, setTransactionHistory] = useState([]);
   const [loadingInventoryDetails, setLoadingInventoryDetails] = useState(false);
+  // Manual close ticket dialog state
+  const [showCloseTicketModal, setShowCloseTicketModal] = useState(false);
+  const [closeTicketReason, setCloseTicketReason] = useState('');
+  const [closingTicket, setClosingTicket] = useState(false);
 
   // Use the new conversation hook
   const {
@@ -1795,17 +1799,7 @@ export default function TicketDashboard() {
                 ) : null}
                 {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) && ticketData?.status !== 'closed' && (
                   <button
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to manually close this ticket? Any pending spare requests will be cancelled.')) {
-                        handleMilestoneAction({
-                          action: 'cancel_spare_and_close',
-                          targetStage: 'TICKET_CLOSED',
-                          requiresPhotos: false,
-                          currentStage: currentMilestone?.stage,
-                          notes: 'Ticket manually closed by Macsoft team'
-                        });
-                      }
-                    }}
+                    onClick={() => setShowCloseTicketModal(true)}
                     className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700"
                     title="Manually close ticket even if spare requests are pending"
                   >
@@ -2001,17 +1995,7 @@ export default function TicketDashboard() {
                 ) : null}
                 {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) && ticketData?.status !== 'closed' && (
                   <button
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to manually close this ticket? Any pending spare requests will be cancelled.')) {
-                        handleMilestoneAction({
-                          action: 'cancel_spare_and_close',
-                          targetStage: 'TICKET_CLOSED',
-                          requiresPhotos: false,
-                          currentStage: currentMilestone?.stage,
-                          notes: 'Ticket manually closed by Macsoft team'
-                        });
-                      }
-                    }}
+                    onClick={() => setShowCloseTicketModal(true)}
                     className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700"
                     title="Manually close ticket even if spare requests are pending"
                   >
@@ -2278,6 +2262,109 @@ export default function TicketDashboard() {
         onClose={closeDocumentModal}
         document={selectedDocument}
       />
+
+      {/* Manual Close Ticket Dialog Box */}
+      {showCloseTicketModal && (
+        <div className="fixed inset-0 bg-black/25 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative mx-auto p-4 sm:p-5 border w-full max-w-md shadow-xl rounded-xl bg-white">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 bg-red-100 rounded-full text-red-600">
+                  <XCircle className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900">
+                  Close Ticket Manually
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowCloseTicketModal(false);
+                  setCloseTicketReason('');
+                }}
+                className="text-gray-400 hover:text-gray-600 rounded-lg p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-gray-600">
+                Are you sure you want to permanently close ticket <span className="font-semibold text-gray-900">{ticketData?.ticketCode}</span>?
+              </p>
+              
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                Any pending or active spare requests for this ticket will be automatically cancelled.
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Reason for closure (optional)
+                </label>
+                <textarea
+                  value={closeTicketReason}
+                  onChange={(e) => setCloseTicketReason(e.target.value)}
+                  placeholder="Enter reason for closing this ticket..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm resize-none"
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCloseTicketModal(false);
+                  setCloseTicketReason('');
+                }}
+                disabled={closingTicket}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setClosingTicket(true);
+                    await handleMilestoneAction({
+                      action: 'cancel_spare_and_close',
+                      targetStage: 'TICKET_CLOSED',
+                      requiresPhotos: false,
+                      currentStage: currentMilestone?.stage,
+                      notes: closeTicketReason.trim() || 'Ticket manually closed by Macsoft team'
+                    });
+                    setShowCloseTicketModal(false);
+                    setCloseTicketReason('');
+                  } catch (err) {
+                    addToast({
+                      title: 'Error',
+                      description: err.message || 'Failed to close ticket',
+                      variant: 'error'
+                    });
+                  } finally {
+                    setClosingTicket(false);
+                  }
+                }}
+                disabled={closingTicket}
+                className="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+              >
+                {closingTicket ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                    Closing...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="w-4 h-4 mr-1.5" />
+                    Confirm Close
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Spare Request Reject Modal */}
       {showSpareRejectModal && (

@@ -535,12 +535,24 @@ const MilestoneCard = ({
 
     const handleTransition = async () => {
         if (config.photoRequired && photos.length === 0) {
-            alert(`This stage requires at least ${config.minPhotos || 1} photo(s)`);
+            if (addToast) {
+                addToast({
+                    title: 'Photos Required',
+                    description: `This stage requires at least ${config.minPhotos || 1} photo(s)`,
+                    variant: 'error'
+                });
+            }
             return;
         }
         
         if (config.notesRequired && !notes.trim()) {
-            alert('Please add notes describing how the issue was resolved');
+            if (addToast) {
+                addToast({
+                    title: 'Notes Required',
+                    description: 'Please add notes describing how the issue was resolved',
+                    variant: 'error'
+                });
+            }
             return;
         }
 
@@ -557,7 +569,13 @@ const MilestoneCard = ({
 
     const handleBlock = async () => {
         if (!blockReason.trim()) {
-            alert('Please provide a reason for blocking');
+            if (addToast) {
+                addToast({
+                    title: 'Reason Required',
+                    description: 'Please provide a reason for blocking',
+                    variant: 'error'
+                });
+            }
             return;
         }
         await onBlock(milestone.id, blockReason);
