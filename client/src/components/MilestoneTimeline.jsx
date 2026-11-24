@@ -497,6 +497,7 @@ const MilestoneCard = ({
     allMilestones,
     ticketStatus,
     ticketCreatedBy,
+    assignedServiceCenter,
     availableTransitions = []
 }) => {
     const [showDetails, setShowDetails] = useState(isActive);
@@ -677,6 +678,7 @@ const MilestoneCard = ({
                                         allMilestones={allMilestones}
                                         ticketCreatedBy={ticketCreatedBy}
                                         currentUserId={user?.id}
+                                        assignedServiceCenter={assignedServiceCenter}
                                         availableTransitions={availableTransitions}
                                     />
                                 )}
@@ -846,7 +848,7 @@ const MilestoneCard = ({
     );
 };
 
-export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMilestoneUpdate, onAction, onUpdateNotes, ticketStatus, ticketCreatedBy }) => {
+export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMilestoneUpdate, onAction, onUpdateNotes, ticketStatus, ticketCreatedBy, assignedServiceCenter }) => {
     const [milestones, setMilestones] = useState(propMilestones || []);
     const [availableTransitions, setAvailableTransitions] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -1682,6 +1684,7 @@ export const MilestoneTimeline = ({ ticketId, milestones: propMilestones, onMile
                             allMilestones={milestones}
                             ticketStatus={ticketStatus}
                             ticketCreatedBy={ticketCreatedBy}
+                            assignedServiceCenter={assignedServiceCenter}
                             availableTransitions={availableTransitions}
                         />
                     );

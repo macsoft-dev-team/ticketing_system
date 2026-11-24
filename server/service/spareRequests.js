@@ -1358,19 +1358,30 @@ async function bulkApproveSpareRequestItems(itemIds, approvedBy, approverName, a
  * Bulk cancel all spare requests for a ticket
  * Used when service center technician wants to cancel spare request and close ticket
  */
-async function bulkCancelSpareRequestsByTicket(ticketCode, cancelledBy, reason = 'Spare requests cancelled') {
+async function bulkCancelSpareRequestsByTicket(ticketIdentifier, cancelledBy, reason = 'Spare requests cancelled') {
   try {
+    let ticketCode = ticketIdentifier;
+    if (typeof ticketIdentifier === 'number') {
+      const ticketRec = await prisma.ticket.findUnique({
+        where: { id: ticketIdentifier },
+        select: { ticketCode: true }
+      });
+      if (ticketRec) {
+        ticketCode = ticketRec.ticketCode;
+      }
+    }
+
     const result = await prisma.$transaction(async (tx) => {
-      // Get all pending spare request items for this ticket
+      // Get all active / pending spare requests for this ticket
       const spareRequests = await tx.spareRequest.findMany({
         where: { 
-          ticketCode,
-          status: { in: ['REQUESTED', 'pending'] }
+          ticketCode: String(ticketCode),
+          status: { in: ['PENDING', 'pending', 'REQUESTED', 'URGENT', 'urgent', 'PARTIALLY_APPROVED', 'APPROVED', 'approved'] }
         },
         include: {
           spareItems: {
             where: {
-              status: { in: ['REQUESTED', 'pending'] }
+              status: { in: ['REQUESTED', 'pending', 'APPROVED', 'approved', 'PENDING'] }
             }
           }
         }
@@ -1395,42 +1406,48 @@ async function bulkCancelSpareRequestsByTicket(ticketCode, cancelledBy, reason =
           await tx.spareRequestItem.updateMany({
             where: {
               spareRequestId: spareRequest.id,
-              status: { in: ['REQUESTED', 'pending'] }
+              status: { in: ['REQUESTED', 'pending', 'APPROVED', 'approved', 'PENDING'] }
             },
             data: {
               status: 'cancelled',
               updatedAt: new Date()
             }
           });
+        }
 
-          // Update spare request status to cancelled
-          await tx.spareRequest.update({
-            where: { id: spareRequest.id },
-            data: {
-              status: 'CANCELLED',
-              updatedBy: cancelledBy,
-              updatedAt: new Date()
-            }
-          });
+        // Update spare request status to cancelled
+        await tx.spareRequest.update({
+          where: { id: spareRequest.id },
+          data: {
+            status: 'CANCELLED',
+            updatedBy: cancelledBy,
+            updatedAt: new Date()
+          }
+        });
 
-          totalCancelledRequests++;
-          totalCancelledItems += spareRequest.spareItems.length;
+        totalCancelledRequests++;
+        totalCancelledItems += spareRequest.spareItems.length;
 
-          // Create notification for requester
-          await tx.notification.create({
-            data: {
-              title: 'Spare Request Cancelled',
-              description: `Your spare request has been cancelled. ${reason}`,
-              type: 'SPARE_CANCELLED',
-              createdById: cancelledBy,
-              recipients: {
-                create: {
-                  userId: spareRequest.createdBy,
-                  seen: false
+        // Create notification for requester
+        if (spareRequest.createdBy && spareRequest.createdBy !== cancelledBy) {
+          try {
+            await tx.notification.create({
+              data: {
+                title: 'Spare Request Cancelled',
+                description: `Your spare request has been cancelled. ${reason}`,
+                type: 'SPARE_CANCELLED',
+                createdById: cancelledBy,
+                recipients: {
+                  create: {
+                    userId: spareRequest.createdBy,
+                    seen: false
+                  }
                 }
               }
-            }
-          });
+            });
+          } catch (notifErr) {
+            console.error('Error creating cancellation notification:', notifErr);
+          }
         }
       }
 

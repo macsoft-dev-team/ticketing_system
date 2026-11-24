@@ -481,22 +481,24 @@ const getTickets = async (skip, take, filter, userId, role) => {
         where.id = -1;
       }
     } else if (role === "CUSTOMER_SERVICE_HEAD") {
-      // CSH sees tickets only if the ticket creator's primary state (createdByUser.stateId)
-      // is in the CSH's allowed state IDs (primary + assigned states).
+      // CSH sees tickets in their allowed states OR tickets assigned to their service center OR tickets created by them
+      const orConditions = [];
       if (allowedStateIdsArr.length) {
-        const andConditions = [
-          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
-        ];
+        const stateCond = { createdByUser: { stateId: { in: allowedStateIdsArr } } };
         if (user?.orgCode) {
-          andConditions.push({ createdByUser: { orgCode: user.orgCode } });
+          orConditions.push({ AND: [stateCond, { createdByUser: { orgCode: user.orgCode } }] });
+        } else {
+          orConditions.push(stateCond);
         }
-        where.AND = andConditions;
-        // NOTE:
-        // - If you also want to restrict by the ticket.state string (the ticket's own state name),
-        //   add `{ state: { in: allowedStateNamesArr } }` into the AND array.
-        // - Current behavior enforces: creator's primary state must be one of CSH's allowed states.
+      }
+      if (user?.centerCode) {
+        orConditions.push({ assignedServiceCenter: user.centerCode });
+      }
+      orConditions.push({ createdBy: userId });
+
+      if (orConditions.length > 0) {
+        where.OR = orConditions;
       } else {
-        // head has no allowed states => no tickets
         where.id = -1;
       }
     } else {
@@ -534,21 +536,24 @@ const getTickets = async (skip, take, filter, userId, role) => {
         milestoneCountWhere.ticket.id = -1;
       }
     } else if (role === "CUSTOMER_SERVICE_HEAD") {
+      const cshOrConditions = [];
       if (allowedStateIdsArr.length) {
-        // Mirror logic used for fetching tickets: only counts for tickets
-        // where createdByUser.stateId is in allowedStateIdsArr.
-        const cshAndConditions = [
-          { createdByUser: { stateId: { in: allowedStateIdsArr } } },
-        ];
+        const cshAnd = [{ createdByUser: { stateId: { in: allowedStateIdsArr } } }];
         if (user?.orgCode) {
-          cshAndConditions.push({ createdByUser: { orgCode: user.orgCode } });
+          cshAnd.push({ createdByUser: { orgCode: user.orgCode } });
         }
-        statusCountWhere = { AND: cshAndConditions };
+        cshOrConditions.push({ AND: cshAnd });
+      }
+      if (user?.centerCode) {
+        cshOrConditions.push({ assignedServiceCenter: user.centerCode });
+      }
+      cshOrConditions.push({ createdBy: userId });
 
-        // Also apply same AND within milestone ticket filter (plus stage + not closed)
+      if (cshOrConditions.length > 0) {
+        statusCountWhere = { OR: cshOrConditions };
         milestoneCountWhere.ticket = {
           ...milestoneCountWhere.ticket,
-          AND: cshAndConditions,
+          OR: cshOrConditions,
         };
       } else {
         statusCountWhere = { id: -1 };
@@ -984,6 +989,7 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
         id: true,
         role: true,
         centerCode: true,
+        orgCode: true,
         serviceCenter: {
           select: {
             id: true,
@@ -1017,10 +1023,30 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
       ticketCodeSuffix,
     );
 
-    // For SERVICE_CENTER_TECHNICIAN, auto-assign their service center but keep the approval gate
+    // Auto-assign service center when created by service center or service center technician
     let assignedServiceCenter = null;
-    if (user.role === "SERVICE_CENTER_TECHNICIAN" && user.centerCode) {
-      assignedServiceCenter = user.centerCode;
+    let userCenterCode = user.centerCode || user.serviceCenter?.centerCode || null;
+
+    if (!userCenterCode && user.orgCode && ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"].includes(user.role)) {
+      const sc = await prisma.serviceCenter.findFirst({
+        where: { orgCode: user.orgCode },
+        select: { centerCode: true },
+      });
+      if (sc) {
+        userCenterCode = sc.centerCode;
+      }
+    }
+
+    if (
+      ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"].includes(user.role) &&
+      userCenterCode
+    ) {
+      assignedServiceCenter = userCenterCode;
+    } else if (
+      userCenterCode &&
+      !["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT", "CUSTOMER_FIELD_ENGINEER"].includes(user.role)
+    ) {
+      assignedServiceCenter = userCenterCode;
     }
 
     // Validate that at least one photo is attached
@@ -1110,9 +1136,10 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     });
 
     // Create initial milestones for the ticket
-    // Both technician and standard roles now start with a standard TICKET_RAISED milestone awaiting assignment/approval
-    const notesText = user.role === "SERVICE_CENTER_TECHNICIAN"
-      ? "Ticket raised by service center technician. Awaiting Macsoft review/approval."
+    // Both service center staff/technicians and standard roles start with TICKET_RAISED milestone
+    const isServiceCenterCreator = ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"].includes(user.role);
+    const notesText = isServiceCenterCreator
+      ? "Ticket raised by service center. Awaiting Macsoft review/approval."
       : "Ticket has been raised and awaiting service center assignment.";
 
     const milestonesData = {

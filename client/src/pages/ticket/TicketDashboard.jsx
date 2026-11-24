@@ -1770,7 +1770,8 @@ export default function TicketDashboard() {
               onAction={handleMilestoneAction}
               onUpdateNotes={handleUpdateNotes}
               ticketStatus={ticketData?.status}
-              ticketCreatedBy={ticketData?.createdBy}
+              ticketCreatedBy={ticketData?.createdBy || ticket?.createdByUser || ticket?.createdBy}
+              assignedServiceCenter={ticketData?.assignedServiceCenter || ticket?.assignedServiceCenter}
             />
           </div>
 
@@ -1787,12 +1788,32 @@ export default function TicketDashboard() {
                 )}
               </h2>
               <div className="flex items-center gap-2">
-                {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
+                {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) ? (
                   <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
                     Approval Access
                   </span>
                 ) : null}
-                {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && spareRequests.length > 0 && currentMilestone?.stage === 'SPARE_REQUESTED' && (
+                {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) && ticketData?.status !== 'closed' && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to manually close this ticket? Any pending spare requests will be cancelled.')) {
+                        handleMilestoneAction({
+                          action: 'cancel_spare_and_close',
+                          targetStage: 'TICKET_CLOSED',
+                          requiresPhotos: false,
+                          currentStage: currentMilestone?.stage,
+                          notes: 'Ticket manually closed by Macsoft team'
+                        });
+                      }
+                    }}
+                    className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700"
+                    title="Manually close ticket even if spare requests are pending"
+                  >
+                    <XCircle className="h-3 w-3 mr-1" />
+                    Close Ticket
+                  </button>
+                )}
+                {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) && spareRequests.length > 0 && currentMilestone?.stage === 'SPARE_REQUESTED' && (
                   <button
                     onClick={handleBulkApproveSpareRequests}
                     disabled={!allSpareRequestsResolved}
@@ -1973,12 +1994,32 @@ export default function TicketDashboard() {
                 Spare Requests
               </h2>
               <div className="flex items-center gap-2">
-                {user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD' ? (
+                {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) ? (
                   <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
                     Approval Access
                   </span>
                 ) : null}
-                {(user?.role === 'MACSOFT_ADMIN' || user?.role === 'MACSOFT_HEAD') && spareRequests.length > 0 && currentMilestone?.stage === 'SPARE_REQUESTED' && (
+                {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) && ticketData?.status !== 'closed' && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to manually close this ticket? Any pending spare requests will be cancelled.')) {
+                        handleMilestoneAction({
+                          action: 'cancel_spare_and_close',
+                          targetStage: 'TICKET_CLOSED',
+                          requiresPhotos: false,
+                          currentStage: currentMilestone?.stage,
+                          notes: 'Ticket manually closed by Macsoft team'
+                        });
+                      }
+                    }}
+                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-red-600 hover:bg-red-700"
+                    title="Manually close ticket even if spare requests are pending"
+                  >
+                    <XCircle className="h-3 w-3 mr-1" />
+                    Close Ticket
+                  </button>
+                )}
+                {['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user?.role) && spareRequests.length > 0 && currentMilestone?.stage === 'SPARE_REQUESTED' && (
                   <button
                     onClick={handleBulkApproveSpareRequests}
                     disabled={!allSpareRequestsResolved}

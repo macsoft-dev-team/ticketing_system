@@ -272,7 +272,7 @@ const milestoneStageConfig = [
     order: 14.5,
     label: "Close Requested",
     description: "Close request submitted by service center technician, awaiting Macsoft team approval",
-    allowedRoles: ["SERVICE_CENTER_TECHNICIAN", "MACSOFT_ADMIN", "MACSOFT_HEAD"],
+    allowedRoles: ["SERVICE_CENTER_TECHNICIAN", "MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"],
     photoRequired: false,
     notes: "Awaiting Macsoft admin/head approval to close the ticket",
   },
@@ -281,7 +281,7 @@ const milestoneStageConfig = [
     order: 15,
     label: "Ticket Closed",
     description: "Ticket permanently closed",
-    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN", "SERVICE_CENTER_TECHNICIAN"], // Allow service center technicians to close tickets they created
+    allowedRoles: ["MACSOFT_HEAD", "MACSOFT_ADMIN", "MACSOFT_SUPPORT", "SERVICE_CENTER_TECHNICIAN"], // Allow service center technicians to close tickets they created and Macsoft team
     photoRequired: false,
     isFinal: true,
     notes: "Ticket has been permanently closed",
@@ -344,6 +344,18 @@ function getNextAvailableStages(currentStage, userRole) {
       (config) => config && canRoleTransitionToStage(userRole, config.stage)
     );
 
+  // If user is part of Macsoft team, always allow manual close unless already closed
+  if (
+    ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole) &&
+    currentStage !== 'TICKET_CLOSED' &&
+    !nextStages.some((s) => s.stage === 'TICKET_CLOSED')
+  ) {
+    const closedConfig = getStageConfig('TICKET_CLOSED');
+    if (closedConfig) {
+      nextStages.push(closedConfig);
+    }
+  }
+
   return nextStages;
 }
 
@@ -359,6 +371,14 @@ function validateMilestoneTransition(
       valid: false,
       error: `Invalid stage: ${targetStage}`,
     };
+  }
+
+  // Allow Macsoft team to manually close any ticket at any time, even if spare requests are pending
+  if (
+    ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(userRole) &&
+    (targetStage === 'TICKET_CLOSED' || data.action === 'close_ticket' || data.action === 'cancel_spare_and_close')
+  ) {
+    return { valid: true };
   }
 
   // Special validation for SERVICE_CENTER_TECHNICIAN closing tickets

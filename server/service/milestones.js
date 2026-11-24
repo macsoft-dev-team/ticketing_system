@@ -381,9 +381,9 @@ const transitionMilestone = async (
 
     // Additional validation for RECEIVED_AT_SERVICE_CENTER
     if (targetStage === "RECEIVED_AT_SERVICE_CENTER") {
-      const isTechCreated = ticket.createdByUser?.role === "SERVICE_CENTER_TECHNICIAN";
+      const isTechCreated = ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"].includes(ticket.createdByUser?.role);
       
-      // If technician-created, allow transition from SERVICE_CENTER_ASSIGNED.
+      // If service center created, allow transition from SERVICE_CENTER_ASSIGNED.
       // Otherwise, require transition from SUBMITTED_TO_SERVICE_CENTER.
       if (isTechCreated) {
         if (
@@ -407,23 +407,24 @@ const transitionMilestone = async (
       }
     }
 
-    // Special validation for close_ticket and cancel_spare_and_close actions
+    // Special validation for close_ticket, cancel_spare_and_close, or direct TICKET_CLOSED transitions
     if (
       data.action === "close_ticket" ||
-      data.action === "cancel_spare_and_close"
+      data.action === "cancel_spare_and_close" ||
+      targetStage === "TICKET_CLOSED"
     ) {
-      // Allow MACSOFT_ADMIN and MACSOFT_HEAD unrestricted access, SERVICE_CENTER_TECHNICIAN can request close
+      // Allow MACSOFT team unrestricted access, SERVICE_CENTER_TECHNICIAN can request close
+      const isMacsoft = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"].includes(userRole);
       if (
         userRole !== "SERVICE_CENTER_TECHNICIAN" &&
-        userRole !== "MACSOFT_ADMIN" &&
-        userRole !== "MACSOFT_HEAD"
+        !isMacsoft
       ) {
         throw new Error(
-          "Only service center technicians or MACSOFT admins/heads can perform this action"
+          "Only service center technicians or MACSOFT team can perform this action"
         );
       }
 
-      // MACSOFT_ADMIN and MACSOFT_HEAD can close any ticket.
+      // MACSOFT team can close any ticket directly.
       // SERVICE_CENTER_TECHNICIAN closing is routed to CLOSE_REQUESTED, so they are allowed to initiate it.
     }
 
@@ -506,16 +507,20 @@ const transitionMilestone = async (
       }
     }
 
-    // Handle special case for cancel_spare_and_close - cancel all spare requests
-    if (data.action === "cancel_spare_and_close") {
+    // Cancel any pending spare requests if closing ticket or cancelling spares
+    if (
+      data.action === "cancel_spare_and_close" ||
+      targetStage === "TICKET_CLOSED" ||
+      data.action === "close_ticket"
+    ) {
       try {
         await spareRequestService.bulkCancelSpareRequestsByTicket(
           ticket.ticketCode,
           userId,
-          "Service center technician cancelled spare requests and closed ticket"
+          data.notes || "Ticket closed manually"
         );
       } catch (cancelError) {
-        console.error("Error cancelling spare requests:", cancelError);
+        console.error("Error cancelling spare requests on ticket close:", cancelError);
         // Continue with milestone creation even if spare cancellation fails
       }
     }
@@ -554,7 +559,7 @@ const transitionMilestone = async (
     if (
       targetStage === "DELIVERED_TO_FIELD" ||
       targetStage === "FIELD_CLEARANCE_APPROVED" ||
-      (targetStage === "REQUEST_CLEARED_AT_FIELD" && userRole === "SERVICE_CENTER_TECHNICIAN")
+      (targetStage === "REQUEST_CLEARED_AT_FIELD" && (userRole === "SERVICE_CENTER_TECHNICIAN" || userRole === "CUSTOMER_SERVICE_HEAD"))
     ) {
       shouldCreateTicketClosed = true;
 
