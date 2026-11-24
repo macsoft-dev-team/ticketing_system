@@ -93,6 +93,28 @@ const createTicket = async (req, res) => {
   const io = req.io;
 
   try {
+    // Validate that at least one photo is uploaded
+    const hasPhoto = files && files.length > 0 && files.some(file => 
+      (file.mimetype && file.mimetype.startsWith('image/')) || 
+      /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(file.originalname)
+    );
+
+    if (!hasPhoto) {
+      // Clean up any uploaded non-photo temp files
+      if (files && files.length > 0) {
+        files.forEach(f => {
+          try {
+            if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path);
+          } catch (e) {
+            console.error("Error cleaning up temp file:", e);
+          }
+        });
+      }
+      return res.status(400).json({
+        message: "At least one photo is mandatory to create a ticket."
+      });
+    }
+
     // Process uploaded files if any
     let attachments = [];
     if (files && files.length > 0) {
@@ -112,12 +134,10 @@ const createTicket = async (req, res) => {
       attachments
     );
     
-
-    
     res.status(201).json(newTicket);
   } catch (error) {
      res.status(500).json({ 
-      message: "Internal server error",
+      message: error.message || "Internal server error",
       error: error.message 
     });
   }

@@ -1022,6 +1022,17 @@ const createTicket = async (ticket, userId, io, attachments = []) => {
     if (user.role === "SERVICE_CENTER_TECHNICIAN" && user.centerCode) {
       assignedServiceCenter = user.centerCode;
     }
+
+    // Validate that at least one photo is attached
+    const hasPhoto = attachments && attachments.length > 0 && attachments.some(file =>
+      (file.mimetype && file.mimetype.startsWith('image/')) ||
+      (file.originalname && /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(file.originalname)) ||
+      (file.filename && /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(file.filename))
+    );
+    if (!hasPhoto) {
+      throw new Error("At least one photo is required to create a ticket.");
+    }
+
     // Process attachments - move from temp folder to ticket folder
     let processedAttachments = [];
     if (attachments && attachments.length > 0) {

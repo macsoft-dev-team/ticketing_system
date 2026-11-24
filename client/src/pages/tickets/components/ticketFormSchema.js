@@ -26,7 +26,19 @@ export const ticketFormSchema = yup.object({
   priority: yup.string().required('Priority is required'),
   category: yup.string().required('Category is required'),
   state: yup.string().required('State is required'),
-  attachments: yup.mixed().nullable()
+  attachments: yup.mixed()
+    .test('has-photo', 'At least one photo is mandatory to create a ticket', function (value) {
+      if (!value) return false;
+      const files = Array.isArray(value) ? value : [value];
+      if (files.length === 0) return false;
+      return files.some(file => {
+        if (!file) return false;
+        const type = file.type || '';
+        const name = file.name || '';
+        return type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(name);
+      });
+    })
+    .required('At least one photo is mandatory to create a ticket')
 });
 
 // Default values for the form

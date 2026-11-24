@@ -140,6 +140,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         handleSubmit,
         formState: { errors, isValid, isDirty },
         setValue,
+        setError,
         watch,
         reset,
         clearErrors,
@@ -498,7 +499,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
         setUploadedFiles(prev => {
             const updated = [...prev, ...processedFiles];
-            setValue('attachments', updated.map(f => f.file));
+            setValue('attachments', updated.map(f => f.file), { shouldValidate: true });
             return updated;
         });
         clearErrors('attachments');
@@ -507,7 +508,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     const removeFile = useCallback((fileId) => {
         setUploadedFiles(prev => {
             const updated = prev.filter(f => f.id !== fileId);
-            setValue('attachments', updated.map(f => f.file));
+            setValue('attachments', updated.length > 0 ? updated.map(f => f.file) : null, { shouldValidate: true });
             return updated;
         });
     }, [setValue]);
@@ -551,6 +552,25 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
     // Form submission
     const handleFormSubmit = async (data) => {
+        // Enforce at least one photo is attached
+        const hasPhoto = uploadedFiles.some(f => 
+            f.type?.startsWith('image/') || 
+            f.file?.type?.startsWith('image/') || 
+            /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(f.name || f.file?.name)
+        );
+        if (!hasPhoto) {
+            setError('attachments', {
+                type: 'manual',
+                message: 'At least one photo is mandatory to create a ticket.'
+            });
+            addToast({
+                title: "Photo Required",
+                description: "Please attach or capture at least one photo before creating the ticket.",
+                variant: "destructive"
+            });
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             // Format data to match backend expectations
@@ -1369,12 +1389,12 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                             {isRestrictedRole ? (
                                 <>
                                     <Camera className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5 text-blue-600" />
-                                    <span className="truncate">Capture Photos (Device Camera)</span>
+                                    <span className="truncate">Capture Photos (Device Camera) <span className="text-red-500">*</span></span>
                                 </>
                             ) : (
                                 <>
                                     <Upload className="w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
-                                    <span className="truncate">Attachments (Optional)</span>
+                                    <span className="truncate">Photos & Attachments <span className="text-red-500">*</span></span>
                                 </>
                             )}
                         </h3>
@@ -1565,7 +1585,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                             ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             }`}
-                        title={!isValid ? 'Please fill all required fields correctly' : 'Submit ticket'}
+                        title={!isValid ? 'Please fill all required fields correctly (at least one photo is mandatory)' : 'Submit ticket'}
                     >
                         {(isSubmitting || ticketLoading) ? (
                             <>
