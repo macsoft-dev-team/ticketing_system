@@ -12,7 +12,8 @@
     "test-message-marking": "node scripts/test-message-notification-marking.js",
     "test-comprehensive": "node scripts/test-comprehensive-auto-close.js",
     "test-buzzer": "node scripts/test-buzzer-alerts.js",
-    "test-mqtt-buzzer": "node scripts/test-mqtt-buzzer.js"
+    "test-mqtt-buzzer": "node scripts/test-mqtt-buzzer.js",
+    "close-inactive-tickets": "node scripts/close-inactive-tickets.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
