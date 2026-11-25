@@ -50,7 +50,7 @@ import ModbusTemplates from '../../pages/modbustemplates/ModbusTemplates';
 
 const BASE_ITEMS = {
   // -------------------------
-  // MAIN
+  // OVERVIEW
   // -------------------------
   dashboard: {
     path: '/dashboard',
@@ -68,11 +68,14 @@ const BASE_ITEMS = {
     element: <NotificationsPage />,
   },
 
+  // -------------------------
+  // TICKET OPERATIONS
+  // -------------------------
   tickets: {
     path: '/tickets',
     icon: Ticket,
     label: 'Tickets',
-    category: 'main',
+    category: 'tickets',
     element: <Tickets />,
   },
 
@@ -81,7 +84,7 @@ const BASE_ITEMS = {
     icon: NotebookText,
     label: 'Ticket Details',
     hidden: true,
-    category: 'main',
+    category: 'tickets',
     element: <TicketDashboard />,
   },
 
@@ -90,42 +93,15 @@ const BASE_ITEMS = {
     icon: FilePlus,
     label: 'New Ticket',
     hidden: true,
-    category: 'main',
+    category: 'tickets',
     element: <TicketForm />,
   },
 
-  inventory: {
-    path: '/inventory',
-    icon: Boxes,
-    label: 'Inventory',
-    category: 'main',
-    element: <Inventory />,
-  },
-
-  products: {
-    path: '/products',
-    icon: PackageSearch,
-    label: 'Products',
-    category: 'main',
-    element: <Products />,
-  },
-
-  motorhp: {
-    path: '/motorhp',
-    icon: Wrench,
-    label: 'Motor HP',
-    category: 'management',
-    element: <MotorHP />,
-  },
-
-  // -------------------------
-  // TECHNICAL
-  // -------------------------
   receiveController: {
     path: '/receive-controller',
     icon: ScanLine,
     label: 'Receive Controller',
-    category: 'technical',
+    category: 'tickets',
     element: <ReceiveController />,
   },
 
@@ -133,82 +109,15 @@ const BASE_ITEMS = {
     path: '/deliver',
     icon: Truck,
     label: 'Deliver',
-    category: 'technical',
+    category: 'tickets',
     element: <DeliveryPage />,
-  },
-
-  serviceCenter: {
-    path: '/service-center',
-    icon: Building2,
-    label: 'Service Center',
-    category: 'technical',
-    element: <ServiceCenters />,
-  },
-
-  vfdModels: {
-    path: '/vfd-models',
-    icon: Cpu,
-    label: 'VFD Models',
-    category: 'technical',
-    element: <VfdModelList />,
-  },
-
-  vfdParameters: {
-    path: '/vfd-parameters',
-    icon: Sliders,
-    label: 'VFD Parameters',
-    category: 'technical',
-    element: <VfdParameterList />,
-  },
-
-  vfdTelemetry: {
-    path: '/vfd-telemetry',
-    icon: Activity,
-    label: 'Telemetry Scaling',
-    category: 'technical',
-    element: <VfdTelemetryList />,
-  },
-
-  configs: {
-    path: '/configs',
-    icon: Settings,
-    label: 'RMS Configurations',
-    category: 'technical',
-    element: <ConfigList />,
-  },
-
-  // -------------------------
-  // MANAGEMENT
-  // -------------------------
-  users: {
-    path: '/users',
-    icon: UsersRound,
-    label: 'Users',
-    category: 'management',
-    element: <UsersPage />,
-  },
-
-  organisation: {
-    path: '/customers',
-    icon: Building,
-    label: 'Customers',
-    category: 'management',
-    element: <OrganisationPage />,
-  },
-
-  project: {
-    path: '/projects',
-    icon: FolderKanban,
-    label: 'Projects',
-    category: 'management',
-    element: <Projects />,
   },
 
   spareRequest: {
     path: '/spare-request',
     icon: Wrench,
     label: 'Spare Request',
-    category: 'management',
+    category: 'tickets',
     element: <SpareRequest />,
   },
 
@@ -216,22 +125,120 @@ const BASE_ITEMS = {
     path: '/spare-request-approval',
     icon: ClipboardList,
     label: 'Spare Approval',
-    category: 'management',
+    category: 'tickets',
     element: <SpareRequestApproval />,
   },
+
+  // -------------------------
+  // RMS & VFD CONTROL
+  // -------------------------
+  vfdModels: {
+    path: '/vfd-models',
+    icon: Cpu,
+    label: 'VFD Models',
+    category: 'rms',
+    element: <VfdModelList />,
+  },
+
+  vfdParameters: {
+    path: '/vfd-parameters',
+    icon: Sliders,
+    label: 'VFD Parameters',
+    category: 'rms',
+    element: <VfdParameterList />,
+  },
+
+  vfdTelemetry: {
+    path: '/vfd-telemetry',
+    icon: Activity,
+    label: 'Telemetry Scaling',
+    category: 'rms',
+    element: <VfdTelemetryList />,
+  },
+
+  configs: {
+    path: '/configs',
+    icon: Settings,
+    label: 'RMS Configurations',
+    category: 'rms',
+    element: <ConfigList />,
+  },
+
   template: {
     path: '/configuration-templates',
     icon: Network,
-    label: 'Configuration Templates',
-    category: 'management',
+    label: 'Config Templates',
+    category: 'rms',
     element: <ModbusTemplates />,
+  },
+
+  // -------------------------
+  // INVENTORY & ASSETS
+  // -------------------------
+  inventory: {
+    path: '/inventory',
+    icon: Boxes,
+    label: 'Inventory',
+    category: 'inventory',
+    element: <Inventory />,
+  },
+
+  products: {
+    path: '/products',
+    icon: PackageSearch,
+    label: 'Products',
+    category: 'inventory',
+    element: <Products />,
+  },
+
+  motorhp: {
+    path: '/motorhp',
+    icon: Wrench,
+    label: 'Motor HP',
+    category: 'inventory',
+    element: <MotorHP />,
+  },
+
+  // -------------------------
+  // ADMINISTRATION
+  // -------------------------
+  serviceCenter: {
+    path: '/service-center',
+    icon: Building2,
+    label: 'Service Centers',
+    category: 'admin',
+    element: <ServiceCenters />,
+  },
+
+  organisation: {
+    path: '/customers',
+    icon: Building,
+    label: 'Customers',
+    category: 'admin',
+    element: <OrganisationPage />,
+  },
+
+  project: {
+    path: '/projects',
+    icon: FolderKanban,
+    label: 'Projects',
+    category: 'admin',
+    element: <Projects />,
+  },
+
+  users: {
+    path: '/users',
+    icon: UsersRound,
+    label: 'Users',
+    category: 'admin',
+    element: <UsersPage />,
   },
 
   settings: {
     path: '/settings',
     icon: Settings,
     label: 'Settings',
-    category: 'management',
+    category: 'admin',
     element: <SettingsPage />,
   },
 
@@ -239,7 +246,7 @@ const BASE_ITEMS = {
     path: '/profile',
     icon: CircleUserRound,
     label: 'Profile',
-    category: 'management',
+    category: 'admin',
     element: <ProfilePage />,
     hidden: true,
   },
