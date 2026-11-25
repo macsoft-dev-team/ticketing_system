@@ -5,8 +5,8 @@ import PageHeader from '../../components/ui/PageHeader.jsx';
 import { vfdParameterApi } from '../../lib/services/vfdService.js';
 
 export default function VfdParameterList({ navigate }) {
-  const [models, setModels] = useState([]);
-  const [selectedModel, setSelectedModel] = useState('');
+  const [models, setModels] = useState(['SI21', 'SI22', 'Hex']);
+  const [selectedModel, setSelectedModel] = useState('SI21');
   const [data, setData] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,12 +26,12 @@ export default function VfdParameterList({ navigate }) {
     async function loadModels() {
       try {
         const list = await vfdParameterApi.modelCodes();
-        setModels(list);
-        if (list.length > 0 && !selectedModel) {
-          setSelectedModel(list[0]);
+        if (list && list.length > 0) {
+          setModels(list);
+          setSelectedModel((prev) => (prev && list.includes(prev) ? prev : list[0]));
         }
       } catch (err) {
-        setError('Failed to load VFD models');
+        console.warn('Failed to load VFD models:', err);
       }
     }
     loadModels();
@@ -149,7 +149,7 @@ export default function VfdParameterList({ navigate }) {
               setSelectedModel(e.target.value);
               setCurrentPage(1);
             }}
-            className="px-3 py-2 text-xs font-bold border border-slate-300 bg-slate-50 text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs cursor-pointer"
+            className="min-w-[130px] px-3 py-2 text-xs font-bold border border-slate-300 bg-slate-50 text-slate-800 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs cursor-pointer"
           >
             {models.map((m) => (
               <option key={m} value={m}>

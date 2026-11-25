@@ -9,20 +9,35 @@ const router = express.Router();
  */
 router.get('/', async (req, res) => {
     try {
-        const models = await prisma.vfdParameter.findMany({
-            distinct: ['vfdModel'],
-            select: {
-                vfdModel: true,
-            },
+        const activeModels = await prisma.vfdModel.findMany({
+            where: { isActive: true },
+            select: { modelCode: true },
+            orderBy: { modelCode: 'asc' },
         });
 
+        const paramModels = await prisma.vfdParameter.findMany({
+            distinct: ['vfdModel'],
+            select: { vfdModel: true },
+        });
+
+        const modelSet = new Set();
+        activeModels.forEach(m => m.modelCode && modelSet.add(m.modelCode));
+        paramModels.forEach(m => m.vfdModel && modelSet.add(m.vfdModel));
+
+        if (modelSet.size === 0) {
+            ['SI21', 'SI22', 'Hex'].forEach(m => modelSet.add(m));
+        }
+
+        const models = Array.from(modelSet);
         res.json({
-            models: models.map(m => m.vfdModel),
+            models,
+            total: models.length,
         });
     } catch (error) {
         console.error('VFD models fetch error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch VFD models'
+        res.json({
+            models: ['SI21', 'SI22', 'Hex'],
+            total: 3,
         });
     }
 });

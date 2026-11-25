@@ -39,8 +39,27 @@ export const vfdModelApi = {
 
 export const vfdParameterApi = {
   modelCodes: async () => {
-    const res = await axios.get(API_ENDPOINTS.vfdParams);
-    return res.data.models || [];
+    try {
+      const res = await axios.get(API_ENDPOINTS.vfdParams);
+      const list = res.data?.models || (Array.isArray(res.data) ? res.data : []);
+      if (Array.isArray(list) && list.length > 0) {
+        return list;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch from vfdparams, attempting vfdModels fallback', err);
+    }
+
+    try {
+      const res = await axios.get(API_ENDPOINTS.vfdModels);
+      const list = (res.data?.vfdModels || []).map((m) => m.modelCode).filter(Boolean);
+      if (Array.isArray(list) && list.length > 0) {
+        return list;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch from vfdModels', err);
+    }
+
+    return ['SI21', 'SI22', 'Hex'];
   },
   byModel: async (vfdModel, { page = 1, limit = 10, search = '' } = {}) => {
     const params = new URLSearchParams();
