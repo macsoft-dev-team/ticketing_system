@@ -10,3 +10,7 @@ export { default as SignupPage } from './signup/signup';
 export { default as Inventory } from './inventory/inventory';
 export { default as ReceiveController } from './receiveController/ReceiveController';
 export { default as MotorHP } from './motorhp/motorhp';
+export { default as VfdModelList } from './vfdModels/VfdModelList';
+export { default as VfdParameterList } from './vfdParameters/VfdParameterList';
+export { default as VfdTelemetryList } from './vfdTelemetry/VfdTelemetryList';
+export { default as ConfigList } from './configs/ConfigList';

@@ -19,7 +19,10 @@ import {
   Building,
   ScanLine,
   PackageSearch,
-  Bell as NotificationBell
+  Bell as NotificationBell,
+  Cpu,
+  Sliders,
+  Activity,
 } from 'lucide-react';
 
 import Dashboard from '../../pages/dashboard/dashboard';
@@ -34,7 +37,7 @@ import ProtectedRoute from '../../components/ProtectedRoute';
 import Layout from '../../components/layout/layout';
 import TicketForm from '../../pages/tickets/components/ticketForm';
 import ServiceCenters from '../../pages/serviceCenters/serviceCenters';
-import { Tickets, TicketDashboard, SpareRequest, SpareRequestApproval, Inventory, ReceiveController, MotorHP } from '../../pages';
+import { Tickets, TicketDashboard, SpareRequest, SpareRequestApproval, Inventory, ReceiveController, MotorHP, VfdModelList, VfdParameterList, VfdTelemetryList, ConfigList } from '../../pages';
 import Products from '../../pages/products/products';
 import OrganisationPage from '../../pages/organisation/organisation';
 import ProfilePage from '../../pages/profile/Profile';
@@ -142,6 +145,38 @@ const BASE_ITEMS = {
     element: <ServiceCenters />,
   },
 
+  vfdModels: {
+    path: '/vfd-models',
+    icon: Cpu,
+    label: 'VFD Models',
+    category: 'technical',
+    element: <VfdModelList />,
+  },
+
+  vfdParameters: {
+    path: '/vfd-parameters',
+    icon: Sliders,
+    label: 'VFD Parameters',
+    category: 'technical',
+    element: <VfdParameterList />,
+  },
+
+  vfdTelemetry: {
+    path: '/vfd-telemetry',
+    icon: Activity,
+    label: 'Telemetry Scaling',
+    category: 'technical',
+    element: <VfdTelemetryList />,
+  },
+
+  configs: {
+    path: '/configs',
+    icon: Settings,
+    label: 'RMS Configurations',
+    category: 'technical',
+    element: <ConfigList />,
+  },
+
   // -------------------------
   // MANAGEMENT
   // -------------------------
@@ -222,6 +257,11 @@ const ROLE_ITEMS = {
     BASE_ITEMS.deliver,
     BASE_ITEMS.serviceCenter,
 
+    BASE_ITEMS.vfdModels,
+    BASE_ITEMS.vfdParameters,
+    BASE_ITEMS.vfdTelemetry,
+    BASE_ITEMS.configs,
+
     BASE_ITEMS.products,
     BASE_ITEMS.inventory,
 
@@ -249,6 +289,11 @@ const ROLE_ITEMS = {
     BASE_ITEMS.deliver,
     BASE_ITEMS.serviceCenter,
 
+    BASE_ITEMS.vfdModels,
+    BASE_ITEMS.vfdParameters,
+    BASE_ITEMS.vfdTelemetry,
+    BASE_ITEMS.configs,
+
     BASE_ITEMS.products,
     BASE_ITEMS.inventory,
 
@@ -271,6 +316,11 @@ const ROLE_ITEMS = {
     BASE_ITEMS.receiveController,
     BASE_ITEMS.deliver,
     BASE_ITEMS.serviceCenter,
+
+    BASE_ITEMS.vfdModels,
+    BASE_ITEMS.vfdParameters,
+    BASE_ITEMS.vfdTelemetry,
+    BASE_ITEMS.configs,
 
     BASE_ITEMS.products,
     BASE_ITEMS.template,
@@ -310,6 +360,9 @@ const ROLE_ITEMS = {
     BASE_ITEMS.tickets,
     BASE_ITEMS.ticketDetails,
     BASE_ITEMS.ticketNew,
+    BASE_ITEMS.vfdModels,
+    BASE_ITEMS.vfdParameters,
+    BASE_ITEMS.configs,
     BASE_ITEMS.profile,
   ],
 };
@@ -326,6 +379,10 @@ const getRouteProtection = (item, role) => {
     '/inventory': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'SERVICE_CENTER_TECHNICIAN', 'CUSTOMER_SERVICE_HEAD'],
     '/spare-request-approval': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Only these roles can approve spare requests
     '/motorhp': ['MACSOFT_ADMIN', 'MACSOFT_HEAD'], // Motor HP management for admin and head roles
+    '/vfd-models': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_FIELD_ENGINEER'],
+    '/vfd-parameters': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_FIELD_ENGINEER'],
+    '/vfd-telemetry': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'],
+    '/configs': ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT', 'CUSTOMER_FIELD_ENGINEER'],
   };
 
   const requiredRoles = routeProtections[item.path];

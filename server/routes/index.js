@@ -36,6 +36,10 @@ const jobs = require("./jobs");
 const workingHours = require("./workingHours");
 const dashboard = require("./dashboard");
 const buzzerConfig = require("./buzzerConfig");
+const vfdModels = require("./vfdModels");
+const vfdParams = require("./vfdParams");
+const vfdTelemetry = require("./vfdTelemetry");
+const configRoutes = require("./config");
 
 router.post("/auth/login", login);
 router.post("/auth/register", register);
@@ -67,6 +71,10 @@ router.use("/working-hours", authenticate, workingHours);
 router.use("/dashboard", authenticate, dashboard);
 router.use("/buzzer-config", authenticate, buzzerConfig);
 router.use("/templates", authenticate, templates);
+router.use("/vfd-models", authenticate, vfdModels);
+router.use("/vfdparams", authenticate, vfdParams);
+router.use("/vfd-telemetry-configs", authenticate, vfdTelemetry);
+router.use("/config", authenticate, configRoutes);
 
 // without authentication
 router.use("/states", states);

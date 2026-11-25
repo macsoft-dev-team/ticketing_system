@@ -28,5 +28,9 @@ export const API_ENDPOINTS = {
   motorhp: `${API_URL}/motorhp`,
   templates: `${API_URL}/templates`,
   settings: `${API_URL}/settings`,
+  vfdModels: `${API_URL}/vfd-models`,
+  vfdParams: `${API_URL}/vfdparams`,
+  vfdTelemetry: `${API_URL}/vfd-telemetry-configs`,
+  config: `${API_URL}/config`,
   LMS_BASE_URL: import.meta.env.VITE_LMS_BASE_URL,
 };

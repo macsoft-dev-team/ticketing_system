@@ -209,6 +209,7 @@ model User {
   organisation           Organisation?           @relation(fields: [orgCode], references: [orgCode])
   createdBatches         batch[]                 @relation("BatchCreator")
   updatedBatches         batch[]                 @relation("BatchUpdater")
+  configs                Config[]
 }
 
 model Ticket {
@@ -638,3 +639,77 @@ model template {
   updatedAt  DateTime?     @updatedAt
   customer   Organisation? @relation(fields: [orgCode], references: [orgCode])
 }
+
+model Config {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  projectId  String   @db.VarChar(100)
+  companyId  String   @db.VarChar(100)
+  hp         String   @db.VarChar(50)
+  type       String   @db.VarChar(50)
+  acDc       String   @db.VarChar(10)
+  oilWater   String   @db.VarChar(10)
+  commands   String   @db.LongText
+  version    Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId, companyId, hp, type, acDc, oilWater])
+  @@index([userId])
+  @@index([projectId])
+  @@index([companyId])
+  @@map("configs")
+}
+
+model VfdParameter {
+  id          Int      @id @default(autoincrement())
+  vfdModel    String   @db.VarChar(50)
+  paramName   String   @db.VarChar(255)
+  address     String   @db.VarChar(50)
+  value       Int?     @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([vfdModel, address])
+  @@index([vfdModel])
+  @@map("vfd_parameters")
+}
+
+model VfdModel {
+  id           Int      @id @default(autoincrement())
+  modelCode    String   @unique @db.VarChar(50)
+  modelName    String   @db.VarChar(255)
+  manufacturer String   @db.VarChar(255)
+  daddCommand  String   @db.Text
+  errorCodes   Json?
+  statusCodes  Json?
+  description  String?  @db.Text
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([modelCode])
+  @@map("vfd_models")
+}
+
+model TelemetryConfig {
+  id          Int      @id @default(autoincrement())
+  vfdModel    String   @db.VarChar(50)
+  cmdKey      String   @db.VarChar(50)
+  displayName String   @db.VarChar(255)
+  unit        String   @default("") @db.VarChar(50)
+  scaleFactor Float    @default(1.0)
+  decimals    Int      @default(0)
+  defaultAddr String?  @db.VarChar(50)
+  kpiTarget   String?  @db.VarChar(50)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([vfdModel, cmdKey])
+  @@index([vfdModel])
+  @@map("telemetry_configs")
+}
+
