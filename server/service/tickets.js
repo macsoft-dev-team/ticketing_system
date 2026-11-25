@@ -1970,7 +1970,7 @@ const exportTickets = async (params = {}, user) => {
           },
         },
         state: { select: { id: true, name: true, stateCode: true } },
-        selectedDistrict: { select: { id: true, name: true, districtCode: true } },
+        selectedDistrict: { select: { id: true, districtName: true, districtCode: true } },
         ticketMilestones: {
           orderBy: { order: "asc" },
           include: {
@@ -2039,7 +2039,7 @@ const exportTickets = async (params = {}, user) => {
         supplierName: t.customerName || "N/A",
         farmerPhone: t.createdByUser?.phone || "N/A",
         state: t.state?.name || t.stateCode || "N/A",
-        district: t.selectedDistrict?.name || t.district || "N/A",
+        district: t.selectedDistrict?.districtName || t.district || "N/A",
         village: t.village || "N/A",
         block: t.block || "N/A",
         complaintType: t.complaintType || "N/A",
