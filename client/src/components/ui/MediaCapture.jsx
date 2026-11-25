@@ -228,12 +228,16 @@ const MediaCapture = ({
     }
 
     try {
-      // Compress the native device photo to prevent huge files (e.g. 5-10MB) from mobile cameras
-      const compressed = await compressImage(file, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
-      await onCapture(compressed, 'photo', false);
+      if (currentMode === 'video' || file.type?.startsWith('video/')) {
+        await onCapture(file, 'video', false);
+      } else {
+        // Compress the native device photo to prevent huge files (e.g. 5-10MB) from mobile cameras
+        const compressed = await compressImage(file, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
+        await onCapture(compressed, 'photo', false);
+      }
     } catch (err) {
       console.warn('Compression error on device capture:', err);
-      await onCapture(file, 'photo', false);
+      await onCapture(file, currentMode, false);
     }
     onClose();
   };
@@ -443,11 +447,13 @@ const MediaCapture = ({
 
     setIsSubmitting(true);
     try {
+      const ext = currentMode === 'photo' ? 'jpg' : (recordedBlob.type?.includes('webm') ? 'webm' : 'mp4');
+      const prefix = currentMode === 'photo' ? 'Live_Photo_' : currentMode === 'video' ? 'Live_Video_' : 'Live_Audio_';
       const file = new File(
         [recordedBlob], 
-        `Live_Photo_${Date.now()}.${currentMode === 'photo' ? 'jpg' : currentMode === 'video' ? 'mp4' : 'webm'}`,
+        `${prefix}${Date.now()}.${ext}`,
         { 
-          type: recordedBlob.type || 'image/jpeg',
+          type: recordedBlob.type || (currentMode === 'photo' ? 'image/jpeg' : 'video/mp4'),
           lastModified: Date.now()
         }
       );
@@ -667,8 +673,8 @@ const MediaCapture = ({
           <input
             ref={deviceCameraInputRef}
             type="file"
-            accept="image/*"
-            capture="environment"
+            accept={currentMode === 'video' ? "video/*" : "image/*"}
+            capture={facingMode === 'user' ? "user" : "environment"}
             className="hidden"
             onChange={handleDeviceCameraCapture}
           />

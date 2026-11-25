@@ -204,6 +204,55 @@ const MessageAttachment = ({ attachment, isOwnMessage, onPreview }) => {
       );
     }
 
+    const isVideo = (attachment.type === 'video') || 
+      (attachment.mimetype && attachment.mimetype.startsWith('video/')) || 
+      (attachment.fileType && attachment.fileType.startsWith('video/')) || 
+      /\.(mp4|mov|avi|webm|ogg)$/i.test(attachment.name || attachment.fileName || '');
+
+    const getVideoUrl = () => {
+      if (!attachment.url) return '';
+      if (attachment.url.startsWith('http')) return attachment.url;
+      const path = attachment.url.startsWith('/') ? attachment.url : `/${attachment.url}`;
+      return `${baseUrl}${path}`;
+    };
+
+    if (isVideo && attachment.url) {
+      const vidUrl = getVideoUrl();
+      return (
+        <div className="mb-2 max-w-xs sm:max-w-sm">
+          <div className="relative overflow-hidden rounded-lg border border-black/10 bg-black shadow-xs">
+            <video
+              src={vidUrl}
+              controls
+              playsInline
+              preload="metadata"
+              className="w-full max-h-56 rounded-lg bg-black"
+            />
+          </div>
+          <div className={`flex items-center justify-between text-[11px] mt-1 px-1 ${isOwnMessage ? 'text-blue-100' : 'text-gray-600'}`}>
+            <span className="truncate max-w-40 font-medium">{attachment.name || 'Live Video'}</span>
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className={`p-1 rounded hover:bg-black/10 transition-colors cursor-pointer ${isOwnMessage ? 'text-white' : 'text-gray-700'}`}
+              title="Download video"
+            >
+              {isDownloading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-3 h-3 border border-current border-t-transparent rounded-full"
+                />
+              ) : (
+                <Download className="w-3 h-3" />
+              )}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <motion.div
         whileHover={{ scale: 1.02 }}
@@ -647,13 +696,14 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
   const isFieldOrTechnician = ['CUSTOMER_FIELD_ENGINEER', 'SERVICE_CENTER_TECHNICIAN'].includes(normalizedRole);
 
   // File upload is restricted to Macsoft / Admin roles only.
-  // Field Engineers and Service Technicians must capture live photos (file upload disabled).
+  // Field Engineers and Service Technicians must capture live photos/videos (file upload disabled).
   const canUploadFiles = isMacsoftRole;
-  const canCaptureLivePhoto = isFieldOrTechnician || isMacsoftRole;
+  const canCaptureLiveMedia = isFieldOrTechnician || isMacsoftRole;
 
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [showMediaCapture, setShowMediaCapture] = useState(false);
+  const [captureMode, setCaptureMode] = useState('photo'); // 'photo' or 'video'
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [mediaUploadEnabled, setMediaUploadEnabled] = useState(false);
   const [maxVideoDuration, setMaxVideoDuration] = useState(120);
@@ -765,21 +815,30 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
 
   const handleMediaCapture = async (file, mediaType, sendDirectly = false) => {
     try {
-      const fileName = file?.name || `Live_Photo_${Date.now()}.jpg`;
-      const fileType = file?.type || 'image/jpeg';
+      const isVideo = mediaType === 'video' || file?.type?.startsWith('video/') || /\.(mp4|mov|avi|webm)$/i.test(file?.name || '');
+      const defaultExt = isVideo ? (file?.type?.includes('webm') ? 'webm' : 'mp4') : 'jpg';
+      const fileName = file?.name || (isVideo ? `Live_Video_${Date.now()}.${defaultExt}` : `Live_Photo_${Date.now()}.jpg`);
+      const fileType = file?.type || (isVideo ? 'video/mp4' : 'image/jpeg');
       const FileConstructor = typeof window !== 'undefined' ? window.File : null;
       let safeFile = file;
       if (typeof FileConstructor === 'function' && !(file instanceof FileConstructor)) {
         safeFile = new FileConstructor([file], fileName, { type: fileType });
       }
 
-      // Aggressively compress image before sending to ensure fast delivery & small size (< 250 KB)
-      const compressed = await compressImage(safeFile, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
-      const finalFile = (typeof FileConstructor === 'function' && compressed instanceof FileConstructor && compressed.name)
-        ? compressed
-        : (typeof FileConstructor === 'function'
-            ? new FileConstructor([compressed], safeFile?.name || fileName, { type: 'image/jpeg' })
-            : compressed);
+      let finalFile = safeFile;
+      // Only compress photos, never compress video
+      if (!isVideo) {
+        try {
+          const compressed = await compressImage(safeFile, { quality: 0.7, maxWidth: 1280, maxHeight: 1280 });
+          finalFile = (typeof FileConstructor === 'function' && compressed instanceof FileConstructor && compressed.name)
+            ? compressed
+            : (typeof FileConstructor === 'function'
+                ? new FileConstructor([compressed], safeFile?.name || fileName, { type: 'image/jpeg' })
+                : compressed);
+        } catch (compErr) {
+          console.warn('Image compression fallback:', compErr);
+        }
+      }
 
       if (sendDirectly) {
         if (!muted) {
@@ -789,16 +848,18 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
         setMessage('');
         setAttachments([]);
       } else {
-        // Attach directly to chat input, EXACTLY like ticket creation!
+        // Attach directly to chat input
         setAttachments(prev => [...prev, finalFile]);
       }
     } catch (err) {
-      console.warn('Image compression fallback:', err);
+      console.warn('Media capture fallback:', err);
+      const isVideo = mediaType === 'video' || file?.type?.startsWith('video/');
+      const defaultExt = isVideo ? 'mp4' : 'jpg';
       const FileConstructor = typeof window !== 'undefined' ? window.File : null;
       const fallbackFile = (typeof FileConstructor === 'function' && file instanceof FileConstructor && file.name)
         ? file
         : (typeof FileConstructor === 'function'
-            ? new FileConstructor([file], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' })
+            ? new FileConstructor([file], isVideo ? `Live_Video_${Date.now()}.${defaultExt}` : `Live_Photo_${Date.now()}.jpg`, { type: isVideo ? 'video/mp4' : 'image/jpeg' })
             : file);
 
       if (sendDirectly) {
@@ -811,7 +872,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
           setAttachments([]);
         } catch (sendErr) {
           toast({
-            title: "Failed to send photo",
+            title: isVideo ? "Failed to send video" : "Failed to send photo",
             description: sendErr.message || "Please check connection and retry",
             variant: "destructive"
           });
@@ -855,6 +916,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             <div className="flex flex-wrap gap-2">
               {attachments.map((file, index) => {
                 const isImage = file.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(file.name);
+                const isVideo = file.type?.startsWith('video/') || /\.(mp4|mov|avi|webm)$/i.test(file.name);
                 return (
                   <motion.div
                     key={index}
@@ -864,6 +926,8 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
                   >
                     {isImage ? (
                       <Camera className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-blue-600 flex-shrink-0" />
+                    ) : isVideo ? (
+                      <Video className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-purple-600 flex-shrink-0" />
                     ) : (
                       <FileIcon className="w-[14px] h-[14px] sm:w-4 sm:h-4 text-gray-500 flex-shrink-0" />
                     )}
@@ -873,11 +937,16 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
                         Live Photo
                       </span>
                     )}
+                    {isVideo && (
+                      <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] rounded font-semibold uppercase">
+                        Live Video
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => removeAttachment(index)}
                       className="text-red-500 hover:text-red-700 transition-colors p-0.5 rounded hover:bg-red-50 ml-1 cursor-pointer"
-                      title="Remove photo"
+                      title="Remove attachment"
                     >
                       <X className="w-3 h-3 sm:w-[14px] sm:h-[14px]" />
                     </button>
@@ -899,7 +968,7 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             onPaste={handlePaste}
             placeholder={
               isFieldOrTechnician
-                ? "Type a message or tap camera to capture live photo..."
+                ? "Type a message or tap camera/video to capture live media..."
                 : "Type your message..."
             }
             disabled={disabled}
@@ -940,21 +1009,46 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
           )}
 
           {/* Live Photo Capture (Camera): For Service Technicians, Field Engineers, and Macsoft roles */}
-          {canCaptureLivePhoto && (
+          {canCaptureLiveMedia && (
             <motion.button
               type="button"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={() => setShowMediaCapture(true)}
+              onClick={() => {
+                setCaptureMode('photo');
+                setShowMediaCapture(true);
+              }}
               disabled={disabled}
               className={`p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed ${
                 isFieldOrTechnician
                   ? 'text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 shadow-xs'
                   : 'text-gray-500 hover:text-blue-500'
               }`}
-              title={isFieldOrTechnician ? "Capture live photo with device camera (Upload disabled)" : "Take live photo with camera"}
+              title="Capture live photo with camera"
             >
               <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+            </motion.button>
+          )}
+
+          {/* Live Video Capture (Video): For Service Technicians, Field Engineers, and Macsoft roles */}
+          {canCaptureLiveMedia && (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                setCaptureMode('video');
+                setShowMediaCapture(true);
+              }}
+              disabled={disabled}
+              className={`p-2 sm:p-3 rounded-full transition-colors cursor-pointer disabled:text-gray-300 disabled:cursor-not-allowed ${
+                isFieldOrTechnician
+                  ? 'text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 shadow-xs'
+                  : 'text-gray-500 hover:text-purple-500'
+              }`}
+              title="Record live video with camera"
+            >
+              <Video className="w-4 h-4 sm:w-5 sm:h-5" />
             </motion.button>
           )}
 
@@ -980,10 +1074,10 @@ export const ChatInput = ({ onSendMessage, onFileUpload, disabled = false, ticke
             onCapture={handleMediaCapture}
             onClose={handleMediaCaptureClose}
             disabled={disabled}
-            allowedModes={isFieldOrTechnician ? ['photo'] : (mediaUploadEnabled ? ['photo', 'video', 'audio'] : ['photo'])}
-            initialMode="photo"
-            maxVideoDuration={maxVideoDuration}
-            maxAudioDuration={maxAudioDuration}
+            allowedModes={['photo', 'video']}
+            initialMode={captureMode}
+            maxVideoDuration={maxVideoDuration || 120}
+            maxAudioDuration={maxAudioDuration || 300}
           />
         )}
       </AnimatePresence>

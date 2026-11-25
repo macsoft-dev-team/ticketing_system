@@ -68,9 +68,11 @@ const createConversationUpload = (ticketCode) => {
       
       const isImage = (file.mimetype && file.mimetype.startsWith('image/')) || 
                       /\.(jpe?g|png|gif|webp|bmp)$/i.test(file.originalname);
+      const isVideo = (file.mimetype && file.mimetype.startsWith('video/')) || 
+                      /\.(mp4|mov|avi|webm|ogg|m4v)$/i.test(file.originalname);
 
-      // Images are always allowed
-      if (isImage) {
+      // Images and videos are always allowed in conversation
+      if (isImage || isVideo) {
         return cb(null, true);
       }
 
