@@ -8,10 +8,10 @@ import { compressImage } from '../lib/utils/imageCompressor';
  * Shows a popup to select and preview photos before uploading.
  * Strictly enforces device camera capture for Field Engineers and Service Center Technicians on SUBMITTED_TO_SERVICE_CENTER.
  */
-const PhotoUploadModal = ({ 
-  isOpen, 
-  onClose, 
-  onUpload, 
+const PhotoUploadModal = ({
+  isOpen,
+  onClose,
+  onUpload,
   title = 'Upload Photos',
   description = 'Select photos to upload for this milestone',
   minPhotos = 1,
@@ -178,7 +178,7 @@ const PhotoUploadModal = ({
         return;
       }
       const nextIndex = selectedFiles.length + 1;
-      const fileName = `Device_Photo_${nextIndex}_${Date.now()}.jpg`;
+      const fileName = `Live_Photo_${nextIndex}_${Date.now()}.jpg`;
       const file = new File([blob], fileName, { type: 'image/jpeg' });
       addPhotoFile(file);
       setErrorMsg('');
@@ -192,10 +192,10 @@ const PhotoUploadModal = ({
 
     // Create preview URLs for selected images
     const newPreviewUrls = files.map(file => URL.createObjectURL(file));
-    
+
     setSelectedFiles(prev => [...prev, ...files]);
     setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
-    
+
     // Initialize labels for new files
     if (requireLabels) {
       setPhotoLabels(prev => {
@@ -214,13 +214,13 @@ const PhotoUploadModal = ({
 
   const handleRemovePhoto = (index) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    
+
     // Revoke the object URL to free memory
     if (previewUrls[index]) {
       URL.revokeObjectURL(previewUrls[index]);
     }
     setPreviewUrls(prev => prev.filter((_, i) => i !== index));
-    
+
     // Remove corresponding label
     if (requireLabels) {
       setPhotoLabels(prev => prev.filter((_, i) => i !== index));
@@ -265,11 +265,11 @@ const PhotoUploadModal = ({
     }
 
     // Create files with labels if required
-    const filesWithLabels = requireLabels 
+    const filesWithLabels = requireLabels
       ? compressedFiles.map((file, index) => ({
-          file,
-          label: photoLabels[index] || ''
-        }))
+        file,
+        label: photoLabels[index] || ''
+      }))
       : compressedFiles;
 
     if (!filesWithLabels.length) {
@@ -361,7 +361,7 @@ const PhotoUploadModal = ({
                   muted
                   autoPlay
                 />
-                
+
                 {/* Guide overlay */}
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                   <div className="w-4/5 h-3/4 border-2 border-dashed border-white/60 rounded-xl flex items-center justify-center">
@@ -461,7 +461,7 @@ const PhotoUploadModal = ({
                       </p>
                     </div>
                   </label>
-                  
+
                   {/* Take Photo */}
                   <label className="block">
                     <div className="border-2 border-dashed border-orange-300 bg-orange-50/30 rounded-xl p-4 sm:p-5 text-center hover:border-orange-500 hover:bg-orange-50 transition-colors cursor-pointer flex flex-col items-center justify-center h-full">
@@ -485,7 +485,7 @@ const PhotoUploadModal = ({
                   </label>
                 </div>
               )}
-              
+
               <div className="text-xs text-center text-gray-500">
                 <span>Minimum {minPhotos} photo{minPhotos > 1 ? 's' : ''} required</span>
                 {requireLabels && requiredLabels.length > 0 && (
@@ -561,8 +561,8 @@ const PhotoUploadModal = ({
                                 >
                                   <option value="">Select photo type...</option>
                                   {requiredLabels.map((label) => (
-                                    <option 
-                                      key={label} 
+                                    <option
+                                      key={label}
                                       value={label}
                                       disabled={photoLabels.includes(label) && photoLabels[index] !== label}
                                     >
@@ -616,11 +616,10 @@ const PhotoUploadModal = ({
                   </span>
                   {requireLabels && requiredLabels.length > 0 && (
                     <div>
-                      <span className={`text-xs ${
-                        photoLabels.filter(label => label).length === selectedFiles.length 
-                          ? 'text-green-600 font-medium' 
-                          : 'text-amber-600 font-medium'
-                      }`}>
+                      <span className={`text-xs ${photoLabels.filter(label => label).length === selectedFiles.length
+                        ? 'text-green-600 font-medium'
+                        : 'text-amber-600 font-medium'
+                        }`}>
                         {photoLabels.filter(label => label).length} of {selectedFiles.length} labeled
                       </span>
                     </div>
@@ -641,7 +640,7 @@ const PhotoUploadModal = ({
                 type="button"
                 onClick={handleUpload}
                 disabled={
-                  uploading || 
+                  uploading ||
                   selectedFiles.length < minPhotos ||
                   (requireLabels && photoLabels.some((label, index) => !label && index < selectedFiles.length)) ||
                   (requireLabels && requiredLabels.length > 0 && selectedFiles.length !== requiredLabels.length)

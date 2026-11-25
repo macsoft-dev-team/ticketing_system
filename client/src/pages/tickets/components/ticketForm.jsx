@@ -129,7 +129,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         ctx.drawImage(video, 0, 0, width, height);
         canvas.toBlob((blob) => {
             if (!blob) return;
-            const file = new File([blob], `Device_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            const file = new File([blob], `Live_Photo_${Date.now()}.jpg`, { type: 'image/jpeg' });
             handleFileUpload([file]);
             stopLiveCamera();
         }, 'image/jpeg', 0.85);
@@ -243,7 +243,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
         fetchProjects();
     }, [addToast]);
 
- 
+
     // Auto-populate state information when project is selected
     useEffect(() => {
         const selectedProject = watch('project');
@@ -553,9 +553,9 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
     // Form submission
     const handleFormSubmit = async (data) => {
         // Enforce at least one photo is attached
-        const hasPhoto = uploadedFiles.some(f => 
-            f.type?.startsWith('image/') || 
-            f.file?.type?.startsWith('image/') || 
+        const hasPhoto = uploadedFiles.some(f =>
+            f.type?.startsWith('image/') ||
+            f.file?.type?.startsWith('image/') ||
             /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(f.name || f.file?.name)
         );
         if (!hasPhoto) {
@@ -618,7 +618,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                 if (controllerError && controllerError.includes('not found in LMS')) {
                     successDescription += ' Note: Controller details could not be fetched from LMS, but the ticket was created with the provided information.';
                 }
-                
+
                 addToast({
                     title: "Success!",
                     description: successDescription,
@@ -895,7 +895,7 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
                                         </motion.p>
                                     )}
                                 </motion.div>
-                                  
+
                                 {/* Motor Type */}
                                 <motion.div variants={itemVariants} className="space-y-1 xs:space-y-1.5 sm:space-y-2">
                                     <label className="flex items-center gap-1.5 xs:gap-2 text-xs sm:text-sm font-medium text-gray-700">
@@ -1323,8 +1323,8 @@ export default function TicketForm({ onSubmit, onCancel, initialData = null }) {
 
                                     {/* Fault Code - Only show for Motor Not Running */}
                                     {watchedValues.faultType === 'Motor Not Running' && (
-                                        <motion.div 
-                                            variants={itemVariants} 
+                                        <motion.div
+                                            variants={itemVariants}
                                             className="space-y-1.5 sm:space-y-2"
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
