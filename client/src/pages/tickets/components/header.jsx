@@ -1,13 +1,48 @@
-import { Plus, Search, Filter, X, ChevronDown } from "lucide-react";
+import { Plus, Search, Filter, X, ChevronDown, FileSpreadsheet, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect, useCallback } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import useTickets from "../../../lib/hooks/useTickets";
+import useAuth from "../../../lib/hooks/useAuth";
+import { useToast } from "../../../components/ui/toast";
+import { exportTicketsToExcel } from "../../../lib/utils/ticketExportUtils";
 import { useDebounce } from "../../../lib/hooks/ticketHooks";
 
 export default function Header() {
     const { tickets, setFilters, filters, statusCount, setCurrentPage } = useTickets();
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const [isExporting, setIsExporting] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const isMacsoftRole = user && ['MACSOFT_ADMIN', 'MACSOFT_HEAD', 'MACSOFT_SUPPORT'].includes(user.role);
+
+    const handleExport = async () => {
+        if (isExporting) return;
+        try {
+            setIsExporting(true);
+            const result = await exportTicketsToExcel({ user });
+            if (addToast) {
+                addToast({
+                    title: "Excel Export Completed",
+                    description: `Successfully exported ${result.count} ticket(s) to ${result.filename}`,
+                    variant: "success",
+                    duration: 4000
+                });
+            }
+        } catch (error) {
+            console.error("Failed to export tickets:", error);
+            if (addToast) {
+                addToast({
+                    title: "Export Failed",
+                    description: error?.response?.data?.message || error?.message || "Failed to generate Excel report. Please try again.",
+                    variant: "destructive",
+                    duration: 5000
+                });
+            }
+        } finally {
+            setIsExporting(false);
+        }
+    };
     const [activeFilter, setActiveFilter] = useState(filters?.status || '');
     const [activeStageFilter, setActiveStageFilter] = useState(filters?.stage || '');
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
@@ -347,6 +382,31 @@ export default function Header() {
                         >
                             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Filter className="w-5 h-5" />}
                         </motion.button>
+
+                    {/* Export Today Excel Button (Macsoft roles only) */}
+                    {isMacsoftRole && (
+                        <motion.button
+                            variants={buttonVariants}
+                            whileHover={!isExporting ? "hover" : {}}
+                            whileTap={!isExporting ? "tap" : {}}
+                            onClick={handleExport}
+                            disabled={isExporting}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.45 }}
+                            className="flex items-center cursor-pointer gap-1 sm:gap-2 px-3 sm:px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Export Today's Tickets to Excel (Summary, Open, In Progress, Closed)"
+                        >
+                            {isExporting ? (
+                                <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+                            ) : (
+                                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                            )}
+                            <span className="hidden sm:inline">Export Today</span>
+                            <span className="sm:hidden">Export</span>
+                        </motion.button>
+                    )}
+
                      {/* Create Ticket Button */}
                     <NavLink to="/tickets/new" >
                         <motion.button
@@ -472,6 +532,27 @@ export default function Header() {
                                     ))}
                                 </select>
                             </div>
+
+                            {/* Mobile Export Button (Macsoft roles only) */}
+                            {isMacsoftRole && (
+                                <div className="pt-2">
+                                    <button
+                                        onClick={() => {
+                                            handleExport();
+                                            setIsMobileMenuOpen(false);
+                                        }}
+                                        disabled={isExporting}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg shadow-sm transition-all duration-200 disabled:opacity-50"
+                                    >
+                                        {isExporting ? (
+                                            <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+                                        ) : (
+                                            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                                        )}
+                                        <span>Export Today's Tickets (.xlsx)</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 )}

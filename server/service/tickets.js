@@ -1889,6 +1889,212 @@ const searchTickets = async (keyword, userId, userRole) => {
   }
 };
 
+/**
+ * Export tickets for a specified date range (default today) with complete details
+ * Restricted to Macsoft roles
+ */
+const exportTickets = async (params = {}, user) => {
+  try {
+    const { date, startDate, endDate, status } = params;
+
+    let start;
+    let end;
+
+    if (startDate && endDate) {
+      start = new Date(startDate);
+      end = new Date(endDate);
+    } else {
+      // Determine date in IST (+05:30)
+      let targetDateStr = date;
+      if (!targetDateStr) {
+        const now = new Date();
+        const istTime = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+        const y = istTime.getUTCFullYear();
+        const m = String(istTime.getUTCMonth() + 1).padStart(2, "0");
+        const d = String(istTime.getUTCDate()).padStart(2, "0");
+        targetDateStr = `${y}-${m}-${d}`;
+      }
+      start = new Date(`${targetDateStr}T00:00:00.000+05:30`);
+      end = new Date(`${targetDateStr}T23:59:59.999+05:30`);
+    }
+
+    const where = {
+      OR: [
+        { createdAt: { gte: start, lte: end } },
+        { updatedAt: { gte: start, lte: end } },
+      ],
+    };
+
+    if (status && ["OPEN", "IN_PROGRESS", "CLOSED"].includes(status.toUpperCase())) {
+      where.status = status.toUpperCase();
+    }
+
+    const rawTickets = await prisma.ticket.findMany({
+      where,
+      include: {
+        createdByUser: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            phone: true,
+            centerCode: true,
+          },
+        },
+        updatedByUser: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            phone: true,
+          },
+        },
+        serviceCenter: {
+          select: {
+            id: true,
+            name: true,
+            centerCode: true,
+            address: true,
+            users: {
+              where: {
+                role: { in: ["SERVICE_CENTER_TECHNICIAN", "CUSTOMER_SERVICE_HEAD"] },
+                isActive: true,
+              },
+              select: {
+                id: true,
+                name: true,
+                role: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        state: { select: { id: true, name: true, stateCode: true } },
+        selectedDistrict: { select: { id: true, name: true, districtCode: true } },
+        ticketMilestones: {
+          orderBy: { order: "asc" },
+          include: {
+            changer: {
+              select: {
+                id: true,
+                name: true,
+                role: true,
+                phone: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [{ createdAt: "desc" }],
+    });
+
+    const formattedTickets = rawTickets.map((t) => {
+      const milestones = t.ticketMilestones || [];
+      const latestMilestone = milestones.length > 0 ? milestones[milestones.length - 1] : null;
+      const currentStage = latestMilestone?.stage || "TICKET_RAISED";
+
+      // Technician who worked on milestones
+      const techMilestone = [...milestones].reverse().find(
+        (m) =>
+          m.changer &&
+          (m.changer.role === "SERVICE_CENTER_TECHNICIAN" ||
+            m.changer.role === "CUSTOMER_SERVICE_HEAD")
+      );
+      let technicianName = techMilestone?.changer?.name || "";
+      let technicianPhone = techMilestone?.changer?.phone || "";
+
+      // Fallback to service center assigned technician
+      if (!technicianName && t.serviceCenter?.users?.length > 0) {
+        const techUser =
+          t.serviceCenter.users.find(
+            (u) => u.role === "SERVICE_CENTER_TECHNICIAN"
+          ) || t.serviceCenter.users[0];
+        technicianName = techUser?.name || "";
+        technicianPhone = techUser?.phone || "";
+      }
+
+      // Closure remark / latest notes
+      const closureMilestone = milestones.find((m) => m.stage === "TICKET_CLOSED");
+      const remarks = closureMilestone?.notes || latestMilestone?.notes || t.description || "";
+
+      return {
+        id: t.id,
+        ticketCode: t.ticketCode,
+        status: t.status,
+        currentStage,
+        controllerNo: t.controllerNo || "N/A",
+        imei: t.imei || "N/A",
+        motorType: t.motorType || "N/A",
+        hp: t.hp || "N/A",
+        faultType: t.faultType || "N/A",
+        faultCode: t.faultCode || "N/A",
+        assignedServiceCenter: t.serviceCenter
+          ? `${t.serviceCenter.name} (${t.serviceCenter.centerCode})`
+          : t.assignedServiceCenter || "Unassigned",
+        serviceCenterName: t.serviceCenter?.name || "Unassigned",
+        serviceCenterCode: t.serviceCenter?.centerCode || t.assignedServiceCenter || "N/A",
+        technician: technicianName || "Not Assigned",
+        technicianContactNo: technicianPhone || "N/A",
+        farmerName: t.farmerName || "N/A",
+        supplierName: t.customerName || "N/A",
+        farmerPhone: t.createdByUser?.phone || "N/A",
+        state: t.state?.name || t.stateCode || "N/A",
+        district: t.selectedDistrict?.name || t.district || "N/A",
+        village: t.village || "N/A",
+        block: t.block || "N/A",
+        complaintType: t.complaintType || "N/A",
+        description: t.description || "",
+        createdBy: t.createdByUser?.name || "N/A",
+        createdRole: t.createdByUser?.role || "N/A",
+        createdAt: t.createdAt,
+        updatedAt: t.updatedAt,
+        remarks,
+      };
+    });
+
+    const stats = {
+      total: formattedTickets.length,
+      open: formattedTickets.filter((t) => t.status === "OPEN").length,
+      inProgress: formattedTickets.filter((t) => t.status === "IN_PROGRESS").length,
+      closed: formattedTickets.filter((t) => t.status === "CLOSED").length,
+      createdToday: formattedTickets.filter((t) => {
+        const createdTime = new Date(t.createdAt).getTime();
+        return createdTime >= start.getTime() && createdTime <= end.getTime();
+      }).length,
+      serviceCenterBreakdown: {},
+    };
+
+    formattedTickets.forEach((t) => {
+      const scKey = t.assignedServiceCenter || "Unassigned";
+      if (!stats.serviceCenterBreakdown[scKey]) {
+        stats.serviceCenterBreakdown[scKey] = {
+          name: t.serviceCenterName,
+          code: t.serviceCenterCode,
+          open: 0,
+          inProgress: 0,
+          closed: 0,
+          total: 0,
+        };
+      }
+      stats.serviceCenterBreakdown[scKey].total++;
+      if (t.status === "OPEN") stats.serviceCenterBreakdown[scKey].open++;
+      else if (t.status === "IN_PROGRESS") stats.serviceCenterBreakdown[scKey].inProgress++;
+      else if (t.status === "CLOSED") stats.serviceCenterBreakdown[scKey].closed++;
+    });
+
+    return {
+      dateRange: {
+        start: start.toISOString(),
+        end: end.toISOString(),
+      },
+      stats,
+      tickets: formattedTickets,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getTickets,
   getTicketById,
@@ -1900,4 +2106,5 @@ module.exports = {
   searchTickets,
   checkActiveTicketForController,
   archiveTicketData,
+  exportTickets,
 };

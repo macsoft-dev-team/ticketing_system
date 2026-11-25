@@ -449,6 +449,26 @@ const getArchivalCandidates = async (req, res) => {
   }
 };
 
+const exportTickets = async (req, res) => {
+  try {
+    const userRole = req.user?.role;
+    const allowedRoles = ["MACSOFT_ADMIN", "MACSOFT_HEAD", "MACSOFT_SUPPORT"];
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({ message: "Access restricted to Macsoft team roles only." });
+    }
+
+    const { date, startDate, endDate, status } = req.query;
+    const result = await ticketService.exportTickets({ date, startDate, endDate, status }, req.user);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error exporting tickets:", error);
+    res.status(500).json({ 
+      message: "Failed to export tickets",
+      error: error.message 
+    });
+  }
+};
+
 module.exports = {
   getTickets,
   createTicket,
@@ -463,4 +483,5 @@ module.exports = {
   archiveTicketManually,
   triggerArchivalJob,
   getArchivalCandidates,
+  exportTickets,
 };
