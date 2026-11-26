@@ -3,12 +3,12 @@ import * as yup from 'yup';
 // Simplified validation schema for debugging
 export const ticketFormSchema = yup.object({
   // ticketCode is now auto-generated, so no validation needed
-  customerName: yup.string().required('Customer name is required'),
+  customerName: yup.string().nullable().default('Customer'),
   farmerName: yup.string().required('Farmer name is required'),
   controllerNo: yup.string().required('Controller number is required'),
   imei: yup.string().nullable(),
   hp: yup.string().nullable(),
-  motorHpId: yup.number().nullable(),
+  motorHpId: yup.mixed().nullable(),
   motorType: yup.string().nullable(),
   head: yup.string().nullable(),
   pumpPlacementDepth: yup.string().nullable(),
@@ -23,22 +23,10 @@ export const ticketFormSchema = yup.object({
     otherwise: (schema) => schema.nullable()
   }),
   description: yup.string().required('Description is required'),
-  priority: yup.string().required('Priority is required'),
-  category: yup.string().required('Category is required'),
+  priority: yup.string().default('medium'),
+  category: yup.string().default('hardware'),
   state: yup.string().required('State is required'),
-  attachments: yup.mixed()
-    .test('has-photo', 'At least one photo is mandatory to create a ticket', function (value) {
-      if (!value) return false;
-      const files = Array.isArray(value) ? value : [value];
-      if (files.length === 0) return false;
-      return files.some(file => {
-        if (!file) return false;
-        const type = file.type || '';
-        const name = file.name || '';
-        return type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp|heic|heif)$/i.test(name);
-      });
-    })
-    .required('At least one photo is mandatory to create a ticket')
+  attachments: yup.mixed().nullable()
 });
 
 // Default values for the form
