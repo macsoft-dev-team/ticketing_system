@@ -1,98 +1,157 @@
 /**
- * Map/Clone Configurations to a Specific Customer (e.g. CRI PUMPS - CRIPUMPS001)
+ * Map/Clone Configurations to an Existing Customer (e.g. CRI PUMPS - CRIPUMPS001)
  * 
  * Usage:
- *   node scripts/map-config-to-customer.js [targetOrgCode] [targetProjectId]
+ *   node map-config-to-customer.js [CUSTOMER_CODE] [PROJECT_CODE] [--dry-run]
  * 
- * Example:
- *   node scripts/map-config-to-customer.js CRIPUMPS001 PRJ001
+ * Examples:
+ *   node map-config-to-customer.js CRIPUMPS001
+ *   node map-config-to-customer.js KSB001
+ *   node map-config-to-customer.js WAAREE001 PRJ001 --dry-run
  */
 
 const { prisma } = require("../lib/clients");
 
 async function mapConfigsToCustomer() {
-  const targetOrgCode = process.argv[2] || "CRIPUMPS001";
-  const targetProjectCode = process.argv[3] || "PRJ001";
+  const rawArgs = process.argv.slice(2);
+  const isDryRun = rawArgs.includes("--dry-run");
+  const cleanArgs = rawArgs.filter(a => !a.startsWith("--"));
 
-  console.log(`\nMapping configurations to Customer: [${targetOrgCode}]...`);
+  let targetOrgCode = (cleanArgs[0] || "CRIPUMPS001").replace(/["']/g, "").trim();
+  let targetProjectCode = (cleanArgs[1] || "").replace(/["']/g, "").trim();
 
-  // 1. Ensure target Organisation exists and is ACTIVE
-  let org = await prisma.organisation.findUnique({
-    where: { orgCode: targetOrgCode },
+  // Guard: Detect if user accidentally passed a script or SQL filename
+  if (targetOrgCode.endsWith(".js") || targetOrgCode.endsWith(".sql") || targetOrgCode.includes("/") || targetOrgCode.includes("\\")) {
+    console.error("\n==================================================");
+    console.error(" [Error] Invalid Customer Code detected:", targetOrgCode);
+    console.error("==================================================");
+    console.error("It looks like you passed a file path instead of an existing customer code.");
+    console.error("\n1. If you intended to run the RMS SQL Database Migration:");
+    console.error(`   Run: node migrate-rms-sql.js ${targetOrgCode.endsWith(".sql") ? `"${targetOrgCode}"` : '"rms_service.sql"'} ${isDryRun ? "--dry-run" : ""}`);
+    console.error("\n2. If you intended to map configurations to an existing customer:");
+    console.error("   Run: node map-config-to-customer.js [CUSTOMER_CODE]");
+    console.error("   Example: node map-config-to-customer.js CRIPUMPS001\n");
+    process.exit(1);
+  }
+
+  targetOrgCode = targetOrgCode.trim().toUpperCase();
+
+  console.log("==================================================");
+  console.log(`   Map Configurations to Existing Customer: [${targetOrgCode}]`);
+  console.log("==================================================");
+  console.log(`Target Customer Org : ${targetOrgCode}`);
+  console.log(`Dry Run Mode        : ${isDryRun ? "YES (No writes)" : "NO"}`);
+  console.log("--------------------------------------------------");
+
+  // 1. Look up existing Customer Organisation - DO NOT CREATE
+  let org = await prisma.organisation.findFirst({
+    where: {
+      OR: [
+        { orgCode: targetOrgCode },
+        { name: { contains: targetOrgCode } },
+      ],
+    },
   });
 
   if (!org) {
-    console.log(`  Creating Organisation [${targetOrgCode}]...`);
-    org = await prisma.organisation.create({
-      data: {
-        name: targetOrgCode === "CRIPUMPS001" ? "CRI PUMPS" : targetOrgCode,
-        orgCode: targetOrgCode,
-        email: "solar@cripumps.com",
-        phone: "9962264503",
-        address: "COIMBATORE",
-        isActive: true,
-      },
+    const allOrgs = await prisma.organisation.findMany({
+      select: { id: true, orgCode: true, name: true, isActive: true },
     });
-    console.log(`  ✓ Organisation [${targetOrgCode}] created and marked ACTIVE.`);
-  } else if (!org.isActive) {
-    await prisma.organisation.update({
-      where: { orgCode: targetOrgCode },
-      data: { isActive: true },
-    });
-    console.log(`  ✓ Organisation [${targetOrgCode}] activated.`);
-  } else {
-    console.log(`  ✓ Organisation [${targetOrgCode}] already exists (Active).`);
+
+    console.error(`\n[Error] Customer Organisation [${targetOrgCode}] was NOT found.`);
+    console.error("Existing customers currently in your database:");
+    if (allOrgs.length === 0) {
+      console.error("  (No customers found in database)");
+    } else {
+      for (const o of allOrgs) {
+        console.error(`  - Code: "${o.orgCode}" | Name: "${o.name}" (${o.isActive ? "Active" : "Inactive"})`);
+      }
+    }
+    console.error("\nPlease run with one of the valid Customer Codes listed above.");
+    console.error("Example: node map-config-to-customer.js CRIPUMPS001\n");
+    process.exit(1);
   }
 
-  // 2. Ensure Project exists under this Customer
-  let project = await prisma.project.findUnique({
-    where: { projectCode: targetProjectCode },
-  });
+  console.log(`  ✓ Found existing Customer: [${org.orgCode}] "${org.name}" (ID: ${org.id})`);
+
+  // Ensure customer is active
+  if (!org.isActive) {
+    if (!isDryRun) {
+      await prisma.organisation.update({
+        where: { id: org.id },
+        data: { isActive: true },
+      });
+    }
+    console.log(`  ✓ Customer [${org.orgCode}] activated.`);
+  }
+
+  // 2. Resolve Project for this Customer
+  let project = null;
+  if (targetProjectCode) {
+    project = await prisma.project.findUnique({
+      where: { projectCode: targetProjectCode },
+    });
+  }
 
   if (!project) {
-    project = await prisma.project.create({
-      data: {
-        projectCode: targetProjectCode,
-        name: `${org.name} Project ${targetProjectCode}`,
-        organisationId: org.id,
-        isActive: true,
-      },
+    // Check if the customer already has an existing project
+    project = await prisma.project.findFirst({
+      where: { organisationId: org.id },
     });
-    console.log(`  ✓ Project [${targetProjectCode}] created for ${org.name}.`);
   }
 
-  // 3. Find base configurations (e.g. from MACSOFT)
-  const baseConfigs = await prisma.config.findMany({
+  if (!project) {
+    // Fallback to any existing project like PRJ001
+    project = await prisma.project.findFirst();
+  }
+
+  const finalProjectCode = project ? project.projectCode : (targetProjectCode || "PRJ001");
+  console.log(`  ✓ Using Project: [${finalProjectCode}]`);
+
+  // 3. Find base configurations to clone
+  let baseConfigs = await prisma.config.findMany({
     where: { companyId: "MACSOFT" },
   });
 
   if (baseConfigs.length === 0) {
-    console.log("  No base configurations found under MACSOFT to clone.");
+    baseConfigs = await prisma.config.findMany({ take: 20 });
+  }
+
+  if (baseConfigs.length === 0) {
+    console.log("  [!] No base configuration presets found in the database.");
     return;
   }
 
-  console.log(`  Found ${baseConfigs.length} base configuration presets under MACSOFT.`);
+  // De-duplicate base configs by hp, type, acDc, oilWater
+  const uniquePresets = new Map();
+  for (const c of baseConfigs) {
+    const key = `${c.hp}_${c.type}_${c.acDc}_${c.oilWater}`;
+    if (!uniquePresets.has(key)) {
+      uniquePresets.set(key, c);
+    }
+  }
 
-  // 4. Find or use default engineer / admin user for CRI
-  let defaultUser = await prisma.user.findFirst({
+  console.log(`  Found ${uniquePresets.size} unique base presets to map.`);
+
+  // 4. Find user for this customer (or admin)
+  const defaultUser = await prisma.user.findFirst({
     where: {
       OR: [
-        { orgCode: targetOrgCode },
+        { orgCode: org.orgCode },
         { role: "MACSOFT_ADMIN" },
         { name: "admin" },
       ],
     },
   });
-
   const userId = defaultUser ? defaultUser.id : 1;
 
   let mappedCount = 0;
-  for (const cfg of baseConfigs) {
+  for (const [key, cfg] of uniquePresets) {
     const uniqueKey = {
       userId_projectId_companyId_hp_type_acDc_oilWater: {
         userId,
-        projectId: targetProjectCode,
-        companyId: targetOrgCode,
+        projectId: finalProjectCode,
+        companyId: org.orgCode,
         hp: cfg.hp,
         type: cfg.type,
         acDc: cfg.acDc,
@@ -100,29 +159,33 @@ async function mapConfigsToCustomer() {
       },
     };
 
-    await prisma.config.upsert({
-      where: uniqueKey,
-      update: {
-        commands: cfg.commands,
-        version: cfg.version,
-      },
-      create: {
-        userId,
-        projectId: targetProjectCode,
-        companyId: targetOrgCode,
-        hp: cfg.hp,
-        type: cfg.type,
-        acDc: cfg.acDc,
-        oilWater: cfg.oilWater,
-        commands: cfg.commands,
-        version: cfg.version,
-      },
-    });
+    if (!isDryRun) {
+      await prisma.config.upsert({
+        where: uniqueKey,
+        update: {
+          commands: cfg.commands,
+          version: cfg.version,
+        },
+        create: {
+          userId,
+          projectId: finalProjectCode,
+          companyId: org.orgCode,
+          hp: cfg.hp,
+          type: cfg.type,
+          acDc: cfg.acDc,
+          oilWater: cfg.oilWater,
+          commands: cfg.commands,
+          version: cfg.version,
+        },
+      });
+    }
     mappedCount++;
-    console.log(`    + Mapped: ${cfg.hp}HP ${cfg.type} (${cfg.acDc}/${cfg.oilWater}) -> [${targetOrgCode}]`);
+    console.log(`    + Mapped preset: ${cfg.hp}HP ${cfg.type} (${cfg.acDc}/${cfg.oilWater}) -> [${org.orgCode}]`);
   }
 
-  console.log(`\n✓ Successfully mapped ${mappedCount} configuration presets to ${org.name} (${targetOrgCode})!`);
+  console.log("==================================================");
+  console.log(`✓ Successfully mapped ${mappedCount} configuration presets to existing customer ${org.name} (${org.orgCode})!`);
+  console.log("==================================================\n");
 }
 
 mapConfigsToCustomer()

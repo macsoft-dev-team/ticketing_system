@@ -87,8 +87,22 @@ async function runMigration() {
   const args = process.argv.slice(2);
   const isDryRun = args.includes("--dry-run");
   const sqlArg = args.find(a => !a.startsWith("--"));
-  const defaultPath = path.resolve(__dirname, "./rms_service.sql");
-  const sqlFilePath = sqlArg ? path.resolve(sqlArg) : defaultPath;
+  const candidatePaths = [
+    sqlArg ? path.resolve(sqlArg) : null,
+    path.resolve(__dirname, "./rms_service.sql"),
+    path.resolve(__dirname, "../rms_service.sql"),
+    path.resolve(__dirname, "../../rms_service.sql"),
+    path.resolve(__dirname, "../../../service/rms_service.sql"),
+    "/root/rms_service.sql",
+    "/root/ticketing-system2/rms_service.sql",
+    "/root/ticketing-system2/server/rms_service.sql",
+  ].filter(Boolean);
+
+  let sqlFilePath = candidatePaths.find(p => fs.existsSync(p));
+
+  if (!sqlFilePath) {
+    sqlFilePath = sqlArg ? path.resolve(sqlArg) : path.resolve(__dirname, "rms_service.sql");
+  }
 
   console.log("==================================================");
   console.log("   RMS MySQL Dump -> Ticketing System Migration   ");
