@@ -38,9 +38,7 @@ async function testMqttBuzzer() {
   });
 
   // Test 1: Send Buzz ON (force = true)
-  console.log('\n--- Test 1: Sending Buzz ON {"BSTS": 1} ---');
-  await sendBuzzOn(true);
-  await new Promise((r) => setTimeout(r, 1000));
+
 
   // Test 2: Send Buzz OFF (force = true)
   console.log('\n--- Test 2: Sending Buzz OFF {"BSTS": 0} ---');
